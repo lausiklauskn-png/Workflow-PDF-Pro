@@ -140,3 +140,7 @@ Das ist noch **keine vollständige Speicheranbindung**: Java-Brücke, Einstellun
 IndexedDB-Adapter und Wiederherstellung müssen gemeinsam eingebaut und geprüft
 werden. Vorbereitete Android-SAF-/Keystore-Fälle sind getrennt zu protokollieren;
 lokales Kompilieren belegt keinen Lauf auf echter SD-Karte oder unter Windows.
+Nachfolgend bestand auf `ce950ab` der tatsächliche Android-Emulatorlauf mit elf
+SAF-/Keystore-/Tresorkomponentenfällen und drei WebView-/Dateifällen, einschließlich
+internem Standard und Rückwechsel ohne Verlust der alten Ordnerverbindung.
+Exakte Laufnummer und Grenzen siehe [BAUSTAND-ANDROID.md](BAUSTAND-ANDROID.md).

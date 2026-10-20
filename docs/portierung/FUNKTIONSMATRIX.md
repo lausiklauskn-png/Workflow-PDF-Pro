@@ -144,7 +144,9 @@ Varianten benannt; die native Abnahme muss jede davon ausüben.
 
 Diese zwölf Zeilen ergänzen die 122 Bestandsfunktionen. Grundlage und gelesene
 Referenz: [Speicherort und Tresor](SPEICHERORT-UND-TRESOR.md). Keine der folgenden
-Funktionen ist bereits in Workflow PDF Pro implementiert oder nativ abgenommen.
+Funktionen ist bereits vollständig an die laufende Bibliothek angebunden oder
+als Gesamtfunktion abgenommen. Einzelne native Bausteine und ihre neuen
+Emulatornachweise stehen in [BAUSTAND-ANDROID.md](BAUSTAND-ANDROID.md).
 
 | ID | Beauftragtes Verhalten | Zuordnung / offener Nachweis |
 |---|---|---|

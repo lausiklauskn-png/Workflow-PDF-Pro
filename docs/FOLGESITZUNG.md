@@ -100,8 +100,9 @@ Portierungsprüfstand ergänzen; unfertige Adapter nicht als ausgeliefert kennze
 
 Aktueller Bauzweig: `codex/native-android-build`, Entwurf-PR #8. Android-Tresor-
 Bausteine sind vorhanden, jedoch noch nicht mit der Bibliothek verbunden.
-Der komplette neue Original-Testlauf auf `1b3216e` bestand im CI; Android-Emulator
-war dort noch fehlgeschlagen. Neuere Ergebnisse mit Commit und Laufnummer stehen
+Auf dem letzten Implementierungsstand `ce950ab` bestanden im Actions-Lauf
+39513680351 die vollständige Originalkette und der Android-Job mit 14
+Emulatorfällen; das ist keine vollständige native App-Abnahme. Ergebnisse und Grenzen stehen
 in `docs/portierung/BAUSTAND-ANDROID.md`; diesen Stand vor weiteren Aussagen lesen.
 Die zusätzliche Frage zum Vordergrunddienst beim Chrome-Wechsel ist noch offen
 (siehe `docs/portierung/ENTSCHEIDUNGEN.md`), keine Zustimmung aus Schweigen ableiten.

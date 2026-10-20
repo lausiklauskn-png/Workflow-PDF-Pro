@@ -118,3 +118,26 @@ Schnittstelle, keine Android-Gerätenachweise. Jeder native Leseblock bindet den
 erwarteten Datensatzhash, damit kein gemischter Schreibstand als Erfolg gilt.
 PDF-Anzeigen schließen beim Ersetzen die alte Renderinstanz; Speichern/Drucken
 aus der Anzeige übernimmt den Dokumentnamen mit der vorhandenen Zeichenregel.
+
+### Neuer nativer Nachweis auf `ce950abc1e7ca5ab54bb5225e62db1de565e2394`
+
+Im [Actions-Lauf 39513680351](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39513680351)
+bestanden beide Baujobs. Die vollständige unveränderte Original-Testkette mit
+28 Skripten, vier Browser-/Dateiadapterfällen, Release-CLI-Gegenprobe und sieben
+Codec-/Transportfällen bestand erneut. Der Android-Job bestand neu: Bauen,
+Lint, acht JVM-Fälle und **14 echte
+Instrumentierungsfälle auf dem Android-15-Emulator** (14 ausgeführt, 0 Fehler,
+0 ausgelassen). Das umfasst drei WebView-/Dateibrückenfälle und elf
+SAF-/Keystore-/Tresorkomponentenfälle, darunter interner Standard ohne
+Speicherwahl, Rückwechsel auf intern mit weiterhin erreichbarem altem Tresor,
+nicht erreichbarer Hauptordner ohne stillen Wechsel, Schutz laufender Transfers
+und Zurückweisen einer anderen Dateifassung beim Lesen.
+
+Der frühere Startabsturz ist durch das historische CI-Protokoll ausdrücklich
+bestätigt: `Unable to get provider ... FixtureDocuments: ... Provider must be exported`.
+Die korrigierte Systemberechtigung steht ausschließlich im Debug-Manifest;
+der Release enthält diesen Testanbieter nicht. Die Passwort-Wiederaufnahme
+verwendet getrennte App-Einstellungsräume im selben Emulator, kein physisches
+zweites Gerät. Eine echte SD-Karte, die Bibliotheksanbindung sowie Windows/iOS
+sind weiterhin offen. Der Erfolg dieser Komponenten ist keine vollständige
+native-smoke-Abnahme und keine Freigabe einer regulären APK.
