@@ -35,8 +35,10 @@ public final class NativeFoundationTest {
     }
     @Test public void nativeSaveCancellationRetainsOriginalAndCanBeRetried() throws Exception {
         android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        android.content.IntentFilter picker = new android.content.IntentFilter(android.content.Intent.ACTION_CREATE_DOCUMENT);
+        picker.addCategory(android.content.Intent.CATEGORY_OPENABLE);
         android.app.Instrumentation.ActivityMonitor monitor = new android.app.Instrumentation.ActivityMonitor(
-            new android.content.IntentFilter(android.content.Intent.ACTION_CREATE_DOCUMENT),
+            picker,
             new android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_CANCELED, null), true);
         instrumentation.addMonitor(monitor);
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
