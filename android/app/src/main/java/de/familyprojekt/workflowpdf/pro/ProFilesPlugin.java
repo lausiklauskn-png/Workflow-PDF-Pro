@@ -42,6 +42,12 @@ public final class ProFilesPlugin extends Plugin {
         if (name.isEmpty() || name.equals(".") || name.equals("..")) return "Dokument";
         return name;
     }
+    static long integer(Object value) throws IOException {
+        if (!(value instanceof Number)) throw new IOException("INVALID_NUMBER");
+        double number = ((Number) value).doubleValue();
+        if (!Double.isFinite(number) || number < 0 || number != Math.rint(number) || number > 9007199254740991d) throw new IOException("INVALID_NUMBER");
+        return ((Number) value).longValue();
+    }
     private Transfer transfer(String id, boolean finished) throws IOException {
         Transfer t = transfers.get(id);
         if (t == null || t.finished != finished) throw new IOException("INVALID_TICKET");
@@ -65,8 +71,8 @@ public final class ProFilesPlugin extends Plugin {
     @PluginMethod public void append(PluginCall call) {
         work(call, () -> {
             Transfer t = transfer(call.getString("id"), false);
-            Long offset = call.getLong("offset"); String data = call.getString("data", "");
-            if (offset == null || offset != t.size || data.length() > (CHUNK + 2) / 3 * 4) throw new IOException();
+            long offset = integer(call.getData().opt("offset")); String data = call.getString("data", "");
+            if (offset != t.size || data.length() > (CHUNK + 2) / 3 * 4) throw new IOException();
             byte[] bytes = Base64.decode(data, Base64.NO_WRAP);
             if (bytes.length > CHUNK || t.file.getUsableSpace() < bytes.length) throw new IOException();
             try (FileOutputStream out = new FileOutputStream(t.file, true)) { out.write(bytes); out.getFD().sync(); }
@@ -83,8 +89,8 @@ public final class ProFilesPlugin extends Plugin {
     @PluginMethod public void finish(PluginCall call) {
         work(call, () -> {
             Transfer t = transfer(call.getString("id"), false);
-            Long size = call.getLong("size");
-            if (size == null || size != t.size || t.file.length() != size) throw new IOException();
+            long size = integer(call.getData().opt("size"));
+            if (size != t.size || t.file.length() != size) throw new IOException();
             t.finished = true; return new JSObject().put("size", t.size);
         });
     }

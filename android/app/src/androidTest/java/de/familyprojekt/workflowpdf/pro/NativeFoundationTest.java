@@ -30,7 +30,7 @@ public final class NativeFoundationTest {
             assertEquals("true", evaluate(scenario, "document.querySelector('#btnInstall').getBoundingClientRect().width === 0"));
             evaluate(scenario, "WFPNativeFiles.transfer(new Blob(['Native boundary'],{type:'text/plain'}),'Мüller.txt').then(id=>Capacitor.Plugins.WorkflowFiles.abort({id})).then(()=>window.__transferOK=true).catch(e=>window.__transferError=String(e));true");
             await(scenario, "window.__transferOK === true || Boolean(window.__transferError)");
-            assertEquals("true", evaluate(scenario, "window.__transferOK === true"));
+            assertEquals("Native transfer error: " + evaluate(scenario, "window.__transferError"), "true", evaluate(scenario, "window.__transferOK === true"));
         }
     }
     @Test public void nativeSaveCancellationRetainsOriginalAndCanBeRetried() throws Exception {
@@ -44,7 +44,7 @@ public final class NativeFoundationTest {
             for (int attempt = 1; attempt <= 2; attempt++) {
                 evaluate(scenario, "window.__saveResult=null;WFPNativeFiles.save(new Blob(['unchanged'],{type:'text/plain'}),'Dokument.txt').then(r=>window.__saveResult=r).catch(e=>window.__saveResult={error:String(e)});true");
                 await(scenario, "window.__saveResult !== null");
-                assertEquals("true", evaluate(scenario, "window.__saveResult.cancelled === true && !window.__saveResult.saved"));
+                assertEquals("Native save result: " + evaluate(scenario, "JSON.stringify(window.__saveResult)"), "true", evaluate(scenario, "window.__saveResult.cancelled === true && !window.__saveResult.saved"));
                 assertEquals(attempt, monitor.getHits());
             }
         } finally { instrumentation.removeMonitor(monitor); }

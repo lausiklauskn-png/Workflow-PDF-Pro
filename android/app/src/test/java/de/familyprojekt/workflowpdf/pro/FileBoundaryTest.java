@@ -6,6 +6,16 @@ import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
 public final class FileBoundaryTest {
+    @Test public void javascriptOffsetsAcceptJsonIntegersAndRejectLossyValues() throws Exception {
+        assertEquals(0, ProFilesPlugin.integer(Integer.valueOf(0)));
+        assertEquals(262144, ProFilesPlugin.integer(Integer.valueOf(262144)));
+        assertEquals(4294967296L, ProFilesPlugin.integer(Long.valueOf(4294967296L)));
+        assertEquals(3, ProFilesPlugin.integer(Double.valueOf(3)));
+        for (Object value : new Object[] {null, "3", -1, 0.5, Double.NaN, Double.POSITIVE_INFINITY, 9007199254740992d}) {
+            try { ProFilesPlugin.integer(value); fail("Invalid bridge offset accepted"); }
+            catch (java.io.IOException expected) { }
+        }
+    }
     @Test public void exportsCannotEscapeTheirTicketDirectoryAndUnicodeIsPreserved() {
         for (String input : new String[] {"../../key", "a\\b", "\u0000x\n", ".", "..", "", "   "}) {
             String output = ProFilesPlugin.filename(input);
