@@ -1,0 +1,3 @@
+android/gradlew.bat text eol=crlf
+# Preserve raw build output, including whitespace emitted by Gradle.
+docs/portierung/nachweise/*.log -whitespace

@@ -1,5 +1,8 @@
 # Workflow PDF Pro — gemeinsame Arbeitsgrundlage
 
+- Wiederaufnahme, tatsächliche Zugriffsprüfung und Bauumgebung: `docs/FOLGESITZUNG.md`.
+  Eigene bestehende GitHub-Verbindung nutzen; Signierfreigabe bleibt in Actions.
+
 - Verbindlich: `BRIEF_NACHFOLGE_2026-10-20_NATIVE_APP.md` vollständig lesen.
   Der Quellcheckout Workflow-PDF und `upstream/workflow-pdf` bleiben unverändert;
   `node tools/onboarding/verify-upstream.mjs` prüft die bytegleiche Übernahme.
@@ -12,6 +15,9 @@
   lesen. SD-Karte/frei gewählter Ordner für Dokumente und App-Arbeitsdaten,
   Private-Brain-Pro-Speicher-/Tresor-Grundgerüst wiederverwenden. Kein bloßer
   Export als vollständige externe Ablage; komplexe Kernanbindung vorher besprechen.
+  SD ist optional: vollständiges Arbeiten im Gerätespeicher und später unter
+  Windows mit frei gewähltem Rechnerordner erhalten. Gewählt ist die Kombination
+  aus interner Arbeitsdatenbank und verschlüsseltem Ordner als Hauptablage.
 - Signierung und GitHub-Zugang für Claude Code **und** Codex:
   `docs/SIGNIERUNG-UND-GITHUB.md` lesen. Beide verwenden denselben Release-Workflow.
   GitHub-Anmeldung und Android-Signierschlüssel sind getrennte Berechtigungen.

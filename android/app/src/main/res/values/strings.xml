@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Workflow PDF Pro</string>
+    <string name="title_activity_main">Workflow PDF Pro</string>
+    <string name="package_name">de.familyprojekt.workflowpdf.pro</string>
+    <string name="custom_url_scheme">de.familyprojekt.workflowpdf.pro</string>
+</resources>

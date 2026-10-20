@@ -14,6 +14,8 @@ Verbindlicher Auftrag: [Nachfolgebrief](../../BRIEF_NACHFOLGE_2026-10-20_NATIVE_
 5. [Speicherort und Tresor](SPEICHERORT-UND-TRESOR.md): verbindlicher Zusatzauftrag
    SD-Karte/freier Ordner, Wiederverwendung des Private-Brain-Pro-Grundgerüsts,
    offene Anbindung und Abgrenzung zur bisherigen Sicherung.
+6. [Aktueller Android-Bau](BAUSTAND-ANDROID.md): angelegter Host, echte neue lokale
+   Prüfungen, noch offene Geräteadapter und CI-Abnahme; keine fertige APK-Freigabe.
 
 Der ursprüngliche Bestand von Workflow-PDF-Pro blieb erhalten. Unter
 `upstream/workflow-pdf/` liegen sämtliche 191 Quelldateien bytegleich aus

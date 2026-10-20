@@ -221,3 +221,17 @@ Die Workflows sind erst nach Übernahme auf `main` bei GitHub registriert und st
 - `check` von `main` (Stand `5c9c869`): Lauf 39473308583 grün – das Paket aus dem
   Repo lässt sich mit der Freigabe entschlüsseln und passt zum Zertifikats-Pin. Keine App, kein Release; der Veröffentlichungs-Workflow bleibt
   gesperrt, bis App, Build und Nachweise vorliegen.
+
+## Wiederanlauf und gemeinsamer Git-Release-Auftrag
+
+Aktuelle Anleitung: [Folgesitzung](FOLGESITZUNG.md). Aus Codex wurde der vorhandene
+Identitäts-`check` erneut gestartet und bestand in
+[Lauf 39501737287](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39501737287)
+auf main `f403aa1188232e2679fe664ebbdc2a6301ce6106`. Kein neuer Schlüssel erzeugt.
+
+Ein Dienst ohne direktes Workflow-Dispatch kann nach Übernahme der vorbereiteten
+`release-request.yml` auf main denselben Release über einen exakten Git-Auftrag
+anfordern. Die Signierfreigabe bleibt ausschließlich in Actions, dessen Release-
+Workflow alle bisherigen Freigabeprüfungen behält. Noch keinen tatsächlichen
+Git-Brückenlauf oder eine Claude-Veröffentlichung daraus ableiten. Prüfverfahren
+und konkrete Schritte stehen in der Wiederanlaufanleitung.

@@ -1,0 +1,25 @@
+{
+  "name": "workflow-pdf-pro",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Workflow PDF Pro — lokal gebündelter unveränderter Workflow-PDF-Kern mit nativen Geräteadaptern",
+  "scripts": {
+    "verify:upstream": "node tools/onboarding/verify-upstream.mjs",
+    "test": "npm run verify:upstream && npm test --prefix upstream/workflow-pdf",
+    "build:web": "node tools/native/prepare-web.mjs",
+    "sync:android": "npm run build:web && cap sync android",
+    "build:android": "npm run sync:android && cd android && ./gradlew --no-daemon --max-workers=2 assembleRelease",
+    "test:native-web": "npm run build:web && node --test --test-concurrency=1 tools/native/test-web-bundle.mjs tools/native/test-file-adapter.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3",
+    "@pdf-lib/fontkit": "1.1.1",
+    "pdf-lib": "1.17.1",
+    "playwright-core": "1.56.1"
+  }
+}

@@ -1,0 +1,66 @@
+package de.familyprojekt.workflowpdf.pro;
+
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
+
+/** The real packaged WebView and Java bridge. No claim about camera hardware or Google. */
+@RunWith(AndroidJUnit4.class)
+public final class NativeFoundationTest {
+    private String evaluate(ActivityScenario<MainActivity> scenario, String script) throws Exception {
+        CountDownLatch done = new CountDownLatch(1); AtomicReference<String> value = new AtomicReference<>();
+        scenario.onActivity(a -> a.getBridge().getWebView().evaluateJavascript(script, result -> { value.set(result); done.countDown(); }));
+        assertTrue(done.await(10, TimeUnit.SECONDS)); return value.get();
+    }
+    private void await(ActivityScenario<MainActivity> scenario, String script) throws Exception {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(60);
+        while (System.nanoTime() < deadline) { if ("true".equals(evaluate(scenario, script))) return; Thread.sleep(200); }
+        fail("Timed out: " + script);
+    }
+    @Test public void bundledCoreHasLocalOriginAndRealNativeFileBridge() throws Exception {
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            await(scenario, "Boolean(window.__wfpdf && window.WFPNativeFiles && window.PDFLib)");
+            assertEquals("\"https://localhost\"", evaluate(scenario, "location.origin"));
+            assertEquals("\"Workflow PDF Pro\"", evaluate(scenario, "document.querySelector('.marke-name').textContent"));
+            assertEquals("true", evaluate(scenario, "document.querySelector('#btnInstall').getBoundingClientRect().width === 0"));
+            evaluate(scenario, "WFPNativeFiles.transfer(new Blob(['Native boundary'],{type:'text/plain'}),'Мüller.txt').then(id=>Capacitor.Plugins.WorkflowFiles.abort({id})).then(()=>window.__transferOK=true).catch(e=>window.__transferError=String(e));true");
+            await(scenario, "window.__transferOK === true || Boolean(window.__transferError)");
+            assertEquals("true", evaluate(scenario, "window.__transferOK === true"));
+        }
+    }
+    @Test public void nativeSaveCancellationRetainsOriginalAndCanBeRetried() throws Exception {
+        android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        android.app.Instrumentation.ActivityMonitor monitor = new android.app.Instrumentation.ActivityMonitor(
+            new android.content.IntentFilter(android.content.Intent.ACTION_CREATE_DOCUMENT),
+            new android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_CANCELED, null), true);
+        instrumentation.addMonitor(monitor);
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            await(scenario, "Boolean(window.WFPNativeFiles)");
+            for (int attempt = 1; attempt <= 2; attempt++) {
+                evaluate(scenario, "window.__saveResult=null;WFPNativeFiles.save(new Blob(['unchanged'],{type:'text/plain'}),'Dokument.txt').then(r=>window.__saveResult=r).catch(e=>window.__saveResult={error:String(e)});true");
+                await(scenario, "window.__saveResult !== null");
+                assertEquals("true", evaluate(scenario, "window.__saveResult.cancelled === true && !window.__saveResult.saved"));
+                assertEquals(attempt, monitor.getHits());
+            }
+        } finally { instrumentation.removeMonitor(monitor); }
+    }
+    @Test public void androidBackCancelsSafetyPromptBeforeSendingAndReturnsFromEditor() throws Exception {
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            await(scenario, "Boolean(window.__wfpdf && window.PDFLib)");
+            evaluate(scenario, "(async()=>{const p=await PDFLib.PDFDocument.create();p.addPage();await __wfpdf.importDateien([new File([await p.save()],'Back.pdf',{type:'application/pdf'})]);window.__backImported=true;})();true");
+            await(scenario, "window.__backImported === true && document.querySelector('#sc-ed').classList.contains('on')");
+            evaluate(scenario, "__wfpdf.kiReiniger('chrome').halt(__wfpdf.S.doc,[{grund:'unsichtbar',text:'hidden fixture',seite:1}]).then(ok=>window.__cleanAccepted=ok);true");
+            await(scenario, "Boolean(document.querySelector('[data-ki-halt]'))");
+            androidx.test.espresso.Espresso.pressBackUnconditionally();
+            await(scenario, "window.__cleanAccepted === false && !document.querySelector('[data-ki-halt]')");
+            assertEquals("true", evaluate(scenario, "!__wfpdf.S.doc.kiEntfernt"));
+            androidx.test.espresso.Espresso.pressBackUnconditionally();
+            await(scenario, "document.querySelector('#sc-bib').classList.contains('on')");
+        }
+    }
+}

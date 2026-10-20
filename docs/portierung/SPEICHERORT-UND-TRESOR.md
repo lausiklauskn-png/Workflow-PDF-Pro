@@ -6,6 +6,26 @@ gespeichert werden können. Das dortige Speicher-/Tresor-Grundgerüst wiederverw
 Dies ergänzt die vollständige 1:1-Übernahme; es erlaubt keine Kürzung der PDF-,
 Übersetzungs- oder Schutzfunktionen. **Anforderung festgehalten, noch nicht eingebaut.**
 
+### Gewählte Kombination nach Rücksprache
+
+Klaus hat anschließend die Kombination beauftragt: **interne Datenbank plus
+vollständig verschlüsselter Tresor, gewählter Ordner als hauptsächlicher
+Datenspeicher**. Intern bleiben Bibliotheks-/Suchindex und nötige Arbeitskopien;
+die dauerhaften Dokumente und wiederherstellbaren Arbeitsstände gehören in den
+gewählten Tresor. Keine pauschale dauerhafte interne Zweitkopie sämtlicher PDFs
+als fertige Auslagerung ausgeben. Ein Speichern darf erst nach erfolgreichem
+Tresorschreiben als abgeschlossen gelten. Die Schnittstelle wird als separater
+Adapter umgesetzt; der Quellkern bleibt unverändert. KI-Schlüssel verbleiben
+wie bisher gerätelokal und werden nicht automatisch in den Tresor übertragen.
+
+Zusätzliche Klarstellung von Klaus: **SD-Karte ist optional. Vollständiges Arbeiten
+ohne SD-Karte muss möglich sein.** Ohne externe Speicherwahl bleibt der
+Gerätespeicher nutzbar. Auch ein Tresorordner im Hauptspeicher muss wählbar sein.
+Unter Windows einen Ordner auf dem Rechner oder einem verfügbaren externen
+Laufwerk anbieten; keine Android-SD-Annahme in gemeinsame Datenformate einbauen.
+Ein nicht erreichbarer zuvor gewählter Tresor darf keinen stillen Datenreset oder
+eine unbemerkte Umleitung in einen neuen leeren Speicher auslösen.
+
 ## Gewünschtes Verhalten
 
 - In den Einstellungen Speicherort wählen/ändern: Gerätespeicher, SD-Karte oder

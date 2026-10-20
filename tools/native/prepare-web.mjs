@@ -1,0 +1,74 @@
+import { readFile, writeFile, mkdir, rm, cp, lstat } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { resolve, dirname, join, relative } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+export const root = fileURLToPath(new URL('../../', import.meta.url));
+export const runtimeRoots = ['assets/', 'vendor/', 'icons/', 'sbkim/', 'beispiele/'];
+export const runtimeFiles = ['index.html', 'sw.js', 'manifest.webmanifest', 'impressum.html',
+  'sicherheit.html', 'LICENSE', 'RECHTE.md', 'THIRD_PARTY.md'];
+export const nativeFiles = ['native-bootstrap.js', 'native-files.js', 'native.css'];
+export const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+
+// This allowlist is deliberately independent of a recursive checkout copy.
+// Documents, signing material, sessions, tests and repository metadata never enter the APK.
+export function isRuntime(path) {
+  return runtimeFiles.includes(path) || runtimeRoots.some(prefix => path.startsWith(prefix));
+}
+function replaceOnce(html, before, after) {
+  if (html.split(before).length !== 2) throw new Error('Native injection anchor changed: ' + before);
+  return html.replace(before, after);
+}
+export async function prepareWeb(out = join(root, 'www')) {
+  out = resolve(out);
+  if (out !== join(root, 'www')) throw new Error('Bundle output must be the dedicated www directory.');
+  const manifest = JSON.parse(await readFile(join(root, 'docs/portierung/QUELLDATEIEN-SHA256.json'), 'utf8'));
+  const selected = manifest.files.filter(file => isRuntime(file.path));
+  const contents = new Map();
+  // Validate everything before replacing any generated output, including protected modules.
+  for (const file of manifest.files) {
+    const parts = file.path.split('/');
+    if (parts.some(part => !part || part === '.' || part === '..' || part.includes('\\'))) throw new Error('Unsafe manifest path');
+    let cursor = join(root, 'upstream/workflow-pdf');
+    for (const part of parts) {
+      cursor = join(cursor, part);
+      if ((await lstat(cursor)).isSymbolicLink()) throw new Error('Symlink in source path: ' + file.path);
+    }
+    const path = join(root, 'upstream/workflow-pdf', file.path);
+    if (!relative(join(root, 'upstream/workflow-pdf'), path).startsWith('..') && !(await lstat(path)).isSymbolicLink()) {
+      const bytes = await readFile(path);
+      if (bytes.length !== file.bytes || digest(bytes) !== file.sha256) throw new Error('Upstream hash mismatch: ' + file.path);
+      if (isRuntime(file.path)) contents.set(file.path, bytes);
+    } else throw new Error('Unsafe upstream path: ' + file.path);
+  }
+  let html = contents.get('index.html').toString('utf8');
+  html = replaceOnce(html, '<title>Workfloh PDF —', '<title>Workflow PDF Pro —');
+  html = replaceOnce(html, 'content="Workfloh PDF"', 'content="Workflow PDF Pro"');
+  html = replaceOnce(html, 'Workfloh <b>PDF</b>', 'Workflow <b>PDF Pro</b>');
+  html = replaceOnce(html, '</head>', '<link rel="stylesheet" href="native/native.css">\n</head>');
+  // Classic deferred scripts preserve source execution order. The source worker stays intact:
+  // model caches and share receipt must remain functional in the native host as well.
+  html = replaceOnce(html, '<script defer src="assets/app.js?v=67"></script>',
+    '<script defer src="native/native-bootstrap.js"></script>\n<script defer src="native/native-files.js"></script>\n<script defer src="assets/app.js?v=67"></script>');
+  await rm(out, { recursive: true, force: true });
+  await mkdir(out, { recursive: true });
+  const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding and adapter tags'], files: [] };
+  for (const file of selected) {
+    await mkdir(dirname(join(out, file.path)), { recursive: true });
+    const bytes = file.path === 'index.html' ? Buffer.from(html) : contents.get(file.path);
+    await writeFile(join(out, file.path), bytes);
+    receipt.files.push({ path: file.path, sha256: digest(bytes), sourceSha256: file.sha256 });
+  }
+  for (const name of nativeFiles) {
+    const path = join(root, 'native', name);
+    if ((await lstat(path)).isSymbolicLink()) throw new Error('Unsafe native adapter: ' + name);
+    await mkdir(join(out, 'native'), { recursive: true });
+    await cp(path, join(out, 'native', name));
+  }
+  await cp(join(root, 'node_modules/@capacitor/core/LICENSE'), join(out, 'CAPACITOR-LICENSE'));
+  await writeFile(join(out, 'native-bundle.json'), JSON.stringify(receipt, null, 2) + '\n');
+  console.log('Local native bundle: ' + selected.length + ' public source files; source ' + manifest.commit);
+  return receipt;
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) await prepareWeb();

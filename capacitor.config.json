@@ -1,0 +1,13 @@
+{
+  "appId": "de.familyprojekt.workflowpdf.pro",
+  "appName": "Workflow PDF Pro",
+  "webDir": "www",
+  "loggingBehavior": "none",
+  "server": { "androidScheme": "https" },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false,
+    "resolveServiceWorkerRequests": true
+  },
+  "plugins": { "CapacitorHttp": { "enabled": false } }
+}

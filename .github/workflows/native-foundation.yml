@@ -1,0 +1,72 @@
+name: Native Android-Baugrundlage
+on:
+  push:
+    branches: ['**']
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: native-foundation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  web-core:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright-core install --with-deps chromium
+      - run: sudo apt-get update && sudo apt-get install -y fonts-freefont-ttf
+      - name: Unveränderte vollständige Original-Testkette
+        run: npm test
+      - name: Gebündelten PDF-Kern prüfen
+        run: npm run test:native-web
+      - name: Git-Release-Auftrag mit Gegenproben prüfen
+        run: node --test tools/signing/test-request-release.mjs
+  android-foundation:
+    # Deliberately not named native-smoke: these foundation probes are insufficient
+    # for the complete-app release gate in workflow-pdf-release.yml.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm ci
+      - run: npm run sync:android
+      - name: Bauen, Lint und JVM-Gegenproben
+        working-directory: android
+        run: ./gradlew --no-daemon --max-workers=2 assembleRelease lintRelease testReleaseUnitTest
+      - name: KVM für den Emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Echte WebView und Java-Brücke im Emulator
+        uses: reactivecircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808 # v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: cd android && ./gradlew --no-daemon --max-workers=2 :app:connectedDebugAndroidTest
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: android-foundation-reports
+          path: |
+            android/app/build/reports/
+            android/app/build/outputs/androidTest-results/
+          if-no-files-found: warn
+          retention-days: 7

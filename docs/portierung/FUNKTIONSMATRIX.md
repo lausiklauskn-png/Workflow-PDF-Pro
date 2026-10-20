@@ -148,7 +148,7 @@ Funktionen ist bereits in Workflow PDF Pro implementiert oder nativ abgenommen.
 
 | ID | Beauftragtes Verhalten | Zuordnung / offener Nachweis |
 |---|---|---|
-| N001 | Speicherort wählen: Gerät, SD-Karte, anderer freigegebener Ordner | nativer SAF-Adapter; echte Anbieter und SD-Karte prüfen |
+| N001 | Speicherort wählen: Gerät, optionale SD-Karte, anderer freigegebener Ordner; vollständig ohne SD arbeiten | Android-SAF und später Windows-Rechnerordner; kein SD-Zwang, echte Anbieter prüfen |
 | N002 | Eigenen Workflow-PDF-Pro-Ordner anbieten; Wahl ändern und erneut öffnen | dauerhafte Rechte über Neustart/Update; Abbruch ohne Änderung |
 | N003 | Dokumenttresor mit Passwort einrichten, sperren und entsperren | Private-Brain-Grundgerüst mit eigener Identität; Passwortdialog nativ |
 | N004 | Optional auf diesem Gerät entsperrt halten | Android Keystore; Passwort bleibt für anderes Gerät erforderlich |

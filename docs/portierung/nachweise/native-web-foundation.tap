@@ -1,0 +1,32 @@
+
+> workflow-pdf-pro@1.0.0 test:native-web
+> npm run build:web && node --test --test-concurrency=1 tools/native/test-web-bundle.mjs tools/native/test-file-adapter.mjs
+
+
+> workflow-pdf-pro@1.0.0 build:web
+> node tools/native/prepare-web.mjs
+
+Local native bundle: 86 public source files; source 7227c543d4a536cf8f3354a56fbba7574645703e
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+✔ native file adapter simulation: chunks, cancellation, faults, sharing and PDF return (3016.513538ms)
+Local native bundle: 86 public source files; source 7227c543d4a536cf8f3354a56fbba7574645703e
+✔ bundle contains the complete public runtime and unchanged protected files (191.751487ms)
+✔ bundle excludes development material, signing files and private data (5.633854ms)
+✔ generated bundle imports a real form, preserves its original and survives restart (2657.299832ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7585.482377
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
