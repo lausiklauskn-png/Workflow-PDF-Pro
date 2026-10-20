@@ -179,3 +179,30 @@ der Android-Schlüssel ersetzt kein Apple- oder Windows-Zertifikat.
   Workflow enthält deshalb absichtlich eine echte Sperre vor dem Signieren;
   eine funktionsarme Grundfassung wird nicht ausgeliefert. Produktionsschlüssel,
   Environment-Secret, echter CI-Lauf, Installation und Update stehen noch aus.
+
+## Gemessen aus Claude Code (2026-10-20)
+
+Ausgangsstand `codex/workflow-pro-native-foundation` bei `0c067b9`, `main` bei `5892a81`.
+
+| Recht | Ergebnis Claude Code |
+|---|---|
+| Git lesen, Push-Probelauf | ja (`github-access.mjs --probe-write`: gitRead, gitWriteDryRun) |
+| API lesen, Repo-Rechte | ja; GitHub meldet `admin/push` für die Verbindung |
+| Actions-Läufe/Workflows lesen | ja |
+| Environments, Secrets, Actions-Einstellungen lesen/setzen | **nein** – der Claude-Sitzungsproxy sperrt diese API-Pfade |
+| Branch-Schutz lesen | nein (403 der GitHub-App) |
+| Workflow starten (`workflow_dispatch`) | **nein** – im Schwesterrepo Privat-Brain-Pro mit 403 „Resource not accessible by integration“ abgelehnt |
+| Releases | 0 vorhanden; Anlegen nicht versucht (keine App) |
+
+Folge: Environment `android-production` und Secret `WF_PDF_SIGNING_UNLOCK` legt
+Klaus selbst im GitHub-Webformular an; Claude Code sieht davon nur, ob ein
+Workflowlauf die Freigabe lesen kann. Workflowläufe starten Klaus (Knopf
+„Run workflow“) oder eine Arbeitsumgebung mit Actions-Schreibrecht. Claude Code
+kann Läufe lesen, Fehler beheben, Branches/PRs pushen und Ergebnisse prüfen.
+
+Signier-Prüfungen in Claude Code: `test-release-policy` 3/3, `test-identity` 7/7
+(echter Keystore, Verschlüsselung, Manipulation) bestanden; `test-apk` hier nicht
+ausführbar, weil Googles Build-Tools (`dl.google.com`) im Claude-Container gesperrt
+sind – nicht rot im Code, sondern ungeprüft. `verify-upstream`: 191/191 bytegleich.
+
+Die Workflows sind erst nach Übernahme auf `main` bei GitHub registriert und startbar.
