@@ -55,7 +55,9 @@ jobs:
       - run: npm ci
         id: dependencies
       - run: npx playwright-core install --with-deps chromium
-      - run: sudo apt-get update && sudo apt-get install -y fonts-freefont-ttf
+      - run: sudo apt-get update && sudo apt-get install -y fonts-freefont-ttf fonts-roboto-unhinted
+      - name: Unveränderte Browserprüfungen mit Android-Referenzschrift vorbereiten
+        run: echo "FONTCONFIG_FILE=$(node tools/native/android-fontconfig.mjs)" >> "$GITHUB_ENV"
       - name: Tatsächliche Quell-Systemschrift beobachten
         run: node tools/native/probe-header-font.mjs
       - name: Unveränderte vollständige Original-Testkette
@@ -66,6 +68,9 @@ jobs:
       - name: Git-Release-Auftrag mit Gegenproben prüfen
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test tools/signing/test-request-release.mjs
+      - name: Binäre Tresor-Datensätze und Übersetzungsstände prüfen
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: node --test tools/native/test-vault-codec.mjs
       - name: Reinigung nach vorzeitig beendeter Originalkette gesondert prüfen
         if: ${{ failure() && steps.dependencies.outcome == 'success' }}
         run: node upstream/workflow-pdf/tests/reinigung.mjs

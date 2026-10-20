@@ -8,7 +8,7 @@ export const root = fileURLToPath(new URL('../../', import.meta.url));
 export const runtimeRoots = ['assets/', 'vendor/', 'icons/', 'sbkim/', 'beispiele/'];
 export const runtimeFiles = ['index.html', 'sw.js', 'manifest.webmanifest', 'impressum.html',
   'sicherheit.html', 'LICENSE', 'RECHTE.md', 'THIRD_PARTY.md'];
-export const nativeFiles = ['native-bootstrap.js', 'native-files.js', 'native.css'];
+export const nativeFiles = ['native-bootstrap.js', 'native-files.js', 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
 export const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 
 // This allowlist is deliberately independent of a recursive checkout copy.
@@ -42,15 +42,22 @@ export async function prepareWeb(out = join(root, 'www')) {
       if (isRuntime(file.path)) contents.set(file.path, bytes);
     } else throw new Error('Unsafe upstream path: ' + file.path);
   }
+  const adapters = new Map();
+  for (const name of nativeFiles) {
+    const path = join(root, 'native', name);
+    if ((await lstat(path)).isSymbolicLink()) throw new Error('Unsafe native adapter: ' + name);
+    adapters.set(name, await readFile(path));
+  }
+  const adapterUrl = name => 'native/' + name + '?v=' + digest(adapters.get(name));
   let html = contents.get('index.html').toString('utf8');
   html = replaceOnce(html, '<title>Workfloh PDF —', '<title>Workflow PDF Pro —');
   html = replaceOnce(html, 'content="Workfloh PDF"', 'content="Workflow PDF Pro"');
   html = replaceOnce(html, 'Workfloh <b>PDF</b>', 'Workflow <b>PDF Pro</b>');
-  html = replaceOnce(html, '</head>', '<link rel="stylesheet" href="native/native.css">\n</head>');
+  html = replaceOnce(html, '</head>', '<link rel="stylesheet" href="' + adapterUrl('native.css') + '">\n</head>');
   // Classic deferred scripts preserve source execution order. The source worker stays intact:
   // model caches and share receipt must remain functional in the native host as well.
   html = replaceOnce(html, '<script defer src="assets/app.js?v=67"></script>',
-    '<script defer src="native/native-bootstrap.js"></script>\n<script defer src="native/native-files.js"></script>\n<script defer src="assets/app.js?v=67"></script>');
+    '<script defer src="' + adapterUrl('native-bootstrap.js') + '"></script>\n<script defer src="' + adapterUrl('native-files.js') + '"></script>\n<script defer src="assets/app.js?v=67"></script>');
   await rm(out, { recursive: true, force: true });
   await mkdir(out, { recursive: true });
   const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding and adapter tags'], files: [] };
@@ -60,11 +67,9 @@ export async function prepareWeb(out = join(root, 'www')) {
     await writeFile(join(out, file.path), bytes);
     receipt.files.push({ path: file.path, sha256: digest(bytes), sourceSha256: file.sha256 });
   }
-  for (const name of nativeFiles) {
-    const path = join(root, 'native', name);
-    if ((await lstat(path)).isSymbolicLink()) throw new Error('Unsafe native adapter: ' + name);
+  for (const [name, bytes] of adapters) {
     await mkdir(join(out, 'native'), { recursive: true });
-    await cp(path, join(out, 'native', name));
+    await writeFile(join(out, 'native', name), bytes);
   }
   await cp(join(root, 'node_modules/@capacitor/core/LICENSE'), join(out, 'CAPACITOR-LICENSE'));
   await writeFile(join(out, 'native-bundle.json'), JSON.stringify(receipt, null, 2) + '\n');

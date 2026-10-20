@@ -37,6 +37,7 @@ public final class NativeFoundationTest {
         android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         android.content.IntentFilter picker = new android.content.IntentFilter(android.content.Intent.ACTION_CREATE_DOCUMENT);
         picker.addCategory(android.content.Intent.CATEGORY_OPENABLE);
+        picker.addDataType("*/*");
         android.app.Instrumentation.ActivityMonitor monitor = new android.app.Instrumentation.ActivityMonitor(
             picker,
             new android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_CANCELED, null), true);

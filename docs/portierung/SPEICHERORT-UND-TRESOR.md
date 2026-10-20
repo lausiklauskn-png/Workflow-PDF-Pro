@@ -21,7 +21,7 @@ wie bisher gerätelokal und werden nicht automatisch in den Tresor übertragen.
 Zusätzliche Klarstellung von Klaus: **SD-Karte ist optional. Vollständiges Arbeiten
 ohne SD-Karte muss möglich sein.** Ohne externe Speicherwahl bleibt der
 Gerätespeicher nutzbar. Auch ein Tresorordner im Hauptspeicher muss wählbar sein.
-Unter Windows einen Ordner auf dem Rechner oder einem verfügbaren externen
+Unter Windows einen Ordner auf dem Hauptrechner oder einem verfügbaren externen
 Laufwerk anbieten; keine Android-SD-Annahme in gemeinsame Datenformate einbauen.
 Ein nicht erreichbarer zuvor gewählter Tresor darf keinen stillen Datenreset oder
 eine unbemerkte Umleitung in einen neuen leeren Speicher auslösen.
@@ -121,3 +121,22 @@ Android/DeX wird zuerst angebunden; Windows und iOS benötigen eigene Adapter f�
 Ordnerrechte und Geräteschlüsselspeicher. Ein Android-Tresor allein belegt diese
 Plattformen nicht. Anforderungen und offene Nachweise: N001–N012 in der
 [Funktionsmatrix](FUNKTIONSMATRIX.md). Hier wurden keine Tresor-/SD-Gerätetests ausgeführt.
+
+## Begonnene Umsetzung im Android-Bauzweig
+
+Getrennte Bausteine `DocumentVault`, `VaultLocations` und `ProVaultPlugin` sind
+angelegt. Keine Auswahl bedeutet weiterhin interner Speicher; ein Ordnerwechsel
+löscht die bisherigen Freigaben nicht. Die Tresordateien speichern relative
+Dateinamen statt Android-Dokumentkennungen, damit eine Ordnerkopie auf einem
+anderen Laufwerk und später auf einem anderen System geöffnet werden kann.
+Gerätelokale Freigaben und optionale Keystore-Entsperrung bleiben davon getrennt.
+
+Die Verschlüsselung und ihre fünf JVM-Gegenproben stammen aus dem oben genannten
+Private-Brain-Stand; nur der Java-Paketname ist geändert, Lizenz liegt bei.
+Diese fünf Prüfungen wurden jetzt für Workflow PDF Pro lokal erfolgreich
+ausgeführt. Drei neue Datensatzprüfungen erhalten binäre Originale,
+Übersetzungsstände und strukturierte Werte und lehnen beschädigte Umschläge ab.
+Das ist noch **keine vollständige Speicheranbindung**: Java-Brücke, Einstellungen,
+IndexedDB-Adapter und Wiederherstellung müssen gemeinsam eingebaut und geprüft
+werden. Vorbereitete Android-SAF-/Keystore-Fälle sind getrennt zu protokollieren;
+lokales Kompilieren belegt keinen Lauf auf echter SD-Karte oder unter Windows.

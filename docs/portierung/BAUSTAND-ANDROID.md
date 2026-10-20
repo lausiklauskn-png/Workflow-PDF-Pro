@@ -70,3 +70,31 @@ reguläre erste Version bereitgestellt.
 auf geeignetem CI-Browser und separat echte WebView-/Java-Brückenfälle im Emulator
 ausführen. Sein Android-Job heißt absichtlich **nicht `native-smoke`** und öffnet
 damit das bestehende Gate für die vollständige reguläre Freigabe nicht.
+
+## Fortschritt nach den ersten CI-Gegenproben
+
+Die ersten CI-Läufe waren fehlgeschlagen; nicht als vollständigen Erfolg zählen:
+`39507303735` und `39508538478` auf den zugehörigen Baucommits zeigten zwei von
+drei bestandenen Android-WebView-Fällen. Die dritte Probe blieb im echten
+Speicherdialog hängen: Dem blockierenden Test-IntentFilter fehlte der MIME-Typ.
+Die Fixture erhält jetzt `*/*`; das ist noch durch einen neuen Lauf zu bestätigen.
+Ein zuvor tatsächlich gefundener Brückenfehler (Java `Long` statt JavaScript-
+Integer bei kleinen Dateiversätzen) ist korrigiert und mit drei JVM-Fällen geprüft.
+
+Die unveränderte Originalkette scheiterte im CI an der schmalen Kopfzeile bei
+380 px mit DejaVu Sans Bold. CDP und Geometriemessungen belegen den Schriftunterschied.
+Neue lokale Original-`knoten.mjs`-Läufe mit externem Fontconfig-Profil:
+Roboto als Android-Referenz: 126 grün, 0 rot; DejaVu: 124 grün, 2 rot.
+Weder Produkt-CSS noch Quelltests oder Prüfsummen wurden geändert. CI erhält
+jetzt die Android-Referenzschrift; die komplette Kette damit ist noch zu messen.
+
+Die neuen Tresor-Komponenten bauen lokal. Fünf übernommene Kryptoprüfungen und
+drei binäre Datensatzprüfungen bestanden neu; die zehn vorbereiteten nativen
+SAF-/Keystore-Komponentenfälle sind noch nicht ausgeführt. Der Browser-Bundle-
+und Dateiadapterlauf bestand erneut 4/4. Native Adapter-URLs tragen nun ihren
+Inhaltshash, damit nach einem APK-Update kein veraltetes Adapterskript aus dem
+unveränderten Service-Worker-Cache geladen wird. Die Tresor-Brücke ist noch
+nicht mit der laufenden Bibliothek verbunden, also kein fertig nutzbarer Tresor.
+
+Aktuell erneut gelesene Remotes: Quelle main `7227c543d4a536cf8f3354a56fbba7574645703e`,
+Pro main `f403aa1188232e2679fe664ebbdc2a6301ce6106`. Quellcheckout weiterhin sauber.
