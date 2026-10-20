@@ -70,7 +70,7 @@ jobs:
         run: node --test tools/signing/test-request-release.mjs
       - name: Binäre Tresor-Datensätze und Übersetzungsstände prüfen
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
-        run: node --test tools/native/test-vault-codec.mjs
+        run: node --test tools/native/test-vault-codec.mjs tools/native/test-vault-records.mjs
       - name: Reinigung nach vorzeitig beendeter Originalkette gesondert prüfen
         if: ${{ failure() && steps.dependencies.outcome == 'success' }}
         run: node upstream/workflow-pdf/tests/reinigung.mjs
@@ -108,6 +108,27 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           script: cd android && ./gradlew --no-daemon --max-workers=2 :app:connectedDebugAndroidTest
+      - name: Native XML-Befunde über GitHub-API lesbar halten
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          for path in sorted(Path('android/app/build/outputs/androidTest-results').rglob('TEST-*.xml')):
+              try:
+                  root=ET.parse(path).getroot()
+                  lines=[str(path), str(root.attrib)]
+                  for case in root.iter('testcase'):
+                      for failure in list(case.findall('failure'))+list(case.findall('error')):
+                          lines.append(case.get('name','')+': '+(failure.get('message','')+'\n'+(failure.text or ''))[:4500])
+                  for line in lines:
+                      safe=line.replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+                      print('::notice title=Native Prüfergebnisse::'+safe)
+              except ET.ParseError as error:
+                  print('::error::Invalid native test XML: '+str(path))
+                  raise
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

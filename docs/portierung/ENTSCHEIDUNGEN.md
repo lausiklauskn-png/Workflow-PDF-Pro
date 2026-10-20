@@ -64,6 +64,17 @@ wurden für keinen neuen Anbieter behauptet; Arbeitszeiten sind nicht geschätzt
 
 **Entscheidung getroffen:** A — Chrome erhalten, lokalen Hin-/Rücktransport zuerst erproben. Das erlaubt keine heimliche Umstellung auf B/C und ersetzt keine Geräteprüfung. Android/DeX zuerst, Windows danach, iOS anschließend.
 
+### Noch unbeantwortet: Verarbeitung beim Wechsel zu Chrome
+
+Für lange native Übersetzungen wurde gesondert nachgefragt: empfohlener nativer
+Vordergrunddienst mit sichtbarer Benachrichtigung „Übersetzung läuft“ und Abbruch,
+oder abschnittsweise manuelle Rückkehr zur App. Der Vordergrunddienst benötigt
+Android-Dienstberechtigungen und muss Laufzeit-/Energiespargrenzen einhalten;
+die manuelle Variante verändert den gewohnten Ablauf und benötigt viele Wechsel.
+Chrome-Variante A allein ist keine Zustimmung zu dieser zusätzlichen Umstellung.
+Solange Klaus dazu nicht geantwortet hat, keinen solchen Dienst als gewählt
+behandeln und nicht ungefragt einbauen. Unabhängiger Bau kann weitergehen.
+
 ## Weitere Grenzen vor einer Änderung
 
 Neuer verbindlicher Nutzerauftrag vom 20.10.2026: frei gewählter Speicherort

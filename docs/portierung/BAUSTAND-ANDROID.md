@@ -98,3 +98,23 @@ nicht mit der laufenden Bibliothek verbunden, also kein fertig nutzbarer Tresor.
 
 Aktuell erneut gelesene Remotes: Quelle main `7227c543d4a536cf8f3354a56fbba7574645703e`,
 Pro main `f403aa1188232e2679fe664ebbdc2a6301ce6106`. Quellcheckout weiterhin sauber.
+
+### Neuer CI-Befund auf `1b3216e47f6e2afd9243e9693fcafb46028f88f9`
+
+[Actions-Lauf 39512895516](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39512895516):
+Die vollständige Originalkette mit allen 28 Skripten hat jetzt neu bestanden,
+ebenso Browser-Bundle, Git-Release-CLI-Gegenprobe und die drei Datensatzprüfungen.
+Android-Bau/Lint/JVM bestanden; die Emulatorprüfung schlug fehl. Im neu angelegten
+Debug-Testanbieter fehlte die von `DocumentsProvider` verlangte Deklaration
+`exported=true` mit `android.permission.MANAGE_DOCUMENTS`; die Referenz enthält
+diese. Dieser Testanbieter wird jetzt entsprechend korrigiert und bleibt aus
+dem Release ausgeschlossen. Der Folge-Emulatorlauf muss den Befund bestätigen.
+
+Zusätzlicher binärer Transport liegt separat vor, noch nicht in der Bibliothek:
+Originale und Übersetzungsjobs, unterbrochene Transfers, veraltete Speicherstände
+und Austausch eines Datensatzes zwischen Status und Lesen. Neu lokal 7/7
+Codec-/Transportfälle bestanden; davon vier gestellt gegen eine native
+Schnittstelle, keine Android-Gerätenachweise. Jeder native Leseblock bindet den
+erwarteten Datensatzhash, damit kein gemischter Schreibstand als Erfolg gilt.
+PDF-Anzeigen schließen beim Ersetzen die alte Renderinstanz; Speichern/Drucken
+aus der Anzeige übernimmt den Dokumentnamen mit der vorhandenen Zeichenregel.

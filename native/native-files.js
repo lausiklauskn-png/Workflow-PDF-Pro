@@ -69,7 +69,8 @@
 
   let viewer = null;
   async function preview(blob) {
-    viewer?.remove();
+    viewer?.close();
+    const name = (String(window.__wfpdf?.S.doc?.name || 'Dokument').replace(/[\\/:*?"<>|]+/g, '_').trim() || 'Dokument') + '.pdf';
     const panel = document.createElement('section'); panel.className = 'native-pdf-view';
     panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true');
     const row = document.createElement('nav'), pages = document.createElement('div');
@@ -78,8 +79,8 @@
     const close = () => { closed = true; observer?.disconnect(); void pdf?.destroy(); panel.remove(); if (viewer === panel) viewer = null; };
     panel.close = close; viewer = panel;
     button(t('back'), close);
-    button(t('print'), () => { void transfer(blob, 'Dokument.pdf').then(id => api.print({ id })).catch(fail); });
-    button(t('save'), () => { void save(blob, 'Dokument.pdf').catch(fail); });
+    button(t('print'), () => { void transfer(blob, name).then(id => api.print({ id })).catch(fail); });
+    button(t('save'), () => { void save(blob, name).catch(fail); });
     panel.append(row, pages); document.body.append(panel);
     try {
       pdf = await pdfjsLib.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise;

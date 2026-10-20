@@ -355,8 +355,12 @@ final class DocumentVault {
         return info;
     }
     byte[] read(String store, String id, long offset) throws Exception {
+        return read(store,id,offset,null);
+    }
+    byte[] read(String store,String id,long offset,String expectedHash)throws Exception {
         Place p = require(); String name = recordName(store, id); JSONObject record = p.index.optJSONObject(name);
         if (record == null) throw failure("VAULT_RECORD_NOT_FOUND");
+        if(expectedHash!=null&&!expectedHash.equals(record.optString("hash")))throw failure("VAULT_RECORD_CHANGED");
         try (VaultCrypto.Reader reader = reader(p, record.getString("file"), name)) {
             if (reader.size() != record.getLong("size")) throw failure("VAULT_DAMAGED");
             return reader.read(offset, VaultCrypto.CHUNK);

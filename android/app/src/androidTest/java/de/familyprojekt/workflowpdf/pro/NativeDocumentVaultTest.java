@@ -123,4 +123,10 @@ public final class NativeDocumentVaultTest {
         assertEquals(id,places.primary());a.append(ticket,0,new byte[]{1});a.finish(ticket,1);assertArrayEquals(new byte[]{1},read(a,"active"));
         places.select(null);assertArrayEquals(new byte[]{1},read(places.get(id),"active"));
     }
+    @Test public void readWithPreviousVersionHashRejectsAReplacementBeforeReturningAnyBytes()throws Exception {
+        reset();DocumentVault a=fresh("a");a.initialize(a.inspect(tree()),PASSWORD,false);write(a,"x",new byte[]{1,2,3});
+        String previous=a.info("files","x").getString("hash");write(a,"x",new byte[]{4,5,6});
+        try{a.read("files","x",0,previous);fail("Old pointer read different bytes");}catch(IOException expected){assertEquals("VAULT_RECORD_CHANGED",expected.getMessage());}
+        assertArrayEquals(new byte[]{4,5,6},a.read("files","x",0,a.info("files","x").getString("hash")));
+    }
 }

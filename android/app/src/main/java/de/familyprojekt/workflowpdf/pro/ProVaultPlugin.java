@@ -128,7 +128,7 @@ public final class ProVaultPlugin extends Plugin {
     @PluginMethod public void finish(PluginCall call){work(call,()->{DocumentVault v=vault(call);v.finish(call.getString("ticket"),ProFilesPlugin.integer(call.getData().opt("size")));return v.info(call.getString("store"),call.getString("id")).put("saved",true);});}
     @PluginMethod public void abort(PluginCall call){work(call,()->{vault(call).abort(call.getString("ticket"));return new JSONObject();});}
     @PluginMethod public void info(PluginCall call){work(call,()->vault(call).info(call.getString("store"),call.getString("id")));}
-    @PluginMethod public void read(PluginCall call){work(call,()->new JSONObject().put("data",Base64.encodeToString(vault(call).read(call.getString("store"),call.getString("id"),ProFilesPlugin.integer(call.getData().opt("offset"))),Base64.NO_WRAP)));}
+    @PluginMethod public void read(PluginCall call){work(call,()->new JSONObject().put("data",Base64.encodeToString(vault(call).read(call.getString("store"),call.getString("id"),ProFilesPlugin.integer(call.getData().opt("offset")),call.getString("hash")),Base64.NO_WRAP)));}
     @PluginMethod public void list(PluginCall call){work(call,()->new JSONObject().put("ids",vault(call).list(call.getString("store"))));}
     @PluginMethod public void remove(PluginCall call){work(call,()->{vault(call).remove(call.getString("store"),call.getString("id"),call.getBoolean("prefix",false));return new JSONObject().put("saved",true);});}
     @Override protected void handleOnDestroy(){worker.execute(()->locations.close());worker.shutdown();}

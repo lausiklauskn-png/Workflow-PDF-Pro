@@ -97,3 +97,12 @@ Ersatzbibliothek bei fehlender Karte. Die vorhandene Sicherung und alle
 
 Fortschritt und tatsächlich verbliebene Bau-/Geräteprüfungen jeweils im aktuellen
 Portierungsprüfstand ergänzen; unfertige Adapter nicht als ausgeliefert kennzeichnen.
+
+Aktueller Bauzweig: `codex/native-android-build`, Entwurf-PR #8. Android-Tresor-
+Bausteine sind vorhanden, jedoch noch nicht mit der Bibliothek verbunden.
+Der komplette neue Original-Testlauf auf `1b3216e` bestand im CI; Android-Emulator
+war dort noch fehlgeschlagen. Neuere Ergebnisse mit Commit und Laufnummer stehen
+in `docs/portierung/BAUSTAND-ANDROID.md`; diesen Stand vor weiteren Aussagen lesen.
+Die zusätzliche Frage zum Vordergrunddienst beim Chrome-Wechsel ist noch offen
+(siehe `docs/portierung/ENTSCHEIDUNGEN.md`), keine Zustimmung aus Schweigen ableiten.
+Abhängigkeiten nicht mit `npm ci` während eines Gradle-/Lint-Laufs neu erzeugen.
