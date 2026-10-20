@@ -1,0 +1,10 @@
+Workfloh PDF — Schrift im Bild
+    gemessen, Tinten-Anteil je Zeile: Übersetzung 0.76 · 0.77 · 0.74 | Export fest 0.79 · 0.77 · 0.76
+  ✓ Übersetzung: drei Zeilen gezeichnet
+  ✓ … jede Zeile lückenlos (Tinte ≥ 0,55 — ohne Buchstaben-Verlust)
+  ✓ Export „fest" mit kyrillischem Feldwert: drei Zeilen gezeichnet
+  ✓ … jede Zeile lückenlos
+  ✓ keine Fehler in der Konsole
+
+5 grün · 0 ROT
+

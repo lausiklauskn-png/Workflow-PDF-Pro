@@ -1,0 +1,20 @@
+  ✓ Handbuch liegt bei und hat mehr als 10 Seiten
+  ✓ Amtsformular liegt bei und hat 2 Seiten
+  ✓ Handbuch und App nennen „Beispiele zum Ausprobieren"
+  ✓ beide Dateinamen stehen in der App
+  ✓ ein Ordner „Beispiele" im Bereich Übersetzung
+  ✓ beide Beispiele darin, mit ihrer Seitenzahl
+  ✓ danach steht das Übersetzen-Fenster offen
+  ✓ …mit beiden Dokumenten gewählt
+  ✓ ein zweiter Druck legt nichts doppelt an
+  ✓ Hilfe → „📘 Handbuch öffnen" öffnet das Handbuch
+  ✓ …ohne es ein zweites Mal einzulesen
+  ✓ Behördenkasten: kein großes Feld um die Felder herum
+  ✓ …die fünf Behörden-Felder sind da
+  ✓ …und keine gedruckte Beschriftung wird als Eintrag übernommen
+  ✓ keine Fehler in der Konsole
+  ✓ ohne Netz: Meldung statt Stille
+  ✓ …und kein leerer Ordner
+
+17 grün · 0 ROT
+

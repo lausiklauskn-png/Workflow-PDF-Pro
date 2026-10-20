@@ -1,0 +1,56 @@
+Workfloh PDF — Sicherung
+A · ohne Browser
+  ✓ das Schloss ist byte-1:1 (SHA-256 gepinnt)
+  ✓ WFP.Sicherung steht bereit
+  ✓ die Datei trägt Art und Fassung
+  ✓ in der Datei steht KEIN Klartext (Name, IBAN, PDF-Inhalt)
+  ✓ ein Dokument ohne Datei wird gezählt, nicht verschwiegen
+  ✓ das Originalfoto des ungeprüften Dokuments kommt mit in die Sicherung
+  ✓ falsches Passwort → „passwort"
+  ✓ fremde Datei → „keine-sicherung"
+  ✓ andere Fassung → „fassung"
+  ✓ zurückholen: 1 Dokument dazu, 1 Ordner dazu, 1 ohne Datei übersprungen
+  ✓ die PDF-Bytes kommen Byte für Byte zurück
+  ✓ ein Prüf-Befund aus der Datei wird nicht geglaubt (pruefung entfernt)
+  ✓ ein vorhandenes Dokument bleibt unberührt
+  ✓ das Originalfoto kommt zurück, Byte für Byte
+  ✓ … sein Name trägt den Vermerk „Original, „ungeprüft““ vor der Endung
+  ✓ originalName: kein zweiter Vermerk, und ohne Endung steht er hinten
+  ✓ eine Sicherung ohne Originale (von vor dem 2026-10-14) lässt sich lesen
+  ✓ ein zweites Zurückholen fügt nichts hinzu und überschreibt nichts
+  ✓ ein Ordner, den es nicht gibt, wird nicht erfunden (folderId → null)
+  ✓ Erinnerung: eigene Dokumente, nie gesichert → ja
+  ✓ Erinnerung: keine eigenen Dokumente → nein
+  ✓ Erinnerung: vor 13 Tagen gesichert → nein
+  ✓ Erinnerung: vor 14 Tagen gesichert → ja
+  ✓ Erinnerung: „Später" gewählt → nein
+B · im Browser
+  ✓ Schloss und Sicherung sind in der Seite geladen
+  ✓ Ausgangslage: das Foto hat sein Original noch daneben (ungeprüft)
+  ✓ die Erinnerung steht da, solange nie gesichert wurde
+  ✓ der Speicher-Stand wird beim Öffnen genannt (ja · nein · unbekannt)
+  ✓ ein zu kurzes Passwort wird abgewiesen
+  ✓ zwei verschiedene Passwörter werden abgewiesen
+  ✓ der Dateiname nennt Workfloh-PDF-Sicherung und das Datum
+  ✓ in der heruntergeladenen Datei steht kein Klartext
+  ✓ das Passwort wird nirgends abgelegt
+  ✓ die letzte Sicherung ist vermerkt
+  ✓ der Speicher-Stand wird genannt
+  ✓ nach dem Sichern ist die Erinnerung weg
+  ✓ die Bibliothek ist leer
+  ✓ falsches Passwort: die Meldung sagt es
+  ✓ falsches Passwort: nichts kam herein
+  ✓ zurückgeholt: 2 Dokumente und 1 Ordner dazu
+  ✓ das Dokument ist mit Datei und Ordner zurück und steht in der Liste
+  ✓ das Originalfoto ist mit zurück, Byte für Byte
+  ✓ … sein Name trägt den Vermerk „Original, „ungeprüft““
+  ✓ … und das Dokument ist ungeprüft: kein Befund, „jetzt prüfen" steht an der Karte
+  ✓ ein zweites Zurückholen legt nichts doppelt an
+  ✓ ohne Sicherung kommt die Erinnerung wieder
+  ✓ „Später" blendet sie für diesen Besuch aus
+  ✓ in den Einstellungen steht der Weg zur Sicherung
+  ✓ der Knopf in den Einstellungen öffnet die Sicherung
+  ✓ keine Fehler in der Seite
+
+50 grün · 0 ROT
+

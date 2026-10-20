@@ -1,0 +1,11 @@
+
+> workfloh-pdf@1.0.0 messen
+> node tests/masse.mjs
+
+Handbuch digital: 400 Seiten · 4400 Absätze · lesen+übersetzen+speichern 14.5 s (36 ms/Seite) · PDF bauen 127.9 s · Eingang 0.34 MB → Ergebnis 1.06 MB · Zwischenstand 1.63 MB · Speicher-Spitze 132 MB
+Gescannt mit OCR: 10 Seiten · 130 Absätze · lesen+übersetzen+speichern 17.9 s (1789 ms/Seite) · PDF bauen 1.8 s · Eingang 2.51 MB → Ergebnis 2.76 MB · Zwischenstand 0.04 MB · Speicher-Spitze 173 MB
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice

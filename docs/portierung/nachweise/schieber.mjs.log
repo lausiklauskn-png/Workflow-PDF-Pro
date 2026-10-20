@@ -1,0 +1,34 @@
+Workfloh PDF — sichtbarer Schieberegler
+  ✓ der Baustein ist geladen (WFSchieber)
+  ✓ Handy: vier Start-Kacheln, jede höchstens 40 px hoch (Maß: Scanner-Knöpfe)
+  ✓ Handy: die Start-Kacheln stehen untereinander
+  ✓ Handy: die Unterzeile der Start-Kacheln ist ausgeblendet
+  ✓ Handy: „Impressum & Datenschutz" steht sichtbar unter der Bibliothek und führt zur Seite
+  ✓ die Datenschutzerklärung nennt Scannen, Suche nach Bedeutung und Spracheingabe (Stand 27.09.2026)
+  ✓ 720 px: jede Start-Kachel geht über die ganze Breite
+  ✓ 820 px: zwei Spalten, jede Kachel mindestens 45 % der Breite
+  ✓ 1000 px: zwei Spalten, jede Kachel mindestens 45 % der Breite
+  ✓ Vorbedingung: die Feldarten-Leiste ragt am Handy über den Rand (sonst misst der Rest nichts)
+  ✓ unter der Leiste steht ein Schieberegler, und man SIEHT ihn
+  ✓ der Griff ist ein Viereck mit Rillen, groß genug für einen Finger (≥ 44 × 18 px)
+  ✓ die dünne Leiste des Browsers ist ausgeblendet (nur EINE Anzeige)
+  ✓ Handy: das Blatt bekommt mehr als 58 % des Schirms (vorher 53 %)
+  ✓ Handy: die Knöpfe im Bearbeiten-Fenster sind flach (höchstens 32 px)
+  ✓ Handy: der rote Griff ist um rund 20 % kleiner, nicht mehr (12–14 px statt 16)
+  ✓ … und ein Finger knapp daneben trifft ihn trotzdem (Greiffläche blieb groß)
+  ✓ ohne gewähltes Feld steht KEIN Erklärsatz im Fuß (antippen / roter Punkt)
+  ✓ am Anfang steht der Griff links
+  ✓ Griff nach rechts ziehen rollt die Leiste bis ans Ende
+  ✓ … und der Griff steht dann rechts
+  ✓ auf den Anfang der Schiene tippen springt an den Anfang
+  ✓ wischt man die Leiste selbst, läuft der Griff mit (Mitte ↔ Mitte)
+  ✓ ein Knopf der Leiste bleibt antippbar (Text setzen)
+  ✓ nach dem Neuzeichnen des Fußes ist der Schieber wieder da
+  ✓ am breiten Bildschirm passt alles — dann ist KEIN Schieber zu sehen (kein toter Griff)
+  ✓ Vorbedingung: die Ordner-Leiste ragt am Handy über den Rand
+  ✓ unter den Ordner-Knöpfen steht ein Schieberegler mit Griff
+  ✓ … und er rollt die Ordner bis ans Ende
+  ✓ keine Fehler auf der Seite
+
+30 grün · 0 ROT
+

@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: Echte APK wird signiert; Kennung, Version, Zertifikat und Prüfsumme stimmen
+ok 1 - Echte APK wird signiert; Kennung, Version, Zertifikat und Prüfsumme stimmen
+  ---
+  duration_ms: 3834.729358
+  type: 'test'
+  ...
+# Subtest: Nächste APK verwendet dieselbe Identität bei höherer regulärer Version/Buildnummer
+ok 2 - Nächste APK verwendet dieselbe Identität bei höherer regulärer Version/Buildnummer
+  ---
+  duration_ms: 964.889871
+  type: 'test'
+  ...
+# Subtest: Fremde App (Private Brain) wird nicht unter Workflow PDF Pro ausgeliefert
+ok 3 - Fremde App (Private Brain) wird nicht unter Workflow PDF Pro ausgeliefert
+  ---
+  duration_ms: 1001.417113
+  type: 'test'
+  ...
+# Subtest: Debugflag und nicht passende Versionskennung verhindern eine reguläre Ausgabe
+ok 4 - Debugflag und nicht passende Versionskennung verhindern eine reguläre Ausgabe
+  ---
+  duration_ms: 1977.390648
+  type: 'test'
+  ...
+# Subtest: Änderung an der tatsächlich signierten APK wird vom echten apksigner entdeckt
+ok 5 - Änderung an der tatsächlich signierten APK wird vom echten apksigner entdeckt
+  ---
+  duration_ms: 1021.529402
+  type: 'test'
+  ...
+# Subtest: Vorhandene Ausgabe wird nicht ersetzt; falsche Freigabe hinterlässt keine neue APK
+ok 6 - Vorhandene Ausgabe wird nicht ersetzt; falsche Freigabe hinterlässt keine neue APK
+  ---
+  duration_ms: 117.703858
+  type: 'test'
+  ...
+# Subtest: Echter temporärer Android-Keystore wird authentifiziert verschlüsselt; kein Produktionsschlüssel
+ok 7 - Echter temporärer Android-Keystore wird authentifiziert verschlüsselt; kein Produktionsschlüssel
+  ---
+  duration_ms: 2779.485037
+  type: 'test'
+  ...
+# Subtest: Zwei getrennte Wiederherstellungen nutzen dasselbe echte Zertifikat und denselben privaten Schlüssel
+ok 8 - Zwei getrennte Wiederherstellungen nutzen dasselbe echte Zertifikat und denselben privaten Schlüssel
+  ---
+  duration_ms: 745.67512
+  type: 'test'
+  ...
+# Subtest: Falsche Freigabe kann nichts entschlüsseln
+ok 9 - Falsche Freigabe kann nichts entschlüsseln
+  ---
+  duration_ms: 0.851827
+  type: 'test'
+  ...
+# Subtest: Manipulierte Chiffre, Nonce, Tag und Zertifikat werden vor Verwendung abgewiesen
+ok 10 - Manipulierte Chiffre, Nonce, Tag und Zertifikat werden vor Verwendung abgewiesen
+  ---
+  duration_ms: 1.134475
+  type: 'test'
+  ...
+# Subtest: Private-Brain-/fremde App-Kennung und falsche Formate werden abgewiesen
+ok 11 - Private-Brain-/fremde App-Kennung und falsche Formate werden abgewiesen
+  ---
+  duration_ms: 0.355494
+  type: 'test'
+  ...
+# Subtest: Zertifikats-Pin und bereits vorhandene Identität werden nicht ersetzt
+ok 12 - Zertifikats-Pin und bereits vorhandene Identität werden nicht ersetzt
+  ---
+  duration_ms: 286.700922
+  type: 'test'
+  ...
+# Subtest: Auch bei abgebrochenem Signierbefehl bleibt kein entpackter Schlüssel zurück
+ok 13 - Auch bei abgebrochenem Signierbefehl bleibt kein entpackter Schlüssel zurück
+  ---
+  duration_ms: 296.618031
+  type: 'test'
+  ...
+# Subtest: Regulärer Nachweis muss exakt zur Version, App und zum geprüften Commit gehören
+ok 14 - Regulärer Nachweis muss exakt zur Version, App und zum geprüften Commit gehören
+  ---
+  duration_ms: 1.489014
+  type: 'test'
+  ...
+# Subtest: Gleicher Signierer und beide höheren Versionsnummern erlauben ein Update
+ok 15 - Gleicher Signierer und beide höheren Versionsnummern erlauben ein Update
+  ---
+  duration_ms: 0.357736
+  type: 'test'
+  ...
+# Subtest: Numerische Versionsreihenfolge und Ausschluss von Preview-/falschen Tags
+ok 16 - Numerische Versionsreihenfolge und Ausschluss von Preview-/falschen Tags
+  ---
+  duration_ms: 0.238631
+  type: 'test'
+  ...
+# Subtest: Zufällige Freigabe wird nur in neuer privater Datei außerhalb Git abgelegt
+ok 17 - Zufällige Freigabe wird nur in neuer privater Datei außerhalb Git abgelegt
+  ---
+  duration_ms: 163.706195
+  type: 'test'
+  ...
+# Subtest: Vorhandene Freigabe bleibt unverändert
+ok 18 - Vorhandene Freigabe bleibt unverändert
+  ---
+  duration_ms: 51.602264
+  type: 'test'
+  ...
+# Subtest: Klartextfreigabe im Repo wird abgewiesen
+ok 19 - Klartextfreigabe im Repo wird abgewiesen
+  ---
+  duration_ms: 43.128665
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8997.676426

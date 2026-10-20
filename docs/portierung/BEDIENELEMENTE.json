@@ -1,0 +1,3314 @@
+[
+  {
+    "source": "assets/app.js",
+    "line": 65,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-n",
+    "text": "${h(nein || 'Abbrechen')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 65,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-j",
+    "text": "${h(ja || 'OK')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 89,
+    "tag": "input",
+    "attributes": "type=\"text\" data-e value=\"${h(wert || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 89,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-n",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 89,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-j",
+    "text": "OK",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 100,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-abbruch",
+    "text": "⏹ Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 195,
+    "tag": "button",
+    "attributes": "class=\"ordner-chip${S.aktOrdner === 'alle' ? ' on' : ''}\" data-o=\"alle\"",
+    "text": "Alle ${anz('alle')} ${tz('alle')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 196,
+    "tag": "button",
+    "attributes": "class=\"ordner-chip${S.aktOrdner === o.id ? ' on' : ''}\" data-o=\"${o.id}\"",
+    "text": "${o.bereich === 'uebersetzung' ? '🌐 ' : '🗂️ '}${nm(o.name)} ${anz(o.id)} ${tz(o.id)}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 197,
+    "tag": "button",
+    "attributes": "class=\"ordner-chip${S.aktOrdner === 'ohne' ? ' on' : ''}\" data-o=\"ohne\"",
+    "text": "Ohne Ordner ${anz('ohne')} ${tz('ohne')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 198,
+    "tag": "button",
+    "attributes": "class=\"ordner-chip\" data-neu",
+    "text": "＋ Ordner",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 216,
+    "tag": "summary",
+    "attributes": "",
+    "text": "⇅ Sortieren${zr ? ` 📅 ${h(zr)} ` : ''}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 217,
+    "tag": "select",
+    "attributes": "data-sort",
+    "text": "${Object.entries(SORTIERUNG).map(([k, v]) => ` ${v} `).join('')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 219,
+    "tag": "input",
+    "attributes": "type=\"date\" data-von value=\"${h(S.von || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 219,
+    "tag": "input",
+    "attributes": "type=\"date\" data-bis value=\"${h(S.bis || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 219,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-datumweg title=\"Zeitraum wieder weglassen\"",
+    "text": "✕ jedes Datum",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 221,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-ausgabe",
+    "text": "📤 Ordner ausgeben",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 221,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-ueb",
+    "text": "🌐 Übersetzen${sicht.length > 1 ? ' — Dokumente wählen' : ''}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 221,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-erk",
+    "text": "🤖 Felder erkennen${sicht.length > 1 ? ' — Dokumente wählen' : ''}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 222,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-ren",
+    "text": "✎ Ordner umbenennen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 222,
+    "tag": "button",
+    "attributes": "class=\"knopf gefahr\" data-del",
+    "text": "🗑 Ordner löschen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 254,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-alleordner",
+    "text": "In allen Ordnern suchen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 257,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-datumweg2",
+    "text": "✕ jedes Datum",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 273,
+    "tag": "button",
+    "attributes": "class=\"dok-hoch\" data-hoch title=\"Ganz nach oben\" aria-label=\"Ganz nach oben\"",
+    "text": "↑",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 274,
+    "tag": "button",
+    "attributes": "class=\"dok-haken\" data-haken title=\"Auswählen (mehrere teilen oder verschieben)\" aria-label=\"Auswählen\" aria-pressed=\"${WAHL.has(d.id)}\"",
+    "text": "${WAHL.has(d.id) ? '✓' : ''}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 275,
+    "tag": "button",
+    "attributes": "class=\"dok-bild\" data-auf style=\"background-image:url('${d.thumb || ''}')\" title=\"Öffnen\"",
+    "text": "${v ? ` 🤖 ${v} zu prüfen ` : ''}${d.quelle === 'foto' ? ' 📷 Foto ' : ''}${d.uebersetzung ? ` 🌐 ${h((d.uebersetzung.von || '').toUpperCase())}→${h((d.uebersetzung.nach || '').toUpperCase())}${d.uebersetzung.gegenprobe ? ' Gegenprobe' : ''} ` : ''}${d.ausgefuellt ? ` ↩ ausgefüllt aus ${h((d.ausgefuellt.aus || '').toUpperCase())} ` : ''}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 279,
+    "tag": "button",
+    "attributes": "data-auf title=\"Öffnen\"",
+    "text": "✏️",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 279,
+    "tag": "button",
+    "attributes": "data-verschieben title=\"In Ordner verschieben\"",
+    "text": "🗂️",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 279,
+    "tag": "button",
+    "attributes": "data-kopie title=\"Duplizieren (z. B. als Vorlage)\"",
+    "text": "⧉",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 279,
+    "tag": "button",
+    "attributes": "data-teilen title=\"Teilen mit … (E-Mail, Messenger …)\"",
+    "text": "📤",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 279,
+    "tag": "button",
+    "attributes": "data-loeschen title=\"Löschen\"",
+    "text": "🗑",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 354,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" type=\"button\" data-bed-an",
+    "text": "🧠 Suche nach Bedeutung einschalten",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 371,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" type=\"button\" data-bed-mehr",
+    "text": "⚙️",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 372,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" type=\"button\" data-bed-nochmal",
+    "text": "↻ Nochmal",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 372,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" type=\"button\" data-bed-mehr",
+    "text": "⚙️",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 388,
+    "tag": "button",
+    "attributes": "class=\"knopf gefahr\" data-bed-aus",
+    "text": "Ausschalten",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 388,
+    "tag": "button",
+    "attributes": "class=\"knopf primaer\" data-bed-laden",
+    "text": "⬇️ Modell laden",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 388,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Schließen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 634,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-o=\"${o.id}\"",
+    "text": "🗂️ ${nm(o.name)}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 635,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-o=\"\"",
+    "text": "Ohne Ordner",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 635,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-neu",
+    "text": "＋ Neuer Ordner …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 636,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 674,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-wahl-alle",
+    "text": "Alle",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 675,
+    "tag": "button",
+    "attributes": "class=\"knopf klein primaer\" data-wahl-teilen${n ? '' : ' disabled'}",
+    "text": "📤 Teilen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 676,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-wahl-verschieben${n ? '' : ' disabled'}",
+    "text": "🗂️ Verschieben",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 677,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-wahl-loeschen${n ? '' : ' disabled'}",
+    "text": "🗑 Löschen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 678,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-wahl-ende",
+    "text": "✕ Fertig",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 808,
+    "tag": "button",
+    "attributes": "class=\"knopf primaer\" data-teilen-jetzt",
+    "text": "📤 Jetzt teilen …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 808,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-dl",
+    "text": "⬇ ${dateien.length > 1 ? 'Als ZIP herunterladen' : 'Herunterladen'}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 808,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Schließen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1012,
+    "tag": "button",
+    "attributes": "class=\"dok-pruefung offen\" data-pruef-nachholen data-pruefung=\"offen\"",
+    "text": "○ Noch nicht geprüft · jetzt prüfen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1013,
+    "tag": "button",
+    "attributes": "class=\"dok-pruefung warn\" data-pruef data-pruefung=\"warnung\"",
+    "text": "⚠ Verdächtiger Inhalt — ansehen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1014,
+    "tag": "button",
+    "attributes": "class=\"dok-pruefung\" data-pruef data-pruefung=\"ungeprueft\"",
+    "text": "? Nicht ganz geprüft",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1016,
+    "tag": "button",
+    "attributes": "class=\"dok-pruefung info\" data-pruef data-pruefung=\"herkunft\"",
+    "text": "ℹ Herkunft · Prüfbericht",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1019,
+    "tag": "button",
+    "attributes": "class=\"dok-pruefung ok\" data-pruef data-pruefung=\"sauber\"",
+    "text": "✓ Geprüft · Prüfbericht",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1078,
+    "tag": "summary",
+    "attributes": "",
+    "text": "Details anzeigen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1081,
+    "tag": "summary",
+    "attributes": "",
+    "text": "Was geprüft wurde",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1083,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-bericht-laden",
+    "text": "⬇ Prüfbericht als Textdatei",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1083,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-markiert-laden",
+    "text": "⬇ Markierte Kopie speichern",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1083,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-x",
+    "text": "OK",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1124,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-x",
+    "text": "OK",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1136,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Schließen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1136,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-dl",
+    "text": "⬇ Arbeitsstand als Datei sichern",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1141,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-teilen",
+    "text": "📤 Teilen …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1175,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-x",
+    "text": "OK",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1458,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-dok=\"${d.id}\"",
+    "text": "${nm(d.name)} ${d.id === (S.doc && S.doc.id) ? h(T('dieses Dokument')) : d.pages.length + ' ' + h(T('Seiten'))}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1460,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "${h(T('Schließen'))}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1517,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-alle",
+    "text": "✓ Alle übernehmen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1517,
+    "tag": "button",
+    "attributes": "class=\"knopf gefahr\" data-weg",
+    "text": "✕ Alle verwerfen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1528,
+    "tag": "input",
+    "attributes": "id=\"eigWert\" value=\"${h(f.value || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1533,
+    "tag": "button",
+    "attributes": "class=\"knopf${S.platzieren === k ? ' an' : ''}\" data-t=\"${k}\"",
+    "text": "${t.ico} ${t.name}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1534,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"fussSeite\"",
+    "text": "＋ Seite",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1534,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"fussText\"",
+    "text": "📄 Erkannter Text",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1535,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" id=\"platzAbbr\"",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1538,
+    "tag": "button",
+    "attributes": "class=\"knopf klein blau\" id=\"eigOk\"",
+    "text": "✓ Passt",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1539,
+    "tag": "input",
+    "attributes": "id=\"eigLabel\" value=\"${h(f.label || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1540,
+    "tag": "select",
+    "attributes": "id=\"eigTyp\"",
+    "text": "${Object.entries(TYPEN).map(([k, t]) => ` ${t.name} `).join('')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1541,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"eigUnterschr\"",
+    "text": "✒️ ${f.value ? 'Neu unterschreiben' : 'Unterschreiben'}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1541,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"eigUsWeg\"",
+    "text": "Unterschrift entfernen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1542,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" id=\"eigWertC\"${f.value ? ' checked' : ''}",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1543,
+    "tag": "input",
+    "attributes": "type=\"date\" id=\"eigWert\" value=\"${h(f.value || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1544,
+    "tag": "input",
+    "attributes": "id=\"eigWert\" value=\"${h(f.value || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1545,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" id=\"eigMz\"${f.mehrzeilig ? ' checked' : ''}",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1546,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"eigKopie\" title=\"Feld kopieren\"",
+    "text": "⧉ Kopie",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1546,
+    "tag": "button",
+    "attributes": "class=\"knopf gefahr\" id=\"eigDel\"",
+    "text": "🗑 Löschen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1578,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-neu",
+    "text": "Löschen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1578,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1578,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-ok",
+    "text": "✓ Übernehmen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1623,
+    "tag": "textarea",
+    "attributes": "readonly",
+    "text": "${h(t)}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1624,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-k",
+    "text": "Kopieren",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1624,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-x",
+    "text": "Schließen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1633,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-d",
+    "text": "📄 PDF oder Bild wählen eine oder mehrere Dateien",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1634,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-k",
+    "text": "📷 Seite fotografieren",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1635,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1723,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-alle",
+    "text": "Alle",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1723,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" data-dok=\"${h(id)}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1725,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-off",
+    "text": "🔍 Ohne Internet erkennen Findet Linien, Eingabe-Rahmen, graue Eingabeflächen und Kästchen im Seitenbild. Bei digitalen PDFs kommt die Beschriftung aus dem Text daneben.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1726,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-ki",
+    "text": "🤖 Mit KI erkennen — ${h(a.label)} ${kiBereit() ? `Jede Seite wird als Bild an ${h(a.label)} geschickt, mit den offline gefundenen Stellen nummeriert markiert. Die KI benennt sie, sortiert Falsches aus und ergänzt Fehlendes. Die Positionen der markierten Stellen bleiben exakt.` : 'Noch kein Schlüssel eingetragen — tippen, um ihn in den Einstellungen einzutragen.'}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1729,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1766,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-x",
+    "text": "OK",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1952,
+    "tag": "select",
+    "attributes": "data-m",
+    "text": "festes PDF (Einträge fest auf der Seite) ausfüllbares PDF leere ausfüllbare Vorlage Original, unverändert",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1953,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-weg=\"zip\"",
+    "text": "🗜 Als ZIP-Datei (ein Ordner) Eine Datei mit allen PDFs darin, benannt wie der Ordner. Zum Verschicken, Ablegen, Sichern.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1954,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-weg=\"teilen\"",
+    "text": "📤 Alle Dateien teilen Alle PDFs auf einmal an eine App geben (Mail, Messenger, Drive …). Manche Apps nehmen nur eine Datei — dann die ZIP-Datei nehmen.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1955,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-weg=\"eins\"",
+    "text": "📚 Zu einem PDF zusammenfügen Alle Seiten hintereinander in EINEM PDF, in der Reihenfolge oben — z. B. die übersetzten Teile eines Handbuchs wieder als ein Buch. Ausfüllbare Felder werden dabei fest.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1956,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1989,
+    "tag": "button",
+    "attributes": "class=\"knopf primaer\" data-teilen",
+    "text": "📤 Jetzt teilen …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1989,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Schließen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2001,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-m=\"fest\"",
+    "text": "📄 Festes PDF Die eingetragenen Inhalte werden Teil der Seite. Zum Verschicken, Ablegen, Drucken.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2002,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-m=\"ausfuellbar\"",
+    "text": "📝 Ausfüllbares PDF Echte PDF-Formularfelder, vorbelegt mit deinen Einträgen. Der Empfänger kann sie ändern und speichern. Ausfüllen geht in Adobe Acrobat Reader oder Chrome am Computer; die PDF-Anzeige von „Dateien\" oder Google Drive am Handy zeigt oft nur die Kästchen — dafür gibt es die HTML-Fassung.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2003,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-m=\"vorlage\"",
+    "text": "📝 Leere ausfüllbare Vorlage Echte Formularfelder, alle leer. Der Empfänger füllt selbst aus.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2004,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-m=\"html\"",
+    "text": "🌐 Zum Ausfüllen im Browser (HTML) Eine Datei, die sich in jedem Browser öffnet und dort ausfüllen lässt — auch wo die PDF-Anzeige keine Formularfelder kann. Danach im Browser „Als PDF speichern\".",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2005,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-m=\"druck\"",
+    "text": "🖨 Ansehen / Drucken Öffnet das feste PDF in der PDF-Anzeige des Geräts.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2006,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-rueckweg",
+    "text": "↩ Einträge ins Original (${h((S.doc.uebersetzung.von || '').toUpperCase())}) Die Einträge zurückübersetzen und in eine Kopie des Originals „${h(S.doc.uebersetzung.von.toUpperCase())}\" an dieselben Stellen setzen.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2009,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Schließen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2020,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-teilen",
+    "text": "📤 Teilen …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2035,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-teilen",
+    "text": "📤 Teilen …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2053,
+    "tag": "select",
+    "attributes": "data-${name}",
+    "text": "${Object.entries(UE.SPRACHEN).map(([k, v]) => ` ${h(v)} `).join('')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2085,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-uo",
+    "text": "🗂️ Ordner vom Gerät übersetzen Alle PDFs eines Ordners, beliebig viele Seiten. Jede Seite wird einzeln übersetzt und sofort gespeichert.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2086,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-ud",
+    "text": "📄 Einzelne PDFs oder Bilder übersetzen Eine oder mehrere PDF-Dateien oder Fotos (JPG, PNG) wählen. Bei Fotos wird das Blatt gesucht und auf A4 gerade gezogen.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2087,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-ubsp",
+    "text": "📘 Beispiele zum Ausprobieren Das Benutzerhandbuch dieser App (14 Seiten mit Bildern, Tabellen, Kästen, Querformat und einer gescannten Seite) und ein erfundenes Amtsformular. Übersetzen testen, ohne eigene Dokumente zu nehmen. Sie landen im Ordner „Beispiele\".",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2088,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-uk",
+    "text": "📷 Brief fotografieren Papierbrief (z. B. vom Amt) Seite für Seite aufnehmen. Das Blatt wird auf A4 gerade gezogen — ausgedruckt wieder so groß wie das Papier. Die Texterkennung liest ihn auf dem Gerät.",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2089,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-o=\"${o.id}\"",
+    "text": "${o.bereich === 'uebersetzung' ? '🌐 ' : '🗂️ '}${nm(o.name)} ${S.docs.filter(d => d.folderId === o.id && !d.uebersetzung).length} Dokumente",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2090,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2183,
+    "tag": "input",
+    "attributes": "readonly data-adr style=\"width:100%;font-size:12px;padding:6px;border:1px solid #bbb;border-radius:6px\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2184,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-kopie",
+    "text": "📋 Nochmal kopieren",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2184,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-hinok",
+    "text": "OK",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2289,
+    "tag": "input",
+    "attributes": "type=\"number\" min=\"1\" max=\"${p.seiten}\" value=\"${p.jeTeil}\" data-jeteil style=\"width:5em\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2290,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-teilen=\"${h(d.id)}\"",
+    "text": "✂️ In ${p.teile.length} Teile aufteilen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2354,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-alle",
+    "text": "Alle",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2355,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" data-dok=\"${h(d.id)}\"${(opt.gewaehlt ? opt.gewaehlt.includes(d.id) : !mehrere || (alleGewaehlt && !d.uebersetzung)) ? ' checked' : ''}",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2355,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-feld=\"${h(d.id)}\" title=\"Rahmen zum Ausfüllen (Text, Datum, Kästchen, Unterschrift) im Original setzen — sie kommen dann übersetzt mit\"",
+    "text": "✏️ erst Felder setzen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2358,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" data-rueck${EINST.ueRueck !== false ? ' checked' : ''}",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2359,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" data-bilder${EINST.ueBilder ? ' checked' : ''}",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2362,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-weg=\"browser\"",
+    "text": "📱 Übersetzer im Browser prüfe …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2363,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-weg=\"chrome\"",
+    "text": "🌐 Mit Chrome übersetzen (Google) Kostenlos, ohne Schlüssel und ohne Kontingent. Die App zeigt den Text jeder Seite unten an, du tippst einmal in Chrome ⋮ → „Übersetzen\" — danach läuft es Seite für Seite von selbst. Der Text geht dabei an Google.${matchMedia('(display-mode: standalone)').matches ? ' Die App läuft gerade im eigenen Fenster — dort fehlt „Übersetzen\" oft. Dann „' + chromeKnopf() + '\" (darunter)' + (teilenWeg() ? ': im Teilen-Fenster Chrome wählen, dort öffnet sich derselbe Übersetzer. Zurück in der App oben ⟳ tippen.' : ': derselbe Übersetzer öffnet sich in Chrome.') : ''}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2365,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-weg=\"ki\"",
+    "text": "🤖 Mit KI — ${h(a.label)} ${kiBereit() ? `Der Text jeder Seite (nicht das Bild) geht an ${h(a.label)}. Kostet je Seite, abgerechnet über deinen Schlüssel. Vor dem ersten Senden wird gefragt.` : 'Noch kein Schlüssel eingetragen — tippen, um ihn in den Einstellungen einzutragen.'}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2366,
+    "tag": "summary",
+    "attributes": "",
+    "text": "🔎 Messen: was kann dieses Gerät?",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2366,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-messen",
+    "text": "Jetzt messen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2367,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2474,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-weg=\"browser\"",
+    "text": "📱 Übersetzer im Browser prüfe …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2476,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-weg=\"chrome\"",
+    "text": "🌐 Mit Chrome übersetzen (Google) Kostenlos. Die Einträge erscheinen unten, du tippst in Chrome ⋮ → „Übersetzen\" und wählst ${h(UE.NAME_DE[nach])}. Der Text geht dabei an Google.${fenster ? ' Die App läuft gerade im eigenen Fenster — dort gibt es ⋮ → „Übersetzen\" nicht. Dann „' + chromeKnopf() + '\" (darunter): dieselben Einträge öffnen sich in Chrome.' : ''}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2478,
+    "tag": "button",
+    "attributes": "class=\"wahl\" data-weg=\"ki\"",
+    "text": "🤖 Mit KI — ${h(a.label)} ${kiBereit() ? `Nur die Einträge (nicht die Seiten) gehen an ${h(a.label)}. Vor dem ersten Senden wird gefragt.` : 'Noch kein Schlüssel eingetragen — tippen, um ihn einzutragen.'}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2479,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2652,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-oeffne=\"${h(z.neuId)}\"",
+    "text": "${z.teil ? '👁 Teilübersetzung öffnen' : '✏️ Öffnen: Felder setzen / ausfüllen'}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2655,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-x",
+    "text": "OK",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2666,
+    "tag": "button",
+    "attributes": "class=\"wahl${x.code === SP.lang ? ' on' : ''}\" data-sp=\"${x.code}\" lang=\"${x.code}\"${x.rtl ? ' dir=\"rtl\"' : ''}",
+    "text": "${h(x.name)}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2667,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" data-tipps${SP.tipps ? ' checked' : ''}",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2668,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-x",
+    "text": "Fertig",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2735,
+    "tag": "button",
+    "attributes": "class=\"knopf klein rot\" data-sich-jetzt",
+    "text": "Jetzt sichern",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2735,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" data-sich-spaeter",
+    "text": "Später",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2747,
+    "tag": "input",
+    "attributes": "type=\"password\" id=\"siPw1\" autocomplete=\"new-password\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2748,
+    "tag": "input",
+    "attributes": "type=\"password\" id=\"siPw2\" autocomplete=\"new-password\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2750,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" id=\"siErstellen\"",
+    "text": "⬇ Sicherung erstellen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2754,
+    "tag": "input",
+    "attributes": "type=\"file\" id=\"siDatei\" accept=\".json,application/json\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2755,
+    "tag": "input",
+    "attributes": "type=\"password\" id=\"siPwZ\" autocomplete=\"off\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2756,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"siZurueck\"",
+    "text": "⬆ Zurückholen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2760,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"siDauerKnopf\"",
+    "text": "📌 Dauerhaft speichern lassen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2761,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Schließen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2808,
+    "tag": "select",
+    "attributes": "id=\"stAnb\"",
+    "text": "${opt}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2809,
+    "tag": "a",
+    "attributes": "id=\"stKonsole\" target=\"_blank\" rel=\"noopener\" style=\"font-weight:400\"",
+    "text": "— Schlüssel beim Anbieter holen ↗",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2809,
+    "tag": "input",
+    "attributes": "type=\"password\" id=\"stKey\" autocomplete=\"off\" placeholder=\"nur in diesem Browser gespeichert\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2810,
+    "tag": "input",
+    "attributes": "type=\"text\" id=\"stMod\" placeholder=\"\" data-kein-ue",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2811,
+    "tag": "input",
+    "attributes": "type=\"text\" id=\"stUebMod\" placeholder=\"\" data-kein-ue",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2812,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"stTest\"",
+    "text": "🔌 Verbindung testen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2815,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"stSprache\"",
+    "text": "🗣 Sprache und Hinweise …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2817,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" id=\"stLin\"${EINST.linien !== false ? ' checked' : ''}",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2820,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"stSicherung\"",
+    "text": "🔐 Bibliothek sichern und zurückholen …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2821,
+    "tag": "a",
+    "attributes": "href=\"impressum.html\" target=\"_blank\" rel=\"noopener\"",
+    "text": "Impressum &amp; Datenschutz",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2822,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" id=\"stInstall\"",
+    "text": "📲 Als App installieren",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2823,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2823,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-ok",
+    "text": "Speichern",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2857,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-x",
+    "text": "OK",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2891,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-teil=\"haupt\" aria-pressed=\"true\"",
+    "text": "▶ Erklärvideo",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2891,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-teil=\"neu\" aria-pressed=\"false\"",
+    "text": "▶ Neu: Versteckte Befehle",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2892,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-ab=\"${s}\"",
+    "text": "${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')} ${n}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2895,
+    "tag": "a",
+    "attributes": "href=\"${WEBSEITE}\" target=\"_blank\" rel=\"noopener\"",
+    "text": "Alle Kapitel und das Video hochkant auf der Webseite",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2896,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-x",
+    "text": "Schließen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2971,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-hb",
+    "text": "📘 Handbuch öffnen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2971,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-bsp",
+    "text": "📄 Beispiel-Formular",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2971,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-x",
+    "text": "Verstanden",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2975,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-test-bild",
+    "text": "🧪 Bild mit blasser Anweisung",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2975,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-test-pdf",
+    "text": "🧪 PDF mit unsichtbarem Text",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2976,
+    "tag": "a",
+    "attributes": "data-test-laden href=\"beispiele/Testbild-versteckte-Anweisung.png\" download",
+    "text": "⬇ Testbild",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2978,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-video",
+    "text": "🎬 Erklärvideo",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2979,
+    "tag": "a",
+    "attributes": "data-webseite href=\"${WEBSEITE}\" target=\"_blank\" rel=\"noopener\"",
+    "text": "Alle Kapitel und das Video hochkant auf der Webseite",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/html-export.js",
+    "line": 28,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" class=\"f k\" style=\"${st}\" title=\"${t}\"${f.value ? ' checked' : ''}",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/html-export.js",
+    "line": 31,
+    "tag": "textarea",
+    "attributes": "class=\"f t m\" style=\"${st}\" title=\"${t}\"",
+    "text": "${esc(wert)}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/html-export.js",
+    "line": 32,
+    "tag": "input",
+    "attributes": "class=\"f t\" style=\"${st}\" title=\"${t}\" value=\"${esc(wert)}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/html-export.js",
+    "line": 53,
+    "tag": "button",
+    "attributes": "class=\"an\" id=\"druck\"",
+    "text": "🖨 Als PDF speichern",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/html-export.js",
+    "line": 53,
+    "tag": "button",
+    "attributes": "id=\"sichern\"",
+    "text": "💾 Ausgefüllt speichern",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 910,
+    "tag": "a",
+    "attributes": "href",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 41,
+    "tag": "a",
+    "attributes": "href",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 565,
+    "tag": "a",
+    "attributes": "",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 571,
+    "tag": "a",
+    "attributes": "\\b([^",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 286,
+    "tag": "button",
+    "attributes": "class=\"knopf klein scan-zu\" data-schliessen title=\"Schließen\" aria-label=\"Schließen\"",
+    "text": "✕",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 294,
+    "tag": "input",
+    "attributes": "type=\"file\" accept=\"image/*\" capture=\"environment\" data-in-kamera hidden",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 295,
+    "tag": "input",
+    "attributes": "type=\"file\" accept=\"image/*\" multiple data-in-galerie hidden",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 296,
+    "tag": "input",
+    "attributes": "type=\"file\" accept=\"image/*\" data-in-ki hidden",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 368,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-kamera",
+    "text": "📷 Kamera",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 368,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-galerie",
+    "text": "🖼 Aus der Galerie",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 459,
+    "tag": "button",
+    "attributes": "data-kein-ue class=\"scan-zeile${kl}\" data-zeile=\"${i}\" style=\"${st}\" title=\"${h(zeilenText(s, i))}${zl.conf < 70 ? ' — unsicher erkannt (' + zl.conf + ' %), bitte prüfen' : ''}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 485,
+    "tag": "button",
+    "attributes": "class=\"chip${st.ausr === k ? ' on' : ''}\" data-ausr=\"${k}\"",
+    "text": "${n}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 487,
+    "tag": "textarea",
+    "attributes": "data-t rows=\"3\" data-kein-ue",
+    "text": "${h(jetzt)}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 489,
+    "tag": "button",
+    "attributes": "class=\"chip\" data-gr=\"-1\" title=\"Kleiner\"",
+    "text": "A−",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 489,
+    "tag": "button",
+    "attributes": "class=\"chip\" data-gr=\"1\" title=\"Größer\"",
+    "text": "A+",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 493,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-n",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 493,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-r",
+    "text": "↺ Wie erkannt",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 493,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-j",
+    "text": "Übernehmen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 543,
+    "tag": "button",
+    "attributes": "class=\"modus-k${ST.ansicht === 'zuschnitt' ? ' on' : ''}\" data-ansicht=\"zuschnitt\"",
+    "text": "✂ Zuschneiden",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 543,
+    "tag": "button",
+    "attributes": "class=\"modus-k${ST.ansicht === 'ergebnis' ? ' on' : ''}\" data-ansicht=\"ergebnis\"",
+    "text": "✨ Ergebnis",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 547,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-auto",
+    "text": "↺ Automatisch",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 547,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-ganz",
+    "text": "▢ Ganzes Foto",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 548,
+    "tag": "button",
+    "attributes": "class=\"knopf rot scan-weiter\" data-ansicht=\"ergebnis\"",
+    "text": "✓ Zuschnitt passt → Ergebnis",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 550,
+    "tag": "button",
+    "attributes": "class=\"chip${s.filter === k ? ' on' : ''}\" data-filter=\"${k}\"",
+    "text": "${FILTER_NAME[k]}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 551,
+    "tag": "input",
+    "attributes": "type=\"range\" min=\"-100\" max=\"100\" step=\"5\" value=\"${s.hell}\" data-hell",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 552,
+    "tag": "input",
+    "attributes": "type=\"range\" min=\"-100\" max=\"100\" step=\"5\" value=\"${s.kontrast}\" data-kontrast",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 553,
+    "tag": "input",
+    "attributes": "type=\"range\" min=\"0\" max=\"100\" step=\"5\" value=\"${schaerfeVon(s)}\" data-schaerfe",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 554,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-dreh=\"-1\" title=\"Nach links drehen\"",
+    "text": "⟲ Links",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 554,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-dreh=\"1\" title=\"Nach rechts drehen\"",
+    "text": "⟳ Rechts",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 554,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-alle",
+    "text": "Auf alle Seiten anwenden",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 556,
+    "tag": "select",
+    "attributes": "data-sprache title=\"Sprache der Texterkennung\"",
+    "text": "${Object.entries(SPRACHEN).map(([k, v]) => ` ${h(v)} `).join('')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 557,
+    "tag": "button",
+    "attributes": "class=\"knopf${ST.textModus ? ' an' : ''}\" data-textmodus",
+    "text": "✎ Text ändern",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 557,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-ocr",
+    "text": "🔤 Text erkennen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 558,
+    "tag": "button",
+    "attributes": "class=\"knopf${ST.vergleich === 'neben' && s.ocr ? ' an' : ''}\" data-kopie",
+    "text": "📄 Kopie neben Original",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 559,
+    "tag": "select",
+    "attributes": "data-bildnach title=\"In diese Sprache übersetzt ChatGPT\"",
+    "text": "${Object.entries(SB().BILD_SPRACHEN).map(([k, v]) => ` ${h(v)} `).join('')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 559,
+    "tag": "button",
+    "attributes": "class=\"knopf ki-knopf\" data-bildki",
+    "text": "🎨 Mit ChatGPT übersetzen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 559,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-bildholen",
+    "text": "📥 Ergebnis zurückholen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 561,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-maske",
+    "text": "🎭 Textmaske (PNG, durchsichtig)",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 567,
+    "tag": "button",
+    "attributes": "class=\"chip${(ST.vergleich || 'original') === k ? ' on' : ''}\" data-vgl=\"${k}\"",
+    "text": "${n}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 569,
+    "tag": "button",
+    "attributes": "class=\"chip${!alsKopie(s) ? ' on' : ''}\" data-ausgabe=\"original\"",
+    "text": "Original (Foto)",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 569,
+    "tag": "button",
+    "attributes": "class=\"chip${alsKopie(s) ? ' on' : ''}\" data-ausgabe=\"kopie\"",
+    "text": "Kopie (sauberer Text)",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 572,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-genauer${(s.ocr.dpi || OCR_DPI)",
+    "text": "= 300 ? ' disabled' : ''}>🔍 Genauer erkennen (300 dpi)",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 572,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-neufoto",
+    "text": "📷 Seite neu fotografieren",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 573,
+    "tag": "button",
+    "attributes": "class=\"knopf gefahr\" data-weg",
+    "text": "🗑 Seite entfernen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 625,
+    "tag": "button",
+    "attributes": "class=\"scan-daumen-bild\" data-waehle=\"${i}\" title=\"Seite ${i + 1} ansehen\"",
+    "text": "${i + 1}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 626,
+    "tag": "button",
+    "attributes": "data-links=\"${i}\" title=\"Nach vorn\"${i ? '' : ' disabled'}",
+    "text": "◀",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 626,
+    "tag": "button",
+    "attributes": "data-rechts=\"${i}\" title=\"Nach hinten\"${i < ST.seiten.length - 1 ? '' : ' disabled'}",
+    "text": "▶",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 627,
+    "tag": "button",
+    "attributes": "class=\"scan-plus\" data-kamera",
+    "text": "📷 Seite",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 627,
+    "tag": "button",
+    "attributes": "class=\"scan-plus\" data-galerie",
+    "text": "🖼 Galerie",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 649,
+    "tag": "input",
+    "attributes": "data-name value=\"${h(ST.name)}\" data-kein-ue",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 650,
+    "tag": "select",
+    "attributes": "data-format",
+    "text": "${Object.entries(FORMAT).map(([k, v]) => ` ${h(v)} `).join('')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 651,
+    "tag": "select",
+    "attributes": "data-quali",
+    "text": "${Object.entries(QUALI).map(([k, v]) => ` ${h(v.name)} `).join('')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 652,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" data-durch${ST.durchsuchbar ? ' checked' : ''}",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 656,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-laden${fertig ? '' : ' disabled'}",
+    "text": "⬇ PDF herunterladen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 657,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-teilen${fertig ? '' : ' disabled'}",
+    "text": "📤 Teilen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 658,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-zip${fertig ? '' : ' disabled'}",
+    "text": "🖼 Als Bilder (ZIP)",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 659,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-fertig${fertig ? '' : ' disabled'}",
+    "text": "✓ ${h(ST.opt.fertigText || 'PDF erstellen')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 690,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Schließen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 690,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-dl",
+    "text": "⬇ Herunterladen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 690,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-jetzt",
+    "text": "📤 Jetzt teilen …",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/sprache-texte.js",
+    "line": 380,
+    "tag": "a",
+    "attributes": "",
+    "text": "Impressum & Datenschutz",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/sprache-texte.js",
+    "line": 380,
+    "tag": "a",
+    "attributes": "",
+    "text": "Legal notice & privacy",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/sprache-texte.js",
+    "line": 1345,
+    "tag": "a",
+    "attributes": "",
+    "text": "Impressum & Datenschutz",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/sprache-texte.js",
+    "line": 1345,
+    "tag": "a",
+    "attributes": "",
+    "text": "Выходные данные и конфиденциальность",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/sprache-texte.js",
+    "line": 2310,
+    "tag": "a",
+    "attributes": "",
+    "text": "Impressum & Datenschutz",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/sprache-texte.js",
+    "line": 2310,
+    "tag": "a",
+    "attributes": "",
+    "text": "بيانات الناشر وحماية البيانات",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 93,
+    "tag": "button",
+    "attributes": "type=\"button\" class=\"wfs-fertig\" title=\"Aufnahme beenden\"",
+    "text": "■ Stopp",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 469,
+    "tag": "button",
+    "attributes": "type=\"button\" data-halt style=\"margin-top:6px;padding:6px 10px;border:1px solid #999;border-radius:8px;background:#fff\"",
+    "text": "⏹ Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "impressum.html",
+    "line": 18,
+    "tag": "a",
+    "attributes": "href=\"./\"",
+    "text": "← zurück zu Workfloh PDF",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "impressum.html",
+    "line": 22,
+    "tag": "a",
+    "attributes": "href=\"mailto:info@family-projekt.de\"",
+    "text": "info@family-projekt.de",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "impressum.html",
+    "line": 27,
+    "tag": "a",
+    "attributes": "href=\"mailto:info@family-projekt.de\"",
+    "text": "info@family-projekt.de",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 26,
+    "tag": "button",
+    "attributes": "class=\"floh-knopf\" id=\"flohKnopf\" aria-label=\"Zur Bibliothek\" title=\"Zur Bibliothek\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 36,
+    "tag": "button",
+    "attributes": "class=\"lampen\" id=\"lampen\" type=\"button\" aria-expanded=\"false\" aria-controls=\"netz-mehr\" title=\"SBKIM-Knoten: lebt · verkehr · fremd — tippen zeigt Siegel und Netz\"",
+    "text": "lebt verkehr fremd",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 48,
+    "tag": "button",
+    "attributes": "class=\"knopf klein rot\" id=\"btnInstall\" title=\"Als App auf dieses Gerät legen\"",
+    "text": "📲 Installieren",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 49,
+    "tag": "button",
+    "attributes": "class=\"ikon sprache-k\" id=\"btnSprache\" title=\"Sprache der App\"",
+    "text": "DE",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 50,
+    "tag": "button",
+    "attributes": "class=\"ikon\" id=\"btnNeu\" title=\"Neueste Fassung laden (Hard-Reload) — deine Dokumente bleiben\"",
+    "text": "⟳",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 51,
+    "tag": "button",
+    "attributes": "class=\"ikon\" id=\"btnVideo\" title=\"Erklärvideo\" aria-label=\"Erklärvideo\"",
+    "text": "🎬",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 52,
+    "tag": "button",
+    "attributes": "class=\"ikon\" id=\"btnHilfe\" title=\"So geht's\"",
+    "text": "?",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 53,
+    "tag": "button",
+    "attributes": "class=\"ikon\" id=\"btnEinst\" title=\"Einstellungen\"",
+    "text": "⚙️",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 62,
+    "tag": "input",
+    "attributes": "type=\"file\" id=\"inDatei\" accept=\"application/pdf,image/*,.json,application/json\" multiple hidden",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 65,
+    "tag": "button",
+    "attributes": "class=\"gross-knopf\" id=\"btnScan\" type=\"button\"",
+    "text": "📷 Scannen · Foto → PDF zuschneiden · Filter · Text ändern",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 69,
+    "tag": "input",
+    "attributes": "type=\"file\" id=\"inOrdner\" webkitdirectory multiple hidden",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 72,
+    "tag": "button",
+    "attributes": "class=\"gross-knopf\" id=\"btnUebersetzen\" type=\"button\"",
+    "text": "🌐 Importieren zum Übersetzen neue Datei einlesen · Deutsch · Русский · English",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 81,
+    "tag": "input",
+    "attributes": "class=\"bib-suche\" id=\"bibSuche\" type=\"search\" enterkeyhint=\"search\" placeholder=\"Suchen — Name oder Inhalt, z. B. eine Kundennummer\" aria-label=\"Dokumente suchen\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 82,
+    "tag": "button",
+    "attributes": "class=\"bib-knopf\" id=\"bibMic\" type=\"button\" title=\"Sprechen statt tippen\" aria-label=\"Spracheingabe\"",
+    "text": "🎤",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 83,
+    "tag": "button",
+    "attributes": "class=\"bib-knopf\" id=\"bibLos\" type=\"submit\" title=\"Suchen\" aria-label=\"Suchen\"",
+    "text": "🔍",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 93,
+    "tag": "a",
+    "attributes": "href=\"impressum.html\" target=\"_blank\" rel=\"noopener\"",
+    "text": "Impressum &amp; Datenschutz",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 99,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"edZurueck\" title=\"Zurück zur Bibliothek\"",
+    "text": "← Bibliothek",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 100,
+    "tag": "input",
+    "attributes": "class=\"ed-name\" id=\"edName\" aria-label=\"Dokumentname\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 102,
+    "tag": "button",
+    "attributes": "id=\"mBearbeiten\" class=\"modus-k on\" role=\"tab\"",
+    "text": "✏️ Felder bearbeiten",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 103,
+    "tag": "button",
+    "attributes": "id=\"mAusfuellen\" class=\"modus-k\" role=\"tab\"",
+    "text": "✍️ Ausfüllen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 105,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"edErkennen\" title=\"Formularfelder erkennen lassen\"",
+    "text": "🤖 Felder erkennen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 106,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"edZuschneiden\" title=\"Zuschneiden, gerade ziehen, Seitengröße wählen\"",
+    "text": "✂️ Zuschneiden",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 108,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" id=\"zMinus\" title=\"Kleiner\"",
+    "text": "−",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 108,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" id=\"zPlus\" title=\"Größer\"",
+    "text": "+",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 109,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"edSpeichern\" title=\"Speichern · Arbeitsstand als Datei sichern\"",
+    "text": "💾 Speichern",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 110,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"edTeilen\" title=\"Teilen mit … (E-Mail, Messenger …)\"",
+    "text": "📤 Teilen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 111,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" id=\"edExport\"",
+    "text": "⬇ PDF ausgeben",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 116,
+    "tag": "input",
+    "attributes": "class=\"bib-suche\" id=\"edSuche\" type=\"search\" enterkeyhint=\"search\" placeholder=\"🔎 Im Dokument suchen\" aria-label=\"Im Dokument suchen\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 118,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" id=\"edSuchZurueck\" type=\"button\" title=\"Vorheriger Treffer\"",
+    "text": "▲",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 119,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" id=\"edSuchWeiter\" type=\"submit\" title=\"Nächster Treffer\"",
+    "text": "▼",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 127,
+    "tag": "input",
+    "attributes": "type=\"file\" id=\"inAnhang\" accept=\"application/pdf,image/*\" multiple hidden",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 128,
+    "tag": "input",
+    "attributes": "type=\"file\" id=\"inUeOrdner\" webkitdirectory multiple hidden",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 129,
+    "tag": "input",
+    "attributes": "type=\"file\" id=\"inUeDateien\" accept=\"application/pdf,image/*\" multiple hidden",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 890,
+    "tag": "button",
+    "attributes": "type=\"button\" id=\"sbwiz-s1\" style=\"' + KNOPF_CSS + '\"",
+    "text": "' + T(\"Identität erzeugen\") + '",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 892,
+    "tag": "button",
+    "attributes": "type=\"button\" id=\"sbwiz-s2\" disabled style=\"' + KNOPF_CSS + '\"",
+    "text": "' + T(\"Spore erzeugen + ⬇\") + '",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 894,
+    "tag": "button",
+    "attributes": "type=\"button\" id=\"sbwiz-s3\" disabled style=\"' + KNOPF_CSS + '\"",
+    "text": "' + T(\"Backup erzeugen + ⬇\") + '",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 896,
+    "tag": "button",
+    "attributes": "type=\"button\" id=\"sbwiz-s4\" style=\"' + KNOPF_CSS + '\"",
+    "text": "' + T(\"Backup-Datei wählen + wiederherstellen\") + '",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 897,
+    "tag": "input",
+    "attributes": "type=\"file\" id=\"sbwiz-s4-file\" accept=\".json,application/json\" hidden /",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 899,
+    "tag": "select",
+    "attributes": "id=\"sbwiz-idsel\" style=\"margin:.4em 0;max-width:100%;border-radius:8px;border:1px solid #C9A961;background:rgba(0,0,0,0.35);color:#F5E6B8;padding:.35em .5em;font:inherit\"",
+    "text": "' + T(\"— wird geladen … —\") + '",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 904,
+    "tag": "button",
+    "attributes": "type=\"button\" id=\"sbwiz-close\" style=\"margin-top:1em;cursor:pointer;border-radius:8px;border:1px solid rgba(154,167,182,.4);background:transparent;color:#eef2f8;padding:.4em .9em;font:inherit\"",
+    "text": "' + T(\"Schließen\") + '",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3021,
+    "tag": "a",
+    "attributes": "",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 87,
+    "tag": "a",
+    "attributes": "class=\"back\" data-zurueck href=\"./\"",
+    "text": "← zurück zur App",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 88,
+    "tag": "button",
+    "attributes": "class=\"sprachknopf\" type=\"button\" data-sprachknopf hidden translate=\"no\"",
+    "text": "English",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 96,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#mycel\"",
+    "text": "Mycel",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 98,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-knoten\"",
+    "text": "Knoten",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 99,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-spore\"",
+    "text": "Spore",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 100,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-relais\"",
+    "text": "Relais",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 104,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#schutz\"",
+    "text": "Wie geschützt wird",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 106,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#siegel\"",
+    "text": "Das Siegel",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 114,
+    "tag": "a",
+    "attributes": "href=\"#mycel\"",
+    "text": "Was ist das Mycel?",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 115,
+    "tag": "a",
+    "attributes": "href=\"#nutzen\"",
+    "text": "Wofür ist es gut?",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 116,
+    "tag": "a",
+    "attributes": "href=\"#fenster\"",
+    "text": "Das Fenster „Mit dem Knotennetz verbinden“",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 117,
+    "tag": "a",
+    "attributes": "href=\"#karten\"",
+    "text": "Was die Karten im Raum zeigen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 118,
+    "tag": "a",
+    "attributes": "href=\"#siegel\"",
+    "text": "Das Siegel",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 119,
+    "tag": "a",
+    "attributes": "href=\"#lampen\"",
+    "text": "Die Lampen-Leiste",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 120,
+    "tag": "a",
+    "attributes": "href=\"#warum\"",
+    "text": "Warum es Schutz braucht",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 121,
+    "tag": "a",
+    "attributes": "href=\"#schutz\"",
+    "text": "Wie geschützt wird",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 122,
+    "tag": "a",
+    "attributes": "href=\"#eigenes-netz\"",
+    "text": "Ein eigenes Netz einrichten",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 123,
+    "tag": "a",
+    "attributes": "href=\"#empfehlen\"",
+    "text": "Empfehlen und Sperren",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 124,
+    "tag": "a",
+    "attributes": "href=\"#regel\"",
+    "text": "Die eine Regel für dich",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 125,
+    "tag": "a",
+    "attributes": "href=\"#offen\"",
+    "text": "Was noch nicht geht",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 126,
+    "tag": "a",
+    "attributes": "href=\"#mehr\"",
+    "text": "Mehr lesen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 127,
+    "tag": "a",
+    "attributes": "href=\"#woerter\"",
+    "text": "Wörterbuch",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 134,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-knoten\"",
+    "text": "Knoten",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 137,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-vektor\"",
+    "text": "Bedeutungs-Vektor",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 140,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-signatur\"",
+    "text": "Unterschrift",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 145,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-schluessel\"",
+    "text": "Schlüssel",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 147,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-raum\"",
+    "text": "Raum",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 148,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#eigenes-netz\"",
+    "text": "eigenes Netz",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 176,
+    "tag": "a",
+    "attributes": "href=\"https://hbr.org/2022/08/how-much-time-and-energy-do-we-waste-toggling-between-applications\" target=\"_blank\" rel=\"noopener noreferrer\"",
+    "text": "Artikel",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 187,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-identitaet\"",
+    "text": "Identität",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 193,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#karten\"",
+    "text": "Karten",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 199,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-richter\"",
+    "text": "KI-Richter",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 201,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#eigenes-netz\"",
+    "text": "eigenes Netz",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 202,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#empfehlen\"",
+    "text": "Empfehlen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 203,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-sperrliste\"",
+    "text": "Sperrliste",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 216,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-kennung\"",
+    "text": "Kennung",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 217,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-vektor\"",
+    "text": "Vektor",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 217,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#s2\"",
+    "text": "S2",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 222,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-netzadmin\"",
+    "text": "Netzadmin",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 224,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#empfehlen\"",
+    "text": "empfohlen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 228,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-sperrliste\"",
+    "text": "Sperrliste",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 240,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-apoptose\"",
+    "text": "Apoptose",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 241,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-membran\"",
+    "text": "Membran",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 246,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#schutz\"",
+    "text": "S1 bis S5b",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 272,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-membran\"",
+    "text": "Membran",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 273,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#siegel\"",
+    "text": "Siegel",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 329,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-membran\"",
+    "text": "Membran",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 330,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#lampen\"",
+    "text": "FREMD",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 340,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-netzadmin\"",
+    "text": "Netzadmin",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 352,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-netzcode\"",
+    "text": "Netz-Code",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 394,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#empfehlen\"",
+    "text": "Empfehlen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 407,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-sicherheitsnummer\"",
+    "text": "Sicherheitsnummer",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 423,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#w-netzadmin\"",
+    "text": "Netzadmin",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 469,
+    "tag": "a",
+    "attributes": "href=\"https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/docs/papers/sicherer-umgang-im-knotennetz.md\" target=\"_blank\" rel=\"noopener noreferrer\"",
+    "text": "lesen ↗",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 471,
+    "tag": "a",
+    "attributes": "href=\"https://doi.org/10.5281/zenodo.22277738\" target=\"_blank\" rel=\"noopener noreferrer\"",
+    "text": "DOI 10.5281/zenodo.22277738 ↗",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 473,
+    "tag": "a",
+    "attributes": "href=\"https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/docs/ANLEITUNG_EMPFEHLEN.md\" target=\"_blank\" rel=\"noopener noreferrer\"",
+    "text": "Anleitung ↗",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 507,
+    "tag": "a",
+    "attributes": "class=\"back\" data-zurueck href=\"./\"",
+    "text": "← back to the app",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 508,
+    "tag": "button",
+    "attributes": "class=\"sprachknopf\" type=\"button\" data-sprachknopf hidden translate=\"no\"",
+    "text": "Deutsch",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 516,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-mycel\"",
+    "text": "mycelium",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 518,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-knoten\"",
+    "text": "node",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 519,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-spore\"",
+    "text": "spore",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 520,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-relais\"",
+    "text": "relay",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 524,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-schutz\"",
+    "text": "How protection works",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 526,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-siegel\"",
+    "text": "The seal",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 534,
+    "tag": "a",
+    "attributes": "href=\"#en-mycel\"",
+    "text": "What is the mycelium?",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 535,
+    "tag": "a",
+    "attributes": "href=\"#en-nutzen\"",
+    "text": "What is it good for?",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 536,
+    "tag": "a",
+    "attributes": "href=\"#en-fenster\"",
+    "text": "The window “Connect to the node network”",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 537,
+    "tag": "a",
+    "attributes": "href=\"#en-karten\"",
+    "text": "What the cards in the room show",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 538,
+    "tag": "a",
+    "attributes": "href=\"#en-siegel\"",
+    "text": "The seal",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 539,
+    "tag": "a",
+    "attributes": "href=\"#en-lampen\"",
+    "text": "The lamp bar",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 540,
+    "tag": "a",
+    "attributes": "href=\"#en-warum\"",
+    "text": "Why protection is needed",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 541,
+    "tag": "a",
+    "attributes": "href=\"#en-schutz\"",
+    "text": "How protection works",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 542,
+    "tag": "a",
+    "attributes": "href=\"#en-eigenes-netz\"",
+    "text": "Setting up your own network",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 543,
+    "tag": "a",
+    "attributes": "href=\"#en-empfehlen\"",
+    "text": "Recommending and blocking",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 544,
+    "tag": "a",
+    "attributes": "href=\"#en-regel\"",
+    "text": "The one rule for you",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 545,
+    "tag": "a",
+    "attributes": "href=\"#en-offen\"",
+    "text": "What does not work yet",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 546,
+    "tag": "a",
+    "attributes": "href=\"#en-mehr\"",
+    "text": "Further reading",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 547,
+    "tag": "a",
+    "attributes": "href=\"#en-woerter\"",
+    "text": "Glossary",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 553,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-knoten\"",
+    "text": "node",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 556,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-vektor\"",
+    "text": "meaning vector",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 559,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-signatur\"",
+    "text": "signature",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 563,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-schluessel\"",
+    "text": "key",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 565,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-raum\"",
+    "text": "room",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 566,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-eigenes-netz\"",
+    "text": "your own network",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 592,
+    "tag": "a",
+    "attributes": "href=\"https://hbr.org/2022/08/how-much-time-and-energy-do-we-waste-toggling-between-applications\" target=\"_blank\" rel=\"noopener noreferrer\"",
+    "text": "article",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 603,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-identitaet\"",
+    "text": "identity",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 609,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-karten\"",
+    "text": "cards",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 615,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-richter\"",
+    "text": "AI judge",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 617,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-eigenes-netz\"",
+    "text": "your own network",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 618,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-empfehlen\"",
+    "text": "Recommending",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 619,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-sperrliste\"",
+    "text": "block list",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 631,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-kennung\"",
+    "text": "identifier",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 632,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-vektor\"",
+    "text": "vector",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 632,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-s2\"",
+    "text": "S2",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 637,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-netzadmin\"",
+    "text": "network admin",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 639,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-empfehlen\"",
+    "text": "recommended",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 643,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-sperrliste\"",
+    "text": "block list",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 654,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-apoptose\"",
+    "text": "apoptosis",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 655,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-membran\"",
+    "text": "membrane",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 660,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-schutz\"",
+    "text": "S1 to S5b",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 685,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-membran\"",
+    "text": "membrane",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 686,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-siegel\"",
+    "text": "seal",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 739,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-membran\"",
+    "text": "membrane",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 740,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-lampen\"",
+    "text": "FOREIGN",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 750,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-netzadmin\"",
+    "text": "network admin",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 761,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-netzcode\"",
+    "text": "network code",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 803,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-empfehlen\"",
+    "text": "Recommending",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 815,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-sicherheitsnummer\"",
+    "text": "safety number",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 831,
+    "tag": "a",
+    "attributes": "class=\"w\" href=\"#en-w-netzadmin\"",
+    "text": "network admin",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 872,
+    "tag": "a",
+    "attributes": "href=\"https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/docs/papers/sicherer-umgang-im-knotennetz.md\" target=\"_blank\" rel=\"noopener noreferrer\"",
+    "text": "read ↗",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 874,
+    "tag": "a",
+    "attributes": "href=\"https://doi.org/10.5281/zenodo.22277738\" target=\"_blank\" rel=\"noopener noreferrer\"",
+    "text": "DOI 10.5281/zenodo.22277738 ↗",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 876,
+    "tag": "a",
+    "attributes": "href=\"https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/docs/ANLEITUNG_EMPFEHLEN.md\" target=\"_blank\" rel=\"noopener noreferrer\"",
+    "text": "guide ↗",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 906,
+    "tag": "button",
+    "attributes": "id=\"rueckSchwebe\" type=\"button\" hidden",
+    "text": "↩ zurück",
+    "native_evidence": "offen"
+  }
+]

@@ -1,0 +1,51 @@
+Workfloh PDF — Behördenformular, Hin- und Rückweg
+  ✓ Übersetzen-Fenster nennt die Felder, die übersetzt mitkommen
+  ✓ der Weg zum Felder-Setzen wird erklärt (Hinweis im Fenster)
+  ✓ Bericht: „3 Felder übersetzt mitgenommen" + Knopf zum Öffnen
+  ✓ zerlegter Umlaut in der Überschrift wird VOR dem Übersetzen zusammengesetzt (NFC)
+  ✓ jedes Feld des Originals steht in der Übersetzung (quellFeld)
+  ✓ … an DERSELBEN Stelle (x, y, w, h gleich)
+  ✓ Beschriftungen übersetzt (Фамилия, Место рождения, Согласен)
+  ✓ vorhandener Eintrag übersetzt, Kästchen unverändert
+  ✓ Öffnen führt direkt in den Editor zum Ausfüllen
+  ✓ festes PDF (RU): Kyrillisch lesbar, keine Fragezeichen
+  ✓ festes PDF behält A4
+  ✓ ausfüllbares PDF (RU): Felder mit kyrillischem Wert
+  ✓ … und die Schrift dafür steht in /DR (Noto, unter dem Namen aus /DA)
+  ✓ Ausgeben-Fenster bietet „↩ Einträge ins Original (DE)"
+  ✓ Kopie des Originals mit den Beschriftungen des Originals
+  ✓ Einträge zurückübersetzt: Geburtsort = Moskau
+  ✓ Umlaut richtig: „Müller" als EIN Zeichen (NFC), obwohl zerlegt geliefert
+  ✓ Kästchen übernommen (angekreuzt)
+  ✓ Stellen gleich dem Original
+  ✓ als „ausgefüllt aus RU" markiert, im eigenen Ordner, Original unverändert
+  ✓ festes PDF (DE, ausgefüllt): Müller und Moskau auf der Seite
+  ✓ DE → EN: Felder mitgenommen, Beschriftungen englisch
+  ✓ EN: Rückweg heißt „↩ Einträge ins Original (DE)"
+  ✓ EN → DE: Geburtsort = London, Name = Müller, Ordner „ausgefüllt (aus EN)"
+  ✓ ausgefüllte Kopie weiter übersetzt → derselbe „· RU"-Ordner wie das Original
+  ✓ Stamm-Ordner umbenannt → „· RU", „· EN" und „· ausgefüllt …" ziehen mit
+  ✓ App-Fenster: Rückweg nennt, dass „Übersetzen“ dort fehlt, und bietet „Mit Browser öffnen zum Übersetzen“
+  ✓ … „Mit Chrome übersetzen" führt dort NICHT in die Sackgasse (keine Fläche), sondern gleich ins Teilen-Fenster
+  ✓ … geteilt wird der Rückweg (rueck=<Übersetzung>, weg=chrome)
+  ✓ Chrome-Tab öffnet „↩ Einträge ins Original" mit hervorgehobenem Chrome-Weg, Adresse sauber, ohne „In Chrome öffnen"
+  ✓ … unbekanntes Dokument: ehrliche Meldung statt leerem Dialog
+  ✓ Übersetzen-Bereich bietet „📷 Brief fotografieren"
+  ✓ Blatt im Foto erkannt, die Verfahren sind sich einig
+  ✓ Scan-Werkzeug heißt „Brief fotografieren", Seitengröße „Automatisch" vorgewählt
+  ✓ … aufs ganze Foto umschalten geht
+  ✓ … und zurück zur Erkennung
+  ✓ fragt nach dem Ordnernamen
+  ✓ danach öffnet sich das Übersetzen-Fenster mit dem Brief
+  ✓ Seite ist GENAU A4 hoch (595,28 × 841,89 pt)
+  ✓ Brief liegt im Übersetzungs-Bereich
+  ✓ Quadrat steht dort, wo es auf dem Papier steht (±2 %)
+  ✓ kein Tisch am Rand: der Seitenrand ist Papier
+  ✓ ohne erkennbaren Rand: nicht geschnitten, Grund genannt
+  ✓ … liegt trotzdem auf A4 (quer, weil das Bild quer ist)
+  ✓ Ausgeben-Fenster nennt Seitengröße und „Tatsächliche Größe / 100 %"
+  ⏱ Hinweg DE→RU (1 Seite, 3 Felder): 1373 ms · Rückweg RU→DE: 164 ms · Foto → A4 + Ablage: 2334 ms
+  ✓ keine Fehler in der Konsole, kein Aufruf ins Netz
+
+46 grün · 0 ROT
+

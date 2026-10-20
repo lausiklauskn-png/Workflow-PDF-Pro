@@ -1,0 +1,20 @@
+  ✓ kein Funktionsname steht in app.js zweimal
+Workfloh PDF — Zuschneiden im Editor
+  ✓ „✂️ Zuschneiden" steht in der Editor-Leiste, direkt nach „Felder erkennen"
+  ✓ … und die übrigen Knöpfe sind alle noch da
+  ✓ … er ist sichtbar und trägt einen Namen
+  ✓ der Scanner öffnet mit JEDER Seite des Dokuments als Bild
+  ✓ … im Zuschneiden, mit „Übernehmen" statt „PDF erstellen"
+  ✓ Abbrechen ändert nichts (Datei und Felder wie vorher, kein zweites Dokument)
+  ✓ „Übernehmen" legt ein ZWEITES Dokument an (das Original bleibt daneben)
+  ✓ … es heißt „<Name> (zugeschnitten)" und liegt im selben Ordner
+  ✓ … es ist gespeichert, mit neuen Bytes und gleicher Seitenzahl
+  ✓ … es hat ein EIGENES, frisches Vorschaubild
+  ✓ … die Felder samt Einträgen sind kopiert, mit eigenen Kennungen
+  ✓ das Original ist unverändert: Datei, Felder, Name, Vorschaubild
+  ✓ … und offen ist danach die zugeschnittene Kopie
+  ✓ … die Meldung sagt, dass das Original bleibt, und bittet, die Felder zu prüfen
+  ✓ in der Bibliothek stehen beide, die Kopie mit EIGENER Voransicht
+  ✓ keine Fehler auf der Seite
+17 grün · 0 ROT
+

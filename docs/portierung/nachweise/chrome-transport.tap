@@ -1,0 +1,76 @@
+TAP version 13
+# Subtest: Ungültige Sprachpaare eröffnen keine Sitzung
+ok 1 - Ungültige Sprachpaare eröffnen keine Sitzung
+  ---
+  duration_ms: 1.742766
+  type: 'test'
+  ...
+# Subtest: Ohne Sitzungsschlüssel keine Dokumenttexte; Assets ohne fremde Ressourcen
+ok 2 - Ohne Sitzungsschlüssel keine Dokumenttexte; Assets ohne fremde Ressourcen
+  ---
+  duration_ms: 37.335613
+  type: 'test'
+  ...
+# Subtest: Fremder Origin, Preflight und manipuliertes Hostfeld werden abgewiesen
+ok 3 - Fremder Origin, Preflight und manipuliertes Hostfeld werden abgewiesen
+  ---
+  duration_ms: 17.238739
+  type: 'test'
+  ...
+# Subtest: Seiten bleiben geordnet; falsche Anzahl, Wiederholung und alte Antworten greifen nicht
+ok 4 - Seiten bleiben geordnet; falsche Anzahl, Wiederholung und alte Antworten greifen nicht
+  ---
+  duration_ms: 22.369261
+  type: 'test'
+  ...
+# Subtest: Beschädigte Nachrichten und übergroße Texte werden ehrlich abgewiesen, nie gekürzt
+ok 5 - Beschädigte Nachrichten und übergroße Texte werden ehrlich abgewiesen, nie gekürzt
+  ---
+  duration_ms: 44.326723
+  type: 'test'
+  ...
+# Subtest: Abbruch im Browser verwirft die wartende Antwort; keine Originaltexte als Erfolg
+ok 6 - Abbruch im Browser verwirft die wartende Antwort; keine Originaltexte als Erfolg
+  ---
+  duration_ms: 3.644571
+  type: 'test'
+  ...
+# Subtest: Abgelaufene Sitzung und neue Sitzung teilen weder Schlüssel noch Seiten
+ok 7 - Abgelaufene Sitzung und neue Sitzung teilen weder Schlüssel noch Seiten
+  ---
+  duration_ms: 85.803759
+  type: 'test'
+  ...
+# Subtest: Adapter öffnet vor erstem Text nichts und kann auch während des Öffnens abbrechen
+ok 8 - Adapter öffnet vor erstem Text nichts und kann auch während des Öffnens abbrechen
+  ---
+  duration_ms: 0.542725
+  type: 'test'
+  ...
+# Subtest: Browser-Helfer und echter Loopback-Transport: zwei Seiten und unveränderter Originalkern
+ok 9 - Browser-Helfer und echter Loopback-Transport: zwei Seiten und unveränderter Originalkern
+  ---
+  duration_ms: 2046.302732
+  type: 'test'
+  ...
+# Subtest: Browser-Abbrechen erreicht die wartende App über den echten Transport
+ok 10 - Browser-Abbrechen erreicht die wartende App über den echten Transport
+  ---
+  duration_ms: 502.112051
+  type: 'test'
+  ...
+# Subtest: Unveränderte App: Reinigung vor Transport, Abbruch ohne Senden, PDF und Vermerk zurück in App
+ok 11 - Unveränderte App: Reinigung vor Transport, Abbruch ohne Senden, PDF und Vermerk zurück in App
+  ---
+  duration_ms: 4210.574035
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7313.278685

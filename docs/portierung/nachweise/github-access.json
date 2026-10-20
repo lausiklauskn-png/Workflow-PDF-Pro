@@ -1,0 +1,12 @@
+{
+  "repository": "lausiklauskn-png/Workflow-PDF-Pro",
+  "gitRead": true,
+  "apiRead": false,
+  "repositoryWriteIndicated": null,
+  "actionsRead": null,
+  "gitWriteDryRun": true,
+  "workflowDispatch": "nicht ausgeführt",
+  "releaseWrite": "nicht ausgeführt",
+  "signingIdentity": "separat prüfen; kein GitHub-Zugang",
+  "blocker": "GitHub API nicht erreichbar oder nicht autorisiert; keine Tokenwerte auslesen."
+}

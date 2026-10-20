@@ -1,0 +1,43 @@
+Workfloh PDF — Probe im Browser
+  ✓ Kopfleiste zeigt W-Floh und „Workfloh PDF"
+  ✓ PDF eingelesen, Editor zeigt 2 Seiten
+  ✓ vorhandenes PDF-Formularfeld übernommen (Kundennummer, Wert K-4711)
+  ✓ gedrehte Seite wird quer angezeigt (Breite > Höhe)
+  ✓ offline: Feld auf der Namenslinie gefunden und aus dem Text beschriftet
+  ✓ offline: Linie liegt unter dem Namensfeld (x≈18.5 %, Unterkante ≈ 17.1 %)
+  ✓ offline: „Geburtsdatum" wird als Datumsfeld vorgeschlagen
+  ✓ offline: Eingabe-Rahmen „Bemerkung" erkannt, mehrzeilig
+  ✓ offline: beide Kästchen erkannt
+  ✓ offline: Kundennummer-Feld nicht doppelt vorgeschlagen
+  ✓ Vorschlags-Band zeigt die Zahl der offenen Vorschläge
+  ✓ Vorschläge sind orange gestrichelt markiert
+  ✓ KI: je Seite ein Aufruf (2 Seiten)
+  ✓ KI: Namensfeld an die erkannte Linie eingerastet
+  ✓ KI: kein doppeltes Namensfeld (Linienvorschlag ersetzt)
+  ✓ KI: Typ E-Mail übernommen
+  ✓ KI: erkannter Text gespeichert
+  ✓ KI-Vorschläge ungeprüft bis zur Freigabe
+  ✓ „✓ Passt" bestätigt einen einzelnen Vorschlag
+  ✓ „Alle übernehmen" bestätigt alles
+  ✓ QR-Feld von Hand gesetzt und quadratisch
+  ✓ Ausfüllen: Werte stehen im Dokument
+  ✓ Link: E-Mail wird blau, unterstrichen, antippbar → mailto:, ✏️ daneben
+  ✓ Link: ✏️ öffnet das Feld zum Ändern
+  ✓ Link: ohne gültige Adresse kein Link
+  ✓ Link: ein Textfeld erkennt www…, …de, @ selbst — Zahl (Kundennummer!), Datum, Name, PLZ bleiben Text
+  ✓ Link: im Feld „Telefon" wird die Nummer ein Anruf
+  ✓ Link: Kundennummer wird zum Link, nicht zum Anruf
+  ✓ … ein Tipp zeigt die Dokumente mit dieser Kundennummer (hier: dieses)
+  ✓ … eine angebundene Kundenverwaltung bekommt die Nummer
+  ✓ Beschriftung Kunden-Nr. / Artikelnummer / Telefon → passende Feldart
+  ✓ Link: beim Drucken dunkel ohne Unterstrich und ohne ✏️
+  ✓ nach Neuladen: Dokument in der Bibliothek, Felder gespeichert
+  ✓ Bibliothek-Suche findet ein Dokument über einen Feldinhalt, und sagt es, wenn nichts passt
+  ✗ ROT: Abbruch → page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///tmp/wfpdf-tNXD7z/html.html
+Call log:
+[2m  - navigating to "file:///tmp/wfpdf-tNXD7z/html.html", waiting until "load"[22m
+
+    at /workspace/setup/workflow-pdf-baseline/tests/e2e.mjs:250:44
+
+34 grün · 1 ROT
+

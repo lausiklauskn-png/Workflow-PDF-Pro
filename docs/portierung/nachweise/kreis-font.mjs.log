@@ -1,0 +1,18 @@
+  ✓ Listenzeilen mit Ⓒ Ⓑ Ⓐ davor: drei eigene Absätze (nicht verschmolzen)
+  ✓ … auch wenn Ⓐ ein eigenes Textstück vor der Zeile ist
+  ✓ „Voltage Between:" (eingerückt nach Satzende) steht für sich
+  ✓ … und der Satz davor bleibt vollständig ein Absatz („… open between terminals Ⓐ and Ⓑ.")
+  ✓ das Symbol geht mit zum Übersetzer (der Satz bleibt lesbar)
+  ✓ nach der Übersetzung sind die Symbole wieder da, obwohl der Übersetzer „A" daraus machte
+  ✓ … auch mitten im Satz und bei Ziffern (① ❷)
+  ✓ im PDF steht um jedes Symbol ein gezeichneter Kreis (Ring aus Tinte)
+  ✓ Selbst-Riegel: der Ring-Messer findet an einem gewöhnlichen Wortanfang keinen Kreis
+  ✓ der Text läuft hinter dem Symbol weiter (nicht darübergeschrieben)
+  ✓ kreisZurueck: der Reihe nach, jedes Symbol einmal
+  ✓ kreisZurueck: nie mitten in einem Wort („Also")
+  ✓ kreisZurueck: „5V" bleibt, nur die freistehende 1 wird ①
+  ✓ kreisZurueck: schon vorhandenes Symbol bleibt, ohne Gegenstück nichts erfunden
+  ✓ Inhalt der Kreise: Ⓐ→A, ⓑ→b, ①→1, ⑫→12, ❶→1, ➋→2, ➁→2
+  ✓ keine Seitenfehler
+
+16 grün · 0 ROT

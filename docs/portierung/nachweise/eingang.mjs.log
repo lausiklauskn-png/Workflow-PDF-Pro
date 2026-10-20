@@ -1,0 +1,78 @@
+Workfloh PDF — Prüfung beim Einlesen
+  ✓ Kern byte-1:1 aus dem Auslieferungsprüfer: pruefer-anhang.js
+  ✓ Kern byte-1:1 aus dem Auslieferungsprüfer: pruefer-mail.js
+  ✓ Kern byte-1:1 aus dem Auslieferungsprüfer: pruefer-formate.js
+  ✓ eigene Ausgaben (Übersetzung, Teil) werden nicht als Eingang geprüft
+  ✓ Kern und Klebstoff stehen im Offline-Vorrat (Einlesen geht auch ohne Netz)
+  ✓ MANUELL: nach dem Einlesen läuft KEINE Prüfung, jede Karte trägt „jetzt prüfen"
+  ✓ während der Prüfung trägt die Karte „wird geprüft"
+    (alle Prüfungen zusammen 9.9 s, Behälter)
+  ✓ 0D (weißer 1-pt-Text im PDF) → Warnung
+  ✓ … und die Anweisung darin wird als Anweisung an eine KI genannt
+  ✓ 1A als Foto → Anweisung im Bild
+  ✓ … mit markierter Kopie der Stelle
+  ✓ Testbild zum Herunterladen → blasse Anweisung im Bild, mit markierter Kopie
+  ✓ 1A als Scan-PDF ohne Textebene → Anweisung gefunden
+  ✓ 4C mit Botschaft in den Bildpunkten → Verdacht
+  ✓ 4C OHNE Botschaft → keine Warnung
+  ✓ H0 (sauberes Foto) → keine Warnung
+  ✓ H2 (GPS und Anhängsel, in Kamerafotos normal) → keine Warnung
+  ✓ ein sauberes PDF → sauber
+  ✓ das Original bleibt Byte für Byte, wie es kam (nichts entfernt)
+  ✓ nach dem Einlesen öffnet sich der Dialog von selbst — genau einer, auch bei mehreren Funden
+  ✓ die Karte von 0D trägt die Marke „Verdächtiger Inhalt", sichtbar
+  ✓ die Karte eines sauberen Dokuments trägt eine ruhige Marke „Geprüft · Prüfbericht"
+  ✓ … und die Prüfung hebt die Angaben auf (Liste, auch wenn leer)
+  ✓ … H2 (Foto mit GPS) trägt seine Metadaten als Angabe, nicht als Fund
+  ✓ Prüfbericht: ein Tipp auf die ruhige Marke öffnet den Bericht
+  ✓ … mit „Was sonst in der Datei steht" und den Bild-Metadaten, benannt
+  ✓ … ohne „Was jetzt tun" (Angaben sind keine Gefahr)
+  ✓ … „⬇ Prüfbericht als Textdatei" gibt eine Datei <Name>-Pruefbericht.txt
+  ✓ … und darin stehen Kopf, Angaben und der Satz „keine Virenprüfung"
+  ✓ Prüfbericht aus älterer Fassung: benannt, nicht als „keine Angaben" ausgegeben
+  ✓ ein Tipp auf die Marke öffnet den Fund
+  ✓ … mit „Was jetzt tun" (ruhig bleiben)
+  ✓ … und dem Satz, dass nichts entfernt wurde und beim Absender nachzufragen ist
+  ✓ bei einem Bild zeigt der Dialog die markierte Stelle samt Knopf zum Speichern
+  ✓ keine Fehler auf der Seite
+  ✓ ein „sauber" in einer fremden Arbeitsstand-Datei wird nicht geglaubt: neu geprüft → Warnung
+  ✓ im offenen Editor bekommt das Dokument den Befund, und gespeichert bleibt er
+  ✓ fehlt der Prüfkern, heißt es „nicht ganz geprüft" mit Grund, nie sauber
+  ✓ … und die Karte sagt das
+  ✓ ohne Prüfung bleibt ein „sauber" aus einem fremden Arbeitsstand nicht stehen (verworfen)
+  ✓ Herkunft: die Testdateien lassen sich einlesen
+  ✓ Herkunft: PDF mit Nachweis → PDF-HERKUNFT, samt Programm in den Daten
+  ✓ … und der Nachweis gilt NICHT als „weitere Datei im PDF" (kein PDF-ANHANG)
+  ✓ … und macht den Stand nicht zur Warnung
+  ✓ Herkunft: Bild (PNG, caBX) → BILD-HERKUNFT mit Unterzeichner
+  ✓ … ohne Warnung
+  ✓ Herkunft: dasselbe PDF OHNE Nachweis trägt keine Herkunft (Gegenrichtung)
+  ✓ Herkunft steht nicht in der Warnliste
+  ✓ Herkunft bei „sauber": die Karte trägt die ruhige Marke „ℹ Herkunft"
+  ✓ … ein Tipp öffnet die Angabe mit „Details anzeigen", zuerst zugeklappt
+  ✓ … aufgeklappt stehen Programm und Unterzeichner
+  ✓ … ohne „Was jetzt tun" und ohne Warnsatz (eine Angabe, keine Gefahr)
+  ✓ keine Seitenfehler (Herkunft)
+  ✓ Hilfe: Abschnitt „Versteckte Befehle erkennen" mit zwei Testdateien und Download
+  ✓ Hilfe → 🧪 Bild: eingelesen, die Warnung öffnet sich mit markierter Stelle
+  ✓ Hilfe → 🧪 PDF: unsichtbarer Text wird gemeldet
+  ✓ keine Seitenfehler (Testdateien)
+  ✓ MANUELL: ein einzelnes Bild öffnet den Editor — keine Prüfung läuft
+  ✓ MANUELL: … der Editor zeigt „jetzt prüfen" als Knopf
+  ✓ MANUELL: das Originalfoto wird bis zur Prüfung aufgehoben
+  ✓ MANUELL: ein Tipp im Editor startet die Prüfung („wird geprüft")
+  ✓ MANUELL: … danach steht dort der Befund als Knopf
+  ✓ MANUELL: … geprüft wurde das ORIGINALFOTO (Bild-Metadaten gelesen), nicht das PDF daraus
+  ✓ MANUELL: … und das Original ist danach weg
+  ✓ MANUELL: … und ein Tipp öffnet den Prüfbericht
+  ✓ keine Seitenfehler (Editor)
+  ✓ MANUELL: nach dem Neuladen prüft nichts von selbst
+  ✓ MANUELL: … ältere Dokumente ohne Befund tragen „jetzt prüfen"
+  ✓ MANUELL: … und nur dieses eine
+  ✓ MANUELL: der Knopf prüft, statt das Dokument zu öffnen
+  ✓ MANUELL: … das Dokument trägt danach seinen Befund
+  ✓ MANUELL: Löschen der Datei nimmt das aufgehobene Original mit
+  ✓ keine Seitenfehler (Knopf)
+
+73 grün · 0 ROT
+

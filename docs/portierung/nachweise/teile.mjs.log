@@ -1,0 +1,32 @@
+Workfloh PDF — Teile und Übersetzer-Neustart, Probe im Browser
+  ✓ 384 Seiten, 29,3 MB → 10 Teile zu 40 Seiten, der letzte 24
+  ✓ … lückenlos: jede Seite genau einmal, 384 zusammen
+  ✓ … die Rechnung steht Zeile für Zeile da (78,1 KB je Seite, 100 Seiten nach Größe, gedeckelt auf 40, 9 × 40 + 1 × 24)
+  ✓ … und jeder Teil bleibt unter dem Ziel von 8 MB
+  ✓ selbst gewählt 6 Seiten je Teil → 64 Teile, und das steht in der Rechnung
+  ✓ 30 Seiten, 1 MB: kein Aufteilen nötig
+  ✓ große Seiten (60 MB / 100 S.) → weniger Seiten je Teil, jeder Teil ≤ 8 MB
+  ✓ langer Absatz wird in Stücke ≤ 600 Zeichen zerlegt, ohne Text zu verlieren
+  ✓ kleines Dokument (5 Seiten): kein Aufteilen-Kasten
+  ✓ Handbuch (90 Seiten): Kasten mit Rechnung „90 Seiten ÷ 40 = 3 Teile (2 × 40 + 1 × 10)"
+  ✓ … Zeit je Seite ehrlich „noch nicht gemessen"
+  ✓ Seiten je Teil auf 30 → rechnet neu: 3 Teile (3 × 30), Knopf sagt es
+  ✓ 3 Teile angelegt: S. 1–30, 31–60, 61–90, Größe je Teil gemessen
+  ✓ Teil 2 hat 30 Seiten und beginnt mit Seite 31 des Originals
+  ✓ … die Teile liegen im Ordner „Handbuch · Teile"
+  ✓ Übersetzen-Fenster öffnet sich mit den 3 Teilen, nur Teil 1 gewählt
+  ✓ … und bei einem Teil kein neuer Aufteilen-Kasten
+  ✓ „Other generic failures" bricht NICHT mehr ab: neuer Übersetzer, Teil 1 fertig
+  ✓ … der Bericht sagt, dass der Übersetzer neu gestartet wurde
+  ✓ … Ergebnis: 30 Seiten, jede übersetzt, im Ordner „Handbuch · RU"
+  ✓ … und die Zeit je Seite ist jetzt gemessen und gemerkt
+  ✓ anhaltender Fehler: Bericht nennt ihn („Other generic failures"), kein falsches „fertig"
+  ✓ zu langer Absatz wird Satz für Satz übersetzt, nichts geht verloren
+  ✓ dieselben Grenzen noch einmal → keine doppelten Teile (weiter 3)
+  ✓ en: Aufteilen-Kasten ganz übersetzt, samt Rechnung
+  ✓ ru: Aufteilen-Kasten ganz übersetzt, samt Rechnung
+  ✓ ar: Aufteilen-Kasten ganz übersetzt, samt Rechnung
+  ✓ keine Fehler in der Konsole
+
+28 grün · 0 ROT
+

@@ -1,0 +1,118 @@
+name: Reguläre Workflow PDF Pro veröffentlichen
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Regulärer Tag, z. B. v1.0.0
+        required: true
+        type: string
+      commit:
+        description: Vollständiger zuvor geprüfter main-Commit
+        required: true
+        type: string
+permissions:
+  contents: read
+  checks: read
+concurrency:
+  group: workflow-pdf-pro-production-release
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Vollständige App und geprüften Stand verlangen
+        env:
+          EXPECTED_COMMIT: ${{ inputs.commit }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REPOSITORY" == 'lausiklauskn-png/Workflow-PDF-Pro' ]]
+          [[ "$EXPECTED_COMMIT" =~ ^[a-f0-9]{40}$ && "$EXPECTED_COMMIT" == "$GITHUB_SHA" ]]
+          [[ "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          for file in package-lock.json android/gradlew signing/android-release.enc.json signing/android-certificate.json; do
+            if ! test -f "$file"; then
+              echo 'Reguläre Auslieferung noch nicht vorbereitet: App, Build oder eigene Signieridentität fehlt.'
+              exit 1
+            fi
+          done
+          passed=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs" --paginate \
+            --jq '[.check_runs[] | select(.name == "native-smoke" and .conclusion == "success")] | length' | awk '{n+=$1} END {print n}')
+          test "$passed" -ge 1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Vollständige Web- und native Prüfungen
+        run: |
+          set -euo pipefail
+          npm ci
+          npm test
+          npm run sync:android
+          npm run test:native-web
+      - name: Reguläre unsignierte APK bauen
+        working-directory: android
+        run: ./gradlew --no-daemon --max-workers=2 assembleRelease lintRelease testReleaseUnitTest
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: unsigned-production-apk
+          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          if-no-files-found: error
+          retention-days: 3
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: android-production
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: unsigned-production-apk
+          path: unsigned-apk
+      - name: Android-Signierwerkzeuge prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'build-tools;36.0.0'
+          test -x "$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          test -x "$ANDROID_HOME/build-tools/36.0.0/aapt"
+      - name: Mit derselben dauerhaften Identität signieren und prüfen
+        env:
+          WF_PDF_SIGNING_UNLOCK: ${{ secrets.WF_PDF_SIGNING_UNLOCK }}
+          WF_PDF_RELEASE_TAG: ${{ inputs.tag }}
+          WF_PDF_RELEASE_COMMIT: ${{ github.sha }}
+          TMPDIR: ${{ runner.temp }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          export WF_PDF_APKSIGNER="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          export WF_PDF_AAPT="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          mkdir release-files
+          node tools/signing/cli.mjs sign-apk unsigned-apk/app-release-unsigned.apk \
+            "release-files/Workflow-PDF-Pro-${WF_PDF_RELEASE_TAG#v}.apk"
+      - name: Updatefolge prüfen und regulär bereitstellen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/signing/publish-release.mjs "$RELEASE_TAG" "$GITHUB_SHA" release-files

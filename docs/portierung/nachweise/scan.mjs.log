@@ -1,0 +1,128 @@
+Scannen — A · Rechnung (ohne Browser)
+  ✓ abstand: gleiche Ecken → 0, verschobene → in % der Diagonale
+  ✓ entscheiden: Modell und Blatterkennung einig → sicher, Ecken vom Modell
+  ✓ entscheiden: uneinig → NICHT sicher (wird zum Prüfen markiert)
+  ✓ entscheiden: Modell und Kantenerkennung einig → sicher
+  ✓ entscheiden: schwaches Modell (score < 0,5) zählt nicht, Blatt + Kanten einig → sicher
+  ✓ entscheiden: nur eine Meinung → nicht sicher
+  ✓ entscheiden: nichts gefunden → ganzes Foto, nicht sicher
+  ✓ entscheiden: winziges Viereck taugt nicht als Blatt
+  ✓ sortiere: Ecken in beliebiger Reihenfolge → oben links, oben rechts, unten rechts, unten links
+  ✓ seitenMass A4 hoch: 595,28 × 841,89 pt, bei 72 dpi 595 × 842 px
+  ✓ seitenMass Letter quer: 792 × 612 pt
+  ✓ seitenMass „wie das Blatt": Seitenverhältnis 1:2 bleibt
+  ✓ seitenMass A5 hoch: 419,53 × 595,28 pt
+  ✓ seitenMass A6 quer: 419,53 × 297,64 pt
+  ✓ Automatisch: Verhältnis wie DIN (√2) → A4
+  ✓ Automatisch: 1:2 ist kein DIN-Blatt → Original, Verhältnis bleibt
+  ✓ Automatisch: Grenze ± 8 % um √2 — 1,52 noch A4, 1,54 schon Original, 1,31 noch A4, 1,29 (US Letter) Original
+  ✓ unbekanntes Format fällt auf A4 zurück (und sagt es)
+  ✓ drehen rechts: 3×2 wird 2×3, oben links ist das alte unten links
+  ✓ viermal drehen = unverändert
+  ✓ drehen -1 = dreimal rechts
+  ✓ entzerren: in allen vier Ecken der Seite ist Papier, kein Tisch
+  ✓ entzerren: der Punkt aus der Blattmitte liegt in der Seitenmitte
+  ✓ Filter „Dokument": Schatten weg — Papier links und rechts beide fast weiß (> 235)
+  ✓ … und die Schrift bleibt dunkel (< 80)
+  ✓ (ohne Filter lag rechts ein Schatten: 146)
+  ✓ Filter „Schwarzweiß": nur 0 und 255, Schrift schwarz
+  ✓ Filter „Graustufen": R = G = B
+  ✓ Filter „Original": Pixel unverändert
+  ✓ Helligkeit +50 macht heller
+  ✓ Kontrast +60: Schrift dunkler, Papier heller
+  ✓ Schärfe 40 macht einen blassen Strich im Filter „Dokument" deutlich dunkler (Kern 90 → 52)
+  ✓ Schärfe lässt das Papier weiß (Dokument)
+  ✓ Schärfe 0 ändert nichts (Dokument, Pixel gleich ohne Option)
+  ✓ Schärfe wirkt auch im Filter „Original" (Kern dunkler, Farbe bleibt grau)
+  ✓ Schwarzweiß hat weiche Kanten: neben dem Strich ein Zwischenton statt Treppe
+  ✓ Schwarzweiß: Schärfe macht die Kante steiler (Zwischenton dunkler)
+  ✓ Filter „Farbe": Schatten weg (Papier rechts > 235), ein roter Stempel bleibt rot
+  ✓ textFarben: Papier hell, Schrift dunkel gemessen
+Scannen — A2 · Auftrag an ChatGPT (ohne Browser)
+  ✓ Bild-Auftrag: kurz, wie Klaus ihn schreibt — Text extrahieren, übersetzen, an derselben Stelle einfügen, Bild zurück
+  ✓ Bild-Auftrag: die Sprache kommt aus der Wahl
+Scannen — B · Blatterkennung an 17 Testfotos
+  ✓ Modell (Scanic ML) lief auf allen Fotos — ohne Netz, aus vendor/scanic/
+  ✓ KEIN Foto wird „sicher" genannt und liegt mehr als 5 % daneben (sonst würde still falsch geschnitten)
+  ✓ mindestens 10 von 17 sicher und richtig (gemessen am 2026-09-26: 12)
+  ⓘ sicher und richtig 12 · zum Prüfen markiert 5 · sicher und falsch 0
+Scannen — C · Foto → PDF im echten Browser
+  ✓ „Scannen" öffnet das Scan-Werkzeug mit Kamera und Galerie
+  ✓ Blatt im Foto gefunden und sicher (Verfahren einig)
+  ✓ … Ecken liegen auf dem Papier (< 2 % der Diagonale)
+  ✓ Befund steht an der Seite: „✓ Blatt erkannt"
+  ✓ Seitengröße: Automatisch · Original · A4 · A5 · A6 · US Letter (Klaus 2026-09-27)
+  ✓ … Automatisch ist vorgewählt und sagt, was es gewählt hat (→ A4)
+  ✓ beim Ziehen erscheint die Lupe
+  ✓ Lupe ist klein (≤ 90 px, ≤ 25 % der Bildbreite) — der Rest des Fotos bleibt zu sehen
+  ✓ … und liegt NICHT über dem Punkt, den der Finger gerade setzt
+  ✓ Ecke gezogen → Seite gilt als „von Hand gesetzt", die Ecke hat sich bewegt
+  ✓ von Hand gesetzt: kein Befund-Text (die Punkte sagen es, Klaus 2026-09-27)
+  ✓ ↺ Automatisch setzt die erkannten Ecken zurück
+  ✓ „Zuschnitt passt" zeigt die gerade gezogene Seite
+  ✓ Filter „Dokument": auch die beschattete rechte Blattseite wird weiß (> 230)
+  ✓ Regler „🔪 Schärfe" steht da, Vorgabe 40
+  ✓ Schärfe 90 wird übernommen und das Ergebnisbild neu gerechnet
+  ✓ Vorschau so fein wie der Schirm (hier über 80 dpi, höchstens 150)
+  ✓ ⟳ dreht die Seite (quer)
+  ✓ zweite Seite kommt in die Leiste
+  ✓ ◀ tauscht die Reihenfolge (die neue steht vorn)
+  ✓ 🗑 entfernt die Seite, eine bleibt (die richtige)
+  ✓ Texterkennung findet „RECHNUNG 4711" (Zeilen: 3, 1085 ms)
+  ✓ Zeile geändert: „RECHNUNG 9999" gemerkt, Zeile markiert
+  ✓ im Seitenbild ist die geänderte Zeile neu geschrieben (> 5 % der Zeile anders), sonst nichts
+  ✓ 🖼 Als Bilder: ZIP mit einem JPEG (Name und JPEG-Kennung)
+  ✓ „PDF erstellen" legt das Dokument an und öffnet es
+  ✓ Seite ist GENAU A4 hoch
+  ✓ PDF ist durchsuchbar: der geänderte Text steht in der Textebene
+  ✓ … der alte Text nicht mehr
+  ⓘ Texterkennung 1085 ms · PDF 53 KB in 285 ms
+  ✓ Übersetzen → „📷 Brief fotografieren" öffnet das Scan-Werkzeug mit der Kamera
+  ✓ ✕ ohne Seiten schließt ohne Rückfrage
+  ✓ Foto ohne Blatt: NICHT sicher, Befund „bitte prüfen", Warnung im Fuß
+  ✓ „PDF erstellen" fragt vor dem Übernehmen einer ungeprüften Seite
+  ✓ … „Zurück und prüfen" lässt das Werkzeug offen
+  ✓ leeres Werkzeug: „Aus der Galerie" ist lesbar (Schrift ≠ Grund)
+  ✓ „📄 Kopie neben Original": erkennt den Text und zeigt beide nebeneinander
+  ✓ jede Zeile trägt ihre Grundlinie und Schrifthöhe (nicht nur den Rahmen)
+  ✓ die Kopie ist ein eigenes Bild neben dem Original
+  ✓ (Selbst-Riegel) die vergrößerte Zeile ragt in das Band der nächsten — sonst misst die Zeile darunter nichts
+  ✓ Unterlängen der vorigen Zeile werden vom Band der nächsten NICHT gelöscht
+  ✓ Zeile einstellen: rechtsbündig und 120 % gemerkt
+  ✓ in der Kopie steht die Zeile jetzt am rechten Rand, nicht mehr links
+  ✓ Ziehen in der Kopie verschiebt die Zeile nach unten (ohne Dialog)
+  ✓ „Ins PDF kommt: Kopie" gemerkt
+  ✓ PDF aus der Kopie: der Text steht als echter Text drin, KEIN Bild auf der Seite
+  ✓ „📷 Seite neu fotografieren" ersetzt die Seite, statt eine anzuhängen
+  ✓ ChatGPT-Knopf: Bauart wie im Rezeptbuch — wandernder Verlauf in Rot und Blau, kein Roboterkopf
+  ✓ Nur ein Weg zu ChatGPT: kein zweiter Knopf mit Textliste
+  ✓ Ein Tipp teilt Seitenbild (JPEG) UND Auftrag, ohne Dialog dazwischen
+  ✓ Der Auftrag nennt die gewählte Sprache (Russisch)
+  ✓ Ohne Teilen: Bild wird gespeichert und ChatGPT geöffnet
+  ✓ „📥 Ergebnis zurückholen": das Bild kommt als Seite dahinter, das Original bleibt davor
+  ✓ Das Bild von ChatGPT IST die Seite: ganzes Bild, kein Filter, kein Zuschnitt-Zweifel
+  ✓ Im Fuß steht, dass Herunterladen auch hier ablegt
+  ✓ (Selbst-Riegel) das ChatGPT-Bild ist wirklich groß (2200 px) — sonst misst die Zeile darunter nichts
+  ✓ Das ChatGPT-Bild kommt in SEINER Auflösung ins PDF (nicht auf 150 dpi heruntergerechnet)
+  ✓ „⬇ PDF herunterladen" lädt herunter UND legt das PDF in Workfloh PDF ab (alle 3 Seiten, Werkzeug bleibt offen)
+  ✓ … ein zweites Herunterladen ersetzt dasselbe Dokument, statt ein zweites anzulegen
+  ✓ Textmaske ist durchsichtig (Ecke Alpha 0, fast alles leer) und trägt Schrift
+  ✓ „🎭 Textmaske" legt eine PNG-Datei ab
+  ✓ „✓ PDF erstellen" nach dem Herunterladen öffnet DASSELBE Dokument, neu gefüllt — kein Doppel
+  ✓ Handy 360×740: das Foto bekommt mindestens ein Drittel der Höhe (vorher 156 px)
+  ✓ Handy: alle vier Ecken sind zu greifen — keine liegt unter der Kopfleiste
+  ✓ Handy: Reiter Zuschneiden/Ergebnis höchstens 30 px hoch
+  ✓ Handy: der Befund („Ecken …") höchstens 48 px hoch
+  ✓ Handy: Schließen ist nur ein ✕ (mit Namen für Vorleser)
+  ✓ Handy: der Scanner-Kopf ist einzeilig (höchstens 56 px, Titel bricht nicht um)
+  ✓ Handy: kein Erklärtext zu den roten Punkten und der Lupe
+  ✓ Handy: Lupe sichtbar, ≤ 64 px, deckt den Punkt nicht
+  ✓ Vollbild 1000×540: die Bühne nimmt mindestens 80 % der Höhe (vorher 151 px)
+  ✓ Vollbild: das Foto füllt die Bühne (auch ein kleines Foto wird größer gezeigt)
+  ✓ Vollbild: Seitenleiste und Fuß stehen rechts neben dem Foto, nicht darunter
+  ✓ Vollbild: Fenster größer gezogen → das Foto füllt wieder die Bühne
+  ✓ kein Aufruf ins Netz (Modell, Texterkennung, Schrift liegen auf dem Gerät)
+  ✓ keine Fehler in der Konsole
+
+119 grün · 0 ROT
+

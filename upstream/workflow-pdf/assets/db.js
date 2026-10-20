@@ -1,0 +1,71 @@
+/* Workfloh PDF — Speicher (IndexedDB).
+   Vier Fächer: folders (Ordner), docs (Metadaten + Felder), files (die PDF-Bytes),
+   texte (Seitentext mit Lage, für die Suche — seit Version 2, 2026-09-26),
+   vektoren (Bedeutungs-Vektoren je Abschnitt, für die Bedeutungssuche — seit Version 3).
+   Die Bytes liegen getrennt, damit die Bibliothek schnell lädt, ohne jedes PDF
+   mitzulesen. DB-Name ist app-eigen: github.io ist eine GETEILTE Adresse, und
+   IndexedDB gehört dem Ursprung, nicht der App. Den Namen nie ändern. */
+(function () {
+  'use strict';
+  const DB_NAME = 'WorkflohPDF1';
+  const DB_VER = 3;
+  let _db = null;
+
+  function open() {
+    if (_db) return Promise.resolve(_db);
+    return new Promise((res, rej) => {
+      const rq = indexedDB.open(DB_NAME, DB_VER);
+      rq.onupgradeneeded = () => {
+        const db = rq.result;
+        if (!db.objectStoreNames.contains('folders')) db.createObjectStore('folders', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('docs')) db.createObjectStore('docs', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('files')) db.createObjectStore('files', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('texte')) db.createObjectStore('texte', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('vektoren')) db.createObjectStore('vektoren', { keyPath: 'id' });
+      };
+      rq.onsuccess = () => { _db = rq.result; res(_db); };
+      rq.onerror = () => rej(rq.error);
+    });
+  }
+
+  function tx(store, mode, fn) {
+    return open().then(db => new Promise((res, rej) => {
+      const t = db.transaction(store, mode);
+      const st = t.objectStore(store);
+      let out;
+      const r = fn(st);
+      if (r && 'onsuccess' in r) r.onsuccess = () => { out = r.result; };
+      t.oncomplete = () => res(out);
+      t.onerror = () => rej(t.error);
+      t.onabort = () => rej(t.error || new Error('Speichern abgebrochen'));
+    }));
+  }
+
+  /* Vektoren liegen je Dokument als Kopf (id) plus Blöcke (id#00000, id#00001 …) — ein
+     400-Seiten-Handbuch wird so Stück für Stück gespeichert und nach einer Unterbrechung
+     fortgesetzt, statt als ein Riesen-Eintrag bei jedem Zwischenstand neu geschrieben. */
+  const vektorenWeg = id => tx('vektoren', 'readwrite', st => { st.delete(id); return st.delete(IDBKeyRange.bound(id + '#', id + '#\uffff')); });
+  const abgeleitetWeg = id => tx('texte', 'readwrite', st => st.delete(id)).then(() => vektorenWeg(id));
+
+  const DB = {
+    all: store => tx(store, 'readonly', st => st.getAll()),
+    keys: store => tx(store, 'readonly', st => st.getAllKeys()),
+    get: (store, id) => tx(store, 'readonly', st => st.get(id)),
+    put: (store, obj) => tx(store, 'readwrite', st => st.put(obj)),
+    // Der Seitentext hängt an den Bytes: wer sie ersetzt oder löscht, wirft ihn mit weg.
+    // Die Suche erfasst ihn dann neu (app.js, texteNachholen) — ein veralteter Text
+    // fände Dinge, die im PDF nicht mehr stehen. Die Bedeutungs-Vektoren ebenso.
+    vektorenWeg,
+    // Wer eine Datei löscht, löscht ihr aufgehobenes Originalfoto mit (app.js, Prüfung auf Knopfdruck)
+    del: (store, id) => tx(store, 'readwrite', st => { st.delete(id); if (store === 'files' && !String(id).endsWith('~original')) st.delete(id + '~original'); })
+      .then(r => (store === 'files' ? abgeleitetWeg(id).then(() => r) : r)),
+    async putFile(id, bytes) { await DB.put('files', { id, bytes }); await abgeleitetWeg(id); },
+    async getFile(id) { const r = await DB.get('files', id); return r ? r.bytes : null; },
+    async persist() {
+      try { if (navigator.storage && navigator.storage.persist) return await navigator.storage.persist(); } catch (_) {}
+      return false;
+    }
+  };
+  window.WFP = window.WFP || {};
+  window.WFP.DB = DB;
+})();

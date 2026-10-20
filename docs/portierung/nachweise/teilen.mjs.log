@@ -1,0 +1,57 @@
+Workfloh PDF — Teilen, Auswahl, Ziehen auf einen Ordner
+  ✓ Kartenleiste: ✏️ 🗂️ ⧉ 📤 🗑 — der Teilen-Knopf steht vor dem Mülleimer
+  ✓ … und alle fünf passen in eine Reihe (keiner umgebrochen, keiner schmaler als 30 px)
+  ✓ 📤 an der Karte teilt DIREKT, ohne Umweg über einen Dialog
+  ✓ … genau eine PDF-Datei, benannt wie das Dokument
+  ✓ … ohne Einträge geht das Original hinaus (unverändert)
+  ✓ … und die Bibliothek bleibt stehen (nichts wird geöffnet)
+  ✓ mit Einträgen geht das FESTE PDF hinaus (Einträge auf der Seite)
+  ✓ verweigert Android das Teilen, steht „📤 Jetzt teilen …" da
+  ✓ … und der frische Tipp teilt wirklich
+  ✓ ohne Teilen am Gerät: der Dialog sagt es und bietet Herunterladen
+  ✓ … und lädt das PDF herunter
+  ✓ Editor: 📤 Teilen steht direkt vor „⬇ PDF ausgeben"
+  ✓ 📤 im Editor teilt das offene Dokument direkt
+  ✓ … mit dem Eintrag, der eben erst getippt wurde (festes PDF)
+  ✓ … und der Eintrag ist gespeichert, bevor geteilt wird
+  ✓ ohne Auswahl ist keine Auswahl-Leiste zu sehen
+  ✓ Kästchen oben antippen: die Karte ist gewählt, die Leiste zeigt „1 ausgewählt"
+  ✓ danach wählt ein Tipp auf eine Karte dazu, statt sie zu öffnen
+  ✓ … ein zweiter Tipp nimmt sie wieder heraus
+  ✓ „Alle" wählt alle sichtbaren
+  ✓ 📤 Teilen in der Leiste gibt ALLE gewählten auf einmal hinaus
+  ✓ ✕ Fertig hebt die Auswahl auf, die Leiste verschwindet
+  ✓ … danach öffnet ein Tipp wieder das Dokument
+  ✓ Mauszug: ein Schattenbild folgt der Maus
+  ✓ … und die überstrichene Karte kommt dazu (2 gewählt)
+  ✓ … der Ordner unter der Maus leuchtet als Ziel
+  ✓ loslassen auf dem Ordner: beide sind dorthin verschoben
+  ✓ … auch im Speicher, nicht nur in der Anzeige
+  ✓ … nichts wurde dabei geöffnet, kein Schatten bleibt liegen
+  ✓ … und die Auswahl ist danach aufgehoben
+  ✓ Loslassen auf „Alle" verschiebt nichts
+  ✓ (Selbst-Riegel) das Ziehen läuft, und der Weg führte wirklich über Musterbrief A
+  ✓ … direkt nach dem Überstreichen ist noch keine Karte dazugekommen
+  ✓ … Karten, über die der Zeiger nur HINWEGgleitet, bleiben draußen — die, auf der er verweilt, kommt dazu
+  ✓ A: kein Seitenfehler
+  ✓ am Tablet ist das Kästchen oben sichtbar (kein Schweben mit der Maus)
+  ✓ ein kurzer Druck wählt noch nichts
+  ✓ langer Druck (fest andrücken): die Karte ist gewählt, das Kästchen oben an
+  ✓ ziehen über eine zweite Karte wählt sie dazu
+  ✓ … der Ordner unter dem Finger leuchtet als Ziel
+  ✓ … und der Finger rollt dabei die Seite nicht (jede Bewegung abgefangen)
+  ✓ Finger loslassen auf dem Ordner: beide sind verschoben
+  ✓ … nichts wurde geöffnet
+  ✓ langer Druck, dann loslassen: die Karte bleibt gewählt, nichts öffnet sich
+  ✓ … danach nimmt ein kurzer Tipp sie wieder heraus
+  ✓ Finger sofort bewegt (rollen): keine Auswahl, kein Ziehen
+  ✓ Auswahl-Leiste trägt „🗑 Löschen"
+  ✓ … fragt erst nach, mit der Zahl und den Namen
+  ✓ „Abbrechen" löscht nichts
+  ✓ „Löschen" entfernt genau die gewählten, der Rest bleibt
+  ✓ … auch die Datei im Speicher
+  ✓ … und die Auswahl ist danach aufgehoben
+  ✓ B: kein Seitenfehler
+
+53 grün · 0 ROT
+

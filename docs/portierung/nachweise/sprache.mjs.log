@@ -1,0 +1,53 @@
+Workfloh PDF — Sprache der Oberfläche
+  ✓ en: kein Seitenfehler auf der Rundreise
+  ✓ en: die Rundreise hat Texte nachgeschlagen (sonst misst sie nichts)
+  ✓ en: kein sichtbarer Text ohne Übersetzung
+  ✓ en: <html lang> und Richtung stimmen
+  ✓ en: Knopf oben nennt die Sprache
+  ✓ en: Ordnername „Beispiele" bleibt unübersetzt
+  ✓ en: Dokumentnamen bleiben unübersetzt
+  ✓ en: Oberfläche ist wirklich übersetzt (Kachel „Importieren zum Übersetzen")
+  ✓ en: Hinweis (Tooltip) ist übersetzt
+  ✓ en: Hinweise aus → kein Tooltip mehr
+  ✓ en: ein neu gesetzter Titel bleibt bei ausgeschalteten Hinweisen verborgen
+  ✓ en: Hinweise an → Tooltip übersetzt zurück
+  ✓ en: die Wahl übersteht das Neuladen
+  ✓ en: zurück auf Deutsch steht dieselbe Seite da wie ohne Umschalten
+  ✓ en: zurück auf Deutsch: <html lang="de">, links nach rechts
+  ✓ ru: kein Seitenfehler auf der Rundreise
+  ✓ ru: die Rundreise hat Texte nachgeschlagen (sonst misst sie nichts)
+  ✓ ru: kein sichtbarer Text ohne Übersetzung
+  ✓ ru: <html lang> und Richtung stimmen
+  ✓ ru: Knopf oben nennt die Sprache
+  ✓ ru: Ordnername „Beispiele" bleibt unübersetzt
+  ✓ ru: Dokumentnamen bleiben unübersetzt
+  ✓ ru: Oberfläche ist wirklich übersetzt (Kachel „Importieren zum Übersetzen")
+  ✓ ru: Hinweis (Tooltip) ist übersetzt
+  ✓ ru: Hinweise aus → kein Tooltip mehr
+  ✓ ru: ein neu gesetzter Titel bleibt bei ausgeschalteten Hinweisen verborgen
+  ✓ ru: Hinweise an → Tooltip übersetzt zurück
+  ✓ ru: die Wahl übersteht das Neuladen
+  ✓ ru: zurück auf Deutsch steht dieselbe Seite da wie ohne Umschalten
+  ✓ ru: zurück auf Deutsch: <html lang="de">, links nach rechts
+  ✓ ar: kein Seitenfehler auf der Rundreise
+  ✓ ar: die Rundreise hat Texte nachgeschlagen (sonst misst sie nichts)
+  ✓ ar: kein sichtbarer Text ohne Übersetzung
+  ✓ ar: <html lang> und Richtung stimmen
+  ✓ ar: Knopf oben nennt die Sprache
+  ✓ ar: Ordnername „Beispiele" bleibt unübersetzt
+  ✓ ar: Dokumentnamen bleiben unübersetzt
+  ✓ ar: Oberfläche ist wirklich übersetzt (Kachel „Importieren zum Übersetzen")
+  ✓ ar: die Seiten der Dokumente laufen weiter von links
+  ✓ ar: Hinweis (Tooltip) ist übersetzt
+  ✓ ar: Hinweise aus → kein Tooltip mehr
+  ✓ ar: ein neu gesetzter Titel bleibt bei ausgeschalteten Hinweisen verborgen
+  ✓ ar: Hinweise an → Tooltip übersetzt zurück
+  ✓ ar: die Wahl übersteht das Neuladen
+  ✓ ar: zurück auf Deutsch steht dieselbe Seite da wie ohne Umschalten
+  ✓ ar: zurück auf Deutsch: <html lang="de">, links nach rechts
+  ✓ Vorgabe ist Deutsch
+  ✓ Wörterbücher für EN, RU und AR vorhanden (erweiterbar)
+  ✓ das Wörterbuch hat keinen Schlüssel ohne Übersetzung in einer der drei Sprachen
+
+49 grün · 0 ROT
+

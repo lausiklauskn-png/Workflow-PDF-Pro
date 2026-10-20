@@ -1,0 +1,2460 @@
+/*
+ * SBKIM — Modul 23 — Rendezvous (gemeinsamer Raum)
+ *
+ * Löst die Adress-Wand: die in GitHub committete nodeId ist NICHT die
+ * LEBENDE nodeId, die ein Knoten gerade im Browser belauscht (listenNostr).
+ * Statt an eine committete ID zu adressieren, treffen sich lebende Knoten
+ * in einem GETEILTEN Etikett (Nostr-Tag) auf demselben Relais — wie eine
+ * Pinnwand mit einem "gemeinsamen Raum". Ein aktiver Knoten heftet auf
+ * bewusste Nutzer-Aktion seine LEBENDE Visitenkarte (echte Spore inkl.
+ * lebender nodeId) ans Brett; ein Suchender liest die Karten und handshaket
+ * die LEBENDE ID — die der Gegenknoten ja gerade wirklich belauscht.
+ *
+ * Herkunft: bewiesen am 2026-06-28 (Klaus' Browser-Lauf Tablet↔Handy,
+ * "✓ ANDOCK ETABLIERT mit Family Projekt (lebende ID)"). Dieser Code ist
+ * die saubere, konfig-getriebene Ausgliederung des family-project-Prototyps
+ * (sbkim/sbkim-init.js, Funktionen doAnnounce/announcePresence/discoverRoom/
+ * handshakeLiveCard/connectToNet) — KEINE family-Hardcodes mehr. Jeder
+ * Knoten injiziert seinen eigenen nodeName + (optional) seinen Relais-Client.
+ *
+ * VERFASSUNGSTREU (Empfangsmodus mit Antwortrecht, Mycel-Schicht 1):
+ * Anmelden UND Suchen sind ausschliesslich NUTZER-AUSGELOeSTE Aktionen
+ * (Knöpfe in der App). KEIN getakteter Dauer-Piepser (= Pulsation, fürs
+ * Mycel verboten), KEIN Crawl, KEINE Eigenanfrage ins offene Netz beim
+ * Laden. Das Anmelden ist eine bewusste Pilz-Schicht-Geste (Schicht 2),
+ * der Knoten selbst bleibt Empfangsmodus.
+ *
+ * Bewusst NUR Tool-Code über die öffentlichen Flächen der geteilten Kern-
+ * Module: Modul 05 (handshake/listenNostr) + Modul 05b (publish/subscribe).
+ * Die Kern-Module 05/05b bleiben UNANGETASTET (kein Netz-Bruch).
+ *
+ * DOM-frei: dieses Modul liefert nur Daten/Logik. Die Knöpfe + die Karten-
+ * Darstellung sind app-eigen (siehe Karte 23 § UI-Stück) — so bleibt die
+ * Modul-Datei byte-1:1 in jeder PWA kopierbar.
+ *
+ * IDENTITÄTS-HYGIENE (Klaus 2026-07-08, Skill „saubere-netz-anmeldung"):
+ * Weil alle Endknoten-PWAs unter EINER Origin liegen und IndexedDB/Service-
+ * Worker/Caches an der Origin hängen (nicht am Pfad), teilen sich sonst alle
+ * Apps EINE Default-DB `sbkim` → dieselbe nodeId. Darum zwei Modi (NIE mischen):
+ *   Modus A — ensureIdentity(): sanft, automatisch (bei init), idempotent,
+ *     NICHT zerstörend. Eigene Schublade `sbkim_<suffix>` + EINMAL Identität,
+ *     falls keine da. Kein Löschen, KEIN Auto-Anmelden (Empfangsmodus).
+ *   Modus B — repairAndReconnect(): zerstörend, NUR hinter Nutzer-Knopf.
+ *     Reinigt NUR die eigene Origin (löscht `sbkim`, Service-Worker, Caches —
+ *     eigene Schublade bleibt), dann Anmelden + „hart neu laden".
+ *     Identitäts-Isolierung (2026-07-11): liegt die einzige Identität noch im
+ *     geteilten Topf `sbkim`, wird sie ERST in die eigene Schublade migriert
+ *     (Modul 01 migrateIdentityFrom), DANN der Topf gelöscht — Kollision
+ *     aufgelöst UND Identität behalten. Scheitert die Migration, bleibt der
+ *     Topf als Fallback stehen (reiner Schutz vor Identitätsverlust).
+ *
+ * Public surface (registered on window.SbkimRendezvous):
+ *   init(opts?) -> Promise<void>
+ *       opts = { nodeName, relayClient, anastomose, spore, storage, dbSuffix,
+ *                createIdentity, ensureIdentity, prepareCorpus, freshSec,
+ *                listenMs }
+ *       Alle optional. relayClient/anastomose/spore/storage sonst aus den
+ *       Globals. dbSuffix = eigene Schublade. createIdentity = app-eigener
+ *       async-Callback. ensureIdentity:true fährt Modus A einmal (lokal).
+ *       prepareCorpus = app-eigener async-Provider → [{label,text,anchorId,
+ *       passageVec}]; enableAnswering() koppelt damit den lokalen Such-Korpus
+ *       aktiv an Modul 04 (setLocalCorpus), gegen die „Korpus-leer-Falle".
+ *       init() ist idempotent + fail-soft, baut NICHTS ins Netz.
+ *   configure(opts) -> void           (Teil-Update der Konfig, gleiche Felder)
+ *   ensureIdentity(opts?) -> Promise<{ ok, created, nodeId?, reason? }>  (Modus A)
+ *   cleanupSharedOrigin() -> Promise<{ dbDeleted, swUnregistered, cachesDeleted, notes }>
+ *   repairAndReconnect(opts?) -> Promise<{ ok, cleaned, created, nodeId?, reason?, reloadHint }>  (Modus B)
+ *   announce(opts?) -> Promise<{ ok, nodeId?, reason?, bestaetigung? }>
+ *       Lauscht (listenNostr) + heftet die lebende Visitenkarte ans Brett.
+ *       bestaetigung = { stand: "ja"|"nein"|"unbekannt", relais:[{relay,ergebnis,grund}] }
+ *       aus den OK-Antworten der Relais (Modul 05b, 2026-10-14). "nein" ⇒ ok:false.
+ *       Setzt eine vorhandene Identität voraus.
+ *   connectAndAnnounce(opts?) -> Promise<{ ok, created, nodeId?, reason? }>
+ *       Wie announce, erzeugt aber die Identität, falls noch keine da ist —
+ *       über den optionalen opts.createIdentity-Callback (app-eigen, da die
+ *       Domänen-Stichworte app-spezifisch sind). Ohne Callback + ohne
+ *       Identität: { ok:false, created:false, reason }.
+ *   discover(opts?) -> Promise<{ ok, cards, reason? }>
+ *       Liest den Raum (Sammelfenster listenMs), dedupt nach nodeId
+ *       (frischeste Karte gewinnt), filtert die eigene(n) nodeId(s) raus.
+ *       cards = [{ nodeId, nodeName, spore, ts, ageSec, relatedness, isRelated }]
+ *       (ts-absteigend). relatedness/isRelated = zentrierter Verwandtschafts-
+ *       Score zur eigenen Domäne (REINE ANZEIGE; null ohne Modul 04/Vektor).
+ *   relatednessForCards(cards, ownSpore) -> cards'   (pure; reine Anzeige)
+ *       Hängt je Karte relatedness (zentrierter Cosinus, Modul 04) + isRelated
+ *       an. Gatet NICHTS, mutiert die Eingabe nicht, fail-soft.
+ *   handshakeCard(card, opts?) -> Promise<{ outcome, score?, reason?, raw? }>
+ *       Handshake an die LEBENDE ID der Karte (Modul 05, transport:"nostr").
+ *       Fail-soft normalisiert: outcome ∈ {established, rejected,
+ *       rejected-local, timeout, error}.
+ *   enableAnswering(opts?) -> { ok, reason? }   (Bau 23.B)
+ *       Antwortrecht bewusst AN: lauscht auf Frage-Zettel (Tag "sbkim-qry")
+ *       an die eigene lebende nodeId und antwortet mit Top-k der lokalen
+ *       Bedeutungs-Suche (Modul 04 queryLocal). Default AUS, Dedupe + Rate-
+ *       Limit 6/min. disableAnswering() schaltet ab. Beim Einschalten wird der
+ *       lokale Korpus über cfg.prepareCorpus aktiv gekoppelt (Korpus-leer-
+ *       Falle abgesichert; fail-soft ohne Provider).
+ *   askNode(cardOderNodeId, text, opts?) -> Promise<{ ok, results?, ... }>
+ *       (Bau 23.B) Nutzer-ausgelöste Cross-Knoten-Frage; wartet auf den
+ *       Antwort-Zettel (Default 15 s). Vertrag: INTERFACES §1 Modul 23.
+ *   _meta -> { version, tag, presenceKind, sharedDbName, dbSuffix, freshSec,
+ *              listenMs, nodeName, hasRelay, hasAnastomose, hasSpore, hasMatch,
+ *              hasStorage, hasCreateIdentity,
+ *              answering, answeredCount, hasPrepareCorpus, answerCorpusEnsured,
+ *              queryTag, queryKind, queryResKind, queryMaxPerMin,
+ *              frageVerworfen, fragenBestaetigt, fragenUnbestaetigt,
+ *              queryUnsignedMaxPerMin }  (S1, 2026-10-15)
+ *              + { powBits, queryNoPowMaxPerMin, kartenVerdraengt,
+ *                  fragenOhneAufwand }  (S3, 2026-10-16)
+ *              + { blockMax, blocklist, fragenGesperrt, antwortGesperrt,
+ *                  kartenGesperrt }  (S4, 2026-10-16)
+ *
+ * Self-check: emits a console.info line on script load. Siehe
+ * docs/components/23_rendezvous.md + INTERFACES.md §1 Modul 23.
+ */
+(function (global) {
+  "use strict";
+
+  var VERSION = "0.1";
+
+  // ---- Datenverträge (1:1 aus dem bewiesenen family-Prototyp) ----
+  var RDV_TAG = "sbkim-rdv";            // das geteilte Etikett = der gemeinsame Raum
+  var RDV_PRESENCE_KIND = "sbkim-presence";
+  var RDV_FRESH_SEC_DEFAULT = 1800;     // Karten der letzten 30 min berücksichtigen
+  var RDV_LISTEN_MS_DEFAULT = 4000;     // Sammelfenster beim Lesen des Raums
+  var RDV_HANDSHAKE_TIMEOUT_MS = 300000; // 5 min (Klaus 2026-07-08; dokumentierter Wert INTERFACES §Modul 05 / PULS Modul-18-Handshake): Empfänger lädt beim ersten Andocken evtl. das ~30-MB-Modell — 12 s waren zu kurz
+  // Mengenschutz gegen Karten-Flutung (Schutz-Plan Stufe 2b, Vorgriff Modul 11).
+  var RDV_CARDS_MAX = 200;              // Obergrenze je discover()-Durchlauf
+  var RDV_CARDS_PER_SENDER_MAX = 3;     // je Nostr-pubkey höchstens so viele Identitäten
+  var NOSTR_KIND = 1;
+  // Der geteilte Alt-Topf (Default-DB des Storage-Moduls). Modus B löscht NUR
+  // diese DB — NIE die eigene Schublade `sbkim_<suffix>`.
+  var SHARED_DB_NAME = "sbkim";
+  var RELOAD_HINT = "Bitte jetzt hart neu laden (Strg+Shift+R bzw. „Cache leeren und " +
+    "neu laden“), damit der frische Service-Worker greift.";
+
+  // ---- Konfig-Zustand ----
+  var cfg = {
+    nodeName: "SBKIM-Knoten",
+    relayClient: null,   // null → global.SbkimNostrRelay
+    anastomose: null,    // null → global.SbkimAnastomose
+    spore: null,         // null → global.SbkimSpore
+    match: null,         // null → global.SbkimMatch (optional, nur Anzeige-Score)
+    embedding: null,     // null → global.SbkimEmbedding (S2, optional, nur mit geladenem Modell)
+    storage: null,       // null → global.SbkimStorage (Identitäts-Hygiene)
+    dbSuffix: null,      // eigene Schublade `sbkim_<dbSuffix>`
+    createIdentity: null,// app-eigener async-Callback (Spore-Erzeugung)
+    prepareCorpus: null, // async → [{label,text,anchorId,passageVec}] (Korpus-Kopplung, Bau 23.B-Härtung)
+    freshSec: RDV_FRESH_SEC_DEFAULT,
+    listenMs: RDV_LISTEN_MS_DEFAULT,
+  };
+
+  // ---- Eigenes Netz (Schritt 1, 2026-10-13, INTERFACES §Modul 23 „EIGENES NETZ") ----
+  // Ohne Einstellung bleibt ALLES wie vorher: Raum RDV_TAG, Fragen RDV_QUERY_TAG,
+  // Klartext-JSON. Mit Netz-Code: Marken und Schlüssel aus dem Code (Vorbild
+  // Kim-sync raumOeffnen), Karten/Fragen/Antworten AES-GCM-verschlüsselt.
+  // RIEGEL: ein ungültiger Code fällt NIE still ins öffentliche Netz zurück.
+  var NETZ_RAUM_SALZ = "sbkim-netz-raum-v1:";
+  var NETZ_SCHLUESSEL_SALZ = "sbkim-netz-schluessel-v1";
+  var NETZ_RUNDEN = 150000;
+  var NETZ_CODE_MIN = 12;
+  var NETZ_CODE_ZEICHEN = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  var NETZ_SPEICHER_PRAEFIX = "sbkim_netz_";
+  var net = { lage: "oeffentlich", rdvTag: null, qryTag: null, key: null, reason: null, pending: null };
+  // S5 Teil 2: Netzadmin eines eigenen Netzes / Raums (aus der Einstellung).
+  var netzAdmin = null;
+  var NETZ_ADMIN_MUSTER = /^[A-Za-z0-9_-]{16,128}$/;
+
+  function netRaum() { return net.rdvTag || RDV_TAG; }
+  function netFragen() { return net.qryTag || RDV_QUERY_TAG; }
+
+  function netCodeNorm(code) {
+    return String(code == null ? "" : code).replace(/[\s-]+/g, "").toUpperCase();
+  }
+  function netSubtle() {
+    var c = global.crypto || (typeof crypto !== "undefined" ? crypto : null);
+    return (c && c.subtle) ? c : null;
+  }
+  function netHex(buf) {
+    var u = new Uint8Array(buf), s = "";
+    for (var i = 0; i < u.length; i++) s += u[i].toString(16).padStart(2, "0");
+    return s;
+  }
+  function netZuB64(u) { var s = ""; for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]); return btoa(s); }
+  function netAusB64(b) { var s = atob(b), u = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
+
+  function newNetCode() {
+    var c = netSubtle();
+    var roh = new Uint8Array(20);
+    if (c && c.getRandomValues) c.getRandomValues(roh); else throw new Error("Kein Zufall verfügbar (WebCrypto fehlt).");
+    var out = "";
+    for (var i = 0; i < 20; i++) {
+      if (i && i % 4 === 0) out += "-";
+      out += NETZ_CODE_ZEICHEN[roh[i] % NETZ_CODE_ZEICHEN.length];
+    }
+    return out;
+  }
+
+  async function netAbleiten(code) {
+    var n = netCodeNorm(code);
+    if (n.length < NETZ_CODE_MIN || !/^[A-Z0-9]+$/.test(n)) {
+      return { ok: false, reason: "Netz-Code ungültig (mindestens " + NETZ_CODE_MIN + " Zeichen, nur Buchstaben und Ziffern)." };
+    }
+    var c = netSubtle();
+    if (!c) return { ok: false, reason: "Kein WebCrypto — Netz-Code kann nicht gelesen werden." };
+    var enc = new TextEncoder();
+    var h = netHex(await c.subtle.digest("SHA-256", enc.encode(NETZ_RAUM_SALZ + n)));
+    var roh = await c.subtle.importKey("raw", enc.encode(n), "PBKDF2", false, ["deriveKey"]);
+    var key = await c.subtle.deriveKey(
+      { name: "PBKDF2", salt: enc.encode(NETZ_SCHLUESSEL_SALZ), iterations: NETZ_RUNDEN, hash: "SHA-256" },
+      roh, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+    return { ok: true, rdvTag: "sbkim-netz-" + h.slice(0, 32), qryTag: "sbkim-netzq-" + h.slice(32, 64), key: key };
+  }
+
+  // Setzt das Netz. null/{} → öffentlich. {code} → eigen. {roomTag} → nur Raum.
+  // Ein laufender Antwort-Lauscher hört auf der ALTEN Marke — er wird beendet;
+  // die App schaltet das Antwortrecht im neuen Netz wieder ein.
+  function setNetwork(opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    if (answerUnsub) { try { answerUnsub(); } catch (_e) {} answerUnsub = null; }
+    var code = (typeof opts.code === "string") ? opts.code : null;
+    var raum = (typeof opts.roomTag === "string") ? opts.roomTag : null;
+    netzAdmin = (typeof opts.admin === "string" && NETZ_ADMIN_MUSTER.test(opts.admin)) ? opts.admin : null;
+    if (code !== null && code.trim() !== "") {
+      net = { lage: "wird-abgeleitet", rdvTag: null, qryTag: null, key: null, reason: null, pending: null };
+      var mein = net;
+      mein.pending = netAbleiten(code).then(function (r) {
+        if (net !== mein) return { ok: false, network: net.lage, reason: "Netz wurde inzwischen gewechselt." };
+        if (!r.ok) { mein.lage = "ungueltig"; mein.reason = r.reason; return { ok: false, network: "ungueltig", reason: r.reason }; }
+        mein.lage = "eigen"; mein.rdvTag = r.rdvTag; mein.qryTag = r.qryTag; mein.key = r.key;
+        return { ok: true, network: "eigen" };
+      }, function (e) {
+        mein.lage = "ungueltig"; mein.reason = "Netz-Code konnte nicht abgeleitet werden: " + (e && e.message ? e.message : e);
+        return { ok: false, network: "ungueltig", reason: mein.reason };
+      });
+      return mein.pending;
+    }
+    if (raum !== null && raum !== "") {
+      if (!/^[a-z0-9][a-z0-9-]{2,63}$/.test(raum)) {
+        net = { lage: "ungueltig", rdvTag: null, qryTag: null, key: null, pending: null,
+          reason: "Raum-Marke ungültig (3–64 Zeichen, a–z, 0–9, Bindestrich)." };
+        return Promise.resolve({ ok: false, network: "ungueltig", reason: net.reason });
+      }
+      net = { lage: "raum", rdvTag: raum, qryTag: raum + "-qry", key: null, reason: null, pending: null };
+      return Promise.resolve({ ok: true, network: "raum" });
+    }
+    net = { lage: "oeffentlich", rdvTag: null, qryTag: null, key: null, reason: null, pending: null };
+    return Promise.resolve({ ok: true, network: "oeffentlich" });
+  }
+
+  // Vor jeder Netz-Aktion: Ableitung abwarten; ungültig → nichts senden.
+  async function netBereit() {
+    if (net.pending) { try { await net.pending; } catch (_e) {} }
+    if (net.lage === "ungueltig" || net.lage === "wird-abgeleitet") {
+      return { ok: false, reason: net.reason || "Netz-Einstellung nicht bereit." };
+    }
+    return { ok: true };
+  }
+
+  // Inhalt hinaus: öffentlich Klartext-JSON (unverändert), eigen AES-GCM-Umschlag.
+  async function netPacke(obj, tag) {
+    var klar = JSON.stringify(obj);
+    if (!net.key) return klar;
+    var c = netSubtle();
+    var iv = c.getRandomValues(new Uint8Array(12));
+    var ct = new Uint8Array(await c.subtle.encrypt(
+      { name: "AES-GCM", iv: iv, additionalData: new TextEncoder().encode(tag) },
+      net.key, new TextEncoder().encode(klar)));
+    return JSON.stringify({ v: 1, iv: netZuB64(iv), ct: netZuB64(ct) });
+  }
+  // Inhalt herein: ruft handle(obj) — öffentlich synchron wie bisher, eigen nach
+  // dem Entschlüsseln. Was nicht passt, wird still verworfen. `warten` sammelt
+  // die Versprechen, damit ein Sammelfenster sie vor dem Auswerten abwartet.
+  function netEmpfange(ev, tag, handle, warten) {
+    if (!ev || typeof ev.content !== "string") return;
+    if (!net.key) {
+      var o;
+      try { o = JSON.parse(ev.content); } catch (_e) { return; }
+      handle(o);
+      return;
+    }
+    var key = net.key;
+    var p = (async function () {
+      var u;
+      try { u = JSON.parse(ev.content); } catch (_e) { return; }
+      if (!u || u.v !== 1 || typeof u.iv !== "string" || typeof u.ct !== "string") return;
+      try {
+        var klar = await netSubtle().subtle.decrypt(
+          { name: "AES-GCM", iv: netAusB64(u.iv), additionalData: new TextEncoder().encode(tag) },
+          key, netAusB64(u.ct));
+        handle(JSON.parse(new TextDecoder().decode(klar)));
+      } catch (_e) { /* falscher Code / fremder Umschlag → still verwerfen */ }
+    })();
+    if (warten) warten.push(p);
+  }
+
+  // ---- Netz-Einstellung speichern (Entscheidung 2026-10-13, INTERFACES) ----
+  function checkNetSetting(s) {
+    if (!s || typeof s !== "object") return { ok: false, reason: "Keine Netz-Einstellung." };
+    if (typeof s.relay !== "string" || !/^wss:\/\/[A-Za-z0-9.-]+(:[0-9]{1,5})?(\/[^\s]*)?$/.test(s.relay) || s.relay.length > 200) {
+      return { ok: false, reason: "Relais-Adresse ungültig (nur wss://…)." };
+    }
+    var n = netCodeNorm(s.code);
+    if (n.length < NETZ_CODE_MIN || !/^[A-Z0-9]+$/.test(n)) {
+      return { ok: false, reason: "Netz-Code ungültig (mindestens " + NETZ_CODE_MIN + " Zeichen, nur Buchstaben und Ziffern)." };
+    }
+    var name = (typeof s.name === "string") ? s.name.trim().slice(0, 60) : "";
+    var setting = { v: 1, name: name || "Eigenes Netz", relay: s.relay, code: String(s.code).trim(), auto: s.auto !== false };
+    // S5 Teil 2: optional der Netzadmin dieses Netzes (eine Kennung, nie ein Name).
+    var admin = (typeof s.admin === "string") ? s.admin.trim() : "";
+    if (admin) {
+      if (!NETZ_ADMIN_MUSTER.test(admin)) return { ok: false, reason: "Netzadmin-Kennung ungültig (16–128 Zeichen, A–Z, a–z, 0–9, _ und -)." };
+      setting.admin = admin;
+    }
+    return { ok: true, setting: setting };
+  }
+  function netStore(store) {
+    if (store && typeof store.getItem === "function") return store;
+    try { return global.localStorage || null; } catch (_e) { return null; }
+  }
+  function netSchluessel() {
+    return cfg.dbSuffix ? NETZ_SPEICHER_PRAEFIX + cfg.dbSuffix : null;
+  }
+  function loadNetwork(store) {
+    var st = netStore(store), k = netSchluessel();
+    if (!st || !k) return null;
+    var roh; try { roh = st.getItem(k); } catch (_e) { return null; }
+    if (!roh) return null;
+    var s; try { s = JSON.parse(roh); } catch (_e) { return null; }
+    var r = checkNetSetting(s);
+    return r.ok ? r.setting : null;
+  }
+  // Wie loadNetwork, sagt aber AUCH, dass etwas Ungültiges gespeichert ist.
+  // loadNetwork gibt dann null zurück — und null hieße für einen Aufrufer
+  // „öffentlich". Genau das darf eine kaputte Einstellung nie werden (Riegel).
+  function readNetwork(store) {
+    var st = netStore(store), k = netSchluessel();
+    if (!st || !k) return { present: false };
+    var roh; try { roh = st.getItem(k); } catch (_e) { return { present: false }; }
+    if (!roh) return { present: false };
+    var s; try { s = JSON.parse(roh); } catch (_e) {
+      return { present: true, ok: false, value: {}, reason: "Gespeicherte Netz-Einstellung ist nicht lesbar." };
+    }
+    var r = checkNetSetting(s);
+    return r.ok ? { present: true, ok: true, setting: r.setting }
+                : { present: true, ok: false, value: (s && typeof s === "object") ? s : {}, reason: r.reason };
+  }
+  function saveNetwork(setting, store) {
+    var k = netSchluessel();
+    if (!k) return { ok: false, reason: "Ohne dbSuffix wird nicht gespeichert (geteilte Adresse)." };
+    var r = checkNetSetting(setting);
+    if (!r.ok) return r;
+    var st = netStore(store);
+    if (!st) return { ok: false, reason: "Kein Speicher verfügbar." };
+    try { st.setItem(k, JSON.stringify(r.setting)); } catch (e) { return { ok: false, reason: "Speichern fehlgeschlagen: " + (e && e.message ? e.message : e) }; }
+    return { ok: true, setting: r.setting };
+  }
+  function clearNetwork(store) {
+    var st = netStore(store), k = netSchluessel();
+    if (st && k) { try { st.removeItem(k); } catch (_e) {} }
+    return { ok: true };
+  }
+  // Wendet eine Einstellung an: 05b-Relais UND Code. null → öffentliches Netz.
+  async function applyNetwork(setting) {
+    var relay = resolveRelay();
+    if (setting == null) {
+      var rr = (relay && typeof relay.configure === "function") ? relay.configure({ reset: true }) : null;
+      var r0 = await setNetwork(null);
+      return { ok: r0.ok, network: r0.network, relays: rr && rr.relays };
+    }
+    var chk = checkNetSetting(setting);
+    if (!chk.ok) {
+      // Riegel: nicht still öffentlich weitermachen.
+      net = { lage: "ungueltig", rdvTag: null, qryTag: null, key: null, pending: null, reason: chk.reason };
+      return { ok: false, network: "ungueltig", reason: chk.reason };
+    }
+    if (!relay || typeof relay.configure !== "function") {
+      net = { lage: "ungueltig", rdvTag: null, qryTag: null, key: null, pending: null,
+        reason: "Relais-Client kann die Adresse nicht setzen (Modul 05b fehlt)." };
+      return { ok: false, network: "ungueltig", reason: net.reason };
+    }
+    var rc = relay.configure({ relays: [chk.setting.relay] });
+    if (rc && rc.ok === false) {
+      net = { lage: "ungueltig", rdvTag: null, qryTag: null, key: null, pending: null, reason: rc.reason };
+      return { ok: false, network: "ungueltig", reason: rc.reason };
+    }
+    var r1 = await setNetwork({ code: chk.setting.code, admin: chk.setting.admin });
+    return { ok: r1.ok, network: r1.network, relays: rc && rc.relays, reason: r1.reason };
+  }
+
+  // ---- Resolver (Default aus den Globals, Override aus der Konfig) ----
+  function resolveRelay() {
+    var c = cfg.relayClient;
+    if (c && typeof c.publish === "function" && typeof c.subscribe === "function") return c;
+    var g = global.SbkimNostrRelay;
+    if (g && typeof g.publish === "function" && typeof g.subscribe === "function") return g;
+    return null;
+  }
+  function resolveAnastomose() {
+    var a = cfg.anastomose || global.SbkimAnastomose;
+    return (a && typeof a.handshake === "function") ? a : null;
+  }
+  function resolveSpore() {
+    var s = cfg.spore || global.SbkimSpore;
+    return (s && typeof s.getOwnSpore === "function") ? s : null;
+  }
+  // Modul 02 als PRÜFER der fremden Karten (Schutz-Plan Stufe 2b). Getrennt vom
+  // Resolver oben, weil dort nur `getOwnSpore` verlangt wird: eine App kann ein
+  // Spore-Modul ohne `verifyForeignSpore` mitbringen — dann bleibt der Raum
+  // funktionsfähig, meldet die Karten aber ehrlich als UNGEPRÜFT
+  // (`_meta.cardsVerified === false`), statt sie still durchzuwinken.
+  function resolveVerifier() {
+    var s = cfg.spore || global.SbkimSpore;
+    return (s && typeof s.verifyForeignSpore === "function") ? s : null;
+  }
+  // Modul 04 (Match) ist eine OPTIONALE Anzeige-Abhängigkeit — nur für den
+  // zentrierten Verwandtschafts-Score der Raum-Karten. Fehlt es, bleibt der
+  // Raum voll funktionsfähig (Karten ohne Verwandtschafts-Badge).
+  function resolveMatch() {
+    var m = cfg.match || global.SbkimMatch;
+    return (m && typeof m.relatedness === "function") ? m : null;
+  }
+  // Modul 01 (Storage) — nur für die Identitäts-Hygiene (eigene Schublade).
+  function resolveStorage() {
+    var s = cfg.storage || global.SbkimStorage;
+    return (s && typeof s.init === "function") ? s : null;
+  }
+
+  // Modul 03 (Embedding) — nur für S2 „Vektor gegen Text nachrechnen".
+  // Gelesen wird NUR ein bereits geladenes Modell (isReady): der Raum lädt
+  // nie selbst ~118 MB nach. Fehlt es → Karte „nicht-geprueft", nie still grün.
+  function resolveEmbedding() {
+    var e = cfg.embedding || global.SbkimEmbedding;
+    return (e && typeof e.embedPassage === "function" && typeof e.isReady === "function") ? e : null;
+  }
+
+  function nowSec() { return Math.floor(Date.now() / 1000); }
+
+  // ---- S2: Vektor gegen Text nachrechnen (2026-10-15, INTERFACES §23) ----
+  // Der angesagte domainVector ist signiert, aber nicht an den Text gebunden:
+  // ein Knoten konnte einen fremden Vektor kopieren (Befund 2026-10-14, N2 b/c).
+  // Hier rechnet der EMPFÄNGER aus der Selbstbeschreibung nach. Reine Anzeige:
+  // gatet nichts, nimmt nur den Match-Vorrang (Klaus 2026-10-15: Schwelle 0.99,
+  // embeddingSource "content" → nicht nachprüfbar, kein Abzug).
+  var RDV_MEANING_MIN = 0.99;
+  var RDV_MEANING_MODEL = "Xenova/multilingual-e5-small";
+
+  function cosine(a, b) {
+    if (!a || !b || a.length !== b.length || !a.length) return null;
+    var dot = 0, na = 0, nb = 0;
+    for (var i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+    if (!na || !nb) return null;
+    var c = dot / Math.sqrt(na * nb);
+    return isFinite(c) ? c : null;
+  }
+
+  async function checkMeaning(spore) {
+    function out(status, score, snippets, reason) {
+      return { status: status, score: score, snippets: snippets, reason: reason };
+    }
+    var emb = resolveEmbedding();
+    if (!emb) return out("nicht-geprueft", null, null, "Modul 03 fehlt");
+    var ready = false;
+    try { ready = emb.isReady() === true; } catch (_e) { ready = false; }
+    if (!ready) return out("nicht-geprueft", null, null, "Sprachmodell nicht geladen");
+    if (!spore || typeof spore !== "object") return out("nicht-geprueft", null, null, "keine Spore");
+    var vec = toVec(spore.domainVector);
+    if (!vec || !vec.length) return out("nicht-geprueft", null, null, "kein Bedeutungs-Vektor");
+    if (typeof spore.embeddingModel === "string" && spore.embeddingModel && spore.embeddingModel !== RDV_MEANING_MODEL) {
+      return out("nicht-geprueft", null, null, "anderes Modell: " + String(spore.embeddingModel).slice(0, 80));
+    }
+    try {
+      // Satz-Schnipsel: jeder Vektor gegen seinen EIGENEN Text. Gekürzte Sätze
+      // („…") sind nicht verlässlich nachzurechnen und werden übersprungen.
+      var snippets = null;
+      var sv = Array.isArray(spore.snippetVectors) ? spore.snippetVectors : [];
+      var pruefbar = sv.filter(function (x) {
+        return x && typeof x.text === "string" && x.text.trim() && !/…$/.test(x.text.trim()) && toVec(x.vec);
+      });
+      if (pruefbar.length) {
+        snippets = "passen";
+        for (var i = 0; i < pruefbar.length; i++) {
+          var c = cosine(await emb.embedPassage(pruefbar[i].text), toVec(pruefbar[i].vec));
+          if (c === null || c < RDV_MEANING_MIN) { snippets = "passen-nicht"; break; }
+        }
+      }
+      var src = spore.embeddingSource;
+      var desc = typeof spore.domainDescription === "string" ? spore.domainDescription.trim() : "";
+      var kw = Array.isArray(spore.domainKeywords) ? spore.domainKeywords.join(", ") : "";
+      var best = null;
+      if (desc) {
+        var fassungen = [desc];
+        if (kw) fassungen.push(desc + ". " + kw);   // Andock-Wizard, Erst-Signatur
+        if (kw) fassungen.push(desc + " " + kw);    // tools/embed_helper.html (ältere Sporen)
+        for (var f = 0; f < fassungen.length; f++) {
+          var cf = cosine(await emb.embedPassage(fassungen[f]), vec);
+          if (cf !== null && (best === null || cf > best)) best = cf;
+        }
+      }
+      if (snippets === "passen-nicht") return out("passt-nicht", best, snippets, "Satz-Schnipsel passt nicht zu seinem Text");
+      if (src === "content") return out("nicht-nachpruefbar", best, snippets, "Bedeutung aus Inhalten, nicht nachprüfbar");
+      if (best !== null && best >= RDV_MEANING_MIN) return out("passt", best, snippets, "Bedeutung passt zur Beschreibung");
+      if (src === "description") {
+        return out("passt-nicht", best, snippets, desc ? "Bedeutung passt nicht zur Beschreibung" : "Beschreibung fehlt");
+      }
+      return out("nicht-nachpruefbar", best, snippets, "Herkunft des Vektors nicht angegeben");
+    } catch (e) {
+      return out("nicht-geprueft", null, null, "Rechenfehler: " + String(e && e.message ? e.message : e).slice(0, 120));
+    }
+  }
+  function meaningFails(c) { return !!(c && c.meaning && c.meaning.status === "passt-nicht"); }
+
+  // Domänen-Vektor (number[] aus der Spore, oder Float32Array) → Float32Array.
+  // null bei fehlender/ungültiger Eingabe (relatedness() validiert den Rest).
+  function toVec(arr) {
+    if (arr instanceof Float32Array) return arr;
+    if (Array.isArray(arr)) { try { return new Float32Array(arr); } catch (_e) { return null; } }
+    return null;
+  }
+
+  // ---- Verwandtschafts-Anreicherung der Raum-Karten (REINE ANZEIGE) ----
+  // Folge zu Bau 04.E / „Wählen"-UI (2026-06-28): hängt je Karte einen
+  // ZENTRIERTEN Verwandtschafts-Score (Modul 04 relatedness(), whitened-light)
+  // an — ausschliesslich für die Anzeige im Rendezvous-Raum (z.B. Badge
+  // „🧬 verwandt 0.72" vs nur „verbunden"). Der 0.80-Andock-Riegel (Modul 05
+  // handshake / PROVIDER_MIN_MATCH) bleibt UNBERÜHRT — dieser Score gatet
+  // NICHTS, er sortiert/filtert nur die Darstellung. Pure Funktion (DOM-frei,
+  // headless testbar): nimmt die Karten + die eigene Spore, gibt eine NEUE Liste
+  // zurück (Eingabe NICHT mutiert). Fail-soft: ohne Modul 04 / ohne eigenen
+  // domainVector / ohne Karten-domainVector → relatedness null, isRelated false;
+  // relatedness() wirft bei falscher Eingabe (InvalidVectorError/ShapeMismatch)
+  // → pro Karte abgefangen, nie Bruch der ganzen Liste.
+  function relatednessForCards(cards, ownSpore) {
+    var list = Array.isArray(cards) ? cards : [];
+    var match = resolveMatch();
+    var ownVec = (ownSpore && typeof ownSpore === "object") ? toVec(ownSpore.domainVector) : null;
+    return list.map(function (c) {
+      var copy = {};
+      for (var k in c) { if (Object.prototype.hasOwnProperty.call(c, k)) copy[k] = c[k]; }
+      var rel = null, isRel = false;
+      if (match && ownVec && c && c.spore) {
+        var cv = toVec(c.spore.domainVector);
+        if (cv) {
+          try {
+            var s = match.relatedness(ownVec, cv);
+            if (typeof s === "number" && isFinite(s)) {
+              rel = s;
+              isRel = (typeof match.isRelated === "function") ? match.isRelated(s) : (s >= 0.30);
+            }
+          } catch (_e) { rel = null; isRel = false; } // fail-soft, Karte bleibt
+        }
+      }
+      copy.relatedness = rel;
+      copy.isRelated = meaningFails(c) ? false : isRel;   // S2: kein Vorrang
+      return copy;
+    });
+  }
+
+  // ---- Raum-Karten nach FRAGE-Passung ranken (A11, REINE ANZEIGE/AUSWAHL) ----
+  // Klaus' Befund 2026-07-11: bei vielen Knoten kann der Nutzer nicht wissen,
+  // wen er fragen soll. `relatednessForCards` vergleicht die EIGENE Spore mit
+  // jeder Karte (Badge) — hier vergleichen wir stattdessen den bereits
+  // eingebetteten QUERY-Vektor (die getippte Frage) mit jedem Karten-
+  // `domainVector`, damit der Aufrufer den bestpassenden Knoten automatisch
+  // anfragen und die Karten nach Passung sortieren kann.
+  //
+  // Reine Tool-Funktion: DOM-frei, headless testbar, Eingabe NICHT mutiert
+  // (neue Liste). Nutzt Modul 04 `relatedness` (zentrierter Cosinus — bessere
+  // Trennung; opts.raw → rohes `match`). GATET NICHTS — der 0.80-Andock-Riegel
+  // (Modul 05) bleibt unberührt; dies wählt/sortiert nur die Anzeige.
+  // Fail-soft: ohne Modul 04 / ohne Query-Vektor / ohne Karten-domainVector →
+  // Karten UNVERÄNDERT in Eingabe-Reihenfolge zurück, jede mit queryFit:null
+  // (der Aufrufer degradiert dann auf die heutige Recency-Reihenfolge).
+  function rankCardsByQuery(cards, queryVec, opts) {
+    var list = Array.isArray(cards) ? cards : [];
+    var o = opts || {};
+    var match = resolveMatch();
+    var qv = toVec(queryVec);
+    var useRaw = o.raw === true && match && typeof match.match === "function";
+    var enriched = list.map(function (c, i) {
+      var copy = {};
+      for (var k in c) { if (Object.prototype.hasOwnProperty.call(c, k)) copy[k] = c[k]; }
+      var fit = null;
+      if (match && qv && c && c.spore) {
+        var cv = toVec(c.spore.domainVector);
+        if (cv) {
+          try {
+            var s = useRaw ? match.match(qv, cv) : match.relatedness(qv, cv);
+            if (typeof s === "number" && isFinite(s)) fit = s;
+          } catch (_e) { fit = null; } // fail-soft, Karte bleibt
+        }
+      }
+      copy.queryFit = fit;
+      copy._idx = i; // stabiler Tie-Break
+      return copy;
+    });
+    // Ohne brauchbaren Query-Vektor NICHT umsortieren (Eingabe-Reihenfolge).
+    if (!qv || !match) {
+      return enriched.map(function (c) { delete c._idx; return c; });
+    }
+    enriched.sort(function (a, b) {
+      var ma = meaningFails(a), mb = meaningFails(b);   // S2: „passt nicht" ans Ende
+      if (ma !== mb) return ma ? 1 : -1;
+      var va = vouchVorn(a), vb = vouchVorn(b);         // S5 Teil 2: Verbürgte nach vorne
+      if (va !== vb) return va ? -1 : 1;
+      var fa = (typeof a.queryFit === "number") ? a.queryFit : -Infinity;
+      var fb = (typeof b.queryFit === "number") ? b.queryFit : -Infinity;
+      if (fb !== fa) return fb - fa;      // beste Passung zuerst
+      return a._idx - b._idx;             // sonst Eingabe-Reihenfolge (stabil)
+    });
+    return enriched.map(function (c) { delete c._idx; return c; });
+  }
+
+  // S5 Teil 2 (Klaus 2026-10-15: „verbürgte Karten rücken nach vorne").
+  function vouchVorn(c) {
+    var st = c && c.vouch && c.vouch.status;
+    return st === "anker" || st === "kontakt" || st === "verbuergt";
+  }
+
+  // ---- S5 „Bürgen" — Teil 1 (2026-10-15, docs/PLAN_MYCEL_SCHICHTEN.md) ----
+  // Ein bekannter Knoten unterschreibt „diese Kennung kenne ich". Eine
+  // Bürgschaft zählt beim Leser NUR, wenn er dem Bürgen schon traut (Anker
+  // oder eigener Kontakt), höchstens RDV_VOUCH_CHAIN_MAX Schritte weit.
+  // REINE ANZEIGE: gatet nichts, unverbürgte Karten bleiben sichtbar.
+  var RDV_VOUCH_KIND = "sbkim-vouch";
+  var RDV_REVOKE_KIND = "sbkim-vouch-revoke";
+  var RDV_VOUCH_CHAIN_MAX = 2;                 // Klaus 2026-10-15: „2 Schritte"
+  var RDV_VOUCH_TTL_SEC = 180 * 24 * 3600;     // S5b, Klaus 2026-10-16: „höchstens 180 Tage" (vorher 1 Jahr)
+  var RDV_VOUCH_WARN_SEC = 30 * 24 * 3600;     // S5b: Hinweis 30 Tage vor dem Ablauf
+  var RDV_REVOKE_REASON_MAX = 200;             // S5b: Widerruf trägt immer einen Grund
+  var RDV_REVOKE_STORE_MAX = 256;              // S5b: gespeicherte Widerrufe je Leser
+  var RDV_QUERY_VOUCH_MAX = 4;                 // S5b: Bürgschaften, die eine Frage mitträgt
+  var RDV_VOUCH_SKEW_SEC = 600;                // Uhren-Spiel nach vorn
+  var RDV_VOUCH_PER_CARD_MAX = 8;
+  var RDV_REVOKE_PER_CARD_MAX = 32;
+  var RDV_VOUCH_SEEN_MAX = 400;                // Zettel je discover()-Lauf
+  var RDV_ISSUED_STORE_MAX = 64;               // S5b Teil 2: eigene ausgestellte Empfehlungen im Vorrat
+  var RDV_ISSUED_PER_CARD_MAX = 8;             // S5b Teil 2: davon trägt die Karte die neuesten
+  // Netzadmin des OFFENEN Mycels (Klaus 2026-10-15: er bürgt mit Sage-Protokol,
+  // sbkim/spore.json). Gilt NUR im öffentlichen Netz; in einem eigenen Netz
+  // ist dessen Betreiber der Netzadmin (Feld `admin` der Netz-Einstellung).
+  var RDV_OPEN_MYCEL_ADMIN = ["BgjXhSApoOrJD6zFJ4uuEpAliGWPokpKn7UMWRm94PA"];
+  function currentNetAdmin() {
+    if (net.lage === "oeffentlich") return RDV_OPEN_MYCEL_ADMIN[0] || null;
+    if (net.lage === "eigen" || net.lage === "raum") return netzAdmin;
+    return null;   // wird abgeleitet / ungültig → kein Netzadmin
+  }
+
+  // ---- S3 „Rechenaufwand je Zettel" (2026-10-16, docs/PLAN_MYCEL_SCHICHTEN.md) ----
+  // Der Sender rechnet vor dem Senden eine kleine Prüfsummen-Aufgabe (Nonce-
+  // Suche wie Nostr NIP-13, aber im Zettel selbst, nicht am Nostr-Ereignis).
+  // Klaus 2026-10-16: 12 Stufen, Karten + Fragen, „Vorrang bei Enge".
+  //   Karte ohne Aufwand → weiter angenommen; ist der Raum voll (RDV_CARDS_MAX),
+  //                        verdrängt eine Karte MIT Aufwand eine ohne.
+  //   Frage ohne Aufwand → weiter beantwortet, aber höchstens
+  //                        RDV_QUERY_NOPOW_MAX_PER_MIN der Antworten je Minute;
+  //                        der Rest bleibt Fragen mit Aufwand vorbehalten.
+  // ⚠ Benannte Grenze: 12 Stufen kosten eine ehrliche App wenige Hundertstel
+  //   Sekunden, einen Angreifer mit Rechner-Code ~0,01 s je Zettel (gemessen
+  //   2026-10-16 im Sitzungs-Behälter, nicht am Tablet). Die Schicht verdrängt
+  //   Fluter, die gar nicht rechnen; gegen einen entschlossenen Angreifer tragen
+  //   S1 (Unterschrift), S5 (Bürgen) und S4 (Sperrliste).
+  // Rechnung: h = sha256("sbkim-pow-v1|" + sha256(JSON ohne pow/sig/spore) + "|" + pow),
+  //   gültig, wenn h mindestens RDV_POW_BITS führende Null-Bits hat.
+  var RDV_POW_BITS = 12;                 // Klaus 2026-10-16: „12 Stufen"
+  var RDV_POW_PREFIX = "sbkim-pow-v1|";
+  var RDV_POW_NONCE_MAX = 32;            // Länge des Nonce-Felds (untrusted input)
+  var RDV_POW_TRIES_MAX = 1 << 22;       // Sender gibt danach auf (fail-soft: ohne Aufwand)
+  var RDV_QUERY_NOPOW_MAX_PER_MIN = 4;   // von RDV_QUERY_MAX_PER_MIN (6); 2 bleiben Fragen mit Aufwand
+  var POW_K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  // SHA-256 synchron (der Empfangs-Callback kann nicht warten; crypto.subtle ist async).
+  function powSha256(str) {
+    var b = new TextEncoder().encode(str);
+    var l = b.length, n = ((l + 9 + 63) >> 6) << 6;
+    var m = new Uint8Array(n); m.set(b); m[l] = 0x80;
+    var hi = Math.floor(l / 0x20000000), lo = (l * 8) >>> 0;
+    m[n - 8] = hi >>> 24; m[n - 7] = hi >>> 16; m[n - 6] = hi >>> 8; m[n - 5] = hi;
+    m[n - 4] = lo >>> 24; m[n - 3] = lo >>> 16; m[n - 2] = lo >>> 8; m[n - 1] = lo;
+    var H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+    var w = new Uint32Array(64), i;
+    for (var o = 0; o < n; o += 64) {
+      for (i = 0; i < 16; i++) w[i] = (m[o + i * 4] << 24) | (m[o + i * 4 + 1] << 16) | (m[o + i * 4 + 2] << 8) | m[o + i * 4 + 3];
+      for (i = 16; i < 64; i++) {
+        var x = w[i - 15], y = w[i - 2];
+        w[i] = (((x >>> 7) | (x << 25)) ^ ((x >>> 18) | (x << 14)) ^ (x >>> 3)) + w[i - 7] +
+               (((y >>> 17) | (y << 15)) ^ ((y >>> 19) | (y << 13)) ^ (y >>> 10)) + w[i - 16];
+      }
+      var a = H[0], bb = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+      for (i = 0; i < 64; i++) {
+        var t1 = (h + (((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7))) + ((e & f) ^ (~e & g)) + POW_K[i] + w[i]) | 0;
+        var t2 = ((((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10))) + ((a & bb) ^ (a & c) ^ (bb & c))) | 0;
+        h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = bb; bb = a; a = (t1 + t2) | 0;
+      }
+      H[0] = (H[0] + a) | 0; H[1] = (H[1] + bb) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+      H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+    }
+    var s = "";
+    for (i = 0; i < 8; i++) s += ("00000000" + (H[i] >>> 0).toString(16)).slice(-8);
+    return s;
+  }
+  function powNullBits(hex) {
+    var bits = 0;
+    for (var i = 0; i < hex.length; i++) {
+      var v = parseInt(hex[i], 16);
+      if (v === 0) { bits += 4; continue; }
+      return bits + (v < 2 ? 3 : v < 4 ? 2 : v < 8 ? 1 : 0);
+    }
+    return bits;
+  }
+  function powBasis(z) {
+    var o = {};
+    for (var key in z) {
+      if (Object.prototype.hasOwnProperty.call(z, key) && key !== "pow" && key !== "sig" && key !== "spore") o[key] = z[key];
+    }
+    return RDV_POW_PREFIX + powSha256(JSON.stringify(o)) + "|";
+  }
+  // Gilt der Aufwand dieses Zettels? (synchron, wirft nie)
+  function powPruefen(z) {
+    try {
+      if (!z || typeof z.pow !== "string" || !z.pow || z.pow.length > RDV_POW_NONCE_MAX) return false;
+      return powNullBits(powSha256(powBasis(z) + z.pow)) >= RDV_POW_BITS;
+    } catch (_e) { return false; }
+  }
+  // Aufwand rechnen und als z.pow eintragen. Gibt alle 4096 Versuche die
+  // Hand ab (Tablet bleibt bedienbar). Fail-soft: ohne Erfolg kein pow-Feld.
+  async function powRechnen(z) {
+    try {
+      var basis = powBasis(z);
+      // Ohne Zufall: der Inhalt (ts, qid) macht jede Suche eigen, und
+      // Math.random bleibt für qid & Co. unberührt (smoke_netz_eigen friert ihn ein).
+      for (var i = 0; i < RDV_POW_TRIES_MAX; i++) {
+        var nonce = i.toString(36);
+        if (powNullBits(powSha256(basis + nonce)) >= RDV_POW_BITS) { z.pow = nonce; return z; }
+        if ((i & 4095) === 4095) await new Promise(function (r) { setTimeout(r, 0); });
+      }
+    } catch (_e) { /* fail-soft */ }
+    return z;
+  }
+  var kartenVerdraengt = 0, fragenOhneAufwand = 0;   // _meta (S3)
+
+  var BUERGEN_SPEICHER_PRAEFIX = "sbkim_buergen_";
+  var WIDERRUF_SPEICHER_PRAEFIX = "sbkim_widerrufe_";   // S5b: gesehene Widerrufe
+  var vouchCfg = { anchors: [], flagged: [] };
+
+  function idListe(x) {
+    return (Array.isArray(x) ? x : []).filter(function (s) { return typeof s === "string" && s.length > 0 && s.length <= 128; });
+  }
+  function buergenSchluessel() { return cfg.dbSuffix ? BUERGEN_SPEICHER_PRAEFIX + cfg.dbSuffix : null; }
+  function buergenLesen(store) {
+    var st = netStore(store), k = buergenSchluessel(), leer = { v: 1, contacts: [], carried: [], issued: [] };
+    if (!st || !k) return leer;
+    var roh; try { roh = st.getItem(k); } catch (_e) { return leer; }
+    if (!roh) return leer;
+    var o; try { o = JSON.parse(roh); } catch (_e) { return leer; }
+    if (!o || typeof o !== "object") return leer;
+    return {
+      v: 1,
+      contacts: (Array.isArray(o.contacts) ? o.contacts : []).filter(function (c) {
+        return c && typeof c.nodeId === "string" && c.nodeId.length > 0 && c.nodeId.length <= 128;
+      }).map(function (c) { return { nodeId: c.nodeId, name: (typeof c.name === "string") ? c.name.slice(0, 60) : "" }; }),
+      carried: (Array.isArray(o.carried) ? o.carried : []).filter(function (z) { return z && typeof z === "object"; }),
+      onlyVouched: o.onlyVouched === true,   // S5b: „antworte nur Verbürgten"
+      issued: (Array.isArray(o.issued) ? o.issued : []).filter(function (z) { return z && typeof z === "object" && z.kind === RDV_VOUCH_KIND; })
+        .slice(0, RDV_ISSUED_STORE_MAX),     // S5b Teil 2: selbst ausgestellt, reist auf der Karte
+    };
+  }
+  function buergenSchreiben(o, store) {
+    var st = netStore(store), k = buergenSchluessel();
+    if (!k) return { ok: false, reason: "Ohne dbSuffix wird nicht gespeichert (geteilte Adresse)." };
+    if (!st) return { ok: false, reason: "Kein Speicher verfügbar." };
+    try { st.setItem(k, JSON.stringify(o)); } catch (e) { return { ok: false, reason: "Speichern fehlgeschlagen: " + (e && e.message ? e.message : e) }; }
+    return { ok: true };
+  }
+  function loadVouchContacts(store) { return buergenLesen(store).contacts; }
+  function saveVouchContacts(list, store) {
+    var o = buergenLesen(store);
+    o.contacts = (Array.isArray(list) ? list : []).filter(function (c) {
+      return c && typeof c.nodeId === "string" && c.nodeId.length > 0 && c.nodeId.length <= 128;
+    }).map(function (c) { return { nodeId: c.nodeId, name: (typeof c.name === "string") ? c.name.slice(0, 60) : "" }; });
+    var r = buergenSchreiben(o, store);
+    return r.ok ? { ok: true, contacts: o.contacts } : r;
+  }
+
+  // Prüft EINEN Zettel (Bürgschaft oder Widerruf) für sich.
+  // → "gueltig" | "falsch" | "nicht-pruefbar" (Modul 02 fehlt)
+  async function vouchPruefen(z, jetzt) {
+    if (!z || typeof z !== "object") return "falsch";
+    var istV = z.kind === RDV_VOUCH_KIND, istR = z.kind === RDV_REVOKE_KIND;
+    if (!istV && !istR) return "falsch";
+    if (z.v !== 1 || typeof z.voucher !== "string" || typeof z.subject !== "string" || !z.voucher || !z.subject) return "falsch";
+    if (z.voucher === z.subject) return "falsch";
+    if (typeof z.ts !== "number" || !isFinite(z.ts) || z.ts > jetzt + RDV_VOUCH_SKEW_SEC) return "falsch";
+    if (istV) {
+      if (typeof z.exp !== "number" || !isFinite(z.exp)) return "falsch";
+      if (!(z.exp > z.ts) || z.exp - z.ts > RDV_VOUCH_TTL_SEC) return "falsch";   // nie still gekürzt
+      if (z.exp <= jetzt) return "falsch";                                         // abgelaufen
+    }
+    if (istR && !widerrufGrundOk(z.reason)) return "falsch";                       // S5b: ohne Grund ungültig
+    if (typeof z.sig !== "string" || !z.spore || typeof z.spore !== "object") return "falsch";
+    if (z.spore.id !== z.voucher) return "falsch";
+    var v = resolveVerifier();
+    if (!v || typeof v.verifyDetached !== "function") return "nicht-pruefbar";
+    var merk; try { merk = JSON.stringify(z); } catch (_e) { merk = null; }
+    if (merk && vouchEcht[merk]) return "gueltig";     // Unterschrift schon geprüft (Zeit oben immer neu)
+    try {
+      var vr = await v.verifyForeignSpore(z.spore);
+      if (!(vr === true || (vr && vr.valid === true))) return "falsch";
+      var ok = await v.verifyDetached(antwortOhneSig(z), z.sig, z.spore.publicKey);
+      if (ok && merk) vouchEchtMerken(merk);
+      return ok ? "gueltig" : "falsch";
+    } catch (_e) { return "falsch"; }
+  }
+  // Nur die geprüfte Unterschrift wird gemerkt (Schlüssel = der ganze Zettel);
+  // Form, Ablauf und Zeit prüft vouchPruefen bei jedem Lauf neu.
+  var vouchEcht = Object.create(null), vouchEchtZahl = 0;
+  function vouchEchtMerken(k) {
+    if (vouchEchtZahl >= 1000) { vouchEcht = Object.create(null); vouchEchtZahl = 0; }
+    vouchEcht[k] = true; vouchEchtZahl++;
+  }
+  function widerrufGrundOk(g) {
+    return typeof g === "string" && g.trim().length > 0 && g.length <= RDV_REVOKE_REASON_MAX;
+  }
+
+  // ---- S5b: gesehene Widerrufe speichern (Klaus 2026-10-16, Punkt 5) ----
+  // Bisher wirkte ein Widerruf nur, solange der Bürge im Raum war; die
+  // verbürgte App trägt ihre alte Bürgschaft dagegen immer mit. Der Leser legt
+  // jeden gültigen Widerruf ab ("sbkim_widerrufe_" + dbSuffix, ohne dbSuffix
+  // nicht gespeichert) und prüft ihn beim Lesen NEU (geteilte Adresse).
+  // Ein Widerruf schlägt nur Bürgschaften mit ts ≤ Widerruf.ts; die laufen
+  // spätestens RDV_VOUCH_TTL_SEC danach ab. Ältere Widerrufe fallen heraus.
+  function widerrufSchluessel() { return cfg.dbSuffix ? WIDERRUF_SPEICHER_PRAEFIX + cfg.dbSuffix : null; }
+  function widerrufeLesen(store) {
+    var st = netStore(store), k = widerrufSchluessel();
+    if (!st || !k) return [];
+    var roh; try { roh = st.getItem(k); } catch (_e) { return []; }
+    if (!roh) return [];
+    var o; try { o = JSON.parse(roh); } catch (_e) { return []; }
+    return (o && Array.isArray(o.revocations) ? o.revocations : [])
+      .filter(function (z) { return z && typeof z === "object" && z.kind === RDV_REVOKE_KIND; })
+      .slice(0, RDV_REVOKE_STORE_MAX);
+  }
+  function widerrufeMerken(neu, store) {
+    var st = netStore(store), k = widerrufSchluessel();
+    if (!st || !k || !Array.isArray(neu) || !neu.length) return;
+    var jetzt = nowSec(), alt = widerrufeLesen(store), gesehen = Object.create(null), alle = [];
+    alt.concat(neu).forEach(function (z) {
+      if (!z || typeof z.sig !== "string" || gesehen[z.sig]) return;
+      if (typeof z.ts !== "number" || z.ts + RDV_VOUCH_TTL_SEC < jetzt) return;   // wirkt auf nichts mehr
+      gesehen[z.sig] = true; alle.push(z);
+    });
+    alle.sort(function (a, b) { return b.ts - a.ts; });
+    alle = alle.slice(0, RDV_REVOKE_STORE_MAX);
+    if (alle.length === alt.length && alle.every(function (z, i) { return alt[i] && alt[i].sig === z.sig; })) return;
+    try { st.setItem(k, JSON.stringify({ v: 1, revocations: alle })); } catch (_e) { /* fail-soft */ }
+  }
+  function loadSeenRevocations(store) { return widerrufeLesen(store); }
+
+  // Aus gesammelten Zetteln die gültigen Kanten voucher→subject bauen.
+  async function vouchKanten(zettel, jetzt, gespeichert) {
+    var vouches = [], revokes = [], nichtPruefbar = false, gesehen = Object.create(null);
+    // S5b: gespeicherte Widerrufe haben ein eigenes Budget (fremde Zettel
+    // im Raum dürfen sie nicht aus dem Fenster drängen).
+    var liste = (Array.isArray(gespeichert) ? gespeichert : []).slice(0, RDV_REVOKE_STORE_MAX)
+      .concat((Array.isArray(zettel) ? zettel : []).slice(0, RDV_VOUCH_SEEN_MAX));
+    for (var i = 0; i < liste.length; i++) {
+      var z = liste[i];
+      if (!z || typeof z !== "object" || typeof z.sig !== "string") continue;
+      if (gesehen[z.sig]) continue;          // derselbe Zettel aus mehreren Karten
+      gesehen[z.sig] = true;
+      var st = await vouchPruefen(z, jetzt);
+      if (st === "nicht-pruefbar") { nichtPruefbar = true; continue; }
+      if (st !== "gueltig") continue;
+      if (z.kind === RDV_VOUCH_KIND) vouches.push(z); else revokes.push(z);
+    }
+    var kanten = vouches.filter(function (b) {
+      return !revokes.some(function (w) { return w.voucher === b.voucher && w.subject === b.subject && w.ts >= b.ts; });
+    });
+    return { kanten: kanten, revokes: revokes, nichtPruefbar: nichtPruefbar };
+  }
+
+  // vouchTrust(cards, opts) → neue Liste, je Karte `vouch` (Eingabe nicht mutiert).
+  // opts.vouches: weitere Zettel (z. B. aus allen Karten-Ereignissen) ·
+  // opts.anchors / opts.contacts / opts.flagged: Kennungen (ergänzen cfg).
+  async function vouchTrust(cards, opts) {
+    var o = opts || {};
+    var list = Array.isArray(cards) ? cards : [];
+    var jetzt = nowSec();
+    var anker = idListe([currentNetAdmin()]).concat(idListe(vouchCfg.anchors), idListe(o.anchors));
+    var kontakte = loadVouchContacts().map(function (c) { return c.nodeId; }).concat(idListe(o.contacts));
+    var aufgefallen = idListe(vouchCfg.flagged).concat(idListe(o.flagged), sperrIds());   // S4: gesperrt = aufgefallen
+    var zettel = [];
+    list.forEach(function (c) {
+      var cv = (c && Array.isArray(c.vouches)) ? c.vouches : [];
+      var cr = (c && Array.isArray(c.revocations)) ? c.revocations : [];
+      zettel = zettel.concat(cv.slice(0, RDV_VOUCH_PER_CARD_MAX), cr.slice(0, RDV_REVOKE_PER_CARD_MAX));
+    });
+    zettel = zettel.concat(Array.isArray(o.vouches) ? o.vouches : [], buergenLesen().carried);
+    var k = await vouchKanten(zettel, jetzt, widerrufeLesen());
+    widerrufeMerken(k.revokes);                       // S5b: gesehene Widerrufe bleiben
+    // „Der Bürge haftet" — S5b (Klaus 2026-10-16: „alle haften doch nicht für
+    // einen"): nur für die eine App. Fällt eine verbürgte Kennung auf oder wird
+    // gesperrt, verfällt nur diese Bürgschaft; die übrigen des Bürgen gelten.
+    // (Bis S5b verlor der Bürge ALLE seine Bürgschaften — Tafel-Evolution.)
+    var kanten = k.kanten.filter(function (b) { return aufgefallen.indexOf(b.subject) === -1; });
+    // Breitensuche von den Wurzeln, höchstens RDV_VOUCH_CHAIN_MAX Schritte.
+    var weg = Object.create(null);   // nodeId → Kette (Wurzel zuerst)
+    var front = [];
+    anker.concat(kontakte).forEach(function (id) { if (!weg[id]) { weg[id] = []; front.push(id); } });
+    for (var schritt = 1; schritt <= RDV_VOUCH_CHAIN_MAX; schritt++) {
+      var neu = [];
+      front.forEach(function (von) {
+        kanten.forEach(function (b) {
+          if (b.voucher !== von || weg[b.subject]) return;
+          weg[b.subject] = weg[von].concat([von]);
+          neu.push(b.subject);
+        });
+      });
+      front = neu;
+    }
+    var grund = k.nichtPruefbar ? "Modul 02 fehlt — Bürgschaften nicht prüfbar" : null;
+    return list.map(function (c) {
+      var copy = {};
+      for (var key in c) { if (Object.prototype.hasOwnProperty.call(c, key)) copy[key] = c[key]; }
+      var id = c && c.nodeId;
+      var v;
+      if (id && anker.indexOf(id) !== -1) v = { status: "anker", by: [], depth: 0, reason: null };
+      else if (id && kontakte.indexOf(id) !== -1) v = { status: "kontakt", by: [], depth: 0, reason: null };
+      // Ein Aufgefallener steht nie in `weg`: wer für ihn bürgt, haftet, und
+      // dessen Kanten sind oben schon weg (Gegenprobe 2026-10-15: eine eigene
+      // Prüfung hier änderte nichts — toter Anker, darum entfernt).
+      else if (id && weg[id]) v = { status: "verbuergt", by: weg[id].slice(), depth: weg[id].length, reason: null };
+      else v = { status: "unverbuergt", by: [], depth: null, reason: aufgefallen.indexOf(id) !== -1 ? "aufgefallen" : grund };
+      copy.vouch = v;
+      return copy;
+    });
+  }
+
+  // Ausstellen (signiert mit der eigenen Identität, Modul 02 signDetached).
+  async function vouchAusstellen(art, subjectId, opts) {
+    var s = resolveSpore();
+    if (!s || typeof s.signDetached !== "function") return { ok: false, reason: "Modul 02 ohne signDetached — nicht unterschreibbar." };
+    if (typeof subjectId !== "string" || !subjectId || subjectId.length > 128) return { ok: false, reason: "Keine gültige Kennung." };
+    var own; try { own = await s.getOwnSpore(); } catch (_e) { own = null; }
+    if (!own || !own.id) return { ok: false, reason: "Noch keine Identität." };
+    if (own.id === subjectId) return { ok: false, reason: "Für sich selbst bürgt man nicht." };
+    var ts = nowSec();
+    var z = { kind: art, v: 1, voucher: own.id, subject: subjectId, ts: ts, spore: own };
+    if (art === RDV_VOUCH_KIND) {
+      var tage = (opts && typeof opts.days === "number" && isFinite(opts.days) && opts.days > 0) ? opts.days : 180;
+      z.exp = ts + Math.min(RDV_VOUCH_TTL_SEC, Math.floor(tage * 24 * 3600));
+    } else {
+      var grund = (opts && typeof opts.reason === "string") ? opts.reason.trim() : "";
+      if (!widerrufGrundOk(grund)) return { ok: false, reason: "Ein Widerruf braucht einen Grund (höchstens " + RDV_REVOKE_REASON_MAX + " Zeichen)." };
+      z.reason = grund;                                  // S5b: unter der Unterschrift
+    }
+    try { z.sig = await s.signDetached(antwortOhneSig(z)); }
+    catch (e) { return { ok: false, reason: "Unterschrift fehlgeschlagen: " + (e && e.message ? e.message : e) }; }
+    return { ok: true, zettel: z };
+  }
+  // Sicherheitsnummer (S5 Teil 2): symmetrisch aus beiden Schlüsseln, wie B7.
+  // Beide Seiten sehen dieselbe Nummer; vergleichen auf einem zweiten Weg.
+  // Schlüssel-Bytes einer Spore: publicKey ist ein JWK (Ed25519) → `x`.
+  function sasSchluessel(sp) {
+    var k = sp && typeof sp === "object" ? sp.publicKey : null;
+    if (k && typeof k === "object" && typeof k.x === "string" && k.x) return k.x;
+    return null;
+  }
+  async function vouchSafetyNumber(fremd) {
+    var pubF = sasSchluessel(fremd);
+    if (!pubF) return { ok: false, reason: "Die Karte trägt keinen Schlüssel." };
+    var s = resolveSpore();
+    var own = null;
+    try { own = s && typeof s.getOwnSpore === "function" ? await s.getOwnSpore() : null; } catch (_e) { own = null; }
+    var pubE = sasSchluessel(own);
+    if (!pubE) return { ok: false, reason: "Noch keine eigene Identität." };
+    if (pubE === pubF) return { ok: false, reason: "Das ist die eigene Karte." };
+    var c = netSubtle();
+    if (!c) return { ok: false, reason: "Kein WebCrypto." };
+    var paar = [pubE, pubF].sort();
+    var h = new Uint8Array(await c.subtle.digest("SHA-256", new TextEncoder().encode("sbkim-vouch-sas-v1|" + paar[0] + "|" + paar[1])));
+    var ziffern = "";
+    for (var i = 0; i < 15; i++) ziffern += String(h[i] % 100).padStart(2, "0");
+    return { ok: true, number: ziffern.replace(/(\d{5})(?=\d)/g, "$1 ") };
+  }
+  // ---- S5b Teil 2: „die Empfehlung kommt von selbst an" (Klaus 2026-10-16) ----
+  // Aussteller: jede neue Empfehlung kommt in den Vorrat `issued`; die eigene
+  // Karte trägt die neuesten RDV_ISSUED_PER_CARD_MAX (Feld `issued`).
+  // Empfänger: discover() nimmt eine gültige Empfehlung FÜR die eigene Kennung
+  // von selbst in den eigenen Vorrat (carried) — aber nur, wenn der Aussteller
+  // beim Empfänger schon zählt (Netzadmin, eigener Kontakt oder empfohlen).
+  // Ein Unbekannter kann so niemandes Vorrat fluten; für ihn bleibt der Text.
+  async function issuedMerken(z) {
+    var o = buergenLesen();
+    if (!buergenSchluessel()) return;
+    var jetzt = nowSec();
+    o.issued = [z].concat(o.issued.filter(function (x) {
+      return x.sig !== z.sig && !(x.subject === z.subject && x.ts <= z.ts) && typeof x.exp === "number" && x.exp > jetzt;
+    })).slice(0, RDV_ISSUED_STORE_MAX);
+    buergenSchreiben(o);
+  }
+  function issuedEntfernen(subjectId) {
+    var o = buergenLesen();
+    if (!buergenSchluessel()) return;
+    var vorher = o.issued.length;
+    o.issued = o.issued.filter(function (x) { return x.subject !== subjectId; });
+    if (o.issued.length !== vorher) buergenSchreiben(o);
+  }
+  function cardIssued() {
+    var jetzt = nowSec();
+    return buergenLesen().issued.filter(function (z) { return typeof z.exp === "number" && z.exp > jetzt; })
+      .sort(function (a, b) { return b.ts - a.ts; }).slice(0, RDV_ISSUED_PER_CARD_MAX);
+  }
+  var empfehlungenAbgeholt = 0;   // _meta
+  // cards: schon von vouchTrust angereichert · zettel: alle Zettel des Laufs
+  async function empfehlungenAbholen(ownId, cards, zettel) {
+    if (!ownId || !buergenSchluessel()) return 0;
+    var jetzt = nowSec(), je = Object.create(null);
+    (Array.isArray(zettel) ? zettel : []).forEach(function (z) {
+      if (!z || z.kind !== RDV_VOUCH_KIND || z.subject !== ownId || typeof z.voucher !== "string" || typeof z.sig !== "string") return;
+      if (!je[z.voucher] || z.ts > je[z.voucher].ts) je[z.voucher] = z;   // je Aussteller die neueste
+    });
+    var ids = Object.keys(je);
+    if (!ids.length) return 0;
+    var admin = currentNetAdmin();
+    var kontakte = loadVouchContacts().map(function (c) { return c.nodeId; });
+    var stand = Object.create(null);
+    (Array.isArray(cards) ? cards : []).forEach(function (c) { if (c && c.nodeId && c.vouch) stand[c.nodeId] = c.vouch.status; });
+    var o = buergenLesen(), neu = 0;
+    for (var i = 0; i < ids.length; i++) {
+      var z = je[ids[i]];
+      var zaehlt = z.voucher === admin || kontakte.indexOf(z.voucher) !== -1 || vouchVorn({ vouch: { status: stand[z.voucher] } });
+      if (!zaehlt) continue;
+      if (o.carried.some(function (x) { return x.sig === z.sig; })) continue;
+      if ((await vouchPruefen(z, jetzt)) !== "gueltig") continue;
+      // ältere Empfehlung desselben Ausstellers ersetzen
+      o.carried = o.carried.filter(function (x) { return !(x.kind === RDV_VOUCH_KIND && x.voucher === z.voucher && x.subject === ownId && x.ts <= z.ts); });
+      o.carried.push(z); neu++;
+    }
+    if (neu && buergenSchreiben(o).ok) { empfehlungenAbgeholt += neu; return neu; }
+    return 0;
+  }
+  async function createVouch(subjectId, opts) {
+    var x = await vouchAusstellen(RDV_VOUCH_KIND, subjectId, opts);
+    if (x && x.ok) { try { await issuedMerken(x.zettel); } catch (_e) { /* fail-soft: Text-Weg bleibt */ } }
+    return x;
+  }
+  async function createRevocation(subjectId, reason) {
+    var x = await vouchAusstellen(RDV_REVOKE_KIND, subjectId, { reason: reason });
+    if (x && x.ok) { try { issuedEntfernen(subjectId); } catch (_e) { /* fail-soft */ } }
+    return x;
+  }
+
+  // ---- S5b: Hinweis vor dem Ablauf (Klaus 2026-10-16, Punkt 3) ----
+  // Eigene mitgetragene Bürgschaften (subject = eigene Kennung), deren neueste
+  // je Bürge in den nächsten RDV_VOUCH_WARN_SEC abläuft. Verlängern kann nur
+  // der Bürge (neu unterschreiben). → Promise<[{voucher, exp, ts}]>
+  async function vouchExpiring(opts) {
+    var s = resolveSpore(), own = null;
+    try { own = s && typeof s.getOwnSpore === "function" ? await s.getOwnSpore() : null; } catch (_e) { own = null; }
+    if (!own || !own.id) return [];
+    var fenster = (opts && typeof opts.withinSec === "number" && isFinite(opts.withinSec) && opts.withinSec >= 0) ? opts.withinSec : RDV_VOUCH_WARN_SEC;
+    var jetzt = nowSec(), je = Object.create(null);
+    buergenLesen().carried.forEach(function (z) {
+      if (!z || z.kind !== RDV_VOUCH_KIND || z.subject !== own.id || typeof z.voucher !== "string") return;
+      if (typeof z.exp !== "number" || z.exp <= jetzt) return;
+      if (!je[z.voucher] || z.exp > je[z.voucher].exp) je[z.voucher] = { voucher: z.voucher, exp: z.exp, ts: z.ts };
+    });
+    return Object.keys(je).map(function (k) { return je[k]; })
+      .filter(function (x) { return x.exp - jetzt <= fenster; })
+      .sort(function (a, b) { return a.exp - b.exp; });
+  }
+
+  // ---- S5b: „antworte nur Verbürgten" (Klaus 2026-10-16, Firmennetz) ----
+  // Aus (Vorgabe): wie bisher. An: eine Frage wird nur beantwortet, wenn ihr
+  // Absender beim Antwortenden Netzadmin, eigener Kontakt oder verbürgt ist.
+  // Die Bürgschaften kommen aus der Frage selbst (≤ RDV_QUERY_VOUCH_MAX), aus
+  // dem letzten discover()-Lauf und dem eigenen Vorrat. Eine unsignierte Frage
+  // (S1) hat keinen geprüften Absender und wird dann nicht beantwortet.
+  var nurVerbuergtInit = null;              // init({answerOnlyVouched}) schlägt den Speicher
+  var letzteVouchZettel = [];               // aus dem letzten discover()-Lauf
+  var fragenNichtVerbuergt = 0;             // _meta
+  function answerOnlyVouched() {
+    if (nurVerbuergtInit !== null) return nurVerbuergtInit;
+    return buergenLesen().onlyVouched === true;
+  }
+  function setAnswerOnlyVouched(an, store) {
+    var o = buergenLesen(store);
+    o.onlyVouched = an === true;
+    var r = buergenSchreiben(o, store);
+    if (r.ok) nurVerbuergtInit = null;
+    return r.ok ? { ok: true, on: o.onlyVouched } : r;
+  }
+  async function absenderVerbuergt(q) {
+    if (!q || !q.spore || typeof q.spore.id !== "string") return false;
+    var mit = (Array.isArray(q.vouches) ? q.vouches : []).slice(0, RDV_QUERY_VOUCH_MAX);
+    var r = await vouchTrust([{ nodeId: q.spore.id }], { vouches: mit.concat(letzteVouchZettel) });
+    return vouchVorn(r[0]);
+  }
+
+  // Eine erhaltene Bürgschaft (oder einen eigenen Widerruf) in den eigenen
+  // Vorrat legen; doAnnounce trägt ihn in der Karte. Nur gültige Zettel.
+  async function addCarried(z, store) {
+    var st = await vouchPruefen(z, nowSec());
+    if (st !== "gueltig") return { ok: false, reason: st === "nicht-pruefbar" ? "Modul 02 fehlt — nicht prüfbar." : "Zettel ungültig." };
+    var o = buergenLesen(store);
+    if (o.carried.some(function (x) { return x.sig === z.sig; })) return { ok: true, carried: o.carried.length };
+    o.carried.push(z);
+    var r = buergenSchreiben(o, store);
+    return r.ok ? { ok: true, carried: o.carried.length } : r;
+  }
+  function cardCarried() {
+    var c = buergenLesen().carried, jetzt = nowSec();
+    var v = c.filter(function (z) { return z.kind === RDV_VOUCH_KIND && typeof z.exp === "number" && z.exp > jetzt; })
+      .sort(function (a, b) { return b.ts - a.ts; }).slice(0, RDV_VOUCH_PER_CARD_MAX);
+    var r = c.filter(function (z) { return z.kind === RDV_REVOKE_KIND; })
+      .sort(function (a, b) { return b.ts - a.ts; }).slice(0, RDV_REVOKE_PER_CARD_MAX);
+    return { vouches: v, revocations: r };
+  }
+
+  // Weitergeben (S5 Teil 2): die neue Bürgschaft plus die eigenen mitgetragenen
+  // Bürgschaften, damit die Kette beim Empfänger lesbar ist.
+  function vouchPassOn(z) {
+    var liste = (z && typeof z === "object") ? [z] : [];
+    cardCarried().vouches.forEach(function (x) { if (!z || x.sig !== z.sig) liste.push(x); });
+    return liste;
+  }
+
+  // ---- S4 „Signierte Sperrliste im Mycel" (2026-10-16, INTERFACES § Modul 23 S4) ----
+  // Klaus 2026-10-16: öffentlich, signiert, Sage-Protokol unterschreibt (im
+  // eigenen Netz dessen Netzadmin). Die Liste reist auf den Karten im Raum mit
+  // (wie die Bürgschaften); kein Abruf aus dem Netz, beim Laden kein Netz.
+  // ANDERS ALS S5 GATET S4: gesperrte Kennungen fallen aus der Karte, ihre
+  // Fragen werden nicht beantwortet, ihre Antworten verworfen.
+  // Nur nach oben in der Oberfläche (blockId); gelöst wird nur mit einer neuen,
+  // kürzeren Liste (createBlocklist), wie in Kimboard.
+  var RDV_BLOCK_KIND = "sbkim-blocklist";
+  var RDV_BLOCK_MAX = 256;                     // Kennungen je Liste
+  var RDV_BLOCK_SEEN_MAX = 8;                  // geprüfte Listen je discover()-Lauf
+  var RDV_BLOCK_ID_MUSTER = /^[A-Za-z0-9_-]{16,128}$/;
+  var SPERRE_SPEICHER_PRAEFIX = "sbkim_sperre_";
+  var SPERRE_ADMINS_MAX = 4;                   // Speicher: je Netzadmin eine Liste
+  var sperre = { stand: "keine", admin: null, ts: 0, ids: [], zettel: null };
+  var fragenGesperrt = 0, antwortGesperrt = 0, kartenGesperrt = 0;   // _meta (S4)
+
+  function sperreSchluessel() { return cfg.dbSuffix ? SPERRE_SPEICHER_PRAEFIX + cfg.dbSuffix : null; }
+  // Form ohne Kryptografie (synchron). → true | false
+  function sperreForm(z, admin, jetzt) {
+    if (!z || typeof z !== "object" || z.kind !== RDV_BLOCK_KIND || z.v !== 1) return false;
+    if (!admin || z.admin !== admin) return false;
+    if (typeof z.ts !== "number" || !isFinite(z.ts) || z.ts > jetzt + RDV_VOUCH_SKEW_SEC) return false;
+    if (!Array.isArray(z.ids) || z.ids.length > RDV_BLOCK_MAX) return false;
+    var gesehen = Object.create(null);
+    for (var i = 0; i < z.ids.length; i++) {
+      var id = z.ids[i];
+      if (typeof id !== "string" || !RDV_BLOCK_ID_MUSTER.test(id)) return false;
+      if (gesehen[id] || id === admin) return false;     // keine Doppelten, nie der Netzadmin selbst
+      gesehen[id] = true;
+    }
+    if (typeof z.sig !== "string" || !z.spore || typeof z.spore !== "object") return false;
+    return z.spore.id === admin;
+  }
+  // Prüft EINE Sperrliste gegen den Netzadmin des LESERS.
+  // → "gueltig" | "falsch" | "nicht-pruefbar" (Modul 02 fehlt)
+  async function sperrePruefen(z, jetzt) {
+    if (!sperreForm(z, currentNetAdmin(), jetzt)) return "falsch";
+    var pr = resolveVerifier();
+    if (!pr || typeof pr.verifyDetached !== "function") return "nicht-pruefbar";   // S4: ohne Prüfer gilt keine Liste
+    try {
+      var sp = await pr.verifyForeignSpore(z.spore);
+      if (!(sp === true || (sp && sp.valid === true))) return "falsch";
+      var echt = await pr.verifyDetached(antwortOhneSig(z), z.sig, z.spore.publicKey);
+      return echt ? "gueltig" : "falsch";
+    } catch (_e) { return "falsch"; }
+  }
+  function sperreSpeicherLesen() {
+    var st = netStore(), k = sperreSchluessel();
+    if (!st || !k) return {};
+    var roh; try { roh = st.getItem(k); } catch (_e) { return {}; }
+    var o; try { o = roh ? JSON.parse(roh) : null; } catch (_e) { o = null; }
+    return (o && typeof o === "object" && !Array.isArray(o)) ? o : {};
+  }
+  function sperreSpeicherSchreiben(z) {
+    var st = netStore(), k = sperreSchluessel();
+    if (!st || !k) return false;
+    var o = sperreSpeicherLesen();
+    o[z.admin] = z;
+    var keys = Object.keys(o);
+    while (keys.length > SPERRE_ADMINS_MAX) { delete o[keys.shift()]; }
+    try { st.setItem(k, JSON.stringify(o)); return true; } catch (_e) { return false; }
+  }
+  function sperreSetzen(z) {
+    sperre = { stand: "gueltig", admin: z.admin, ts: z.ts, ids: z.ids.slice(), zettel: z };
+  }
+  // Eine Liste übernehmen, wenn sie gültig und NEUER ist. → Prüfstand
+  async function sperreUebernehmen(z, speichern) {
+    var st = await sperrePruefen(z, nowSec());
+    if (st === "nicht-pruefbar") { if (sperre.stand !== "gueltig") sperre.stand = "nicht-pruefbar"; return st; }
+    if (st !== "gueltig") return st;
+    var neuer = !(sperre.stand === "gueltig" && sperre.admin === z.admin && sperre.ts >= z.ts);
+    if (neuer) { sperreSetzen(z); if (speichern !== false) sperreSpeicherSchreiben(z); }
+    return st;
+  }
+  // Den Stand für den aktuellen Netzadmin herstellen (Speicher NEU geprüft:
+  // auf der geteilten Adresse kann eine Geschwister-App ihn beschrieben haben).
+  async function sperreLaden() {
+    var admin = currentNetAdmin();
+    if (sperre.admin !== admin) sperre = { stand: "keine", admin: admin, ts: 0, ids: [], zettel: null };
+    if (!admin) return sperre;
+    var z = sperreSpeicherLesen()[admin];
+    if (z && typeof z === "object" && !(sperre.stand === "gueltig" && sperre.ts >= z.ts)) {
+      await sperreUebernehmen(z, false);
+    }
+    return sperre;
+  }
+  function isBlocked(id) {
+    if (typeof id !== "string" || !id) return false;
+    if (sperre.stand !== "gueltig" || !sperre.admin || sperre.admin !== currentNetAdmin()) return false;
+    return sperre.ids.indexOf(id) !== -1;
+  }
+  function sperrIds() { return (sperre.stand === "gueltig" && sperre.admin === currentNetAdmin()) ? sperre.ids.slice() : []; }
+
+  async function createBlocklist(ids) {
+    var s = resolveSpore();
+    if (!s || typeof s.signDetached !== "function") return { ok: false, reason: "Modul 02 ohne signDetached — nicht unterschreibbar." };
+    var own; try { own = await s.getOwnSpore(); } catch (_e) { own = null; }
+    if (!own || !own.id) return { ok: false, reason: "Noch keine Identität." };
+    var admin = currentNetAdmin();
+    if (!admin || own.id !== admin) return { ok: false, reason: "Sperren kann nur der Netzadmin dieses Netzes." };
+    await sperreLaden();
+    var jetzt = nowSec();
+    var ts = (sperre.stand === "gueltig" && sperre.ts >= jetzt) ? sperre.ts + 1 : jetzt;
+    var z = { kind: RDV_BLOCK_KIND, v: 1, admin: admin, ts: ts, ids: Array.isArray(ids) ? ids.slice() : null, spore: own, sig: "" };
+    if (!sperreForm(z, admin, jetzt + RDV_VOUCH_SKEW_SEC)) return { ok: false, reason: "Ungültige Liste (Kennungen, Doppelte, Netzadmin selbst oder mehr als " + RDV_BLOCK_MAX + ")." };
+    delete z.sig;
+    try { z.sig = await s.signDetached(antwortOhneSig(z)); }
+    catch (e) { return { ok: false, reason: "Unterschrift fehlgeschlagen: " + (e && e.message ? e.message : e) }; }
+    var st = await sperreUebernehmen(z, true);
+    if (st !== "gueltig") return { ok: false, reason: "Die eigene Liste besteht die Prüfung nicht (" + st + ")." };
+    return { ok: true, zettel: z };
+  }
+  async function blockId(nodeId) {
+    if (typeof nodeId !== "string" || !RDV_BLOCK_ID_MUSTER.test(nodeId)) return { ok: false, reason: "Keine gültige Kennung." };
+    await sperreLaden();
+    var ids = sperrIds();
+    if (ids.indexOf(nodeId) !== -1) return { ok: true, zettel: sperre.zettel, schon: true };
+    ids.push(nodeId);
+    return await createBlocklist(ids);
+  }
+  async function addBlocklist(z) {
+    var vorher = sperre.ts;
+    var st = await sperreUebernehmen(z, true);
+    if (st === "nicht-pruefbar") return { ok: false, reason: "Modul 02 fehlt — nicht prüfbar." };
+    if (st !== "gueltig") return { ok: false, reason: "Keine gültige Sperrliste des Netzadmins dieses Netzes." };
+    return { ok: true, newer: sperre.ts > vorher || (sperre.zettel === z) };
+  }
+  async function currentBlocklist() {
+    await sperreLaden();
+    return { stand: sperre.stand, admin: sperre.admin, ts: sperre.ts, ids: sperre.ids.slice(), zettel: sperre.zettel };
+  }
+
+  // VERKEHR-Lampe (Modul 17 / Status-Widget) ehrlich setzen: aktiv, solange
+  // wir lauschen. Fail-soft — Render-Schicht ist optionaler Konsument.
+  function signalListening(active) {
+    try {
+      if (typeof global.dispatchEvent === "function" && typeof global.CustomEvent === "function") {
+        global.dispatchEvent(new global.CustomEvent("sbkim:nostr-listening", {
+          detail: { active: active !== false },
+        }));
+      }
+    } catch (_e) { /* fail-soft */ }
+  }
+
+  async function getOwnLiveSpore() {
+    var spore = resolveSpore();
+    if (!spore) return null;
+    try {
+      return await spore.getOwnSpore();
+    } catch (_e) {
+      return null;
+    }
+  }
+
+  // ---- dbHasIdentity(dbName) — read-only IndexedDB-Probe (Identitäts-Schutz) ----
+  // Prüft OHNE Seiteneffekt, ob eine benannte SBKIM-DB bereits eine Identität
+  // trägt (nicht-leerer Store `sbkim_keys`). Rein lesend, fail-soft: ohne
+  // IndexedDB / bei jedem Fehler → false. Legt die DB NICHT dauerhaft an — muss
+  // sie zum Prüfen geöffnet werden und existierte sie vorher nicht (onupgrade-
+  // needed feuert), wird die frisch-leere Phantom-DB gleich wieder gelöscht.
+  // Nutzt NUR die Web-IndexedDB-API + die bekannten Store-Namen — Modul 01/02
+  // bleiben unangetastet.
+  function dbHasIdentity(dbName) {
+    return new Promise(function (resolve) {
+      var idb = (typeof global.indexedDB !== "undefined" && global.indexedDB) ? global.indexedDB : null;
+      if (!idb || typeof idb.open !== "function" || !dbName) return resolve(false);
+      var req, created = false;
+      try { req = idb.open(dbName); } catch (_e) { return resolve(false); }
+      req.onupgradeneeded = function () { created = true; };
+      req.onerror = function () { resolve(false); };
+      req.onblocked = function () { resolve(false); };
+      req.onsuccess = function () {
+        var db = req.result;
+        function finish(has) {
+          try { db.close(); } catch (_e) {}
+          if (created) { try { idb.deleteDatabase(dbName); } catch (_e2) {} }
+          resolve(has);
+        }
+        try {
+          if (created || !db.objectStoreNames || !db.objectStoreNames.contains("sbkim_keys")) {
+            return finish(false);
+          }
+          var tx = db.transaction("sbkim_keys", "readonly");
+          var cnt = tx.objectStore("sbkim_keys").count();
+          cnt.onsuccess = function () { finish(typeof cnt.result === "number" && cnt.result > 0); };
+          cnt.onerror = function () { finish(false); };
+        } catch (_e) { finish(false); }
+      };
+    });
+  }
+
+  // ==== IDENTITÄTS-HYGIENE (Skill „saubere-netz-anmeldung") ====
+
+  // ---- Modus A: ensureIdentity() — sanft, automatisch, idempotent ----
+  async function ensureIdentity(opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var suffix = (typeof opts.dbSuffix === "string" && opts.dbSuffix.length > 0) ? opts.dbSuffix : cfg.dbSuffix;
+    var storage = resolveStorage();
+    if (suffix && storage) {
+      try { await storage.init({ dbSuffix: suffix }); } catch (_e) { /* fail-soft */ }
+    }
+    // Identitäts-Isolierung (2026-07-11, Teil 2): liegt die einzige Identität
+    // noch im geteilten Topf `sbkim` und die eigene Schublade ist leer, holen
+    // wir sie herüber, BEVOR getOrCreateIdentity unten eine NEUE erzeugt (was
+    // die geteilte-Topf-Kollision fortschreiben würde). Modus A = sanft,
+    // additiv, nicht-zerstörend (der geteilte Topf bleibt hier stehen; erst
+    // repairAndReconnect löscht ihn). Fail-soft; ohne migrateIdentityFrom
+    // (älteres Storage-Modul) passiert nichts.
+    if (suffix && storage && typeof storage.migrateIdentityFrom === "function") {
+      try {
+        var sharedHasIdA = await dbHasIdentity(SHARED_DB_NAME);
+        var suffixHasIdA = await dbHasIdentity("sbkim_" + suffix);
+        if (sharedHasIdA && !suffixHasIdA) {
+          await storage.migrateIdentityFrom(SHARED_DB_NAME);
+        }
+      } catch (_e) { /* fail-soft: dann erzeugt getOrCreateIdentity ggf. neu */ }
+    }
+    var spore = resolveSpore();
+    if (!spore || typeof spore.getOrCreateIdentity !== "function") {
+      return { ok: false, created: false, reason: "Modul 02 (Spore) nicht geladen." };
+    }
+    var existed = false;
+    if (typeof spore.getNodeId === "function") {
+      try { existed = !!(await spore.getNodeId()); } catch (_e) { existed = false; }
+    }
+    var id;
+    try {
+      id = await spore.getOrCreateIdentity();
+    } catch (e) {
+      return { ok: false, created: false, reason: "getOrCreateIdentity fehlgeschlagen: " + (e && e.message ? e.message : e) };
+    }
+    return { ok: true, created: !existed, nodeId: (id && id.nodeId) ? id.nodeId : undefined };
+  }
+
+  // ---- cleanupSharedOrigin(opts?) — Modus-B-Reinigung (NUR eigene Origin) ----
+  // opts.deleteSharedDb (Default true): löscht den geteilten Alt-Topf `sbkim`.
+  // Identitäts-Schutz (Weg A, 2026-07-11): repairAndReconnect() setzt das auf
+  // FALSE, wenn die einzige Identität noch im geteilten Topf steckt — dann
+  // bleibt `sbkim` STEHEN (sonst wäre die Identität weg). SW-Abmeldung +
+  // Cache-Leerung laufen IMMER (heilen den häufigsten Kollisions-Anteil).
+  async function cleanupSharedOrigin(opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var deleteSharedDb = opts.deleteSharedDb !== false;
+    var result = { dbDeleted: false, dbKept: false, swUnregistered: 0, cachesDeleted: 0, notes: [] };
+    if (!deleteSharedDb) {
+      result.dbKept = true;
+      result.notes.push("Geteilte DB 'sbkim' NICHT gelöscht — sie trägt noch die einzige Identität (Schutz vor Identitätsverlust).");
+    } else {
+    try {
+      var idb = (typeof global.indexedDB !== "undefined" && global.indexedDB) ? global.indexedDB : null;
+      if (idb && typeof idb.deleteDatabase === "function") {
+        await new Promise(function (resolve) {
+          var settled = false;
+          function done() { if (!settled) { settled = true; resolve(); } }
+          var req;
+          try { req = idb.deleteDatabase(SHARED_DB_NAME); } catch (_e) { return done(); }
+          req.onsuccess = function () { result.dbDeleted = true; done(); };
+          req.onerror = function () { result.notes.push("DB-Löschen fehlgeschlagen (fail-soft)."); done(); };
+          req.onblocked = function () { result.notes.push("DB blockiert (offene Verbindung) — nach hartem Neuladen erneut."); done(); };
+        });
+      } else { result.notes.push("Kein IndexedDB verfügbar."); }
+    } catch (_e) { result.notes.push("DB-Löschen übersprungen (fail-soft)."); }
+    }
+    try {
+      var nav = global.navigator;
+      if (nav && nav.serviceWorker && typeof nav.serviceWorker.getRegistrations === "function") {
+        var regs = await nav.serviceWorker.getRegistrations();
+        for (var i = 0; i < (regs ? regs.length : 0); i++) {
+          try { if (await regs[i].unregister()) result.swUnregistered++; } catch (_e) { /* fail-soft */ }
+        }
+      }
+    } catch (_e) { result.notes.push("Service-Worker-Abmeldung übersprungen (fail-soft)."); }
+    try {
+      var cs = global.caches;
+      if (cs && typeof cs.keys === "function") {
+        var keys = await cs.keys();
+        for (var j = 0; j < (keys ? keys.length : 0); j++) {
+          try { if (await cs.delete(keys[j])) result.cachesDeleted++; } catch (_e) { /* fail-soft */ }
+        }
+      }
+    } catch (_e) { result.notes.push("Cache-Leerung übersprungen (fail-soft)."); }
+    return result;
+  }
+
+  // ---- Modus B: repairAndReconnect() — nutzer-ausgelöst, identitäts-schonend ----
+  async function repairAndReconnect(opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var suffix = (typeof opts.dbSuffix === "string" && opts.dbSuffix.length > 0) ? opts.dbSuffix : cfg.dbSuffix;
+    var storage = resolveStorage();
+    // Reihenfolge (Weg A, 2026-07-11): eigene Schublade ZUERST aktivieren, DANN
+    // erst reinigen — sonst könnte die spätere init den geteilten Topf gar nicht
+    // mehr von der eigenen Schublade unterscheiden.
+    if (suffix && storage) {
+      try { await storage.init({ dbSuffix: suffix }); } catch (_e) { /* fail-soft */ }
+    }
+    // Identitäts-Schutz: den geteilten Topf `sbkim` NUR löschen, wenn die eigene
+    // Schublade `sbkim_<suffix>` die Identität schon trägt. Steckt die einzige
+    // Identität (Alt-Fall / frühe Ordering-Kollision) noch in `sbkim`, würde das
+    // Löschen sie vernichten und beim Neu-Anmelden eine NEUE erzeugen — genau das
+    // gemeldete Symptom. Im Zweifel (Probe-Fehler) NICHT löschen (fail-safe:
+    // Identität behalten geht vor geteilten Topf leeren). Bei newIdentity:true
+    // will der Nutzer ausdrücklich frisch anfangen → volle Reinigung.
+    // Identitäts-Isolierung (2026-07-11): Alt-Fall (Identität nur im geteilten
+    // Topf) wird jetzt AUFGELÖST statt nur geschützt — die Identität wird in
+    // die eigene Schublade MIGRIERT, dann der geteilte Topf gefahrlos gelöscht
+    // (Kollision weg UND Identität behalten). Nur wenn die Migration fehlschlägt
+    // oder kein Migrations-Pfad da ist (älteres Storage-Modul), bleibt der reine
+    // Schutz als Fallback (Topf stehen lassen). Bei newIdentity:true will der
+    // Nutzer ausdrücklich frisch anfangen → volle Reinigung, keine Migration.
+    var protectShared = false, identityNote = null, migrated = false;
+    if (opts.newIdentity !== true) {
+      try {
+        var sharedHasId = await dbHasIdentity(SHARED_DB_NAME);
+        var suffixHasId = suffix ? await dbHasIdentity("sbkim_" + suffix) : false;
+        if (sharedHasId && !suffixHasId) {
+          if (suffix && storage && typeof storage.migrateIdentityFrom === "function") {
+            try {
+              await storage.migrateIdentityFrom(SHARED_DB_NAME);
+              var suffixHasIdAfter = await dbHasIdentity("sbkim_" + suffix);
+              if (suffixHasIdAfter) {
+                migrated = true;
+                identityNote = "Deine Identität lag im geteilten Speicher — sie wurde in deine eigene Schublade übernommen; der geteilte Topf wird jetzt geleert (Kollision aufgelöst, Identität behalten).";
+              } else {
+                protectShared = true;
+                identityNote = "Migration unvollständig — geteilte DB vorsichtshalber NICHT gelöscht (Identität geschützt).";
+              }
+            } catch (_e2) {
+              protectShared = true;
+              identityNote = "Migration fehlgeschlagen — geteilte DB vorsichtshalber NICHT gelöscht (Identität geschützt).";
+            }
+          } else {
+            // Kein Migrations-Pfad (älteres Storage-Modul) → reiner Schutz.
+            protectShared = true;
+            identityNote = "Deine Identität lag noch im geteilten Speicher — sie wurde NICHT gelöscht (kein Identitätsverlust). Nach dem harten Neuladen läuft sie in deiner eigenen Schublade weiter.";
+          }
+        }
+      } catch (_e) { protectShared = true; identityNote = "Speicher-Probe fehlgeschlagen — geteilte DB vorsichtshalber NICHT gelöscht (Identität geschützt)."; }
+    }
+    var cleaned = await cleanupSharedOrigin({ deleteSharedDb: !protectShared });
+    // Nach der Reinigung die eigene Schublade erneut sicherstellen (der geteilte
+    // Topf kann jetzt weg sein; die eigene Schublade überlebt in jedem Fall).
+    if (suffix && storage) {
+      try { await storage.init({ dbSuffix: suffix }); } catch (_e) { /* fail-soft */ }
+    }
+    if (opts.newIdentity === true) {
+      var sp = resolveSpore();
+      if (sp && typeof sp.getActiveIdentityKey === "function" && typeof sp.removeIdentity === "function") {
+        try {
+          var activeKey = await sp.getActiveIdentityKey();
+          await sp.removeIdentity(activeKey);
+        } catch (_e) { /* fail-soft: dann bleibt die bestehende Identität */ }
+      }
+    }
+    var res = await connectAndAnnounce({ createIdentity: opts.createIdentity || cfg.createIdentity || undefined });
+    return {
+      ok: res.ok, cleaned: cleaned, created: res.created,
+      protectedIdentity: protectShared, migratedIdentity: migrated, identityNote: identityNote,
+      nodeId: res.nodeId, reason: res.reason, reloadHint: RELOAD_HINT, bestaetigung: res.bestaetigung,
+    };
+  }
+
+  // ---- init / configure ----
+  function applyOpts(opts) {
+    if (!opts || typeof opts !== "object") return;
+    if (typeof opts.nodeName === "string" && opts.nodeName.length > 0) cfg.nodeName = opts.nodeName;
+    if (opts.relayClient !== undefined) cfg.relayClient = opts.relayClient;
+    if (opts.anastomose !== undefined) cfg.anastomose = opts.anastomose;
+    if (opts.spore !== undefined) cfg.spore = opts.spore;
+    if (opts.match !== undefined) cfg.match = opts.match;
+    if (opts.embedding !== undefined) cfg.embedding = opts.embedding;
+    if (opts.storage !== undefined) cfg.storage = opts.storage;
+    if (typeof opts.dbSuffix === "string" && opts.dbSuffix.length > 0) cfg.dbSuffix = opts.dbSuffix;
+    if (typeof opts.createIdentity === "function") cfg.createIdentity = opts.createIdentity;
+    if (opts.prepareCorpus !== undefined) {
+      cfg.prepareCorpus = (typeof opts.prepareCorpus === "function") ? opts.prepareCorpus : null;
+      answerCorpusEnsured = false; // neuer Provider → beim nächsten Antwort-AN neu koppeln
+    }
+    if (typeof opts.freshSec === "number" && isFinite(opts.freshSec) && opts.freshSec > 0) {
+      cfg.freshSec = Math.floor(opts.freshSec);
+    }
+    if (typeof opts.listenMs === "number" && isFinite(opts.listenMs) && opts.listenMs > 0) {
+      cfg.listenMs = Math.floor(opts.listenMs);
+    }
+    if (opts.vouchAnchors !== undefined) vouchCfg.anchors = idListe(opts.vouchAnchors);   // S5
+    if (opts.vouchFlagged !== undefined) vouchCfg.flagged = idListe(opts.vouchFlagged);   // S5
+    if (opts.answerOnlyVouched !== undefined) nurVerbuergtInit = opts.answerOnlyVouched === true;   // S5b
+    if (opts.netCode !== undefined || opts.roomTag !== undefined) {
+      setNetwork({ code: opts.netCode, roomTag: opts.roomTag });
+    }
+  }
+
+  async function init(opts) {
+    applyOpts(opts);
+    if (net.pending) { try { await net.pending; } catch (_e) {} }
+    // init() baut KEINE Verbindung auf (Empfangsmodus). Modus A (sanft, lokal,
+    // idempotent) nur wenn ausdrücklich verlangt — das ist KEINE Netz-Aktion.
+    if (opts && opts.ensureIdentity) {
+      try { await ensureIdentity(); } catch (_e) { /* fail-soft */ }
+    }
+    return Promise.resolve();
+  }
+
+  function configure(opts) { applyOpts(opts); }
+
+  // ---- Kern: lauschen + lebende Visitenkarte ans Brett heften ----
+  // Geteilt von announce() und connectAndAnnounce().
+  // Relais-Antwort deuten (INTERFACES §Modul 05b „Relais-Antwort", 2026-10-14).
+  // "ja" = mindestens ein Relais meldete OK true · "nein" = alle antworteten,
+  // alle lehnten ab · "unbekannt" = alles andere (auch ein Client ohne antwort).
+  function bestaetigungAus(a) {
+    if (!a || !Array.isArray(a.relais)) return { stand: "unbekannt", relais: [] };
+    var liste = a.relais.map(function (r) {
+      return { relay: String(r && r.relay || ""), ergebnis: String(r && r.ergebnis || "unbekannt"),
+        grund: String(r && r.grund || "").slice(0, 200) };
+    });
+    var ja = liste.some(function (r) { return r.ergebnis === "angenommen"; });
+    var alleNein = liste.length > 0 && liste.every(function (r) { return r.ergebnis === "abgelehnt"; });
+    return { stand: ja ? "ja" : (alleNein ? "nein" : "unbekannt"), relais: liste };
+  }
+
+  async function doAnnounce(own, ohneWarten) {
+    var relay = resolveRelay();
+    if (!relay) {
+      return { ok: false, reason: "Kein Nostr-Relais-Client (Modul 05b) verfügbar." };
+    }
+    var nb = await netBereit();
+    if (!nb.ok) return { ok: false, reason: nb.reason };
+    // Erst lauschen, damit der Knoten erreichbar ist, wenn jemand andockt.
+    var ana = resolveAnastomose();
+    if (ana && typeof ana.listenNostr === "function") {
+      try { await ana.listenNostr(); } catch (_e) { /* fail-soft: weiter, Karte hängt trotzdem */ }
+    }
+    var card = {
+      kind: RDV_PRESENCE_KIND,
+      nodeId: own.id,
+      nodeName: cfg.nodeName,
+      spore: own,
+      ts: nowSec(),
+    };
+    var mit = cardCarried();                       // S5: Bürgschaften / Widerrufe mittragen
+    if (mit.vouches.length) card.vouches = mit.vouches;
+    if (mit.revocations.length) card.revocations = mit.revocations;
+    var aus = cardIssued();                        // S5b Teil 2: selbst ausgestellte Empfehlungen
+    if (aus.length) card.issued = aus;
+    try { await sperreLaden(); } catch (_e) {}
+    if (sperre.stand === "gueltig" && sperre.zettel) card.blocklist = sperre.zettel;   // S4: Liste mittragen
+    await powRechnen(card);                        // S3: Aufwand rechnen (nach allen Feldern)
+    var pr;
+    try {
+      pr = await relay.publish({
+        kind: NOSTR_KIND,
+        created_at: nowSec(),
+        tags: [["t", netRaum()]],
+        content: await netPacke(card, netRaum()),
+      });
+    } catch (e) {
+      return { ok: false, reason: "Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e) };
+    }
+    signalListening(true);
+    var antwort = null;
+    if (!ohneWarten && pr && pr.antwort && typeof pr.antwort.then === "function") {
+      try { antwort = await pr.antwort; } catch (_e) { antwort = null; }
+    }
+    var best = bestaetigungAus(antwort);
+    if (best.stand === "nein") {
+      return { ok: false, nodeId: own.id, bestaetigung: best,
+        reason: "Kein Relais hat die Anmeldung angenommen: " + best.relais.map(function (r) {
+          return r.relay + " — " + (r.grund || "ohne Grund");
+        }).join("; ") };
+    }
+    return { ok: true, nodeId: own.id, bestaetigung: best };
+  }
+
+  // ---- announce(): nur (neu) anmelden — setzt Identität voraus ----
+  async function announce() {
+    var relay = resolveRelay();
+    if (!relay) {
+      return { ok: false, reason: "Kein Nostr-Relais-Client (Modul 05b) verfügbar." };
+    }
+    var own = await getOwnLiveSpore();
+    if (!own || !own.id) {
+      return { ok: false, reason: "Noch keine Identität — connectAndAnnounce() nutzen oder zuerst eine Spore erzeugen." };
+    }
+    return await doAnnounce(own);
+  }
+
+  // ---- connectAndAnnounce(): Identität erzeugen (falls keine) + anmelden ----
+  // opts.createIdentity: optional async () -> spore. App-eigen (Domänen-
+  // Stichworte sind app-spezifisch). Ohne Callback + ohne Identität → ok:false.
+  async function connectAndAnnounce(opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var relay = resolveRelay();
+    if (!relay) {
+      return { ok: false, created: false, reason: "Kein Nostr-Relais-Client (Modul 05b) verfügbar." };
+    }
+    var own = await getOwnLiveSpore();
+    if (own && own.id) {
+      var rA = await doAnnounce(own);
+      return { ok: rA.ok, created: false, nodeId: rA.nodeId, reason: rA.reason, bestaetigung: rA.bestaetigung };
+    }
+    // Keine Identität — über den app-eigenen Callback erzeugen (opts oder cfg).
+    var makeId = (typeof opts.createIdentity === "function") ? opts.createIdentity : cfg.createIdentity;
+    if (typeof makeId !== "function") {
+      return {
+        ok: false, created: false,
+        reason: "Keine Identität und kein createIdentity-Callback übergeben " +
+          "(app-eigen, da Domänen-Stichworte app-spezifisch sind).",
+      };
+    }
+    try {
+      await makeId();
+    } catch (e) {
+      return { ok: false, created: false, reason: "Identitäts-Erzeugung fehlgeschlagen: " + (e && e.message ? e.message : e) };
+    }
+    var fresh = await getOwnLiveSpore();
+    if (!fresh || !fresh.id) {
+      return { ok: false, created: false, reason: "Identität nach createIdentity nicht lesbar." };
+    }
+    var rB = await doAnnounce(fresh);
+    return { ok: rB.ok, created: true, nodeId: rB.nodeId, reason: rB.reason, bestaetigung: rB.bestaetigung };
+  }
+
+  // ---- discover(): lebende Visitenkarten lesen ----
+  async function discover(opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var relay = resolveRelay();
+    if (!relay) {
+      return { ok: false, cards: [], reason: "Kein Nostr-Relais-Client (Modul 05b) verfügbar." };
+    }
+    var nbD = await netBereit();
+    if (!nbD.ok) return { ok: false, cards: [], reason: nbD.reason };
+    var raumTag = netRaum();
+    var wartenD = [];
+    var listenMs = (typeof opts.listenMs === "number" && isFinite(opts.listenMs) && opts.listenMs > 0)
+      ? Math.floor(opts.listenMs) : cfg.listenMs;
+    var freshSec = (typeof opts.freshSec === "number" && isFinite(opts.freshSec) && opts.freshSec > 0)
+      ? Math.floor(opts.freshSec) : cfg.freshSec;
+
+    var own = await getOwnLiveSpore();
+    var ownId = own && own.id;
+
+    var sinceSec = nowSec() - freshSec;
+    var byId = {};   // nodeId -> { card, ts }
+    var perSender = Object.create(null);  // nostr-pubkey -> Anzahl Identitäten
+    var cardCount = 0;                    // Karten gesamt in diesem Durchlauf
+    var rejected = 0;                     // wegen Echtheit/Bindung verworfen
+    var reihe = [];                       // S3: Reihenfolge der aufgenommenen Kennungen
+    var verdraengtHier = 0;               // S3: ohne Aufwand verdrängt (dieser Lauf)
+    var vouchZettel = [];                 // S5: aus ALLEN Karten-Ereignissen, nicht nur der neuesten
+    var blockZettel = [], blockSigs = Object.create(null);   // S4: Sperrlisten aus allen Karten-Ereignissen
+    var gesperrtHier = 0;                 // S4: herausgefallene Karten dieses Laufs
+    var adminD = currentNetAdmin();
+    var unsub = null;
+    try {
+      unsub = relay.subscribe(
+        { kinds: [NOSTR_KIND], "#t": [raumTag], since: sinceSec },
+        function onEvent(ev) {
+          netEmpfange(ev, raumTag, function (card) { karteNehmen(ev, card); }, wartenD);
+        },
+      );
+      function karteNehmen(ev, card) {
+          if (!card || card.kind !== RDV_PRESENCE_KIND || !card.nodeId || !card.spore) return;
+          // Mengenschutz (Stufe 2b): der Raum darf nicht beliebig groß werden,
+          // und ein einzelner Nostr-Absender nicht beliebig viele Identitäten
+          // gleichzeitig auslegen. Still verwerfen — der Fluter erfährt nichts.
+          var sender = (typeof ev.pubkey === "string" && ev.pubkey) ? ev.pubkey : "?";
+          var mitAufwand = powPruefen(card);      // S3
+          if (!byId[card.nodeId]) {
+            var vonDiesem = perSender[sender] || 0;
+            if (vonDiesem >= RDV_CARDS_PER_SENDER_MAX) return;
+            if (cardCount >= RDV_CARDS_MAX) {
+              // S3 „Vorrang bei Enge": nur eine Karte MIT Aufwand darf hinein,
+              // und nur, indem sie die zuletzt gekommene Karte OHNE Aufwand verdrängt.
+              if (!mitAufwand) return;
+              var wegId = null;
+              for (var ri = reihe.length - 1; ri >= 0; ri--) {
+                if (byId[reihe[ri].id] && !byId[reihe[ri].id].pow) { wegId = reihe[ri]; reihe.splice(ri, 1); break; }
+              }
+              if (!wegId) return;
+              delete byId[wegId.id];
+              perSender[wegId.sender] = Math.max(0, (perSender[wegId.sender] || 1) - 1);
+              cardCount--;
+              verdraengtHier++;
+            }
+            perSender[sender] = vonDiesem + 1;
+            cardCount++;
+          }
+          // Die Karte kann keine fremde Spore unter eigenem Namen tragen.
+          if (card.spore.id !== card.nodeId) { rejected++; return; }
+          if (vouchZettel.length < RDV_VOUCH_SEEN_MAX) {
+            if (Array.isArray(card.vouches)) vouchZettel = vouchZettel.concat(card.vouches.slice(0, RDV_VOUCH_PER_CARD_MAX));
+            if (Array.isArray(card.revocations)) vouchZettel = vouchZettel.concat(card.revocations.slice(0, RDV_REVOKE_PER_CARD_MAX));
+            if (Array.isArray(card.issued)) vouchZettel = vouchZettel.concat(card.issued.slice(0, RDV_ISSUED_PER_CARD_MAX));   // S5b Teil 2
+          }
+          // S4: nur Listen des eigenen Netzadmins sammeln (Vorfilter ohne Krypto).
+          var bl = card.blocklist;
+          if (bl && typeof bl === "object" && bl.admin === adminD && typeof bl.sig === "string" &&
+              !blockSigs[bl.sig] && blockZettel.length < RDV_BLOCK_SEEN_MAX * 4) {
+            blockSigs[bl.sig] = true; blockZettel.push(bl);
+          }
+          var ts = (typeof card.ts === "number" ? card.ts : (typeof ev.created_at === "number" ? ev.created_at : 0));
+          if (!byId[card.nodeId]) reihe.push({ id: card.nodeId, sender: sender });
+          if (!byId[card.nodeId] || ts > byId[card.nodeId].ts) byId[card.nodeId] = { card: card, ts: ts, pow: mitAufwand };
+      }
+    } catch (e) {
+      return { ok: false, cards: [], reason: "Raum-Lesen fehlgeschlagen: " + (e && e.message ? e.message : e) };
+    }
+
+    return await new Promise(function (resolve) {
+      setTimeout(async function () {
+        if (unsub) { try { unsub(); } catch (e) {} }
+        if (wartenD.length) { try { await Promise.all(wartenD); } catch (_e) {} }
+        var now = nowSec();
+        var cards = Object.keys(byId)
+          .filter(function (id) { return id !== ownId; })
+          .map(function (id) {
+            var entry = byId[id];
+            var c = entry.card;
+            return {
+              nodeId: id,
+              nodeName: (typeof c.nodeName === "string" && c.nodeName.length > 0) ? c.nodeName : "Knoten",
+              spore: c.spore,
+              ts: entry.ts,
+              ageSec: Math.max(0, now - (entry.ts || now)),
+            };
+          })
+          .sort(function (a, b) { return b.ts - a.ts; });
+        // ECHTHEIT (Stufe 2b): Ed25519-Prüfung je Karte über Modul 02. Erst hier,
+        // weil verifyForeignSpore async ist und der Empfangs-Callback es nicht
+        // abwarten kann. Ungültige Karten fallen raus — niemand kann sich mehr
+        // unter fremder Identität ins Brett hängen.
+        // ⚠ Modul 02 liefert {valid, reason}, NIE `false` (INTERFACES §2 Modul 02).
+        //   Bis 2026-10-14 stand hier `!== false` — damit galt JEDE Spore als echt,
+        //   auch eine mit kaputter Signatur (Befund 2026-10-14, N2). Gelesen wird
+        //   jetzt `.valid === true`; ein Prüfer mit nacktem Boolean (alte Proben,
+        //   Forker) wird weiter verstanden.
+        // ⚠ Die Prüfung steht VOR dem Zusammenfassen nach Namen: sonst verdrängt
+        //   eine unechte Karte mit neuerer Zeit die echte gleichen Namens und fällt
+        //   danach selbst heraus — beide wären weg.
+        // S4: Sperrliste herstellen (Speicher + Raum, neueste zuerst), dann
+        // gesperrte Karten herausnehmen — VOR Echtheit, Namen und Bürgen.
+        try {
+          await sperreLaden();
+          var blKand = blockZettel.filter(function (z) { return typeof z.ts === "number"; })
+            .sort(function (a, b) { return b.ts - a.ts; }).slice(0, RDV_BLOCK_SEEN_MAX);
+          for (var bi = 0; bi < blKand.length; bi++) {
+            if (sperre.stand === "gueltig" && sperre.ts >= blKand[bi].ts) break;
+            await sperreUebernehmen(blKand[bi], true);
+          }
+        } catch (_e) { /* fail-soft: ohne Liste nichts gesperrt */ }
+        cards = cards.filter(function (c) {
+          if (isBlocked(c.nodeId)) { gesperrtHier++; return false; }
+          return true;
+        });
+        kartenGesperrt += gesperrtHier;
+        var verifier = resolveVerifier();
+        var cardsVerified = !!verifier;
+        if (verifier) {
+          var geprueft = [];
+          for (var vi = 0; vi < cards.length; vi++) {
+            var okSpore = false;
+            try {
+              var vr = await verifier.verifyForeignSpore(cards[vi].spore);
+              okSpore = (vr === true) || !!(vr && typeof vr === "object" && vr.valid === true);
+            } catch (e) { okSpore = false; }   // wirft bei ungültiger Spore → unecht
+            if (okSpore) geprueft.push(cards[vi]); else rejected++;
+          }
+          cards = geprueft;
+        }
+        // S2: Bedeutung nachrechnen — nur geprüfte Karten, nur mit geladenem
+        // Modell (sonst „nicht-geprueft"). Vor relatednessForCards, damit
+        // „passt nicht" dort keinen Vorrang bekommt.
+        if (opts.checkMeaning !== false) {
+          for (var mi = 0; mi < cards.length; mi++) {
+            try { cards[mi].meaning = await checkMeaning(cards[mi].spore); }
+            catch (_e) { cards[mi].meaning = { status: "nicht-geprueft", score: null, snippets: null, reason: "Fehler" }; }
+          }
+        }
+        // Adress-Wand-Härtung (Klaus 2026-07-10): ein Knoten kann durch
+        // wiederholtes „Aufräumen & neu anmelden" mehrere Alt-Identitäten
+        // hinterlassen — deren Präsenz-Kärtchen leben ~30 min weiter und
+        // fluten den Raum („immer mehr Identitäten"). Pro Knoten-NAME nur die
+        // NEUESTE Karte zeigen (Liste ist bereits ts-absteigend sortiert). So
+        // trifft „❓ Fragen" immer die frischeste, lauschende ID; die toten
+        // Alt-Kärtchen verschwinden aus Raum + Karte. Opt-out: collapseByName:false.
+        // ⚠ Der Name ist NICHT geprüft (er steht außerhalb der Spore). Eine echt
+        //   signierte fremde Identität kann denselben Namen tragen. Die gezeigte
+        //   Karte zählt deshalb mit, wie viele andere Kennungen gleichen Namens
+        //   ausgeblendet wurden (`gleicherName`) — die Anzeige nennt es.
+        if (opts.collapseByName !== false) {
+          var seenName = Object.create(null);
+          cards = cards.filter(function (c) {
+            var key = (c.nodeName || "").toLowerCase();
+            if (!key) return true;
+            if (seenName[key]) { seenName[key].gleicherName = (seenName[key].gleicherName || 0) + 1; return false; }
+            seenName[key] = c; return true;
+          });
+        }
+        // S5: Bürgschaften prüfen — reine Anzeige, Karten bleiben alle sichtbar.
+        letzteVouchZettel = vouchZettel.slice(0, RDV_VOUCH_SEEN_MAX);   // S5b: für „antworte nur Verbürgten"
+        if (opts.vouchTrust !== false) {
+          try { cards = await vouchTrust(cards, { vouches: vouchZettel }); }
+          catch (_e) { /* fail-soft: Karten ohne vouch */ }
+        }
+        // S5b Teil 2: Empfehlungen für mich von selbst abholen (nur hier, im
+        // nutzer-ausgelösten discover; beim Laden kein Netz).
+        var abgeholt = 0;
+        try { abgeholt = await empfehlungenAbholen(ownId, cards, vouchZettel); } catch (_e) { /* fail-soft */ }
+        // Reine Anzeige-Anreicherung: zentrierter Verwandtschafts-Score je Karte
+        // (gatet nichts; Handshake bleibt 0.80-Riegel). Fail-soft ohne Modul 04.
+        resolve({
+          ok: true,
+          cards: relatednessForCards(cards, own),
+          cardsVerified: cardsVerified,   // false = Modul 02 fehlt, Karten UNGEPRÜFT
+          rejected: rejected,             // ehrlich: wie viele fielen raus
+          verdraengt: (kartenVerdraengt += verdraengtHier, verdraengtHier),     // S3: Karten ohne Aufwand, die bei vollem Raum weichen mussten
+          gesperrt: gesperrtHier,         // S4: Karten gesperrter Kennungen, die herausfielen
+          picked: abgeholt,               // S5b Teil 2: Empfehlungen für mich, die neu abgeholt wurden
+        });
+      }, listenMs);
+    });
+  }
+
+  // ---- handshakeCard(): Handshake an die LEBENDE ID der Karte ----
+  async function handshakeCard(card, opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    if (!card || !card.spore || !card.spore.id) {
+      return { outcome: "error", reason: "Karte ohne gültige Spore." };
+    }
+    var ana = resolveAnastomose();
+    if (!ana) {
+      return { outcome: "error", reason: "Modul 05 (Anastomose) nicht geladen." };
+    }
+    var timeoutMs = (typeof opts.timeoutMs === "number" && isFinite(opts.timeoutMs) && opts.timeoutMs > 0)
+      ? Math.floor(opts.timeoutMs) : RDV_HANDSHAKE_TIMEOUT_MS;
+    var r;
+    try {
+      r = await ana.handshake(card.spore, null, { transport: "nostr", timeoutMs: timeoutMs });
+    } catch (e) {
+      var nm = e && e.name ? e.name : "";
+      if (nm === "HandshakeTimeoutError") {
+        return { outcome: "timeout", reason: "Keine Antwort in " + Math.round(timeoutMs / 1000) + " s — Gegenknoten offline/nicht wach (Visitenkarte veraltet)." };
+      }
+      return { outcome: "error", reason: (nm ? "(" + nm + ") " : "") + (e && e.message ? e.message : String(e)) };
+    }
+    var oc = (r && typeof r.outcome === "string") ? r.outcome : "rejected";
+    return {
+      outcome: oc,
+      score: (r && typeof r.score === "number") ? r.score : undefined,
+      reason: (r && r.reason) ? r.reason : undefined,
+      raw: r,
+    };
+  }
+
+  // ==== Bau 23.B — Cross-Knoten-Frage (bidirektionale Bedeutungs-Suche) ====
+  // Vertrag: INTERFACES.md §1 Modul 23 § Bau 23.B. Knoten fragt Knoten
+  // server-los über das Relais; der Gegenknoten antwortet mit den Top-k
+  // seiner LOKALEN Bedeutungs-Suche (Modul 04 queryLocal, app-registrierter
+  // Korpus-Provider). FRAGEN ist nutzer-ausgelöst; ANTWORTEN ist das
+  // Antwortrecht des Empfangsmodus und wird per enableAnswering()
+  // AUSDRÜCKLICH eingeschaltet (Default AUS, nicht persistiert).
+  // v1 ehrlich offen: Zettel-Umschläge UNSIGNIERT — Identitäts-Wahrheit
+  // bleibt beim signierten Handshake + 0.80-Riegel; Antworten sind ADVISORY.
+  var RDV_QUERY_TAG = "sbkim-qry";
+  var RDV_QUERY_KIND = "sbkim-query";
+  var RDV_QUERY_RES_KIND = "sbkim-query-res";
+  var RDV_QUERY_MAX_PER_MIN = 6;     // Antwort-Rate-Limit (Vorgriff Modul 11)
+  var RDV_QUERY_UNSIGNED_MAX_PER_MIN = 2; // S1: davon höchstens so viele für unsignierte Fragen (Klaus 2026-10-15)
+  var RDV_QUERY_TEXT_MAX = 300;      // Frage-Text hart gekappt (untrusted input)
+  var RDV_QUERY_K_MAX = 5;           // maximal 5 Treffer je Antwort
+  var RDV_ASK_TIMEOUT_MS = 60000; // 15 s war zu knapp: der Antworter lädt beim ersten Mal sein ~30-MB-Modell
+  // A12 Briefkasten (Klaus 2026-07-11): Fragen/Antworten sollen eine Zeitver-
+  // zögerung überleben (App war zu, als gefragt wurde). Statt nur „ab jetzt"
+  // lauscht der Antworter beim Einschalten LOOKBACK zurück und holt liegen-
+  // gebliebene Fragen nach; der Frager liest späte Antworten über dasselbe
+  // Fenster nach (fetchAnswers). Empfangsmodus-treu: nutzer-ausgelöst beim
+  // Öffnen, KEIN Dauer-Ticker. Reale Grenze = Aufbewahrungsdauer des Relais.
+  var RDV_ANSWER_LOOKBACK_SEC = 1800; // 30 min zurück (Frage/Antwort nachholen)
+  // ---- Antworten an den Antworter binden (Bau 23.R, 2026-10-14) ----
+  // Befund docs/sessions/archiv/2026-10-14_angriffsflaeche_mycel.md (N1): die
+  // Antwort-Zettel waren unsigniert, `fromNodeId` nur eine Behauptung. Wer den
+  // öffentlichen Frage-Tag mithörte, antwortete im Namen des gefragten Knotens,
+  // schneller als dieser, und überschrieb in fetchAnswers mit selbst gesetzter Zeit.
+  // Jetzt: der Antworter legt seine Spore bei und unterschreibt den Zettel
+  // (Modul 02 signDetached). Der Frager prüft Spore, Bindung an fromNodeId,
+  // Unterschrift und dass fromNodeId der GEFRAGTE Knoten ist.
+  //   bestaetigt   → genommen, schlägt jede unbestätigte Antwort
+  //   unbestaetigt → ohne Unterschrift (alte Fassung, oder Modul 02 ohne Sign-Pfad);
+  //                  wird nur genommen, wenn keine bestätigte kommt, und trägt
+  //                  bestaetigt:false — die Oberfläche sagt es, der KI-Richter bekommt sie nicht
+  //   falsch       → Unterschrift/Spore/Bindung passt nicht, oder ein anderer als der
+  //                  gefragte Knoten antwortet → verworfen
+  var RDV_LABEL_MAX = 200;              // Treffer-Titel hart gekappt (untrusted input)
+  var RDV_UNBESTAETIGT_WARTE_MS = 3000; // so lange wartet askNode nach einer unbestätigten
+                                        // Antwort noch auf eine bestätigte
+  // ---- S1 „Fragen unterschreiben" (2026-10-15, docs/PLAN_MYCEL_SCHICHTEN.md) ----
+  // Der Frage-Zettel trägt jetzt dieselbe spore + sig wie der Antwort-Zettel;
+  // zettelSignieren/zettelPruefen dienen beiden. Der Antworter prüft die Frage:
+  //   bestaetigt   → beantwortet (Rate-Limit RDV_QUERY_MAX_PER_MIN)
+  //   unbestaetigt → alte Fassung ohne spore/sig: weiter beantwortet, aber nur
+  //                  RDV_QUERY_UNSIGNED_MAX_PER_MIN davon je Minute
+  //   falsch       → nicht beantwortet, gezählt in _meta.frageVerworfen
+  function antwortOhneSig(a) {
+    var o = {};
+    for (var key in a) { if (Object.prototype.hasOwnProperty.call(a, key) && key !== "sig") o[key] = a[key]; }
+    return o;
+  }
+  async function zettelSignieren(zettel) {
+    var s = resolveSpore();
+    if (!s || typeof s.signDetached !== "function") return zettel;     // fail-soft: unsigniert
+    try {
+      var own = await s.getOwnSpore();
+      if (!own || own.id !== zettel.fromNodeId) return zettel;
+      zettel.spore = own;
+      zettel.sig = await s.signDetached(antwortOhneSig(zettel));
+    } catch (_e) { delete zettel.spore; delete zettel.sig; }
+    return zettel;
+  }
+  async function zettelPruefen(a, erwartetVon) {
+    if (erwartetVon && a.fromNodeId !== erwartetVon) return "falsch";
+    if (typeof a.sig !== "string" || !a.spore || typeof a.spore !== "object") {
+      return (a.sig === undefined && a.spore === undefined) ? "unbestaetigt" : "falsch";
+    }
+    var v = resolveVerifier();
+    if (!v || typeof v.verifyDetached !== "function") return "unbestaetigt";   // nicht prüfbar
+    if (a.spore.id !== a.fromNodeId) return "falsch";
+    try {
+      var vr = await v.verifyForeignSpore(a.spore);
+      if (!(vr === true || (vr && vr.valid === true))) return "falsch";
+      return (await v.verifyDetached(antwortOhneSig(a), a.sig, a.spore.publicKey)) ? "bestaetigt" : "falsch";
+    } catch (_e) { return "falsch"; }
+  }
+  function ergebnisseLesen(a) {
+    return (Array.isArray(a.results) ? a.results : []).slice(0, RDV_QUERY_K_MAX).map(function (r) {
+      var o = { label: String((r && r.label) || "").slice(0, RDV_LABEL_MAX), score: (r && typeof r.score === "number") ? r.score : null };
+      if (r && typeof r.anchorId === "string" && r.anchorId) o.anchorId = r.anchorId.slice(0, 120);
+      return o;
+    });
+  }
+  var antwortVerworfen = 0;            // _meta: wie viele Antworten die Prüfung nicht bestanden
+  var frageVerworfen = 0, fragenBestaetigt = 0, fragenUnbestaetigt = 0;   // _meta (S1)
+
+  var answerUnsub = null;            // aktiver Antwort-Lauscher (null = AUS)
+  var answeredCount = 0;
+  var seenQids = [];                 // Dedupe-Fenster (Cap 200)
+  var answerTimestamps = [];         // für das Rate-Limit (ms-Zeitstempel)
+  var answerCorpusEnsured = false;   // Korpus-Kopplung schon erzwungen? (Bau 23.B-Härtung)
+
+  function resolveQueryMatch() {
+    var m = cfg.match || global.SbkimMatch;
+    return (m && typeof m.queryLocal === "function") ? m : null;
+  }
+
+  // ---- Korpus-Kopplung härten (Bau 23.B-Härtung, 2026-07-10) ----
+  // Die Korpus-leer-Falle: enableAnswering() ruft beim Fragen queryLocal —
+  // ECHTE Treffer gibt es aber nur, wenn Modul 04 vorher einen lokalen Korpus
+  // registriert bekam (setLocalCorpus). Bisher tat das AUSSCHLIESSLICH das
+  // Such-Widget (Modul 22) LAZY bei der ERSTEN Widget-Suche. Antwort-Pfad (23)
+  // und Korpus-Aufbau (22) waren also nicht gekoppelt → wer „Antworten" AN-
+  // schaltet, aber nie selbst suchte, antwortete mit LEERER Liste trotz
+  // vorhandener Daten (live zugeschlagen, PULS.md 2026-07-02). Beim bewussten
+  // Einschalten des Antwortrechts stellen wir den Korpus jetzt AKTIV sicher —
+  // unabhängig davon, ob je eine Widget-Suche lief.
+  //
+  // Verfassungstreu + fail-soft: rein lokal (kein Netz), nutzt NUR die
+  // öffentliche Fläche von Modul 04 (setLocalCorpus). Ohne cfg.prepareCorpus
+  // (App koppelt den Korpus anders, z.B. selbst übers Widget) ODER ohne
+  // setLocalCorpus-Fähigkeit ODER bei einem Fehler im Provider → wir tun
+  // NICHTS bzw. lassen den Korpus wie er ist; queryLocal liefert dann ehrlich
+  // leer, es bricht NICHTS. Idempotent: nur einmal je Provider.
+  async function ensureAnswerCorpus() {
+    if (answerCorpusEnsured) return;
+    if (typeof cfg.prepareCorpus !== "function") return; // App koppelt anders → nicht erzwingen
+    var m = cfg.match || global.SbkimMatch;
+    if (!m || typeof m.setLocalCorpus !== "function") return; // kein Registrier-Pfad → fail-soft
+    try {
+      var corpus = await cfg.prepareCorpus();
+      if (Array.isArray(corpus)) {
+        m.setLocalCorpus(corpus);
+        answerCorpusEnsured = true;
+      }
+    } catch (_e) { /* fail-soft: Korpus bleibt unverändert, queryLocal ggf. ehrlich leer */ }
+  }
+  function qidSeen(qid) { return seenQids.indexOf(qid) !== -1; }
+  function rememberQid(qid) {
+    seenQids.push(qid);
+    if (seenQids.length > 200) seenQids.splice(0, seenQids.length - 200);
+  }
+  function forgetQid(qid) {
+    var i = seenQids.indexOf(qid);
+    if (i !== -1) seenQids.splice(i, 1);
+  }
+  // answerTimestamps: [{ t: ms, u: unsigniert?, p: ohne Aufwand (S3)? }]
+  function underRateLimit(unsigniert, ohneAufwand) {
+    var cut = Date.now() - 60000;
+    answerTimestamps = answerTimestamps.filter(function (e) { return e.t > cut; });
+    if (answerTimestamps.length >= RDV_QUERY_MAX_PER_MIN) return false;
+    // S3: Fragen ohne Aufwand teilen sich nur RDV_QUERY_NOPOW_MAX_PER_MIN Plätze.
+    if (ohneAufwand && answerTimestamps.filter(function (e) { return e.p; }).length >= RDV_QUERY_NOPOW_MAX_PER_MIN) return false;
+    if (!unsigniert) return true;
+    return answerTimestamps.filter(function (e) { return e.u; }).length < RDV_QUERY_UNSIGNED_MAX_PER_MIN;
+  }
+
+  // ---- enableAnswering(): Antwortrecht bewusst einschalten ----
+  async function enableAnswering(opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    if (answerUnsub) return { ok: true, reason: "Antworten läuft schon (idempotent)." };
+    var relay = resolveRelay();
+    if (!relay) return { ok: false, reason: "Kein Nostr-Relais-Client (Modul 05b) verfügbar." };
+    var nbA = await netBereit();
+    if (!nbA.ok) return { ok: false, reason: nbA.reason };
+    var fragTagA = netFragen();
+    var own = await getOwnLiveSpore();
+    if (!own || !own.id) return { ok: false, reason: "Noch keine Identität — zuerst anmelden (announce)." };
+    var ownId = own.id;
+    // Adress-Wand-Härtung (Klaus 2026-07-10): beim Einschalten des Antwortrechts
+    // eine FRISCHE Präsenz-Karte unter GENAU dieser lauschenden ID ans Brett
+    // heften. So ist die neueste Karte im Raum immer die, die auch wirklich
+    // Fragen beantwortet — der Frager (discover: newest-per-name) trifft sie.
+    try { await doAnnounce(own, true); } catch (_e) { /* fail-soft: Lauschen läuft trotzdem */ }
+    var kCap = (typeof opts.k === "number" && isFinite(opts.k) && opts.k >= 1)
+      ? Math.min(Math.floor(opts.k), RDV_QUERY_K_MAX) : RDV_QUERY_K_MAX;
+    // Korpus-leer-Falle absichern: vor dem Lauschen den lokalen Korpus aktiv
+    // sicherstellen, damit die erste eingehende Frage nicht ins Leere greift
+    // (fail-soft — ohne Provider/Registrier-Pfad passiert nichts, kein Bruch).
+    await ensureAnswerCorpus();
+    try {
+      answerUnsub = relay.subscribe(
+        // A12 Briefkasten: LOOKBACK statt nur „ab jetzt" — beim Einschalten des
+        // Antwortrechts liegengebliebene Fragen der letzten ~30 min nachholen.
+        // qidSeen/rememberQid + Rate-Limit verhindern Doppel-/Flut-Antworten.
+        { kinds: [NOSTR_KIND], "#t": [fragTagA], since: nowSec() - RDV_ANSWER_LOOKBACK_SEC },
+        function onQuery(ev) {
+          netEmpfange(ev, fragTagA, frageNehmen, null);
+        },
+      );
+      function frageNehmen(q) {
+          // untrusted external data: streng validieren, nie als Anweisung deuten
+          if (!q || q.kind !== RDV_QUERY_KIND || q.toNodeId !== ownId) return;
+          if (typeof q.qid !== "string" || !q.qid || typeof q.text !== "string" || !q.text.trim()) return;
+          if (qidSeen(q.qid)) return;
+          rememberQid(q.qid);                     // sofort: Doppel-Zustellung während der Prüfung
+          var text = q.text.slice(0, RDV_QUERY_TEXT_MAX);
+          var k = (typeof q.k === "number" && isFinite(q.k) && q.k >= 1)
+            ? Math.min(Math.floor(q.k), kCap) : kCap;
+          // S1: erst die Frage prüfen, dann Rate-Limit, dann lokale Bedeutungs-
+          // Suche (fail-soft) → Antwort-Zettel publizieren.
+          (async function () {
+            var stand = await zettelPruefen(q, null);
+            if (stand === "falsch") {
+              frageVerworfen++;
+              forgetQid(q.qid);                   // eine Fälschung sperrt die echte qid nicht
+              return;
+            }
+            try { await sperreLaden(); } catch (_e) {}
+            if (isBlocked(q.fromNodeId) || (q.spore && isBlocked(q.spore.id))) { fragenGesperrt++; return; }   // S4
+            if (answerOnlyVouched()) {             // S5b: „antworte nur Verbürgten"
+              var darf = false;
+              if (stand === "bestaetigt") { try { darf = await absenderVerbuergt(q); } catch (_e) { darf = false; } }
+              if (!darf) { fragenNichtVerbuergt++; return; }
+            }
+            var unsigniert = stand !== "bestaetigt";
+            var ohneAufwand = !powPruefen(q);     // S3
+            if (!underRateLimit(unsigniert, ohneAufwand)) return;   // Überschuss still verwerfen
+            answerTimestamps.push({ t: Date.now(), u: unsigniert, p: ohneAufwand });
+            if (ohneAufwand) fragenOhneAufwand++;
+            if (unsigniert) fragenUnbestaetigt++; else fragenBestaetigt++;
+            var results = [];
+            var match = resolveQueryMatch();
+            if (match) {
+              try {
+                // exclude:true — die Frage eines fremden Knotens kann eine
+                // Verneinung tragen („alkoholfrei", „ohne Erdbeeren"). Modul 04
+                // parst sie und filtert VOR dem Ranking (Bau 04.I). Ohne
+                // Verneinung byte-gleich; Andock-Riegel unberührt.
+                var hits = await match.queryLocal(text, k, { hybrid: true, exclude: true });
+                results = (Array.isArray(hits) ? hits : []).slice(0, k).map(function (h) {
+                  var r = { label: String(h.label || ""), score: (typeof h.score === "number") ? h.score : null };
+                  if (typeof h.anchorId === "string" && h.anchorId) r.anchorId = h.anchorId;
+                  return r;
+                });
+              } catch (_e) { results = []; }      // ehrlich leer statt Bruch
+            }
+            try {
+              await relay.publish({
+                kind: NOSTR_KIND,
+                created_at: nowSec(),
+                tags: [["t", fragTagA]],
+                content: await netPacke(await zettelSignieren({
+                  kind: RDV_QUERY_RES_KIND, qid: q.qid,
+                  toNodeId: q.fromNodeId, fromNodeId: ownId,
+                  fromName: cfg.nodeName, results: results, ts: nowSec(),
+                }), fragTagA),
+              });
+              answeredCount++;
+            } catch (_e) { /* fail-soft: Antwort verloren, kein Bruch */ }
+          })();
+      }
+    } catch (e) {
+      answerUnsub = null;
+      return { ok: false, reason: "Antwort-Lauscher fehlgeschlagen: " + (e && e.message ? e.message : e) };
+    }
+    // Vorwärmen (Bau 23.B-Härtung II, 2026-07-10): der Antworter lädt sein
+    // ~30-MB-Modell + baut seinen Korpus SONST erst bei der ersten eingehenden
+    // Frage — das kann 30 s–2 min dauern und läuft in den Frage-Timeout. Deshalb
+    // beim Einschalten des Antwortrechts JETZT im Hintergrund eine Aufwärm-Suche
+    // absetzen: das lädt Modell + Korpus vor, sodass die erste echte Frage
+    // sofort beantwortet wird. Fire-and-forget, fail-soft (kein Netz, rein lokal).
+    (function warmUpAnswerer() {
+      var m = resolveQueryMatch();
+      if (!m) return;
+      try { Promise.resolve(m.queryLocal("aufwärmen", 1)).catch(function () {}); }
+      catch (_e) { /* fail-soft */ }
+    })();
+    signalListening(true);
+    return { ok: true };
+  }
+
+  function disableAnswering() {
+    if (answerUnsub) { try { answerUnsub(); } catch (_e) {} }
+    answerUnsub = null;
+  }
+
+  // ---- askNode(): einem lebenden Knoten eine Suchfrage stellen ----
+  async function askNode(target, text, opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var toNodeId = null;
+    if (target && typeof target === "object") {
+      toNodeId = target.nodeId || (target.spore && target.spore.id) || null;
+    } else if (typeof target === "string") { toNodeId = target; }
+    if (!toNodeId) return { ok: false, reason: "Kein Ziel-Knoten (Karte oder nodeId) angegeben." };
+    if (typeof text !== "string" || !text.trim()) return { ok: false, reason: "Leere Frage." };
+    var relay = resolveRelay();
+    if (!relay) return { ok: false, reason: "Kein Nostr-Relais-Client (Modul 05b) verfügbar." };
+    var nbQ = await netBereit();
+    if (!nbQ.ok) return { ok: false, reason: nbQ.reason };
+    var fragTagQ = netFragen();
+    var own = await getOwnLiveSpore();
+    if (!own || !own.id) return { ok: false, reason: "Noch keine Identität — zuerst anmelden (announce)." };
+    var ownId = own.id;
+    var k = (typeof opts.k === "number" && isFinite(opts.k) && opts.k >= 1)
+      ? Math.min(Math.floor(opts.k), RDV_QUERY_K_MAX) : RDV_QUERY_K_MAX;
+    var timeoutMs = (typeof opts.timeoutMs === "number" && isFinite(opts.timeoutMs) && opts.timeoutMs > 0)
+      ? Math.floor(opts.timeoutMs) : RDV_ASK_TIMEOUT_MS;
+    var qid = "q" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    var started = Date.now();
+    try { await sperreLaden(); } catch (_e) {}    // S4
+
+    return await new Promise(function (resolve) {
+      var done = false, unsub = null, timer = null;
+      function finish(res) {
+        if (done) return;
+        done = true;
+        if (timer) clearTimeout(timer);
+        if (unsub) { try { unsub(); } catch (_e) {} }
+        resolve(res);
+      }
+      // Erst auf die Antwort lauschen, dann fragen (kein Fenster verpassen).
+      try {
+        unsub = relay.subscribe(
+          { kinds: [NOSTR_KIND], "#t": [fragTagQ], since: nowSec() - 5 },
+          function onRes(ev) {
+            netEmpfange(ev, fragTagQ, antwortNehmen, null);
+          },
+        );
+        // Bau 23.R: nur der GEFRAGTE Knoten, und eine unterschriebene Antwort
+        // schlägt jede unbestätigte (siehe zettelPruefen).
+        var vorlaeufig = null, graceTimer = null;
+        function antwortNehmen(a) {
+            if (!a || a.kind !== RDV_QUERY_RES_KIND || a.qid !== qid || a.toNodeId !== ownId) return;
+            if (isBlocked(a.fromNodeId) || (a.spore && isBlocked(a.spore.id))) { antwortGesperrt++; return; }   // S4
+            zettelPruefen(a, toNodeId).then(function (stand) {
+              if (done) return;
+              if (stand === "falsch") { antwortVerworfen++; return; }
+              var res = { ok: true, qid: qid, results: ergebnisseLesen(a), fromNodeId: a.fromNodeId || null,
+                          bestaetigt: stand === "bestaetigt", tookMs: Date.now() - started };
+              if (stand === "bestaetigt") { if (graceTimer) clearTimeout(graceTimer); finish(res); return; }
+              if (!vorlaeufig) {
+                vorlaeufig = res;
+                graceTimer = setTimeout(function () { finish(vorlaeufig); }, RDV_UNBESTAETIGT_WARTE_MS);
+              }
+            });
+        }
+      } catch (e) {
+        finish({ ok: false, reason: "Antwort-Lauscher fehlgeschlagen: " + (e && e.message ? e.message : e) });
+        return;
+      }
+      var frage = {
+        kind: RDV_QUERY_KIND, qid: qid, toNodeId: toNodeId, fromNodeId: ownId,
+        fromName: cfg.nodeName, text: text.trim().slice(0, RDV_QUERY_TEXT_MAX), k: k, ts: nowSec(),
+      };
+      // S5b: eigene Bürgschaften mitgeben, damit ein Knoten mit „antworte nur
+      // Verbürgten" die Kette lesen kann. Jeder Zettel ist für sich signiert.
+      var mitV = cardCarried().vouches.slice(0, RDV_QUERY_VOUCH_MAX);
+      if (mitV.length) frage.vouches = mitV;
+      powRechnen(frage                        // S3: erst Aufwand, dann unterschreiben
+      ).then(zettelSignieren                 // S1: die Frage trägt spore + sig
+      ).then(function (zettel) {
+        return netPacke(zettel, fragTagQ);
+      }).then(function (inhalt) {
+        return relay.publish({
+          kind: NOSTR_KIND,
+          created_at: nowSec(),
+          tags: [["t", fragTagQ]],
+          content: inhalt,
+        });
+      }).catch(function (e) {
+        finish({ ok: false, reason: "Frage-Zettel konnte nicht publiziert werden: " + (e && e.message ? e.message : e) });
+      });
+      timer = setTimeout(function () {
+        if (vorlaeufig) { if (graceTimer) clearTimeout(graceTimer); finish(vorlaeufig); return; }
+        // A12: qid mitgeben — der Frager merkt die Frage als „offen" und liest
+        // die Antwort später über fetchAnswers([qid]) nach (Briefkasten).
+        finish({ ok: false, pending: true, qid: qid, reason: "Noch keine Antwort in " + Math.round(timeoutMs / 1000) + " s — Gegenknoten evtl. offline. Die Frage bleibt offen; beim nächsten Öffnen „Antworten abholen“." });
+      }, timeoutMs);
+    });
+  }
+
+  // ---- A12 Briefkasten: späte Antworten NACHLESEN ----
+  // askNode gibt nach dem Timeout auf; war der Gegenknoten da noch zu, landet
+  // seine Antwort später trotzdem auf dem Relais. fetchAnswers holt sie beim
+  // nächsten Öffnen (Nutzer-Aktion) über ein Lookback-Fenster ab — Briefkasten
+  // leeren, KEIN Dauer-Ticker. qids = Array offener Frage-IDs (aus askNode).
+  // Reale Grenze: Aufbewahrungsdauer des Relais. Fail-soft, DOM-frei.
+  async function fetchAnswers(qids, opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    // Bau 23.R: qids = Strings ODER {qid, toNodeId}. Mit toNodeId wird nur die
+    // Antwort genau dieses Knotens genommen.
+    var want = {};
+    (Array.isArray(qids) ? qids : []).forEach(function (id) {
+      if (typeof id === "string" && id) want[id] = { von: null };
+      else if (id && typeof id === "object" && typeof id.qid === "string" && id.qid) {
+        want[id.qid] = { von: (typeof id.toNodeId === "string" && id.toNodeId) ? id.toNodeId : null };
+      }
+    });
+    if (!Object.keys(want).length) return { ok: true, answers: [] };
+    var relay = resolveRelay();
+    if (!relay) return { ok: false, reason: "Kein Nostr-Relais-Client (Modul 05b) verfügbar.", answers: [] };
+    var nbF = await netBereit();
+    if (!nbF.ok) return { ok: false, reason: nbF.reason, answers: [] };
+    var fragTagF = netFragen();
+    var wartenF = [];
+    var own = await getOwnLiveSpore();
+    if (!own || !own.id) return { ok: false, reason: "Noch keine Identität — zuerst anmelden.", answers: [] };
+    var ownId = own.id;
+    try { await sperreLaden(); } catch (_e) {}    // S4
+    var lookbackSec = (typeof opts.lookbackSec === "number" && isFinite(opts.lookbackSec) && opts.lookbackSec > 0)
+      ? Math.floor(opts.lookbackSec) : RDV_ANSWER_LOOKBACK_SEC;
+    var waitMs = (typeof opts.waitMs === "number" && isFinite(opts.waitMs) && opts.waitMs > 0)
+      ? Math.floor(opts.waitMs) : cfg.listenMs;
+    return await new Promise(function (resolve) {
+      var byQid = {}, unsub = null, timer = null, done = false;
+      async function finish() {
+        if (done) return; done = true;
+        if (timer) clearTimeout(timer);
+        if (unsub) { try { unsub(); } catch (_e) {} }
+        // Bau 23.R: die Prüfung einer Antwort hängt sich erst NACH dem Entschlüsseln an —
+        // so lange warten, bis keine neue mehr dazukommt.
+        for (var wn = -1; wn !== wartenF.length;) { wn = wartenF.length; try { await Promise.all(wartenF.slice()); } catch (_e) {} }
+        var out = Object.keys(byQid).map(function (q) { return byQid[q]; });
+        resolve({ ok: true, answers: out });
+      }
+      try {
+        unsub = relay.subscribe(
+          { kinds: [NOSTR_KIND], "#t": [fragTagF], since: nowSec() - lookbackSec },
+          function onRes(ev) {
+            netEmpfange(ev, fragTagF, antwortSammeln, wartenF);
+          },
+        );
+        function antwortSammeln(a) {
+            if (!a || a.kind !== RDV_QUERY_RES_KIND) return;      // nur Antwort-Zettel
+            if (a.toNodeId !== ownId) return;                     // nur an mich
+            if (typeof a.qid !== "string" || !want[a.qid]) return; // nur meine offenen Fragen
+            if (isBlocked(a.fromNodeId) || (a.spore && isBlocked(a.spore.id))) { antwortGesperrt++; return; }   // S4
+            var p = zettelPruefen(a, want[a.qid].von).then(function (stand) {
+              if (stand === "falsch") { antwortVerworfen++; return; }
+              var best = stand === "bestaetigt";
+              var ts = (typeof a.ts === "number") ? a.ts : 0;
+              var prev = byQid[a.qid];
+              // Bau 23.R: bestätigt schlägt unbestätigt, egal welche Zeit; erst
+              // innerhalb derselben Stufe gilt die neueste (newest-per-qid).
+              if (prev) {
+                if (prev.bestaetigt && !best) return;
+                if (prev.bestaetigt === best && typeof prev.ts === "number" && prev.ts >= ts) return;
+              }
+              byQid[a.qid] = { qid: a.qid, fromNodeId: a.fromNodeId || null, fromName: a.fromName || null,
+                               results: ergebnisseLesen(a), ts: ts, bestaetigt: best };
+            });
+            wartenF.push(p);
+        }
+      } catch (e) {
+        resolve({ ok: false, reason: "Nachlese-Lauscher fehlgeschlagen: " + (e && e.message ? e.message : e), answers: [] });
+        return;
+      }
+      timer = setTimeout(finish, waitMs);
+    });
+  }
+
+  // ---- Public surface ----
+  var api = {
+    init: init,
+    configure: configure,
+    announce: announce,
+    connectAndAnnounce: connectAndAnnounce,
+    discover: discover,
+    handshakeCard: handshakeCard,
+    enableAnswering: enableAnswering,   // Bau 23.B — Antwortrecht bewusst AN (Default AUS)
+    disableAnswering: disableAnswering, // Bau 23.B
+    askNode: askNode,                   // Bau 23.B — nutzer-ausgelöste Cross-Knoten-Frage
+    fetchAnswers: fetchAnswers,         // A12 Briefkasten — späte Antworten nachlesen (Lookback)
+    relatednessForCards: relatednessForCards, // pure (cards, ownSpore) → angereicherte Liste; reine Anzeige
+    rankCardsByQuery: rankCardsByQuery,
+    checkMeaning: checkMeaning,               // S2 — (spore) → {status, score, snippets, reason}; reine Anzeige       // A11 — pure (cards, queryVec) → nach Frage-Passung sortiert; reine Anzeige/Auswahl
+    vouchTrust: vouchTrust,                   // S5 — (cards, opts) → je Karte `vouch`; reine Anzeige
+    createVouch: createVouch,                 // S5 — Bürgschaft ausstellen (eigene Identität)
+    createRevocation: createRevocation,       // S5 — Bürgschaft widerrufen; S5b: (subjectId, reason), Grund Pflicht
+    vouchExpiring: vouchExpiring,             // S5b — eigene Bürgschaften, die bald ablaufen
+    answerOnlyVouched: answerOnlyVouched,     // S5b — „antworte nur Verbürgten" an?
+    setAnswerOnlyVouched: setAnswerOnlyVouched, // S5b — Einstellung je Knoten (gespeichert)
+    loadSeenRevocations: loadSeenRevocations, // S5b — gespeicherte, gesehene Widerrufe
+    addCarried: addCarried,                   // S5 — erhaltene Bürgschaft / eigenen Widerruf mittragen
+    loadVouchContacts: loadVouchContacts,     // S5 — eigene Kontakte (Wurzeln)
+    saveVouchContacts: saveVouchContacts,     // S5
+    vouchPassOn: vouchPassOn,                 // S5 Teil 2 — Text zum Weitergeben (Liste)
+    vouchSafetyNumber: vouchSafetyNumber,     // S5 Teil 2 — Sicherheitsnummer zum Vergleich
+    currentNetAdmin: currentNetAdmin,         // S5 Teil 2 — Netzadmin des aktuellen Netzes
+    blockId: blockId,                         // S4 — Netzadmin sperrt eine Kennung (nur nach oben)
+    createBlocklist: createBlocklist,         // S4 — Netzadmin unterschreibt eine ganze Liste
+    addBlocklist: addBlocklist,               // S4 — eingefügte Liste prüfen und übernehmen
+    currentBlocklist: currentBlocklist,       // S4 — Stand der Liste des aktuellen Netzadmins
+    isBlocked: isBlocked,                     // S4 — (nodeId) → Boolean, Stand der zuletzt geladenen Liste
+    ensureIdentity: ensureIdentity,             // Modus A (sanft, automatisch, idempotent)
+    cleanupSharedOrigin: cleanupSharedOrigin,   // Modus-B-Reinigung (nur eigene Origin)
+    repairAndReconnect: repairAndReconnect,     // Modus B (zerstörend, nutzer-ausgelöst)
+    // Eigenes Netz (Schritt 1, 2026-10-13) — INTERFACES §Modul 23 „EIGENES NETZ"
+    setNetwork: setNetwork,
+    newNetCode: newNetCode,
+    checkNetSetting: checkNetSetting,
+    loadNetwork: loadNetwork,
+    readNetwork: readNetwork,
+    saveNetwork: saveNetwork,
+    clearNetwork: clearNetwork,
+    applyNetwork: applyNetwork,
+    get _meta() {
+      return {
+        version: VERSION,
+        tag: netRaum(),
+        network: net.lage,
+        encrypted: !!net.key,
+        networkReason: net.reason || null,
+        presenceKind: RDV_PRESENCE_KIND,
+        sharedDbName: SHARED_DB_NAME,
+        dbSuffix: cfg.dbSuffix,
+        freshSec: cfg.freshSec,
+        listenMs: cfg.listenMs,
+        nodeName: cfg.nodeName,
+        hasRelay: resolveRelay() !== null,
+        hasAnastomose: resolveAnastomose() !== null,
+        hasSpore: resolveSpore() !== null,
+        // Werden fremde Karten kryptografisch geprüft? false = Modul 02 fehlt
+        // oder kann kein verifyForeignSpore → Karten sind UNGEPRÜFT. Ehrlich
+        // sichtbar statt still durchgewinkt (Schutz-Plan Stufe 2b).
+        cardsVerified: resolveVerifier() !== null,
+        cardsMax: RDV_CARDS_MAX,
+        cardsPerSenderMax: RDV_CARDS_PER_SENDER_MAX,
+        hasMatch: resolveMatch() !== null,
+        hasStorage: resolveStorage() !== null,
+        // Identitäts-Isolierung (2026-07-11): trägt das aktive Storage-Modul
+        // den Migrations-Pfad? (älteres Bundle ohne migrateIdentityFrom → false,
+        // dann greift der reine Schutz-Fallback in repairAndReconnect).
+        hasMigrate: (function () { var s = resolveStorage(); return !!(s && typeof s.migrateIdentityFrom === "function"); })(),
+        hasCreateIdentity: typeof cfg.createIdentity === "function",
+        answering: answerUnsub !== null,          // Bau 23.B
+        answeredCount: answeredCount,             // Bau 23.B
+        hasPrepareCorpus: typeof cfg.prepareCorpus === "function", // Bau 23.B-Härtung
+        answerCorpusEnsured: answerCorpusEnsured,  // Bau 23.B-Härtung (Korpus gekoppelt?)
+        queryTag: netFragen(),                    // Bau 23.B (im eigenen Netz abgeleitet)
+        queryKind: RDV_QUERY_KIND,                // Bau 23.B
+        queryResKind: RDV_QUERY_RES_KIND,         // Bau 23.B
+        queryMaxPerMin: RDV_QUERY_MAX_PER_MIN,    // Bau 23.B
+        antwortVerworfen: antwortVerworfen,       // Bau 23.R: Antworten, die die Prüfung nicht bestanden
+        frageVerworfen: frageVerworfen,           // S1: Fragen, die die Prüfung nicht bestanden
+        fragenBestaetigt: fragenBestaetigt,       // S1: beantwortete unterschriebene Fragen
+        fragenUnbestaetigt: fragenUnbestaetigt,   // S1: beantwortete Fragen ohne Unterschrift
+        queryUnsignedMaxPerMin: RDV_QUERY_UNSIGNED_MAX_PER_MIN, // S1
+        powBits: RDV_POW_BITS,                    // S3
+        queryNoPowMaxPerMin: RDV_QUERY_NOPOW_MAX_PER_MIN, // S3
+        kartenVerdraengt: kartenVerdraengt,       // S3: Karten ohne Aufwand, die bei vollem Raum weichen mussten
+        fragenOhneAufwand: fragenOhneAufwand,     // S3: beantwortete Fragen ohne Aufwand
+        antwortSigniert: (function () { var s = resolveSpore(); return !!(s && typeof s.signDetached === "function"); })(), // Bau 23.R
+        labelMax: RDV_LABEL_MAX,
+        meaningMin: RDV_MEANING_MIN,              // S2
+        vouchChainMax: RDV_VOUCH_CHAIN_MAX,       // S5
+        vouchTtlSec: RDV_VOUCH_TTL_SEC,           // S5 (S5b: 180 Tage)
+        vouchWarnSec: RDV_VOUCH_WARN_SEC,         // S5b
+        revokeReasonMax: RDV_REVOKE_REASON_MAX,   // S5b
+        queryVouchMax: RDV_QUERY_VOUCH_MAX,       // S5b
+        answerOnlyVouched: answerOnlyVouched(),   // S5b
+        fragenNichtVerbuergt: fragenNichtVerbuergt, // S5b: nicht beantwortet, Absender nicht verbürgt
+        issuedPerCardMax: RDV_ISSUED_PER_CARD_MAX,   // S5b Teil 2
+        empfehlungenAbgeholt: empfehlungenAbgeholt,  // S5b Teil 2
+        vouchAnchors: idListe(vouchCfg.anchors).length, // S5 (init-Anker, ohne Netzadmin)
+        netAdmin: currentNetAdmin(),              // S5 Teil 2
+        blockMax: RDV_BLOCK_MAX,                  // S4
+        blocklist: { stand: (sperre.admin === currentNetAdmin()) ? sperre.stand : "keine",
+                     admin: currentNetAdmin(), ts: (sperre.admin === currentNetAdmin()) ? sperre.ts : 0,
+                     count: sperrIds().length },  // S4
+        fragenGesperrt: fragenGesperrt,           // S4: nicht beantwortete Fragen gesperrter Kennungen
+        antwortGesperrt: antwortGesperrt,         // S4: verworfene Antworten gesperrter Kennungen
+        kartenGesperrt: kartenGesperrt,           // S4: herausgefallene Karten (alle Läufe)
+        rankByQueryNote: "rankCardsByQuery(cards, queryVec, {raw?}) rankt Raum-Karten nach Frage-Passung (Modul 04 relatedness, zentriert; raw→match). REINE Anzeige/Auswahl, gatet nichts, 0.80-Riegel unberührt; fail-soft ohne Vektor → Eingabe-Reihenfolge.", // A11
+      };
+    },
+  };
+
+  global.SbkimRendezvous = api;
+
+  if (typeof console !== "undefined" && console.info) {
+    console.info(
+      "MODUL 23 RENDEZVOUS bereit (gemeinsamer Raum, Empfangsmodus/nutzer-ausgelöst), " +
+        "Funktionen: init/configure/announce/connectAndAnnounce/discover/handshakeCard/" +
+        "enableAnswering/disableAnswering/askNode/relatednessForCards/" +
+        "ensureIdentity/cleanupSharedOrigin/repairAndReconnect",
+    );
+  }
+})(typeof window !== "undefined" ? window : globalThis);

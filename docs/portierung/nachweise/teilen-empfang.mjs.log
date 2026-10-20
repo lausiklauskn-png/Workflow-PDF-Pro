@@ -1,0 +1,25 @@
+Workfloh PDF — Empfang aus der Teilen-Liste
+  ✓ das Manifest nennt ein share_target
+  ✓ … als POST mit multipart/form-data (nur so kommen Dateien mit)
+  ✓ … mit einem Datei-Feld, das PDFs und Bilder annimmt
+  ✓ … und der Worker liest genau dieses Feld
+  ✓ … und fängt genau diese Adresse ab
+  ✓ … und sie liegt im Geltungsbereich der App
+  ✓ „Öffnen mit": file_handlers nennt PDF
+  ✓ der Vorrat der geteilten Dateien übersteht ein neues CACHE_VERSION
+  ✓ der POST-Empfang steht VOR dem Ausstieg für alles, was nicht GET ist
+  ✓ der Worker steuert die Seite (Ausgangslage, sonst misst der Rest nichts)
+  ✓ ein geteiltes PDF landet in der Bibliothek (Name mit Umlauten unverändert)
+  ✓ … und die Datei wurde nie an den Server geschickt (der Worker hat sie abgefangen)
+  ✓ … und die Adresse trägt danach kein ?geteilt mehr (Neuladen liest nicht doppelt ein)
+  ✓ … und der Vorrat der geteilten Dateien ist leer
+  ✓ … und eine einzelne Datei wird gleich geöffnet
+  ✓ Neuladen danach legt das Dokument nicht ein zweites Mal an
+  ✓ PDF und Foto zusammen geteilt: beide kommen an
+  ✓ nur Text geteilt: die App sagt, dass keine Datei ankam
+  ✓ leerer Vorrat: die App meldet es, statt still zu bleiben
+  ✓ keine Seitenfehler im Teilen-Weg
+  ✓ „Öffnen mit": die App meldet sich bei launchQueue an
+  ✓ … und eine damit geöffnete PDF landet in der Bibliothek
+22 grün · 0 ROT
+

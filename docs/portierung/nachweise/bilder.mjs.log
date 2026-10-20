@@ -1,0 +1,24 @@
+  · Texterkennung im Foto: 19 Zeilen, alter Filter ließ 5 durch, neuer 0 → ["\\ 1) \\ [e) q ON C (55)","In ON n ) (47)","\\ yo \\ | | (55)",") Di 2 \\ | I ° (47)","O,'o N DEN lo \\ ‚ (47)"]
+  ✓ Foto, Vorgabe: nur die zwei echten Absätze (ob gelesen wurde, misst erst das Schild unten)
+  ✓ … die Seite trägt bildText 0 und keine Texterkennung
+  ✓ Selbst-Riegel: das erfundene Foto erzeugt mit dem ALTEN Filter wirklich Schein-Text
+  ✓ der neue Filter lässt davon nichts durch
+  ✓ mit „Text in Bildern" an: kein Schein-Text aus dem Foto im Ergebnis
+  ✓ mit „Text in Bildern" an: echter Text im Bild wird gelesen (Warnhinweis, Netzstecker)
+  ✓ … ohne den Haken bleibt auch echter Bild-Text unberührt
+  ✓ gespeicherter Stand mit Bild-Text wird ohne den Haken neu gelesen (kein alter Bild-Text im Ergebnis)
+  ✓ … auch ein Stand von vor dem 2026-09-26 (ohne bildText)
+  ✓ Scan-Seite bleibt: eine gescannte Seite aus einem alten Stand wird ohne Haken NICHT neu gelesen
+  ✓ mit dem Haken bleibt ein vollständiger Stand stehen (keine neue Anfrage)
+  ✓ Klaus' Kästen fallen heraus: „e.g. : \", „IE |", „Paes fe", „SOs cis"
+  ✓ unsicher erkannt (60) fällt heraus, sicher erkannt (85) bleibt
+  ✓ ein Rahmen-Zeichen (|) wirft die Zeile heraus, auch mit echten Wörtern
+  ✓ überwiegend Ziffern fällt heraus, zwei Wörter aus vier Buchstaben bleiben
+  ✓ Übersetzen-Dialog: Haken „Text in Bildern mitübersetzen" steht da und ist aus
+  ✓ … ohne Haken: im fertigen PDF stehen nur die zwei Absätze, nichts aus dem Bild
+  ✓ mit Haken: die Wahl wird gemerkt und der Bild-Text kommt an
+  ✓ beim nächsten Öffnen steht der Haken wieder so, wie zuletzt gewählt
+  ✓ keine Seitenfehler
+
+20 grün · 0 ROT
+
