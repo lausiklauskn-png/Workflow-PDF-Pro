@@ -9,6 +9,40 @@ concurrency:
   group: native-foundation-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  previous-failure-context:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Vorherige fehlgeschlagene Probe für Folgesitzungen zugänglich machen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          previous=$(gh api --method GET "repos/$GITHUB_REPOSITORY/actions/workflows/native-foundation.yml/runs" \
+            -f "branch=$GITHUB_REF_NAME" -f status=completed -f per_page=5 \
+            --jq '[.workflow_runs[] | select(.conclusion == "failure")][0].id // empty')
+          if test -z "$previous"; then exit 0; fi
+          gh run view "$previous" --repo "$GITHUB_REPOSITORY" --log-failed > "$RUNNER_TEMP/previous-ci-failure.txt"
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          lines=Path(os.environ['RUNNER_TEMP']+'/previous-ci-failure.txt').read_text().splitlines()
+          selected=[]
+          for i,line in enumerate(lines):
+              if any(word in line for word in ['FAILED','Timed out','AssertionError','What went wrong','ROT:','Error:']):
+                  selected.extend(lines[max(0,i-1):i+7])
+          if not selected: selected=lines[-35:]
+          text='\n'.join(dict.fromkeys(selected))[-12000:]
+          # GitHub check annotations can be read through api.github.com even when
+          # a coding environment cannot reach the Azure log download host.
+          for offset in range(0,len(text),3000):
+              piece=text[offset:offset+3000].replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+              print('::notice title=Vorheriger CI-Fehler (historisch)::'+piece)
+          PY
   web-core:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
