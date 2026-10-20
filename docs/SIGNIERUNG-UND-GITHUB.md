@@ -218,6 +218,6 @@ Die Workflows sind erst nach Übernahme auf `main` bei GitHub registriert und st
   `signing/android-certificate.json`. Zertifikat SHA-256
   `0da805c9ad11ded86227fa4398e9237766f9f2d12bec66d65cb20309cbea3837`,
   App-Kennung `de.familyprojekt.workflowpdf.pro`. Kein Private-Brain-Schlüssel.
-- Offen: Workflow einmal mit `check` von `main` starten (belegt die Wiederherstellung
-  aus dem Repo). Keine App, kein Release; der Veröffentlichungs-Workflow bleibt
+- `check` von `main` (Stand `5c9c869`): Lauf 39473308583 grün – das Paket aus dem
+  Repo lässt sich mit der Freigabe entschlüsseln und passt zum Zertifikats-Pin. Keine App, kein Release; der Veröffentlichungs-Workflow bleibt
   gesperrt, bis App, Build und Nachweise vorliegen.
