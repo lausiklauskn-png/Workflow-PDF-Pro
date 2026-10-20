@@ -206,3 +206,18 @@ ausführbar, weil Googles Build-Tools (`dl.google.com`) im Claude-Container gesp
 sind – nicht rot im Code, sondern ungeprüft. `verify-upstream`: 191/191 bytegleich.
 
 Die Workflows sind erst nach Übernahme auf `main` bei GitHub registriert und startbar.
+
+## Eingerichtet (2026-10-20)
+
+- Environment `android-production` und Secret `WF_PDF_SIGNING_UNLOCK` von Klaus
+  angelegt; Freigabe zusätzlich getrennt gesichert. Actions: Lese-/Schreibrecht,
+  PR-Erstellung erlaubt.
+- Workflow „Dauerhafte Workflow-PDF-Pro-Signieridentität“, `initialize`:
+  Lauf 39472967095 grün (Erzeugen, Entschlüsseln, Zertifikatsbindung geprüft).
+- PR #3 gemergt: nur `signing/android-release.enc.json` (AES-256-GCM) und
+  `signing/android-certificate.json`. Zertifikat SHA-256
+  `0da805c9ad11ded86227fa4398e9237766f9f2d12bec66d65cb20309cbea3837`,
+  App-Kennung `de.familyprojekt.workflowpdf.pro`. Kein Private-Brain-Schlüssel.
+- Offen: Workflow einmal mit `check` von `main` starten (belegt die Wiederherstellung
+  aus dem Repo). Keine App, kein Release; der Veröffentlichungs-Workflow bleibt
+  gesperrt, bis App, Build und Nachweise vorliegen.
