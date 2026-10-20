@@ -1,0 +1,46 @@
+Workfloh PDF — Spracheingabe mit Laufbalken
+  ✓ vor dem Tippen: kein Balken zu sehen
+  ✓ Mikrofon antippen: der Balken steht SOFORT da (im selben Augenblick)
+  ✓ … und zwar IM Suchfeld, unter der Textzeile (nicht darunter)
+  ✓ … das Feld wird dafür höher, der Text bleibt darüber zu sehen
+  ✓ … mit einem Stopp-Knopf im Balken, der zu treffen ist
+  ✓ … und die Lupe (Suchen) bleibt daneben zu treffen
+  ✓ … mit 40 Stellen, am Anfang nur Pünktchen
+  ✓ … der Knopf zeigt, dass zugehört wird
+  ✓ die Erkennung liefert Zwischenstände (interimResults) und hört Deutsch
+  ✓ beim Sprechen steht der Text SCHON im Feld („Bäcke")
+  ✓ … aber gesucht wird noch nicht (die Liste bleibt ganz)
+  ✓ beim Sprechen laufen Striche durch den Balken
+  ✓ … und die Striche sind verschieden hoch
+  ✓ der Text wächst mit („Bäckerei Auftrag")
+  ✓ in der Pause kommen Pünktchen nach (die neuesten Stellen sind Pünktchen)
+  ✓ … und die Aufnahme läuft in der Pause weiter (noch nicht fertig)
+  ✓ nach einer längeren Pause endet sie von selbst
+  ✓ … und dann wird gesucht: nur noch das passende Dokument
+  ✓ … der Balken ist danach wieder leer (keine Striche stehen)
+  ✓ … und das Feld hat wieder seine alte Höhe
+  ✓ Endstand und Zwischenstand stehen zusammen im Feld
+  ✓ „Stopp" beendet sofort und sucht
+  ✓ für den zweiten Durchgang wurde eine neue Erkennung angelegt
+  ✓ Mikrofon ein zweites Mal antippen beendet die Aufnahme
+  ✓ ein verweigertes Mikrofon wird gesagt, der Balken geht weg
+  ✓ ohne jede Sprache hört sie nach einigen Sekunden von selbst auf
+  ✓ … und sucht dann nichts
+  ✓ bei englischer Oberfläche hört die Erkennung Englisch
+  ✓ … und der Balken spricht Englisch
+  ✓ am Handy (360 px) passt der Balken in die Breite, der Stopp-Knopf bleibt darin
+  ✓ … auch am Handy (360 px) liegt er im Feld, mit treffbarem Stopp-Knopf
+  ✓ am Handy (320 px) passt der Balken in die Breite, der Stopp-Knopf bleibt darin
+  ✓ … auch am Handy (320 px) liegt er im Feld, mit treffbarem Stopp-Knopf
+  ✓ dasselbe Endstück zweimal geschickt → „kopieren" steht EINMAL da
+  ✓ … auch dreimal in einer Liste → einmal
+  ✓ ein Stück, das schon am Ende steht, kommt nur einmal vor („Angebot Tisch")
+  ✓ ein Stück, das alles Bisherige schon enthält, ersetzt es („kopieren Auftrag")
+  ✓ beginnt Chrome eine neue, kürzere Liste, bleibt das schon Gesagte stehen
+  ✓ ein Wort, das IN einem Stück doppelt gesagt wird, bleibt doppelt („sehr sehr gut")
+  ✓ zwei verschiedene Endstücke stehen beide da („Bäckerei Auftrag")
+  ✓ keine Fehler auf der Seite
+  ✓ ohne Spracherkennung im Browser: Knopf aus, mit Grund, kein Balken
+
+42 grün · 0 ROT
+

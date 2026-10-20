@@ -1,0 +1,568 @@
+/* Workfloh PDF — Stil. Marke wie WorkFloh: Rot #E0231B, weiße Flächen, rote Umrandung. */
+:root{
+  --rot:#E0231B;--rot-d:#b71a13;--rot-h:#fdecea;--blau:#1d4ed8;--blau-h:#e8efff;
+  --ink:#16181d;--ink2:#555b66;--linie:#dfe2e8;--grund:#f4f5f8;--flaeche:#fff;
+  --ki:#e8870b;--ki-h:#fff4e3;--ok:#15803d;--schatten:0 2px 10px rgba(20,24,33,.08);
+  --r:12px;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--grund);color:var(--ink);font-size:15px;line-height:1.4;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+
+/* Kopfleiste */
+.kopf{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:4px 12px 4px 6px;
+  background:var(--flaeche);border-bottom:3px solid var(--rot);box-shadow:var(--schatten);min-height:64px}
+.floh-knopf{border:0;background:none;padding:0;width:60px;height:60px;flex:none}
+.floh{display:block;width:60px;height:60px;background:url(../icons/w-floh-160.png) center/contain no-repeat;
+  background-image:image-set(url(../icons/w-floh-120.webp) type('image/webp'),url(../icons/w-floh-160.png) type('image/png'));
+  transform-origin:50% 90%;animation:floh-wippen 3.2s ease-in-out infinite}
+.floh.hopst{animation:floh-hopsen .7s ease-out 1}
+@keyframes floh-wippen{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-3px) rotate(2deg)}}
+@keyframes floh-hopsen{0%{transform:translateY(0)}35%{transform:translateY(-14px) rotate(-8deg)}70%{transform:translateY(0) rotate(4deg)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.floh,.floh.hopst{animation:none}}
+.marke{flex:1;min-width:0;overflow:hidden}
+.marke-name{font-size:1.25rem;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+.marke-name b{color:var(--rot)}
+.marke-sub{font-size:.78rem;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kopf-rechts{display:flex;gap:6px;align-items:center;flex:none}
+.ikon{width:40px;height:40px;border-radius:50%;border:2px solid var(--linie);background:var(--flaeche);font-weight:800;font-size:1rem}
+.ikon:hover{border-color:var(--rot)}
+
+.screen{display:none}.screen.on{display:block}
+
+/* Knöpfe */
+.knopf{border:2px solid var(--linie);background:var(--flaeche);border-radius:10px;padding:8px 12px;font-weight:600;min-height:40px;white-space:nowrap}
+.knopf:hover{border-color:var(--rot)}
+.knopf.rot{background:var(--rot);border-color:var(--rot);color:#fff}
+.knopf.rot:hover{background:var(--rot-d)}
+.knopf.blau{background:var(--blau);border-color:var(--blau);color:#fff}
+.knopf.klein{min-width:40px;padding:6px 10px}
+.knopf.gefahr{color:var(--rot);border-color:#f3c2bf}
+.knopf.an{border-color:var(--rot);background:var(--rot-h)}
+.knopf:disabled{opacity:.5;cursor:default}
+
+/* Bibliothek */
+#sc-bib{padding:14px;max-width:1200px;margin:0 auto}
+.import-leiste{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+/* Vier Kacheln: nebeneinander erst ab 1200 px. Mit auto-fit(220 px) standen sie zwischen 641 und 900 px
+   (DeX-Fenster „fast Handyformat") in 2–3 schmalen Spalten, die letzte allein (Klaus 2026-09-27: „zu schmal"). */
+@media (min-width:1200px){.import-leiste{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.gross-knopf{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--flaeche);border:2px solid var(--rot);
+  border-radius:var(--r);cursor:pointer;box-shadow:var(--schatten);transition:transform .1s}
+.gross-knopf:hover{transform:translateY(-1px)}
+.gross-knopf.rot{background:var(--rot);color:#fff}
+.gross-knopf .gk-ico{font-size:1.9rem}
+.gross-knopf .gk-t{font-weight:700;line-height:1.2}
+.gross-knopf small{font-weight:400;opacity:.8}
+.ablage{position:fixed;inset:0;z-index:80;background:rgba(224,35,27,.12);border:4px dashed var(--rot);display:flex;
+  align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;color:var(--rot-d);pointer-events:none}
+.ordner-leiste{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px}
+.ordner-chip{border:2px solid var(--linie);background:var(--flaeche);border-radius:999px;padding:7px 14px;white-space:nowrap;font-weight:600}
+.ordner-chip.on{border-color:var(--rot);background:var(--rot-h);color:var(--rot-d)}
+.ordner-chip .anz{font-weight:400;color:var(--ink2);margin-left:4px}
+.bib-suche{width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--linie,#ccc);border-radius:10px;font:inherit;margin:0 0 10px;background:var(--flaeche,#fff);color:inherit}
+.ordner-aktionen{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.dok-gitter{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.dok{background:var(--flaeche);border:1px solid var(--linie);border-radius:var(--r);overflow:hidden;box-shadow:var(--schatten);display:flex;flex-direction:column}
+.dok-bild{aspect-ratio:3/4;background:#eceef2 center/contain no-repeat;border:0;width:100%;padding:0;position:relative}
+.dok-bild .marken{position:absolute;left:6px;top:6px;display:flex;gap:4px;flex-wrap:wrap}
+.marke-klein{font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.95);border:1px solid var(--linie)}
+.marke-klein.ki{background:var(--ki-h);border-color:var(--ki);color:#8a4a00}
+.dok-info{padding:8px 10px;flex:1}
+.dok-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dok-meta{font-size:.78rem;color:var(--ink2)}
+.dok-akt{display:flex;border-top:1px solid var(--linie)}
+.dok-akt button{flex:1;border:0;background:none;padding:8px 0;font-size:1rem}
+.dok-akt button:hover{background:var(--grund)}
+.leer{padding:40px 20px;text-align:center;color:var(--ink2);background:var(--flaeche);border:2px dashed var(--linie);border-radius:var(--r);grid-column:1/-1}
+.leer b{color:var(--ink)}
+
+/* Editor */
+#sc-ed.on{display:flex;flex-direction:column;height:calc(100vh - 67px);height:calc(100dvh - 67px)}
+.ed-leiste{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 10px;background:var(--flaeche);border-bottom:1px solid var(--linie)}
+.ed-name{flex:1;min-width:140px;border:2px solid var(--linie);border-radius:10px;padding:8px 10px;font-weight:700}
+.ed-name:focus{border-color:var(--rot);outline:none}
+.modus{display:flex;border:2px solid var(--rot);border-radius:10px;overflow:hidden}
+.modus-k{border:0;background:var(--flaeche);padding:8px 12px;font-weight:700;min-height:36px}
+.modus-k.on{background:var(--rot);color:#fff}
+.zoom{display:flex;gap:4px}
+.vorschlag-band{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:var(--ki-h);border-bottom:2px solid var(--ki);font-size:.9rem}
+.vorschlag-band b{color:#8a4a00}
+.ed-flaeche{flex:1;overflow:auto;background:#d9dce3;padding:16px 8px 120px}
+.seiten{display:flex;flex-direction:column;align-items:center;gap:18px}
+.seite{position:relative;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.25);touch-action:pan-x pan-y}
+.seite canvas{display:block;width:100%;height:100%}
+.seite-nr{position:absolute;right:-2px;top:-20px;font-size:.75rem;color:#4b5160}
+.lage{position:absolute;inset:0}
+.seite.platzieren .lage{cursor:crosshair;background:rgba(29,78,216,.04)}
+
+/* Felder */
+.feld{position:absolute;border:1.5px solid var(--blau);background:rgba(29,78,216,.07);border-radius:3px;touch-action:none}
+.feld.ki{border:2px dashed var(--ki);background:rgba(232,135,11,.10)}
+.feld.sel{outline:3px solid rgba(224,35,27,.55);outline-offset:1px;z-index:5}
+.feld{container-type:size}
+/* Etikett IM Feld (überdeckt keine Nachbarzeile); ausgewählt steht es als Fähnchen darüber */
+.feld .etikett{position:absolute;left:3px;right:3px;top:50%;transform:translateY(-50%);font-size:clamp(7px,55cqh,12px);line-height:1.1;
+  color:var(--blau);opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;font-weight:600}
+.feld.ki .etikett{color:#9a5200}
+.feld.hatwert .etikett{display:none}
+.feld.check-feld .etikett{display:none}
+.feld.sel .etikett{display:block;top:auto;bottom:100%;transform:none;left:-1px;right:auto;max-width:240px;font-size:10px;opacity:1;padding:1px 5px;border-radius:4px 4px 0 0;background:var(--blau);color:#fff}
+.feld.sel.ki .etikett{background:var(--ki)}
+/* Griff (Klaus 2026-09-27: „rote Punkte ein bisschen dick … um 20 % verkleinert, aber nicht mehr"): 16 → 13 px.
+   Die Greiffläche bleibt so groß wie vorher — ein unsichtbarer Rand (::after) fängt den Finger. */
+.feld .griff{display:none;position:absolute;right:-6px;bottom:-6px;width:13px;height:13px;border-radius:50%;background:var(--rot);border:2px solid #fff;box-shadow:0 0 0 1px var(--rot);cursor:nwse-resize}
+.feld .griff::after{content:"";position:absolute;inset:-9px;border-radius:50%}
+.feld.sel .griff{display:block}
+.feld .wert{position:absolute;inset:0;display:flex;align-items:center;padding:0 3px;overflow:hidden;white-space:nowrap;color:#0b1a52;pointer-events:none}
+.feld .wert.mz{align-items:flex-start;white-space:pre-wrap;line-height:1.15}
+.feld .kreuz{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#0b1a52}
+.feld .qrbild{width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.feld .qrbild svg{width:100%;height:100%}
+.feld .qrleer{font-size:10px;color:var(--ink2);text-align:center;padding:2px}
+/* Ausfüllmodus: Felder sind Eingaben, keine Griffe */
+.ausfuellen .feld{border-color:rgba(29,78,216,.35);background:rgba(29,78,216,.05)}
+.ausfuellen .feld .griff,.ausfuellen .feld .etikett{display:none}
+.ausfuellen .feld.ki{border-style:dashed}
+.feld input,.feld textarea{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;padding:0 3px;color:#0b1a52;outline:none;resize:none}
+.feld input:focus,.feld textarea:focus{background:rgba(255,255,160,.45)}
+.feld .flink{position:absolute;left:0;top:0;right:30px;bottom:0;z-index:3;display:none;align-items:center;padding:0 3px;color:#0645ad;text-decoration:underline;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.feld .flinkedit{position:absolute;right:2px;top:50%;transform:translateY(-50%);z-index:3;display:none;min-width:26px;height:min(26px,100%);padding:0 3px;border-radius:6px;background:#fff;border:1px solid #c9ced8;font-size:13px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+.feld.verlinkt .flink,.feld.verlinkt .flinkedit{display:flex}
+.feld.verlinkt input,.feld.verlinkt textarea{color:transparent}
+@media print{.feld .flink{color:#0b1a52!important;text-decoration:none!important}.feld .flinkedit{display:none!important}}
+.feld.check-feld{cursor:pointer}
+
+/* Fußleiste Editor */
+.ed-fuss{position:sticky;bottom:0;background:var(--flaeche);border-top:2px solid var(--rot);padding:8px 10px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;max-height:46vh;overflow:auto}
+.werkzeug{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.werkzeug .titel{font-weight:700;color:var(--ink2);font-size:.85rem;margin-right:2px}
+.eigenschaften{flex:1;min-width:260px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.eig{display:flex;flex-direction:column;gap:2px;font-size:.78rem;color:var(--ink2)}
+.eig input,.eig select,.eig textarea{border:2px solid var(--linie);border-radius:8px;padding:6px 8px;font-size:.95rem;color:var(--ink);background:#fff;min-height:38px}
+.eig input:focus,.eig select:focus,.eig textarea:focus{border-color:var(--rot);outline:none}
+.eig-haken{flex-direction:row;align-items:center;gap:6px;min-height:38px;color:var(--ink)}
+.hinweis{font-size:.82rem;color:var(--ink2)}
+.ki-hinweis{background:var(--ki-h);border:1px solid var(--ki);border-radius:8px;padding:6px 10px;font-size:.85rem}
+
+/* Dialoge */
+.dlg-grund{position:fixed;inset:0;z-index:60;background:rgba(10,12,18,.45);display:flex;align-items:center;justify-content:center;padding:14px}
+.dlg{background:var(--flaeche);border-radius:16px;border-top:5px solid var(--rot);width:100%;max-width:560px;max-height:90vh;overflow:auto;padding:16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.dlg h2{margin:0 0 8px;font-size:1.2rem}
+.dlg p{margin:.4em 0}
+.dlg .zeile{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;justify-content:flex-end}
+.dlg label{display:block;margin:10px 0 4px;font-weight:600;font-size:.9rem}
+.dlg input[type=text],.dlg input[type=password],.dlg select,.dlg textarea{width:100%;border:2px solid var(--linie);border-radius:8px;padding:8px 10px;background:#fff}
+.dlg textarea{min-height:180px;font-size:.85rem}
+.wahl{display:block;width:100%;text-align:left;border:2px solid var(--linie);background:#fff;border-radius:12px;padding:10px 12px;margin:8px 0}
+.wahl:hover{border-color:var(--rot)}
+.wahl b{display:block;font-size:1rem}
+.wahl span{font-size:.85rem;color:var(--ink2)}
+.fortschritt{height:8px;background:var(--grund);border-radius:99px;overflow:hidden;margin:10px 0}
+.fortschritt>i{display:block;height:100%;width:0;background:var(--rot);transition:width .2s}
+.aufnahme-bilder{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin:10px 0}
+.aufnahme-bilder div{position:relative;aspect-ratio:3/4;background:#eee center/cover;border-radius:8px;border:1px solid var(--linie)}
+.aufnahme-bilder button{position:absolute;right:4px;top:4px;border:0;border-radius:50%;width:26px;height:26px;background:rgba(0,0,0,.6);color:#fff}
+.aufnahme-bilder div{background-size:contain;background-repeat:no-repeat}
+.aufnahme-bilder .blatt-um{position:absolute;left:4px;right:4px;bottom:4px;top:auto;width:auto;height:auto;border-radius:6px;padding:3px 4px;font-size:.72rem;background:rgba(0,0,0,.65);color:#fff;text-align:center;line-height:1.2}
+.dlg ol,.dlg ul{padding-left:1.2em;margin:.4em 0}
+.dlg li{margin:.25em 0}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;z-index:90;
+  background:#1c1f26;color:#fff;padding:10px 16px;border-radius:12px;max-width:min(92vw,560px);transition:.25s;font-size:.92rem;box-shadow:0 6px 24px rgba(0,0,0,.3)}
+.toast.an{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.toast button{margin-left:10px;background:none;border:1px solid #fff8;color:#fff;border-radius:8px;padding:2px 8px}
+
+@media (max-width:640px){
+  .marke-sub{display:none}
+  .lang{display:none}
+  .kopf{min-height:54px}.floh-knopf,.floh{width:50px;height:50px}
+  #sc-ed.on{height:calc(100vh - 57px);height:calc(100dvh - 57px)}
+  .ed-leiste{gap:6px;padding:6px}
+  #edZurueck{order:1}.ed-name{order:2}#edExport{order:3}.modus{order:4}#edErkennen{order:5}.zoom{order:6}
+  .ed-leiste .knopf{padding:6px 9px;min-height:36px}
+  .ed-leiste>*{flex:none}
+  .ed-name{flex:1 0 100px;min-width:100px;padding:6px 8px}
+  .modus-k{padding:6px 8px;font-size:.85rem}
+  .vorschlag-band{padding:6px 8px;gap:6px;font-size:.85rem}
+  .vorschlag-band .knopf{min-height:32px;padding:4px 8px}
+  .ed-flaeche{padding:10px 4px 90px}
+  .ed-fuss{padding:6px;gap:6px;max-height:42vh}
+  .werkzeug{flex-wrap:nowrap;overflow-x:auto;max-width:100%}
+  .werkzeug .knopf{min-height:36px;padding:5px 9px}
+  .eigenschaften{min-width:0;gap:6px}
+  .ki-hinweis{width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 8px}
+  .werkzeug .titel{display:none}
+  .ordner-aktionen .knopf{white-space:normal;text-align:left}
+}
+/* Kopfleiste am schmalen Handy (Klaus 2026-09-27: „DE, Aktualisieren, Fragezeichen und Zahnrädchen werden
+   zu groß und gehen auf den Schriftzug"). Knöpfe und Floh werden kleiner, der Schriftzug auch — er darf nicht
+   unter die Knöpfe laufen (.marke schneidet notfalls ab statt zu überlappen). */
+@media (max-width:520px){.kopf{gap:6px;padding:4px 8px 4px 4px}.floh-knopf,.floh{width:42px;height:42px}.kopf-rechts{gap:4px}.ikon{width:34px;height:34px;font-size:.9rem}.marke-name{font-size:1.08rem;white-space:normal;line-height:1.05}.ikon.sprache-k{font-size:.72rem}}
+@media (max-width:370px){.floh-knopf,.floh{width:36px;height:36px}.kopf-rechts{gap:3px}.ikon{width:31px;height:31px;font-size:.82rem;border-width:1.5px}.marke-name{font-size:.98rem}}
+/* 🎬 in der Kopfleiste (Klaus 2026-09-28): sechs Knöpfe samt Installieren passen bei 320 px nur so neben „Workfloh PDF“ */
+@media (max-width:370px){.kopf{padding-right:4px}.kopf-rechts{gap:2px}#btnInstall{width:31px;height:31px;min-height:31px;min-width:31px;padding:0;border-radius:50%}.marke-name{font-size:.86rem}}
+.bib-suchform.wfs-an .bib-knopf{top:22px}
+@media print{.kopf,.ed-leiste,.ed-fuss,.vorschlag-band{display:none}}
+/* Ausfüllen: Finger darf über Feldern scrollen (touch-action:none gilt nur fürs Ziehen) */
+.ausfuellen .feld{touch-action:auto}
+/* Unterschrift */
+.feld .usbild{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:left center;pointer-events:none}
+.feld .usleer{position:absolute;inset:0;display:flex;align-items:center;padding:0 6px;font-size:clamp(8px,40cqh,13px);color:var(--blau);opacity:.75;pointer-events:none}
+.ausfuellen .feld:has(.usleer),.ausfuellen .feld:has(.usbild){cursor:pointer}
+.us-flaeche{display:block;margin:10px auto;background:#fff;border:2px dashed #b8c2d9;border-radius:10px;touch-action:none;cursor:crosshair}
+.erk-liste{max-height:30vh;overflow:auto;border:1px solid var(--linie);border-radius:10px;padding:4px 8px}
+.erk-dok{display:flex;gap:8px;align-items:center;padding:6px 0;min-height:36px}
+.wahl:disabled{opacity:.45}
+.fortschritt.laeuft>i{background-image:linear-gradient(45deg,rgba(255,255,255,.35) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.35) 50%,rgba(255,255,255,.35) 75%,transparent 75%);background-size:16px 16px;animation:fbStreifen .8s linear infinite}
+@keyframes fbStreifen{to{background-position:16px 0}}
+@media (prefers-reduced-motion:reduce){.fortschritt.laeuft>i{animation:none}}
+.fb-kopf{display:flex;align-items:center;gap:10px}
+.dreher{flex:none;width:22px;height:22px;border-radius:50%;border:3px solid var(--grund);border-top-color:var(--rot);animation:dreh .8s linear infinite}
+@keyframes dreh{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.dreher{animation-duration:2.4s}}
+.ue-sprachen{display:flex;gap:10px;align-items:flex-end}
+.ue-sprachen>div:not(.ue-pfeil){flex:1}
+.ue-pfeil{padding-bottom:10px;font-weight:700}
+.ue-mess{margin:10px 0;font-size:.9rem}
+.ue-mess summary{cursor:pointer;font-weight:600}
+.ue-mess [data-mess]{margin:6px 0}
+button.gross-knopf{font:inherit;text-align:left;color:inherit;width:100%;cursor:pointer}
+
+/* Sprache der App (assets/sprache.js) */
+.ikon.sprache-k { font-size: .8rem; font-weight: 700; letter-spacing: .02em; }
+.sprach-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin: 10px 0; }
+.sprach-liste .wahl.on { outline: 3px solid #E0231B; }
+label.haken { display: flex; gap: 8px; align-items: center; font-weight: 400; margin-top: 8px; }
+[hidden] { display: none !important; }
+/* Arabisch: die Oberfläche läuft von rechts, die Seiten der Dokumente NICHT —
+   Felder stehen in Prozent von links, der Text der Dokumente hat seine eigene Richtung. */
+[dir="rtl"] body { direction: rtl; }
+[dir="rtl"] .ed-flaeche, [dir="rtl"] .seiten, [dir="rtl"] #wfp-chrome, [dir="rtl"] input, [dir="rtl"] textarea { direction: ltr; }
+[dir="rtl"] .dlg input[type="text"], [dir="rtl"] .dlg textarea { direction: auto; }
+[dir="rtl"] .wahl { text-align: right; }
+/* Suche (2026-09-26): Fundstellen in der Bibliothek und auf der Seite */
+.dok-fund{margin-top:5px;padding:5px 7px;border-left:3px solid #f5b400;background:rgba(245,180,0,.10);border-radius:0 5px 5px 0;font-size:.76rem;line-height:1.35;cursor:pointer}
+.fund-zeile{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fund-wo{font-weight:700;color:#8a5a00}
+.fund-text{color:var(--ink2)}
+.such-stand{grid-column:1/-1;margin-top:6px}
+.fund{position:absolute;z-index:6;border:2.5px solid #f5b400;background:rgba(255,214,0,.30);border-radius:3px;cursor:pointer;box-shadow:0 0 0 2px rgba(255,255,255,.7)}
+@media print{.fund{display:none}}
+/* Suchzeile mit Mikrofon und Lupe im Feld (2026-09-26) */
+.bib-suchform{position:relative;margin:0 0 10px}
+.bib-suchform .bib-suche{margin:0;padding-right:96px}
+.bib-suche::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;display:none}
+.bib-knopf{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:transparent;font-size:1.25rem;cursor:pointer;line-height:1}
+#bibLos{right:4px}
+#bibMic{right:46px}
+.bib-knopf:hover{background:rgba(0,0,0,.06)}
+.bib-knopf:disabled{opacity:.35;cursor:not-allowed}
+#bibMic.hoert{background:#E0231B;color:#fff;animation:hoert 1.2s ease-in-out infinite}
+@keyframes hoert{50%{box-shadow:0 0 0 6px rgba(224,35,27,.25)}}
+/* Im Dokument suchen (2026-09-26) */
+.ed-such{display:flex;gap:6px;align-items:center;padding:6px 10px;background:var(--flaeche);border-bottom:1px solid var(--linie)}
+.ed-such .bib-suche{margin:0;flex:1;min-width:0}
+.ed-such-zahl{font-size:.85rem;color:var(--ink2);min-width:4.5em;text-align:center;white-space:nowrap}
+.fund.akt{border-color:#E0231B;background:rgba(255,160,0,.38);box-shadow:0 0 0 3px rgba(224,35,27,.35)}
+.such-ordner{grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 6px}
+@media print{.ed-such{display:none}}
+/* Trefferzahl je Ordner und Dokument (Klaus 2026-09-26) */
+.treffer-zahl{display:inline-block;margin-left:5px;padding:0 6px;border-radius:9px;background:#FFE08A;color:#5a3d00;font-size:.72rem;font-weight:700;line-height:1.5;vertical-align:middle}
+.dok{position:relative}
+.dok-treffer{position:absolute;top:6px;right:6px;z-index:2;margin:0;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+
+/* Sortierung + Ordner-Ausgabe (2026-09-26) */
+.sortier{display:inline-flex;align-items:center;gap:6px;font-size:.9rem;margin-right:6px}
+.sortier select{padding:6px 8px;border-radius:8px}
+.aus-liste{max-height:30vh;overflow:auto;margin:4px 0 10px;padding-left:22px}
+/* Suche nach Bedeutung (Stufe 2): Zustandsleiste unter dem Suchfeld, Abschnitt unter den Wort-Treffern */
+.bedeutung-leiste{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:-2px 0 10px;min-height:32px;font-size:.88rem}
+.bedeutung-leiste .bed-t{color:var(--ink2)}
+.bedeutung-leiste .bed-mb{font-variant-numeric:tabular-nums;color:var(--ink2)}
+.bedeutung-leiste .fortschritt{flex:1 1 100%;margin:2px 0 0}
+.bedeutung-leiste .bed-fehler{color:#9a1c12}
+.bedeutung-leiste .bed-klein{flex:1 1 100%;font-size:.8rem}
+/* Schmal (320 px): der Einschalt-Knopf bricht um, statt die Seite breiter zu machen (gemessen: 328 px). */
+.bedeutung-leiste .knopf{white-space:normal;text-align:left;max-width:100%}
+.dok[data-schwach] .naehe-zahl{background:#EEE;color:#555}
+.bed-kopf{grid-column:1/-1;margin:14px 0 2px;font-weight:700}
+.bed-grenze{grid-column:1/-1;margin-top:4px}
+.naehe-zahl{background:#DCE8FF;color:#1c3a7a}
+.fund[data-art="bedeutung"]{border-color:#3d6fd6;background:rgba(61,111,214,.18)}
+
+/* Scannen: Foto → PDF (2026-09-26). Ganzer Schirm, unter den Dialogen (z 60) */
+body.scan-offen{overflow:hidden}
+.scan{position:fixed;inset:0;z-index:55;background:var(--grund);display:flex;flex-direction:column;height:100vh;height:100dvh}
+.scan-kopf{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--flaeche);border-bottom:3px solid var(--rot)}
+.scan-titel{font-size:1.1rem}
+.scan-anz{flex:1;color:var(--ink2);font-size:.9rem}
+.scan-haupt{flex:1;min-height:0;display:flex}
+.scan-buehne{flex:1;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;background:#2b2f36;overflow:hidden;padding:4px}
+.scan-werkzeug{width:320px;flex:none;overflow:auto;background:var(--flaeche);border-left:1px solid var(--linie);padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+.scan-leer{color:#fff;text-align:center;max-width:420px;padding:20px}
+.scan-leer .zeile{justify-content:center}
+.scan-leer .knopf:not(.rot){color:var(--ink)}
+.scan-sucht{font-size:1.1rem}
+.scan-bild{position:relative;flex:none;touch-action:none;user-select:none}
+.scan-bild canvas,.scan-bild img{display:block;width:100%;height:100%}
+.scan-linie{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.scan-linie polygon{fill:rgba(224,35,27,.12);stroke:#E0231B;stroke-width:2}
+.scan-griff{position:absolute;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:3px solid #fff;background:rgba(224,35,27,.85);box-shadow:0 0 0 2px #E0231B,0 2px 6px rgba(0,0,0,.4);touch-action:none;cursor:grab;padding:0}
+.scan-bild canvas.scan-lupe{position:absolute;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 6px rgba(0,0,0,.5);pointer-events:none;width:64px;height:64px;box-sizing:border-box}
+.scan-zeilen{position:absolute;inset:0}
+.scan-zeile{position:absolute;border:1.5px solid rgba(29,78,216,.8);background:rgba(29,78,216,.08);border-radius:3px;padding:0}
+.scan-zeile.geaendert{border-color:var(--ok);background:rgba(21,128,61,.12)}
+.scan-zeile.unsicher{border-color:#d97706;background:rgba(245,158,11,.22)}
+.scan-zeile.hell{outline:3px solid #E0231B;outline-offset:1px;background:rgba(224,35,27,.14)}
+[data-tafel="kopie"] .scan-zeile{border-style:dashed;cursor:grab;touch-action:none}
+.scan-vergleich{display:flex;gap:12px;align-items:center;justify-content:center;width:100%;height:100%}
+.scan-tafel{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.scan-tafel figcaption{color:#fff;font-size:.85rem;height:22px;line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+[data-tafel="kopie"] .scan-bild{box-shadow:0 0 0 1px #ccc}
+.scan-stil{display:flex;align-items:center;gap:10px;margin:8px 0}
+.scan-stil>span{min-width:90px;color:var(--ink2)}
+.scan-stil output{min-width:52px;text-align:center;align-self:center}
+.scan-tabs{display:flex;border:2px solid var(--rot);border-radius:10px;overflow:hidden}
+.scan-tabs .modus-k{flex:1}
+.scan-befund{margin:0;padding:8px 10px;border-radius:10px;font-weight:700;display:flex;flex-direction:column;gap:2px}
+.scan-befund small{font-weight:400;color:var(--ink2)}
+.scan-befund.ok{background:#e8f6ec;color:var(--ok)}
+.scan-befund.pruefen{background:var(--ki-h);color:#9a5a00}
+.scan-befund.hand{background:var(--blau-h);color:var(--blau)}
+.scan-knoepfe{display:flex;flex-wrap:wrap;gap:6px}
+.scan-weiter{width:100%}
+.scan-gruppe{display:flex;flex-direction:column;gap:6px}
+.scan-chips{display:flex;flex-wrap:wrap;gap:6px}
+.scan-chips .chip{border:2px solid var(--linie);background:var(--flaeche);border-radius:999px;padding:5px 11px;font-weight:600}
+.scan-chips .chip.on{border-color:var(--rot);background:var(--rot-h);color:var(--rot-d)}
+.scan-regler{display:grid;grid-template-columns:auto 1fr 2.5em;align-items:center;gap:8px;font-size:.92rem}
+.scan-regler output{text-align:right;color:var(--ink2)}
+.scan-leiste{display:flex;gap:8px;overflow-x:auto;padding:8px 10px;background:var(--flaeche);border-top:1px solid var(--linie)}
+.scan-daumen{flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;border:2px solid transparent;border-radius:10px;padding:3px}
+.scan-daumen.on{border-color:var(--rot)}
+.scan-daumen.pruefen .scan-daumen-bild{box-shadow:0 0 0 3px var(--ki)}
+.scan-daumen-bild{position:relative;border:1px solid var(--linie);background:#fff;padding:0;width:60px;height:78px;display:flex;align-items:center;justify-content:center}
+.scan-daumen-bild img{max-width:100%;max-height:100%}
+.scan-daumen-bild span{position:absolute;left:2px;bottom:2px;background:rgba(0,0,0,.6);color:#fff;border-radius:6px;font-size:.7rem;padding:0 5px}
+.scan-daumen-k button{border:1px solid var(--linie);background:var(--flaeche);border-radius:6px;padding:0 7px}
+.scan-plus{flex:none;width:64px;height:92px;border:2px dashed var(--rot);border-radius:10px;background:var(--rot-h);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.3rem;color:var(--rot-d)}
+.scan-plus span{font-size:.72rem;font-weight:700}
+.scan-fuss{background:var(--flaeche);border-top:2px solid var(--rot);padding:8px 12px;display:flex;flex-direction:column;gap:6px;max-height:38vh;overflow:auto}
+.scan-einst{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:.9rem}
+.scan-einst label{display:flex;align-items:center;gap:6px}
+.scan-einst input[data-name]{width:14em;max-width:50vw;padding:5px 8px;border:1px solid var(--linie);border-radius:8px}
+.scan-einst select,.scan-werkzeug select{padding:5px 6px;border:1px solid var(--linie);border-radius:8px;background:var(--flaeche)}
+.scan-aktionen{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.scan-fuss .hinweis,.scan-werkzeug .hinweis{margin:0}
+@media (max-width:760px){
+  /* Handy (Klaus 2026-09-27): vorher bekam das Foto 156 px, die oberen Ecken lagen unter der
+     Kopfleiste. Jetzt bekommt es einen festen Teil des Schirms, und das Scan-Fenster ROLLT —
+     Einstellungen und Knöpfe darunter erreicht man durch Wischen. */
+  .scan{overflow-y:auto}
+  .scan-haupt{flex-direction:column;flex:none}
+  .scan-buehne{flex:none;height:52vh;height:52dvh}
+  .scan-werkzeug{width:auto;border-left:0;border-top:1px solid var(--linie);flex:none;max-height:none}
+  .scan-leiste,.scan-fuss{flex:none}
+  .scan-fuss{max-height:none}
+  .scan-aktionen{justify-content:stretch}.scan-aktionen .knopf{flex:1 1 45%}
+}
+
+/* ChatGPT-Knopf (Klaus 2026-09-27): Bauart wie „KI-Überraschung" im Rezeptbuch (.fz-trend-btn) —
+   wandernder Verlauf, Leuchten, hüpft beim Zeigen, gibt beim Drücken nach — in Rot-Weiß-Blau */
+.knopf.ki-knopf{position:relative;border:1.5px solid rgba(255,255,255,.85);color:#fff;font-weight:900;letter-spacing:.02em;text-shadow:0 1px 3px rgba(0,0,0,.35);
+  background:linear-gradient(90deg,#b71a13,#E0231B,#1d4ed8,#E0231B,#b71a13);background-size:400% 100%;
+  box-shadow:0 3px 16px rgba(224,35,27,.42),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(0,0,0,.18);animation:kiWandern 5s linear infinite}
+.knopf.ki-knopf:hover{animation:kiWandern 5s linear infinite,kiHuepfen 1.8s ease-in-out infinite;box-shadow:0 5px 22px rgba(224,35,27,.55),0 0 0 3px rgba(29,78,216,.18),inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 0 rgba(0,0,0,.18)}
+.knopf.ki-knopf:active{transform:translateY(1px) scale(.96)!important;box-shadow:0 1px 6px rgba(224,35,27,.35),inset 0 2px 4px rgba(0,0,0,.25);filter:brightness(.94)}
+@keyframes kiWandern{0%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes kiHuepfen{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.knopf.ki-knopf,.knopf.ki-knopf:hover{animation:none}}
+/* Teilen, Auswahl, Ziehen auf einen Ordner (2026-09-27) */
+.dok{position:relative;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.dok-haken{position:absolute;right:6px;top:6px;z-index:2;width:28px;height:28px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.28);color:#fff;font-weight:700;font-size:.95rem;line-height:1;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.3);opacity:0;transition:opacity .15s}
+.dok:hover .dok-haken,.dok-gitter.wahl-an .dok-haken,.dok.gewaehlt .dok-haken{opacity:1}
+@media (hover:none){.dok-haken{opacity:.75}}
+.dok.gewaehlt{outline:3px solid var(--rot);outline-offset:-1px}
+.dok.gewaehlt .dok-haken{background:var(--rot)}
+.dok .treffer-zahl.dok-treffer{right:40px}
+/* Pfeil nach oben neben dem Auswahl-Punkt (2026-09-27) — erst, wenn die Seite heruntergerollt ist */
+.dok-hoch{position:absolute;right:40px;top:6px;z-index:2;width:28px;height:28px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.45);color:#fff;font-weight:800;font-size:1rem;line-height:1;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.3);display:none}
+html.gerollt .dok-hoch{display:block}
+html.gerollt .dok .treffer-zahl.dok-treffer{right:74px}
+.wahl-leiste{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--flaeche);border:2px solid var(--rot);border-radius:var(--r);padding:8px 10px;margin:0 0 10px;box-shadow:var(--schatten)}
+.wahl-leiste[hidden]{display:none}
+.wahl-leiste .wahl-tipp{flex-basis:100%;margin:0}
+.ordner-chip.ziel{border-color:var(--rot);background:var(--rot);color:#fff;transform:scale(1.06)}
+.zieh-geist{position:fixed;z-index:9999;pointer-events:none;background:var(--rot);color:#fff;font-weight:700;padding:6px 12px;border-radius:999px;box-shadow:0 4px 16px rgba(0,0,0,.3);white-space:nowrap}
+body.zieht{cursor:grabbing}
+body.zieht .dok-gitter,body.zieht .ordner-leiste{touch-action:none}
+
+/* Sortieren + Zeitraum in EINEM Kasten, klappt zusammen (Klaus 2026-09-27) */
+.sortier-box{flex:1 1 100%;border:1px solid var(--linie);border-radius:10px;padding:0 10px;background:var(--flaeche)}
+.sortier-box>summary{cursor:pointer;padding:8px 0;font-size:.92rem;font-weight:600;list-style:none}
+.sortier-box>summary::-webkit-details-marker{display:none}
+.sortier-box .zeitraum-kurz{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:rgba(224,35,27,.12);font-size:.85rem}
+.sortier-inhalt{display:flex;flex-direction:column;gap:8px;padding:0 0 10px}
+.sortier-inhalt .zeitraum{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.9rem}
+.sortier-inhalt .zeitraum input[type=date]{padding:6px 8px;border-radius:8px;min-width:0}
+/* Handy: flachere Knöpfe, mehr Platz fürs Bild (Klaus 2026-09-27: „die Button in der Handyansicht zu fett …
+   flacher, etwas kleiner, so dass mehr Fläche bleibt für die Ansicht des Bildes. Das ist wichtiger.")
+   Steht am ENDE, damit es die älteren Handy-Regeln oben überstimmt. */
+@media (max-width:640px){
+  .ed-leiste{gap:4px;padding:4px 6px}
+  .ed-leiste .knopf{padding:3px 8px;min-height:30px;font-size:.88rem;border-width:1.5px}
+  .ed-name{padding:3px 8px;font-size:.9rem;border-width:1.5px}
+  .modus-k{padding:3px 8px;min-height:28px;font-size:.82rem}
+  .ed-such{padding:3px 6px;gap:4px}
+  .ed-such .bib-suche{padding:5px 10px}
+  .ed-such .knopf{min-height:30px;padding:2px 9px}
+  .vorschlag-band{padding:4px 6px}
+  .vorschlag-band .knopf{min-height:28px;padding:2px 8px}
+  .ed-fuss{padding:4px 6px;gap:4px}
+  .werkzeug .knopf{min-height:30px;padding:3px 8px;font-size:.88rem;border-width:1.5px}
+  .ed-fuss .hinweis{font-size:.78rem;line-height:1.25;margin:0}
+}
+@media (max-width:760px){
+  .scan-buehne{height:60vh;height:60dvh}
+  .scan .knopf{min-height:32px;padding:4px 10px}
+  .scan-chips .chip{padding:3px 10px}
+}
+/* Handy: die vier Start-Kacheln so flach wie die Scanner-Knöpfe (Klaus 2026-09-27:
+   „PDF-Bild könnte schmaler sein … da muss nicht so eine lange Erklärung drunter sein“).
+   Untereinander, je eine flache Zeile ohne Unterzeile. Bis 760 px wie die anderen Handy-Regeln — darüber
+   stehen sie zwei nebeneinander (Klaus 2026-09-27: „fast Original Handyformat … zu schmal"). */
+@media (max-width:760px){
+  .import-leiste{grid-template-columns:1fr;gap:6px;margin-bottom:10px}
+  .gross-knopf{padding:4px 8px;gap:6px;min-height:36px;border-width:1.5px;border-radius:10px;box-shadow:none}
+  .gross-knopf .gk-ico{font-size:1.1rem;flex:none}
+  .gross-knopf .gk-t{font-size:.9rem;line-height:1.15;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gross-knopf .gk-t br,.gross-knopf small{display:none}
+}
+/* Scanner am Handy (Klaus 2026-09-27: „Ecken von Hand setzen kann auch kleiner und schmaler gemacht werden,
+   genau wie darüber Zuschneiden und Ergebnis"). Dieselben Zeilen stehen in assets/wfpdf/scanner.css
+   beider WorkFlohs — dort gleich halten. */
+@media (max-width:760px){
+  .scan-tabs{border-width:1.5px;border-radius:9px}
+  .scan .scan-tabs .modus-k{min-height:28px;padding:3px 8px;font-size:.85rem;white-space:nowrap}
+  .scan-befund{display:block;padding:3px 8px;font-size:.88rem;line-height:1.3;border-radius:8px}
+  .scan-befund small{display:inline;margin-left:6px;font-size:.78rem}
+  .scan-werkzeug{gap:7px;padding:8px 10px}
+}
+
+/* Vollbild quer (Klaus 2026-09-27: „die Vollbildansicht nutzt den Platz für das Bild nicht optimal aus"):
+   Seitenleiste und Fuß standen UNTER dem Foto und ließen ihm 151 von 540 px (gemessen bei 1000×540).
+   Jetzt steht das Foto links über die ganze Höhe, rechts untereinander Werkzeug · Seiten · Fuß. */
+.scan-werkzeug>*{flex-shrink:0}
+@media (min-width:761px) and (orientation:landscape){
+  .scan{display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:58px max-content max-content max-content 1fr;grid-template-areas:"kopf kopf" "buehne werk" "buehne leiste" "buehne fuss" "buehne rest";overflow-y:auto}
+  .scan-haupt{display:contents}
+  .scan-kopf{grid-area:kopf;position:sticky;top:0;z-index:2;box-sizing:border-box;height:58px}
+  .scan-buehne{grid-area:buehne;position:sticky;top:58px;align-self:start;height:calc(100vh - 58px);height:calc(100dvh - 58px)}
+  .scan-werkzeug{grid-area:werk;width:auto;overflow:visible}
+  .scan-werkzeug,.scan-leiste,.scan-fuss{border-left:1px solid var(--linie)}
+  .scan::after{content:"";grid-area:rest;background:var(--flaeche);border-left:1px solid var(--linie)}
+  .scan-leiste{grid-area:leiste;padding:6px 10px}
+  .scan-daumen-bild{width:48px;height:62px}
+  .scan-plus{width:52px;height:76px}
+  .scan-fuss{grid-area:fuss;max-height:none;overflow:visible;padding:6px 10px}
+  .scan-einst{gap:6px 10px;font-size:.85rem}
+  .scan-einst input[data-name]{width:100%;max-width:none}
+  .scan-einst label:has(input[data-name]){flex:1 1 100%}
+  .scan-aktionen{gap:6px}
+  .scan-aktionen .knopf{flex:1 1 45%;min-height:32px;padding:4px 8px}
+  .scan-fuss .hinweis{font-size:.78rem;line-height:1.25}
+}
+
+/* Scanner-Kopf und Reiter (Klaus 2026-09-27): Schließen ist nur ein ✕, der Titel bricht nicht um,
+   „1 Seite" steht daneben — mehr Höhe fürs Foto. Die Reiter sind auf jeder Breite 28 px, nie mehr.
+   Dieselben Zeilen stehen in assets/wfpdf/scanner.css beider WorkFlohs. */
+.scan-befund[hidden]{display:none!important}
+.scan-kopf{flex-wrap:nowrap}
+.scan-titel{white-space:nowrap}
+.scan-anz{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.scan .scan-zu{flex:0 0 auto;min-width:36px;min-height:32px;padding:2px 10px;font-size:1.1rem;line-height:1}
+.scan .scan-tabs .modus-k{white-space:nowrap;min-height:0;height:28px;padding:0 8px;font-size:.85rem;line-height:1;overflow:hidden;text-overflow:ellipsis}
+
+/* Impressum & Datenschutz unter der Bibliothek (Klaus 2026-09-27) */
+.rechtfuss{text-align:center;font-size:.8rem;margin:22px 0 6px;opacity:.75}
+.rechtfuss a{color:inherit}
+
+/* Prüfung beim Einlesen (2026-10-01): Marke an der Karte, Dialog mit Fund, Stelle und „Was jetzt tun“ */
+.dok-pruefung{display:block;margin-top:4px;font-size:.78rem;font-weight:700;padding:3px 8px;border-radius:8px;border:1px solid var(--linie);background:#fff;color:inherit;text-align:left;cursor:pointer}
+div.dok-pruefung{cursor:default;font-weight:600;opacity:.8}
+.dok-pruefung.warn{background:#fdecea;border-color:#d61e1e;color:#9b1313}
+.pruef-funde{padding-left:1.2em}.pruef-funde li{margin:.3em 0}
+.pruef-markiert{margin:.6em 0}.pruef-markiert img{max-width:100%;max-height:45vh;border:1px solid var(--linie);border-radius:6px;display:block}
+.pruef-markiert figcaption{font-size:.8rem;opacity:.8}
+.pruef-tun{background:#f4f7f6;border:1px solid var(--linie);border-radius:8px;padding:6px 10px;margin:.6em 0}.pruef-tun ol{margin:.2em 0;padding-left:1.3em}
+.pruef-name{font-weight:700;word-break:break-word}
+/* Neu im Erklärvideo-Fenster (Klaus 2026-10-01) */
+.pruef-neu{margin:.6rem 0;padding:.55rem .7rem;border-left:4px solid #c62828;background:rgba(198,40,40,.07);border-radius:6px;font-size:.9rem;line-height:1.4}
+
+/* 🔐 Erinnerung an die Sicherung (Klaus 2026-10-02) */
+.sicherung-erinnerung{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0;padding:8px 12px;border:1px solid #e6b800;border-radius:10px;background:rgba(255,200,0,.12);font-size:.92rem}
+.sicherung-erinnerung span{flex:1 1 220px}
+
+/* SBKIM-Knoten (2026-10-13): feste Lampen-Leiste in der Kopfzeile, Bauart wie Sende-Prüfer und Marktplatz —
+   kein fliegendes Widget (kein Modul 17). Breit: Lampen mit Namen, Siegel und Mycel-Blase in der Zeile.
+   Schmal (≤ 900 px): nur drei Punkte; ein Tipp klappt Namen, Siegel und Blase unter der Kopfzeile auf. */
+.netzleiste{display:flex;align-items:center;gap:6px;flex:none}
+.lampen{display:flex;align-items:center;gap:8px;height:40px;padding:0 10px;border:2px solid var(--linie);border-radius:999px;background:var(--flaeche);color:var(--ink2);font-size:.72rem;font-weight:600}
+.lampen:hover{border-color:var(--rot)}
+.lamp{display:inline-flex;align-items:center;gap:4px}
+.lamp::before{content:"";width:9px;height:9px;border-radius:50%;background:#c3c8d1;flex:none}
+.lamp.on::before{background:#2fbf71;box-shadow:0 0 7px #2fbf71}
+.lamp.warn::before{background:#e8b33a;box-shadow:0 0 7px #e8b33a}
+.lamp.bad::before{background:#e5484d;box-shadow:0 0 7px #e5484d}
+.lamp.puls::before{animation:lampenpuls .9s ease-out}
+@keyframes lampenpuls{0%{transform:scale(1.8)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.lamp.puls::before{animation:none}}
+.netz-mehr{display:flex;align-items:center;gap:6px}
+.siegel-platz{display:inline-flex;align-items:center;min-width:34px;min-height:34px}
+.siegel-platz:empty{min-width:0}
+.mycel-platz{display:inline-flex;align-items:center}
+.lampen-legende{display:none}
+/* Modul 16 liefert das Wappen als SVG ohne Maße — im Flex-Kasten wäre es 0×0. */
+#sbkim-siegel-badge{width:28px;height:28px;flex:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;border-radius:50%}
+#sbkim-siegel-badge svg{width:100%;height:100%;display:block}
+@media (max-width:900px){
+ .lamp-t{display:none}
+ .lampen{gap:5px;padding:0 9px}
+ /* Aufgeklappt hängt es an der Kopfzeile (sticky = Bezugskasten), rechtsbündig: so läuft es auch bei 320 px nicht quer. */
+ .netz-mehr{display:none;position:absolute;top:100%;right:8px;z-index:40;padding:8px 10px;gap:10px;background:var(--flaeche);border:1px solid var(--linie);border-radius:12px;box-shadow:0 10px 26px rgb(0 0 0/.18)}
+ .netzleiste[data-offen="1"] .netz-mehr{display:flex}
+ .netzleiste[data-offen="1"] .lampen{border-color:var(--rot)}
+ .lampen-legende{display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--ink);white-space:nowrap}
+}
+/* Bis 600 px hängt die Leiste als Lasche unter der Kopfzeile, rechts: in der Zeile selbst ist dort kein
+   Platz („Workfloh PDF" würde abgeschnitten, gemessen 320–520 px; bei 481–499 px schnitt main bis 13 px ab, behoben 2026-10-13: die 480er-Verdichtung gilt bis 520 px).
+   Die Kopfzeile ist sticky und damit Bezugskasten; aufgeklappt hängt die Blase unter der Lasche. */
+@media (max-width:600px){
+ .netzleiste{position:absolute;top:100%;right:10px;z-index:31}
+ .lampen{height:24px;padding:0 10px;gap:7px;border-width:0 1.5px 1.5px;border-radius:0 0 12px 12px;box-shadow:0 4px 10px rgb(0 0 0/.12)}
+ .lamp::before{width:8px;height:8px}
+ .netz-mehr{top:100%;right:-2px}
+}
+/* Herkunftsnachweis (C2PA, Klaus 2026-10-14): ruhig, keine Warnfarbe */
+.dok-pruefung.info{background:#eef5fb;border-color:#7aa7cf;color:#1d4f7a}
+.pruef-herkunft{margin:10px 0;padding:8px 10px;border:1px solid #7aa7cf;border-radius:8px;background:#f4f8fc}
+.pruef-herkunft dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 10px;margin:6px 0 0;font-size:.86rem}
+.pruef-herkunft dt{font-weight:700}.pruef-herkunft dd{margin:0;overflow-wrap:anywhere}
+/* Prüfbericht für jedes geprüfte Dokument (Klaus 2026-10-14): ruhig, keine Warnfarbe */
+.dok-pruefung.ok{background:#eef7ef;border-color:#7fb38a;color:#235c31}
+.dok-pruefung.laeuft{display:flex;align-items:center;gap:7px}
+.dok-pruefung.offen{background:#fff8e6;border-color:#c99a2e;color:#6b4a00}
+.ed-pruefung{display:inline-flex;align-items:center}.ed-pruefung[hidden]{display:none}.ed-pruefung .dok-pruefung{margin-top:0}
+.pruef-dreh{width:12px;height:12px;flex:0 0 12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:pruefDreh .9s linear infinite}
+@keyframes pruefDreh{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.pruef-dreh{animation:none;border-right-color:currentColor;opacity:.6}}
+.pruef-titel{margin:0 0 2px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+.pruef-angaben{margin:10px 0;padding:8px 10px;border:1px solid #c9c9c9;border-radius:8px;background:#fafafa}
+.pruef-angaben ul{margin:6px 0 0;padding-left:18px}.pruef-angaben li{margin:4px 0;overflow-wrap:anywhere}
+/* Installieren in der Kopfleiste (Klaus 2026-10-18): steht schon im HTML, damit die Leiste nicht springt; als App weg — vor dem ersten Anstrich */
+#btnInstall[hidden]{display:none!important}
+@media (display-mode:standalone){#btnInstall{display:none!important}}

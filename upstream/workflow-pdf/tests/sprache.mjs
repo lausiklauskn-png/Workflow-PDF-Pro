@@ -1,0 +1,287 @@
+/* Workfloh PDF — Sprache der Oberfläche (assets/sprache.js), im echten Browser.
+   Läuft durch die Zustände der App (Bibliothek, jeder Dialog, Editor in beiden Modi,
+   Ausgabe, Übersetzen …) und schlägt dabei jeden sichtbaren Text nach.
+   Gemessen wird, was ein Nutzer sieht — nicht, was im Wörterbuch steht:
+   - in EN, RU und AR fehlt KEIN Text, den die Rundreise erreicht
+   - Namen des Nutzers (Dokument, Ordner, Feld) bleiben unübersetzt
+   - zurück auf Deutsch steht wieder genau das Deutsche da (nichts bleibt hängen)
+   - Arabisch läuft von rechts, die Seiten der Dokumente nicht
+   - Hinweise (Tooltips) lassen sich ausschalten und kommen übersetzt wieder
+   - die Wahl übersteht das Neuladen
+   SAMMELN=1 gibt statt der Prüfung alle fehlenden Texte als JSON aus (Werkzeug beim Bau). */
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { chromium } from 'playwright-core';
+
+const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const SAMMELN = !!process.env.SAMMELN;
+let gruen = 0, rot = 0;
+const ok = (name, bed, info) => { if (bed) { gruen++; console.log('  ✓ ' + name); } else { rot++; console.log('  ✗ ROT: ' + name + (info !== undefined ? ' → ' + JSON.stringify(info).slice(0, 1500) : '')); } };
+
+function server() {
+  const typ = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css', '.png': 'image/png', '.webmanifest': 'application/manifest+json', '.json': 'application/json', '.pdf': 'application/pdf' };
+  const s = http.createServer((q, r) => {
+    let p = decodeURIComponent(new URL(q.url, 'http://x').pathname); if (p.endsWith('/')) p += 'index.html';
+    const f = path.join(WURZEL, p); if (!f.startsWith(WURZEL) || !fs.existsSync(f)) { r.writeHead(404); r.end(); return; }
+    r.writeHead(200, { 'Content-Type': typ[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r);
+  });
+  return new Promise(res => s.listen(0, '127.0.0.1', () => res(s)));
+}
+
+const srv = await server();
+const URL0 = `http://127.0.0.1:${srv.address().port}/`;
+const exe = ['/opt/pw-browsers/chromium-1194/chrome-linux/chrome'].find(fs.existsSync);
+const browser = await chromium.launch(exe ? { executablePath: exe } : {});
+
+const zu = p => p.evaluate(() => { for (const g of document.querySelectorAll('.dlg-grund')) g.remove(); document.getElementById('toast').classList.remove('an'); });
+const ruhe = p => p.waitForTimeout(60);
+async function schritt(p, name, fn) {
+  try { await fn(); await ruhe(p); } catch (e) { if (!SAMMELN) ok('Rundreise: ' + name, false, String(e).slice(0, 300)); }
+  await zu(p);
+}
+
+/* Die Rundreise: jeder erreichbare Zustand einmal. */
+async function rundreise(p) {
+  const W = '__wfpdf';
+  await schritt(p, 'Hilfe', () => p.evaluate(W => window[W].dlg.hilfe(), W));
+  // Erklärvideo (2026-09-28): der Dialog MIT sichtbarem Offline-Hinweis — beide Sätze müssen übersetzt sein
+  await schritt(p, 'Erklärvideo', async () => { await p.evaluate(W => window[W].dlg.erklaervideo(), W); await p.evaluate(() => { const o = document.querySelector('.dlg [data-offline]'); if (o) o.hidden = false; }); });
+  await schritt(p, 'Sicherung', () => p.evaluate(W => window[W].dlg.sicherungDialog(), W));
+  await schritt(p, 'Sicherung: Erinnerung', async () => {
+    await p.evaluate(W => { window[W].S.docs.push({ id: '__eigen', name: 'Eigenes', pages: [], fields: [] }); localStorage.removeItem('wfpdf_sicherung_zuletzt'); sessionStorage.removeItem('wfpdf_sicherung_spaeter'); }, W);
+    await p.evaluate(W => window[W].dlg.sicherungErinnerung(), W); await ruhe(p);
+    await p.evaluate(() => localStorage.setItem('wfpdf_sicherung_zuletzt', new Date(Date.now() - 20 * 86400000).toISOString()));
+    await p.evaluate(W => window[W].dlg.sicherungErinnerung(), W); await ruhe(p);
+    await p.evaluate(() => localStorage.setItem('wfpdf_sicherung_zuletzt', new Date().toISOString()));
+    await p.evaluate(W => { const w = window[W]; w.S.docs = w.S.docs.filter(d => d.id !== '__eigen'); w.dlg.sicherungErinnerung(); }, W);
+  });
+  await schritt(p, 'Einstellungen', async () => { await p.evaluate(W => window[W].dlg.einstellungen(), W); await p.waitForTimeout(150); });
+  await schritt(p, 'Sprache', () => p.evaluate(W => window[W].dlg.spracheWaehlen(), W));
+  await schritt(p, 'Installieren', () => p.evaluate(W => window[W].dlg.installHinweis(false), W));
+  await schritt(p, 'Installiert', () => p.evaluate(W => window[W].dlg.installHinweis(true), W));
+  await schritt(p, 'Übersetzen-Start', () => p.evaluate(W => window[W].dlg.uebersetzenStart(), W));
+  // Prüfung beim Einlesen (2026-10-01): Marken an der Karte (wird geprüft · Warnung · nicht ganz geprüft) und der Dialog
+  await schritt(p, 'Prüfung beim Einlesen', async () => {
+    await p.evaluate(W => { const S = window[W].S, z = new Date().toISOString();
+      const mk = (id, name, pruefung) => ({ id, name, folderId: null, quelle: 'pdf', createdAt: z, updatedAt: z, pages: [{ w: 595, h: 842 }], fields: [], pruefung });
+      S.docs.push(mk('pr-w', 'Brief A', { stand: 'warnung', funde: [{ kennung: 'PDF-KI-ANWEISUNG', satz: 'x' }, { kennung: 'BILD-LSB-VERDACHT', satz: 'y' }], hinweise: ['h'], zeit: z, markiert: 'data:image/png;base64,iVBORw0KGgo=' }),
+        mk('pr-u', 'Brief B', { stand: 'ungeprueft', funde: [], hinweise: ['h'], zeit: z }), mk('pr-l', 'Brief C', null));
+      window[W].eingang.PRUEF.laufend.add('pr-l'); window[W].suche.zeichneBibliothek(); }, W);
+    await ruhe(p);
+    await p.evaluate(W => window[W].eingang.pruefDialog('pr-w'), W); await p.waitForTimeout(150); await ruhe(p);
+    await zu(p);
+    await p.evaluate(W => window[W].eingang.pruefDialog('pr-u'), W); await p.waitForTimeout(150); await ruhe(p);
+    await p.evaluate(W => { const S = window[W].S; S.docs = S.docs.filter(d => !/^pr-/.test(d.id)); window[W].eingang.PRUEF.laufend.delete('pr-l'); window[W].suche.zeichneBibliothek(); }, W);
+  });
+  await schritt(p, 'Neuer Ordner', () => p.evaluate(W => { window[W].dlg.neuerOrdner(); }, W));
+  await schritt(p, 'Chrome-Hinweis', () => p.evaluate(W => window[W].dlg.chromeHinweis('http://x/', true), W));
+  await schritt(p, 'Chrome-Hinweis ohne Kopie', () => p.evaluate(W => window[W].dlg.chromeHinweis('http://x/', false), W));
+  await schritt(p, 'Zurück-Band', async () => { await p.evaluate(W => window[W].dlg.zurueckBand(), W); await ruhe(p); await p.evaluate(() => document.querySelectorAll('[data-zurueckband]').forEach(e => e.remove())); });
+  // Scannen (2026-09-26): leeres Werkzeug, eine Seite im Zuschnitt (sicher · prüfen · von Hand), Ergebnis mit Text, Zeilen-Dialog, Teilen
+  const scanZu = () => p.evaluate(() => WFP.Scanner.schliessen());
+  await schritt(p, 'Scannen leer', () => p.evaluate(W => window[W].dlg.scanStarten('neu'), W));
+  await scanZu();
+  await schritt(p, 'Scannen: Zuschnitt', async () => {
+    await p.evaluate(async W => {
+      window[W].dlg.scanStarten('anhang');
+      const c = document.createElement('canvas'); c.width = 600; c.height = 800; const x = c.getContext('2d'); x.fillStyle = '#333'; x.fillRect(0, 0, 600, 800); x.fillStyle = '#fff'; x.fillRect(80, 90, 440, 620);
+      const b = await new Promise(r => c.toBlob(r, 'image/png'));
+      await WFP.Scanner.hinzu([new File([b], 'seite.png', { type: 'image/png' })]);
+    }, W);
+    await ruhe(p);
+    for (const lage of [{ sicher: false }, { manuell: true }]) { await p.evaluate(l => { const st = WFP.Scanner.zustand(), s = st.seiten[0]; if (l.manuell) s.manuell = true; else s.erkennung.sicher = false; WFP.Scanner.zeichne(); }, lage); await ruhe(p); }
+    await p.evaluate(() => { const s = WFP.Scanner.zustand().seiten[0], e = s.ecken; s.ecken = null; WFP.Scanner.zeichne(); s._e = e; }); await ruhe(p);
+    await p.evaluate(() => { const s = WFP.Scanner.zustand().seiten[0]; s.ecken = s._e; WFP.Scanner.zeichne(); });
+  });
+  await schritt(p, 'Scannen: Ergebnis und Text', async () => {
+    await p.evaluate(() => { const st = WFP.Scanner.zustand(), s = st.seiten[0]; st.ansicht = 'ergebnis'; WFP.Scanner.zeichne(); }); await ruhe(p);
+    await p.click('.scan [data-alle]'); await ruhe(p);
+    await p.evaluate(() => { const st = WFP.Scanner.zustand(), s = st.seiten[0]; s.ocr = { zeilen: [{ text: 'Musterstadt', conf: 91, box: [0.2, 0.2, 0.4, 0.05] }], sprache: 'deu', schluessel: '' }; s.aenderungen = { 0: 'Beispielstadt' }; st.textModus = true; WFP.Scanner.zeichne(); }); await ruhe(p);
+    await p.click('.scan [data-zeile="0"]'); await ruhe(p);
+  });
+  await schritt(p, 'Scannen: Kopie neben Original', async () => {
+    await p.evaluate(() => { document.querySelectorAll('.dlg').forEach(d => d.remove()); const st = WFP.Scanner.zustand(), s = st.seiten[0]; s.ocr.zeilen.push({ text: 'Unsicher', conf: 40, box: [0.2, 0.4, 0.3, 0.05], base: [0.2, 0.44, 0.5, 0.44], rh: 0.04, desc: 0.01 }); st.vergleich = 'neben'; s.ausgabe = 'kopie'; WFP.Scanner.zeichne(); }); await ruhe(p);
+    await p.click('.scan [data-tafel="kopie"] [data-zeile="1"]'); await ruhe(p);
+  });
+  await schritt(p, 'Scannen: Mit ChatGPT übersetzen', async () => {
+    await p.evaluate(() => { document.querySelectorAll('.dlg').forEach(d => d.remove()); const st = WFP.Scanner.zustand(); st.seiten[0]._kiBild = null; WFP.Scanner.zeichne(); }); await ruhe(p);
+  });
+  await schritt(p, 'Scannen: Teilen', async () => { await p.click('.scan [data-teilen]'); await p.waitForSelector('.dlg [data-dl]'); });
+  await scanZu();
+  // Mit Dokumenten
+  await p.evaluate(W => window[W].beispieleLaden(), W);
+  await p.waitForFunction(W => window[W].S.docs.length >= 2, W, { timeout: 30000 });
+  await ruhe(p);
+  const ids = await p.evaluate(W => window[W].S.docs.map(d => d.id), W);
+  // Suche mit Fundstellen (2026-09-26): Fundzeilen, Hinweis „wird noch erfasst", Öffnen mit Markierung
+  await schritt(p, 'Suche', async () => {
+    await p.evaluate(W => { const w = window[W]; w.S.suche = 'Musterstadt'; w.suche.zeichneBibliothek(); }, W);
+    await p.evaluate(W => window[W].suche.texteNachholen(), W);
+    await p.evaluate(W => { const w = window[W]; w.suche.TEXTE.delete('__nichtda'); w.S.docs.push({ id: '__nichtda', name: 'x', pages: [], fields: [] }); w.suche.zeichneBibliothek(); w.S.docs.pop(); }, W);
+    await p.waitForTimeout(100);
+    const id = await p.evaluate(W => [...window[W].S.fund.keys()][0], W);
+    if (id) { await p.evaluate(([W, id]) => window[W].oeffneDok(id, window[W].S.fund.get(id)), [W, id]); await p.waitForSelector('#sc-ed.on .seite canvas'); await p.waitForTimeout(150); await p.click('#flohKnopf'); await p.waitForSelector('#sc-bib.on'); }
+    await p.evaluate(W => { const w = window[W]; w.S.suche = ''; w.suche.zeichneBibliothek(); }, W);
+  });
+  // Suche nach Bedeutung (2026-09-26): Dialog aus und an, jede Lage der Zustandsleiste, der Abschnitt unter den Treffern
+  await schritt(p, 'Bedeutung: Dialog', () => p.evaluate(W => window[W].dlg.bedeutungDialog(), W));
+  await schritt(p, 'Bedeutung: Lagen', async () => {
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED; B.zustand = 'laedt'; B.stand = { prozent: null, geladen: 0, gesamt: 0 }; w.bedeutung.bedeutungZeichnen(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED; B.stand = { prozent: 45.2, geladen: 20e6, gesamt: 47e6 }; w.bedeutung.bedeutungZeichnen(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED; B.zustand = 'ordnet'; B.ordnet = null; w.bedeutung.bedeutungZeichnen(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED; B.ordnet = { dok: 1, doks: 3, name: 'Handbuch', seite: 12, seiten: 384, fertig: 40, gesamt: 900, msSeite: null, restMs: null }; w.bedeutung.bedeutungZeichnen(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED; B.ordnet = { dok: 2, doks: 3, name: 'Handbuch', seite: 120, seiten: 384, fertig: 400, gesamt: 900, msSeite: 1300, restMs: 600000 }; w.bedeutung.bedeutungZeichnen(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED; B.ordnet = { dok: 3, doks: 3, name: 'Handbuch', seite: 380, seiten: 384, fertig: 890, gesamt: 900, msSeite: 1300, restMs: 5000 }; w.bedeutung.bedeutungZeichnen(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED; B.zustand = 'fehler'; B.fehler = 'x'; w.bedeutung.bedeutungZeichnen(); w.dlg.bedeutungDialog(); }, W); await ruhe(p);
+    await p.evaluate(() => { for (const g of document.querySelectorAll('.dlg-grund')) g.remove(); });
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED; B.zustand = 'laedt'; w.S.suche = 'qqqq'; w.suche.zeichneBibliothek(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED; B.zustand = 'bereit'; w.bedeutung.bedeutungZeichnen(); B.ergebnis = { frage: 'qqqq', r: { gezeigt: [], schwach: [], alle: [], unter: 0, min: 0.8, abstand: 0.04, max: 12 } }; w.suche.zeichneBibliothek(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED, d = w.S.docs[0]; B.ergebnis = { frage: 'qqqq', woerter: 5, r: { gezeigt: [{ id: d.id, w: 0.91, anteil: 0.6, stueck: { page: 0, text: 'Beispieltext', box: null } }, { id: w.S.docs[1].id, w: 0.85, anteil: 0.4, stueck: { page: null, text: 'Kopf', box: null } }], schwach: [], alle: [], unter: 0, min: 0.8, abstand: 0.04, max: 12 } }; w.suche.zeichneBibliothek(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED, d = w.S.docs[0]; B.zustand = 'ordnet'; B.ergebnis = { frage: 'qqqq', woerter: 0, r: { gezeigt: [], schwach: [{ id: d.id, w: 0.78, anteil: 0, stueck: { page: 0, text: 'Beispieltext', box: null } }], alle: [], unter: 1, min: 0.8, abstand: 0.04, max: 12 } }; w.suche.zeichneBibliothek(); B.zustand = 'bereit'; }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W], B = w.bedeutung.BED; B.ergebnis = { frage: 'qqqq', fehler: 'x' }; w.suche.zeichneBibliothek(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W]; w.bedeutung.bedeutungAus(); w.S.suche = ''; w.suche.zeichneBibliothek(); }, W);
+  });
+  // Sortieren-Kasten mit Zeitraum (2026-09-27): offen, jede Lage des Zeitraums, leere Liste, Suche dabei
+  await schritt(p, 'Sortieren und Zeitraum', async () => {
+    const lagen = [['', ''], ['2026-01-01', '2026-12-31'], ['2026-01-01', ''], ['', '2026-12-31'], ['2001-01-01', '2001-01-01'], ['2001-01-01', '2001-01-02'], ['2001-01-01', ''], ['', '2001-01-02']];
+    for (const [v, b] of lagen) { await p.evaluate(([W, v, b]) => { const w = window[W]; w.EINST.sortierung = 'erstellt'; w.S.sortOffen = true; w.S.von = v; w.S.bis = b; w.suche.zeichneBibliothek(); }, [W, v, b]); await ruhe(p); }
+    await p.evaluate(W => { const w = window[W]; w.S.suche = 'Musterstadt'; w.suche.zeichneBibliothek(); }, W); await ruhe(p);
+    await p.evaluate(W => { const w = window[W]; w.S.suche = ''; w.S.von = w.S.bis = ''; w.S.sortOffen = false; w.EINST.sortierung = 'name'; w.suche.zeichneBibliothek(); }, W);
+  });
+  await schritt(p, 'Verschieben', () => p.evaluate(([W, id]) => { window[W].dlg.verschieben(id); }, [W, ids[0]]));
+  // Teilen, Auswahl (2026-09-27): Auswahl-Leiste, Schattenbild beim Ziehen, Teilen-Dialog ohne Teilen am Gerät
+  await schritt(p, 'Auswahl', async () => { await p.evaluate(([W, id]) => { window[W].dlg.wahlUmschalten(id); }, [W, ids[0]]); await ruhe(p);
+    await p.evaluate(() => { const g = document.createElement('div'); g.className = 'zieh-geist'; g.id = 'ziehGeistProbe'; g.textContent = `📄 ${2} · auf einen Ordner ziehen`; document.body.appendChild(g); }); await ruhe(p);
+    await p.evaluate(W => { document.getElementById('ziehGeistProbe').remove(); window[W].dlg.wahlEnde(); }, W); });
+  await schritt(p, 'Teilen-Dialog', async () => { await p.evaluate(([W, ids]) => { Object.defineProperty(navigator, 'canShare', { configurable: true, value: undefined }); window[W].dlg.teilenDocs(ids); }, [W, ids]); await p.waitForSelector('.dlg [data-dl]', { timeout: 20000 }); });
+  await schritt(p, 'Löschen-Frage', () => p.evaluate(([W, id]) => { window[W].dlg.loeschen(id); }, [W, ids[0]]));
+  await schritt(p, 'Ordner ausgeben', () => p.evaluate(W => { const w = window[W]; const o = w.S.ordner.find(o => w.S.docs.some(d => d.folderId === o.id)); if (o) w.dlg.ordnerAusgabe(o); }, W));
+  await schritt(p, 'Erkennen', () => p.evaluate(([W, ids]) => { window[W].dlg.erkennenDialog(ids); }, [W, ids]));
+  await schritt(p, 'Übersetzen-Dialog', async () => { await p.evaluate(([W, ids]) => { window[W].dlg.uebersetzenDialog(ids, true); }, [W, ids]); await p.waitForTimeout(300); });
+  // Übersetzen mit dem (gestellten) Übersetzer des Browsers — Fortschritt, Ergebnis, Rückweg
+  const form0 = await p.evaluate(W => window[W].S.docs.find(d => /Amtsformular/.test(d.name)).id, W);
+  await schritt(p, 'Messen', async () => { await p.evaluate(([W, id]) => { window[W].dlg.uebersetzenDialog([id], true); }, [W, form0]); await p.waitForSelector('.dlg .ue-mess summary'); await p.click('.dlg .ue-mess summary'); await p.click('.dlg [data-messen]'); await p.waitForTimeout(1500); });
+  await schritt(p, 'Übersetzen-Lauf', async () => {
+    await p.evaluate(([W, id]) => { window[W].dlg.uebersetzenDialog([id], true); }, [W, form0]);
+    await p.waitForSelector('.dlg [data-nach]'); await p.selectOption('.dlg [data-von]', 'de'); await p.selectOption('.dlg [data-nach]', 'ru');
+    await p.evaluate(() => { const c = document.querySelector('.dlg [data-rueck]'); if (!c.checked) c.click(); });
+    await p.click('.dlg [data-weg="browser"]');
+    await p.waitForFunction(() => document.querySelector('.dlg [data-x]') && document.querySelectorAll('.dlg li').length, null, { timeout: 60000 });
+  });
+  await schritt(p, 'Rückweg', async () => {
+    const id = await p.evaluate(W => (window[W].S.docs.find(d => d.uebersetzung && !d.uebersetzung.gegenprobe) || {}).id, W);
+    await p.evaluate(([W, id]) => { window[W].dlg.rueckwegDialog(id); }, [W, id]); await p.waitForTimeout(300);
+  });
+  await schritt(p, 'Übersetzung erneut übersetzen', async () => {
+    const id = await p.evaluate(W => (window[W].S.docs.find(d => d.uebersetzung && !d.uebersetzung.gegenprobe) || {}).id, W);
+    await p.evaluate(([W, id]) => { window[W].dlg.uebersetzenDialog([id], false); }, [W, id]); await p.waitForTimeout(300);
+  });
+  await p.evaluate(W => window[W].dlg.zeichneFuss && 0, W);
+  // Editor: das Formular (hat Felder? sonst setzt die Probe eins)
+  const form = await p.evaluate(W => (window[W].S.docs.find(d => /Amtsformular/.test(d.name)) || window[W].S.docs[0]).id, W);
+  await p.evaluate(([W, id]) => window[W].oeffneDok(id), [W, form]);
+  await p.waitForSelector('#sc-ed.on .seite canvas', { timeout: 30000 });
+  await ruhe(p);
+  await p.evaluate(W => { const w = window[W]; w.S.modus = 'bearbeiten'; document.getElementById('mBearbeiten').click(); }, W);
+  await schritt(p, 'Feld setzen', () => p.evaluate(W => window[W].dlg.platzierenStart('text'), W));
+  await p.evaluate(W => window[W].dlg.platzierenStart('text'), W);   // wieder aus
+  await p.evaluate(W => { const w = window[W]; if (!w.S.doc.fields.length) w.S.doc.fields.push({ id: 'probe1', page: 0, type: 'text', label: '', value: '', x: 10, y: 10, w: 30, h: 3, geprueft: false }); w.S.sel = w.S.doc.fields[0].id; w.dlg.zeichneFuss(); document.getElementById('mBearbeiten').click(); }, W);
+  await ruhe(p);
+  await schritt(p, 'Feld gewählt', async () => { await p.evaluate(W => { const w = window[W]; w.S.sel = w.S.doc.fields[0].id; w.dlg.zeichneFuss(); }, W); });
+  await schritt(p, 'Unterschrift', () => p.evaluate(W => { const w = window[W]; w.dlg.unterschreiben({ id: 'x', type: 'unterschrift', label: '', value: '', page: 0, x: 10, y: 60, w: 30, h: 6 }); }, W));
+  await schritt(p, 'Erkannter Text', () => p.evaluate(W => window[W].dlg.erkannterText(), W));
+  await schritt(p, 'Seite anhängen', () => p.evaluate(W => window[W].dlg.seiteDialog(), W));
+  await schritt(p, 'Speichern', async () => { await p.evaluate(W => { window[W].dlg.speichernDialog(); }, W); await p.waitForTimeout(200); });
+  await schritt(p, 'Ausgabe', () => p.evaluate(W => window[W].dlg.exportDialog(), W));
+  await p.click('#mAusfuellen'); await ruhe(p);
+  await schritt(p, 'Ausfüllen', () => p.evaluate(W => window[W].dlg.zeichneFuss(), W));
+}
+
+async function lauf(lang, sammeln) {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  await ctx.addInitScript(l => { try { if (!sessionStorage.getItem('__l')) { localStorage.setItem('wfpdf_sprache_v1', JSON.stringify({ lang: l, tipps: true })); sessionStorage.setItem('__l', '1'); } } catch (_) {} }, lang);
+  await ctx.addInitScript(() => {
+    self.Translator = {
+      availability: async ({ sourceLanguage: a, targetLanguage: b }) => (a === b ? 'unavailable' : 'available'),
+      create: async ({ targetLanguage: b }) => ({ translate: async t => '[' + b + '] ' + t, destroy() {} })
+    };
+  });
+  const p = await ctx.newPage();
+  await p.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  const fehler = []; p.on('pageerror', e => fehler.push(String(e)));
+  await p.goto(URL0);
+  await p.waitForFunction(() => window.__wfpdf && window.WFP && window.WFP.Sprache);
+  await rundreise(p);
+  const r = await p.evaluate(() => ({ text: [...WFP.Sprache.fehlt], satz: [...WFP.Sprache.fehltSatz] }));
+  return { p, ctx, r, fehler };
+}
+
+try {
+  if (SAMMELN) {
+    const { ctx, r } = await lauf('en');
+    fs.writeFileSync(process.env.SAMMELN, JSON.stringify(r, null, 1));
+    console.log('gesammelt:', r.text.length, 'Texte,', r.satz.length, 'Sätze →', process.env.SAMMELN);
+    await ctx.close();
+  } else {
+    console.log('Workfloh PDF — Sprache der Oberfläche');
+    for (const lang of ['en', 'ru', 'ar']) {
+      const { p, ctx, r, fehler } = await lauf(lang);
+      ok(`${lang}: kein Seitenfehler auf der Rundreise`, !fehler.length, fehler);
+      ok(`${lang}: die Rundreise hat Texte nachgeschlagen (sonst misst sie nichts)`, await p.evaluate(() => Object.keys(WFP.SPRACH_TEXTE[WFP.Sprache.lang] || {}).length > 200));
+      ok(`${lang}: kein sichtbarer Text ohne Übersetzung`, r.text.length === 0, r.text);
+      ok(`${lang}: <html lang> und Richtung stimmen`, await p.evaluate(l => document.documentElement.lang === l && document.documentElement.dir === (l === 'ar' ? 'rtl' : 'ltr'), lang));
+      ok(`${lang}: Knopf oben nennt die Sprache`, (await p.textContent('#btnSprache')).trim() === lang.toUpperCase());
+      // Namen des Nutzers bleiben: der Ordner „Beispiele" und die Dokumentnamen
+      await p.click('#flohKnopf'); await p.waitForSelector('#sc-bib.on');
+      await p.waitForTimeout(100);
+      const namen = await p.evaluate(() => ({ chip: [...document.querySelectorAll('.ordner-chip [data-kein-ue]')].map(e => e.textContent), dok: [...document.querySelectorAll('.dok-name')].map(e => e.textContent) }));
+      ok(`${lang}: Ordnername „Beispiele" bleibt unübersetzt`, namen.chip.includes('Beispiele'), namen);
+      ok(`${lang}: Dokumentnamen bleiben unübersetzt`, namen.dok.some(n => /Benutzerhandbuch/.test(n)) && namen.dok.some(n => /Amtsformular/.test(n)), namen);
+      ok(`${lang}: Oberfläche ist wirklich übersetzt (Kachel „Importieren zum Übersetzen")`, !(await p.textContent('#btnUebersetzen')).includes('Importieren'));
+      if (lang === 'ar') {
+        ok('ar: die Seiten der Dokumente laufen weiter von links', await p.evaluate(() => { document.getElementById('sc-ed').classList.add('on'); const d = getComputedStyle(document.getElementById('seiten')).direction; document.getElementById('sc-ed').classList.remove('on'); return d === 'ltr'; }));
+      }
+      // Hinweise aus → kein title; an → übersetzt wieder da
+      const tip = sel => p.evaluate(s => document.querySelector(s).getAttribute('title'), sel);
+      const vorher = await tip('#btnEinst');
+      ok(`${lang}: Hinweis (Tooltip) ist übersetzt`, vorher && vorher !== 'Einstellungen', vorher);
+      await p.evaluate(() => WFP.Sprache.tippsSetzen(false));
+      ok(`${lang}: Hinweise aus → kein Tooltip mehr`, (await tip('#btnEinst')) == null && await p.evaluate(() => !document.querySelector('.kopf [title]')));
+      // die App setzt einen Titel neu, während Hinweise aus sind: er darf nicht auftauchen
+      await p.evaluate(() => { document.getElementById('btnHilfe').title = 'So geht\'s'; });
+      await p.waitForTimeout(50);
+      ok(`${lang}: ein neu gesetzter Titel bleibt bei ausgeschalteten Hinweisen verborgen`, (await tip('#btnHilfe')) == null);
+      await p.evaluate(() => WFP.Sprache.tippsSetzen(true));
+      ok(`${lang}: Hinweise an → Tooltip übersetzt zurück`, (await tip('#btnEinst')) === vorher);
+      // Neu laden: die Wahl bleibt
+      // Der SBKIM-Knoten hängt Siegel und Mycel-Knopf erst nach dem Laden ein (Leerlauf-Pause) —
+      // beide Aufnahmen warten darauf, sonst vergleicht der Wächter zwei verschiedene Augenblicke.
+      await p.reload(); await p.waitForFunction(() => window.WFP && WFP.Sprache && window.WFP_KNOTEN_BEREIT === true);
+      ok(`${lang}: die Wahl übersteht das Neuladen`, await p.evaluate(l => WFP.Sprache.lang === l && document.documentElement.lang === l, lang));
+      // Zurück auf Deutsch: kein Rest der Übersetzung
+      // ⚠ Benannte Grenze: das Wappen im Siegel (Sage-Modul 16, byte-1:1) zeichnet seinen Text EINMAL
+      // beim Einhängen in der Sprache von damals und kennt keinen Neuaufbau. Es spricht nach dem
+      // Umschalten bis zum nächsten Laden weiter die alte Sprache — eine Eigenschaft des Kanons, nicht
+      // von sprache.js. Für diesen Vergleich wird es deshalb ausgeblendet (in BEIDEN Aufnahmen).
+      const ohneWappen = () => { const w = document.getElementById('sbkim-siegel-badge'); const alt = w ? w.style.display : null; if (w) w.style.display = 'none'; const t = document.body.innerText; if (w) w.style.display = alt; return t; };
+      const deutsch = await p.evaluate((f) => { WFP.Sprache.setzen('de'); return (0, eval)(f)(); }, '(' + ohneWappen.toString() + ')');
+      // Vergleich: dieselbe Seite, auf Deutsch NEU geladen (gleicher Speicher, gleiche Ordner)
+      await p.reload(); await p.waitForFunction(() => window.WFP && WFP.Sprache && window.__wfpdf && window.WFP_KNOTEN_BEREIT === true); await p.waitForTimeout(800);
+      const dePlain = await p.evaluate((f) => (0, eval)(f)(), '(' + ohneWappen.toString() + ')');
+      const norm = t => t.replace(/\s+/g, ' ').replace(/\d+/g, '#').trim();
+      ok(`${lang}: zurück auf Deutsch steht dieselbe Seite da wie ohne Umschalten`, norm(deutsch) === norm(dePlain), (() => { const a = norm(deutsch), b = norm(dePlain); let i = 0; while (i < a.length && a[i] === b[i]) i++; return [a.slice(Math.max(0, i - 60), i + 200), b.slice(Math.max(0, i - 60), i + 200)]; })());
+      ok(`${lang}: zurück auf Deutsch: <html lang="de">, links nach rechts`, await p.evaluate(() => document.documentElement.lang === 'de' && document.documentElement.dir === 'ltr'));
+      await ctx.close();
+    }
+    // Deutsch ist die Vorgabe und bleibt unberührt
+    const c = await browser.newContext(); const q = await c.newPage(); await q.goto(URL0); await q.waitForFunction(() => window.__wfpdf);
+    ok('Vorgabe ist Deutsch', await q.evaluate(() => WFP.Sprache.lang === 'de' && document.documentElement.lang === 'de' && document.getElementById('btnSprache').textContent.trim() === 'DE'));
+    ok('Wörterbücher für EN, RU und AR vorhanden (erweiterbar)', await q.evaluate(() => ['en', 'ru', 'ar'].every(l => Object.keys(WFP.SPRACH_TEXTE[l] || {}).length > 200)));
+    ok('das Wörterbuch hat keinen Schlüssel ohne Übersetzung in einer der drei Sprachen', await q.evaluate(() => { const T = WFP.SPRACH_TEXTE; const k = new Set(['en', 'ru', 'ar'].flatMap(l => Object.keys(T[l]))); return [...k].filter(x => ['en', 'ru', 'ar'].some(l => !(x in T[l]))); }).then(x => x.length === 0));
+    await c.close();
+  }
+} catch (e) { ok('Probe lief durch', false, String(e.stack || e)); }
+await browser.close(); srv.close();
+if (!SAMMELN) { console.log(`\n${gruen} grün · ${rot} ROT`); process.exit(rot ? 1 : 0); }

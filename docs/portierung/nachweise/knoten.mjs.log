@@ -1,0 +1,130 @@
+Workfloh PDF — SBKIM-Knoten
+  ✓ Modul sbkim/01_storage.js ist byte-1:1 aus Sage
+  ✓ Modul sbkim/02_spore.js ist byte-1:1 aus Sage
+  ✓ Modul vendor/sbkim/03_embedding.js ist byte-1:1 aus Sage
+  ✓ Modul vendor/sbkim/04_match.js ist byte-1:1 aus Sage
+  ✓ Modul sbkim/05_anastomose.js ist byte-1:1 aus Sage
+  ✓ Modul sbkim/05b_nostr_relay.js ist byte-1:1 aus Sage
+  ✓ Modul sbkim/07_apoptose.js ist byte-1:1 aus Sage
+  ✓ Modul sbkim/15_membran.js ist byte-1:1 aus Sage
+  ✓ Modul sbkim/16_siegel.js ist byte-1:1 aus Sage
+  ✓ Modul sbkim/16b_andock_wizard.js ist byte-1:1 aus Sage
+  ✓ Modul sbkim/23_rendezvous.js ist byte-1:1 aus Sage
+  ✓ Modul sbkim/23_rendezvous_ui.js ist byte-1:1 aus Sage
+  ✓ Modul sbkim/noble-secp256k1.js ist byte-1:1 aus Sage
+  ✓ die Schublade window.SBKIM_DB_SUFFIX = "workflowpdf" steht im <head>
+  ✓ … VOR dem ersten geladenen Skript (Modul 01 liest sie beim Laden)
+  ✓ die Seite lädt den Klebstoff assets/sbkim-init.js mit defer
+  ✓ die Seite lädt KEIN Modul selbst (die Kette tut es nach dem Laden)
+  ✓ KEIN Modul 17 (die Leiste ist fest, kein fliegendes Widget)
+  ✓ die Netz-Leiste steht IN der Kopfzeile
+  ✓ … mit #lamp-alive
+  ✓ … mit #lamp-traffic
+  ✓ … mit #lamp-fremd
+  ✓ … mit #siegel-platz
+  ✓ … und dem Platz für die Mycel-Blase
+  ✓ die Kette trägt alle Glieder in der Kanon-Reihenfolge
+  ✓ … zwischen den Gliedern steht jedes Komma (sonst wird [..] [..] ein Index-Zugriff)
+  ✓ … Modul 05b als ES-Modul (es holt noble-secp256k1.js selbst)
+  ✓ … 04 aus vendor/sbkim mit DERSELBEN Adresse wie die Suche nach Bedeutung (keine zweite Kopie)
+  ✓ … Modul 03 steht NICHT in der Kette (es lädt erst auf „Modell laden")
+  ✓ … und ein schon geladenes 04 wird nicht zweimal geholt
+  ✓ der Klebstoff nennt dieselbe Schublade
+  ✓ keine fremde Herkunft darf per postMessage reden (allowedOrigins leer)
+  ✓ das Band im Wappen heißt WORKFLOH PDF
+  ✓ Rendezvous ohne ensureIdentity (nichts beim Laden)
+  ✓ der Gerätename hängt der Klebstoff ins Verbinden-Panel (data-sbkim-geraetename)
+  ✓ die Kette läuft erst nach dem Laden (load / Leerlauf)
+  ✓ Identität: nodeName „Workfloh PDF", Endpunkt dieser App
+  ✓ … die Beschreibung beginnt mit dem eigenen Namen
+  ✓ … nennt den Zweck (Formular einlesen, ausfüllen, ausgeben)
+  ✓ … nennt SBKIM, Mycel, Sage-Protokol und dass es ein Knoten ist
+  ✓ KEIN SBKIM-Modul im Installations-Vorrat (der Worker legt sie beim ersten Abruf ab)
+  ✓ … Klebstoff und Identität stehen im Vorrat
+  ✓ jede ?v= in der Seite ist dieselbe wie im Vorrat
+  ✓ siegel-inhalt.js: dieselbe ?v= in Kette und Vorrat
+  ✓ CACHE_VERSION ist erhöht (v81 oder später)
+  ✓ 1280 px: die Kette ist durch, Storage · Siegel · Rendezvous · Panel stehen da
+  ✓ 1280 px: die Mycel-Blase ist in ihrem Platz angedockt, kein fliegendes Widget
+  ✓ 1280 px: 04 ist geladen, Modul 03 NICHT (die Suche nach Bedeutung holt es erst auf Knopfdruck)
+  ✓ 1280 px: beim Laden geht KEIN WebSocket auf
+  ✓ 1280 px: … und kein Abruf nach draußen (nur die eigene Adresse)
+  ✓ 1280 px: keine Fehler auf der Seite
+  ✓ 1280 px: die LEBT-Lampe leuchtet (eigene Identität)
+  ✓ 1280 px: die Kopfzeile läuft nicht über, „Workfloh PDF" steht ganz da
+  ✓ 1280 px: die Lampen sind zu sehen und liegen im Fenster
+  ✓ 1280 px: das Siegel steht sichtbar da, 28×28
+  ✓ 1280 px: die Mycel-Blase öffnet ihr Fenster mit der Netz-Box
+  ✓ 1280 px: … und dem Feld für den Gerätenamen
+  ✓ 1280 px: auch nach dem Öffnen kein WebSocket (Verbinden braucht einen eigenen Klick)
+  ✓ 520 px: die Kette ist durch, Storage · Siegel · Rendezvous · Panel stehen da
+  ✓ 520 px: die Mycel-Blase ist in ihrem Platz angedockt, kein fliegendes Widget
+  ✓ 520 px: 04 ist geladen, Modul 03 NICHT (die Suche nach Bedeutung holt es erst auf Knopfdruck)
+  ✓ 520 px: beim Laden geht KEIN WebSocket auf
+  ✓ 520 px: … und kein Abruf nach draußen (nur die eigene Adresse)
+  ✓ 520 px: keine Fehler auf der Seite
+  ✓ 520 px: die Kopfzeile läuft nicht über, „Workfloh PDF" steht ganz da
+  ✓ 520 px: die Lampen sind zu sehen und liegen im Fenster
+  ✓ 520 px: die Lasche mit den Lampen verdeckt keinen Knopf
+  ✓ 520 px: zugeklappt steht das Siegel nicht da
+  ✓ 520 px: das Siegel steht sichtbar da, 28×28
+  ✓ 520 px: … aufgeklappt mit den Namen der Lampen, ohne die Seite zu sprengen
+  ✓ 520 px: … und sagt es dem Vorleser (aria-expanded)
+  ✓ 520 px: ein Tipp daneben klappt die Leiste wieder zu
+  ✓ 520 px: die Mycel-Blase öffnet ihr Fenster mit der Netz-Box
+  ✓ 520 px: … und dem Feld für den Gerätenamen
+  ✓ 520 px: auch nach dem Öffnen kein WebSocket (Verbinden braucht einen eigenen Klick)
+  ✓ 380 px: die Kette ist durch, Storage · Siegel · Rendezvous · Panel stehen da
+  ✓ 380 px: die Mycel-Blase ist in ihrem Platz angedockt, kein fliegendes Widget
+  ✓ 380 px: 04 ist geladen, Modul 03 NICHT (die Suche nach Bedeutung holt es erst auf Knopfdruck)
+  ✓ 380 px: beim Laden geht KEIN WebSocket auf
+  ✓ 380 px: … und kein Abruf nach draußen (nur die eigene Adresse)
+  ✓ 380 px: keine Fehler auf der Seite
+  ✓ 380 px: die Kopfzeile läuft nicht über, „Workfloh PDF" steht ganz da
+  ✓ 380 px: die Lampen sind zu sehen und liegen im Fenster
+  ✓ 380 px: die Lasche mit den Lampen verdeckt keinen Knopf
+  ✓ 380 px: zugeklappt steht das Siegel nicht da
+  ✓ 380 px: das Siegel steht sichtbar da, 28×28
+  ✓ 380 px: … aufgeklappt mit den Namen der Lampen, ohne die Seite zu sprengen
+  ✓ 380 px: … und sagt es dem Vorleser (aria-expanded)
+  ✓ 380 px: ein Tipp daneben klappt die Leiste wieder zu
+  ✓ 380 px: die Mycel-Blase öffnet ihr Fenster mit der Netz-Box
+  ✓ 380 px: … und dem Feld für den Gerätenamen
+  ✓ 380 px: auch nach dem Öffnen kein WebSocket (Verbinden braucht einen eigenen Klick)
+  ✓ 360 px: die Kette ist durch, Storage · Siegel · Rendezvous · Panel stehen da
+  ✓ 360 px: die Mycel-Blase ist in ihrem Platz angedockt, kein fliegendes Widget
+  ✓ 360 px: 04 ist geladen, Modul 03 NICHT (die Suche nach Bedeutung holt es erst auf Knopfdruck)
+  ✓ 360 px: beim Laden geht KEIN WebSocket auf
+  ✓ 360 px: … und kein Abruf nach draußen (nur die eigene Adresse)
+  ✓ 360 px: keine Fehler auf der Seite
+  ✓ 360 px: die Kopfzeile läuft nicht über, „Workfloh PDF" steht ganz da
+  ✓ 360 px: die Lampen sind zu sehen und liegen im Fenster
+  ✓ 360 px: die Lasche mit den Lampen verdeckt keinen Knopf
+  ✓ 360 px: zugeklappt steht das Siegel nicht da
+  ✓ 360 px: das Siegel steht sichtbar da, 28×28
+  ✓ 360 px: … aufgeklappt mit den Namen der Lampen, ohne die Seite zu sprengen
+  ✓ 360 px: … und sagt es dem Vorleser (aria-expanded)
+  ✓ 360 px: ein Tipp daneben klappt die Leiste wieder zu
+  ✓ 360 px: die Mycel-Blase öffnet ihr Fenster mit der Netz-Box
+  ✓ 360 px: … und dem Feld für den Gerätenamen
+  ✓ 360 px: auch nach dem Öffnen kein WebSocket (Verbinden braucht einen eigenen Klick)
+  ✓ 320 px: die Kette ist durch, Storage · Siegel · Rendezvous · Panel stehen da
+  ✓ 320 px: die Mycel-Blase ist in ihrem Platz angedockt, kein fliegendes Widget
+  ✓ 320 px: 04 ist geladen, Modul 03 NICHT (die Suche nach Bedeutung holt es erst auf Knopfdruck)
+  ✓ 320 px: beim Laden geht KEIN WebSocket auf
+  ✓ 320 px: … und kein Abruf nach draußen (nur die eigene Adresse)
+  ✓ 320 px: keine Fehler auf der Seite
+  ✓ 320 px: die Kopfzeile läuft nicht über, „Workfloh PDF" steht ganz da
+  ✓ 320 px: die Lampen sind zu sehen und liegen im Fenster
+  ✓ 320 px: die Lasche mit den Lampen verdeckt keinen Knopf
+  ✓ 320 px: zugeklappt steht das Siegel nicht da
+  ✓ 320 px: das Siegel steht sichtbar da, 28×28
+  ✓ 320 px: … aufgeklappt mit den Namen der Lampen, ohne die Seite zu sprengen
+  ✓ 320 px: … und sagt es dem Vorleser (aria-expanded)
+  ✓ 320 px: ein Tipp daneben klappt die Leiste wieder zu
+  ✓ 320 px: die Mycel-Blase öffnet ihr Fenster mit der Netz-Box
+  ✓ 320 px: … und dem Feld für den Gerätenamen
+  ✓ 320 px: auch nach dem Öffnen kein WebSocket (Verbinden braucht einen eigenen Klick)
+
+126 grün · 0 ROT
+

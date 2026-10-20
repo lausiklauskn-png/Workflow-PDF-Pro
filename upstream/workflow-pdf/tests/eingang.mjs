@@ -1,0 +1,329 @@
+/* Workfloh PDF — Prüfung beim Einlesen (Klaus 2026-10-01), im echten Browser.
+   „Schon wenn ich ein Foto mache, kann das ja passieren. Oder Importdatei." Gemessen an den
+   Vorlagen des Auslieferungsprüfers (tests/eingang-vorlagen/, alle Angaben erfunden):
+   - der Prüfkern ist byte-1:1 aus dem Auslieferungsprüfer (SHA-gepinnt; liegt ein Klon
+     daneben, wird auch gegen ihn verglichen)
+   - 0D (weißer 1-pt-Text), 1A als Bild und als Scan, 4C mit Botschaft → Warnung
+   - 4C ohne, H0 (sauberes Foto), H2 (GPS + Anhängsel — in Kamerafotos normal), ein
+     sauberes PDF → KEINE Warnung (die Gegenrichtung)
+   - das Original bleibt Byte für Byte, wie es kam; nichts wird entfernt
+   - die Karte zeigt die Marke, ein Tipp öffnet Fund, Stelle (bei Bildern) und „Was jetzt tun"
+   - der Dialog erscheint nach dem Einlesen von selbst
+   - ein Befund in einer fremden Arbeitsstand-Datei wird nicht geglaubt
+   - fehlt der Prüfkern, heißt es „nicht ganz geprüft", nie still sauber
+   - offen im Editor: das nächste Speichern überschreibt den Befund nicht
+   WURZEL=<pfad> misst eine andere Kopie (für die Gegenprobe). */
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import * as M from './c2pa-muster.mjs';
+
+const WURZEL = process.env.WURZEL || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+let gruen = 0, rot = 0;
+const ok = (name, bed, info) => { if (bed) { gruen++; console.log('  ✓ ' + name); } else { rot++; console.log('  ✗ ROT: ' + name + (info !== undefined ? ' → ' + JSON.stringify(info).slice(0, 600) : '')); } };
+console.log('Workfloh PDF — Prüfung beim Einlesen');
+
+/* 1 · der Kern, byte-1:1 */
+const PINS = {
+  'pruefer-anhang.js': 'c31ddb5cebc293b542e781a5d1f3bca6d558da227db997822c73b2b8a4c1ea17',
+  'pruefer-mail.js': 'cdf3ca7881bfa68763a2c0be7436d35a65bea4dbd03f606e02eaec5c613632d7',
+  'pruefer-formate.js': 'c7206f163521fd3cf1b09845a7e547e912564838ff1bf899c2575366764d15cd'
+};
+const sha = f => crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
+for (const [n, s] of Object.entries(PINS)) ok('Kern byte-1:1 aus dem Auslieferungsprüfer: ' + n, sha(path.join(WURZEL, 'assets', n)) === s, sha(path.join(WURZEL, 'assets', n)));
+const NACHBAR = path.resolve(WURZEL, '..', 'Auslieferung-Pruefer', 'assets');
+if (fs.existsSync(NACHBAR)) for (const n of Object.keys(PINS)) ok('… und gleich dem Klon daneben: ' + n, sha(path.join(NACHBAR, n)) === sha(path.join(WURZEL, 'assets', n)));
+const APP = fs.readFileSync(path.join(WURZEL, 'assets/app.js'), 'utf8');
+ok('eigene Ausgaben (Übersetzung, Teil) werden nicht als Eingang geprüft', /EINGANG_QUELLEN = \['pdf', 'foto'\]/.test(APP));
+const SW = fs.readFileSync(path.join(WURZEL, 'sw.js'), 'utf8');
+ok('Kern und Klebstoff stehen im Offline-Vorrat (Einlesen geht auch ohne Netz)', ['eingang.js', 'pruefer-anhang.js', 'pruefer-mail.js', 'pruefer-formate.js'].every(n => SW.includes('./assets/' + n + '?v=')));
+
+let pw = null, pdflib = null;
+try { pw = await import('playwright-core'); pdflib = await import('pdf-lib'); } catch (_) {}
+if (!pw || !pdflib) { console.log('  ⊘ nicht lauffähig (playwright-core/pdf-lib fehlt — npm install)'); console.log(`\n${gruen} grün · ${rot} ROT`); process.exitCode = rot ? 1 : 0; process.exit(); }
+const { PDFDocument, StandardFonts } = pdflib;
+const sauberPdf = await (async () => { const d = await PDFDocument.create(); const f = await d.embedFont(StandardFonts.Helvetica); d.addPage([595, 842]).drawText('Antrag auf Bewohnerparkausweis', { x: 60, y: 760, size: 16, font: f }); return Buffer.from(await d.save()); })();
+
+const typ = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css', '.png': 'image/png', '.webmanifest': 'application/manifest+json', '.json': 'application/json', '.pdf': 'application/pdf' };
+const srv = await new Promise(res => { const s = http.createServer((q, r) => {
+  let p = decodeURIComponent(new URL(q.url, 'http://x').pathname); if (p.endsWith('/')) p += 'index.html';
+  const f = path.join(WURZEL, p); if (!f.startsWith(WURZEL) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); r.end(); return; }
+  r.writeHead(200, { 'Content-Type': typ[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r);
+}); s.listen(0, '127.0.0.1', () => res(s)); });
+const url = `http://127.0.0.1:${srv.address().port}/`;
+const exe = ['/opt/pw-browsers/chromium-1194/chrome-linux/chrome'].find(fs.existsSync);
+const browser = await pw.chromium.launch(exe ? { executablePath: exe } : {});
+const V = n => fs.readFileSync(path.join(WURZEL, 'tests/eingang-vorlagen', n)).toString('base64');
+const DATEIEN = {
+  '0D.pdf': V('Vorlage-0D-PDF-versteckter-Text.pdf'), '1A.png': V('Vorlage-1A-Bild-mit-Text.png'), '1A-Scan.pdf': V('Vorlage-1A-PDF-Scan-ohne-Textebene.pdf'),
+  '4C-mit.png': V('Vorlage-4C-Bild-mit-versteckter-Botschaft.png'), '4C-ohne.png': V('Vorlage-4C-Bild-ohne-Botschaft.png'),
+  'H0.jpg': V('Vorlage-H0-Foto-sauber.jpg'), 'H2.jpg': V('Vorlage-H2-Foto-mit-GPS-Verweis-und-Anhaengsel.jpg'), 'Antrag.pdf': sauberPdf.toString('base64'),
+  'Testbild.png': fs.readFileSync(path.join(WURZEL, 'beispiele/Testbild-versteckte-Anweisung.png')).toString('base64')
+};
+const neueSeite = async (sperre) => {
+  const ctx = await browser.newContext({ viewport: { width: 1000, height: 800 } });
+  const page = await ctx.newPage();
+  const fehler = []; page.on('pageerror', e => fehler.push(String(e)));
+  await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  if (sperre) await page.route(sperre, r => r.abort());
+  await page.goto(url); await page.waitForFunction(() => window.__wfpdf);
+  return { ctx, page, fehler };
+};
+const einlesen = (page, namen, still = true) => page.evaluate(async ({ namen, B, still }) => {
+  const files = namen.map(n => { const s = atob(B[n]); const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+    return new File([u], n, { type: n.endsWith('.pdf') ? 'application/pdf' : n.endsWith('.png') ? 'image/png' : 'image/jpeg' }); });
+  const neu = await window.__wfpdf.importDateien(files, null, { still });
+  return neu.map(d => ({ id: d.id, name: d.name }));
+}, { namen, B: Object.fromEntries(namen.map(n => [n, DATEIEN[n]])), still });
+const allePruefen = page => page.evaluate(() => window.__wfpdf.eingang.pruefungNachholen(window.__wfpdf.S.docs.filter(d => !d.pruefung).map(d => d.id)));
+const warteFertig = page => page.waitForFunction(() => window.__wfpdf.eingang.PRUEF.laufend.size === 0, null, { timeout: 240000 });
+const stand = (page, name) => page.evaluate(n => { const d = window.__wfpdf.S.docs.find(x => x.name === n); return d && d.pruefung ? { stand: d.pruefung.stand, arten: d.pruefung.funde.map(f => f.kennung), markiert: !!d.pruefung.markiert, hinweise: d.pruefung.hinweise } : null; }, name);
+
+try {
+  /* 2 · alle Vorlagen einlesen */
+  const { ctx, page, fehler } = await neueSeite();
+  const t0 = Date.now();
+  await einlesen(page, Object.keys(DATEIEN));
+  const vorher = await page.evaluate(() => ({ laufend: window.__wfpdf.eingang.PRUEF.laufend.size, offen: document.querySelectorAll('[data-pruefung="offen"]').length }));
+  ok('MANUELL: nach dem Einlesen läuft KEINE Prüfung, jede Karte trägt „jetzt prüfen"', vorher.laufend === 0 && vorher.offen === Object.keys(DATEIEN).length, vorher);
+  await allePruefen(page);
+  const laeuft = await page.evaluate(() => document.querySelectorAll('[data-pruefung="laeuft"]').length);
+  ok('während der Prüfung trägt die Karte „wird geprüft"', laeuft > 0, laeuft);
+  await warteFertig(page);
+  console.log('    (alle Prüfungen zusammen ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s, Behälter)');
+  const st = {};
+  for (const n of Object.keys(DATEIEN)) st[n.replace(/\.[^.]+$/, '')] = await stand(page, n.replace(/\.[^.]+$/, ''));
+  ok('0D (weißer 1-pt-Text im PDF) → Warnung', st['0D'] && st['0D'].stand === 'warnung' && st['0D'].arten.includes('PDF-VERSTECKTER-TEXT'), st['0D']);
+  ok('… und die Anweisung darin wird als Anweisung an eine KI genannt', st['0D'] && st['0D'].arten.includes('PDF-KI-ANWEISUNG'), st['0D']);
+  ok('1A als Foto → Anweisung im Bild', st['1A'] && st['1A'].stand === 'warnung' && st['1A'].arten.includes('BILD-KI-ANWEISUNG'), st['1A']);
+  ok('… mit markierter Kopie der Stelle', st['1A'] && st['1A'].markiert, st['1A']);
+  // Klaus' Testbild zum Herunterladen (beispiele/, gebaut von tools/testbild-bauen.mjs): die Zeile ist blass
+  ok('Testbild zum Herunterladen → blasse Anweisung im Bild, mit markierter Kopie', st['Testbild'] && st['Testbild'].stand === 'warnung' && st['Testbild'].arten.includes('BILD-KI-ANWEISUNG') && st['Testbild'].markiert, st['Testbild']);
+  ok('1A als Scan-PDF ohne Textebene → Anweisung gefunden', st['1A-Scan'] && st['1A-Scan'].stand === 'warnung' && st['1A-Scan'].arten.some(k => /KI-ANWEISUNG/.test(k)), st['1A-Scan']);
+  ok('4C mit Botschaft in den Bildpunkten → Verdacht', st['4C-mit'] && st['4C-mit'].arten.includes('BILD-LSB-VERDACHT'), st['4C-mit']);
+  ok('4C OHNE Botschaft → keine Warnung', st['4C-ohne'] && st['4C-ohne'].stand !== 'warnung', st['4C-ohne']);
+  ok('H0 (sauberes Foto) → keine Warnung', st['H0'] && st['H0'].stand !== 'warnung', st['H0']);
+  ok('H2 (GPS und Anhängsel, in Kamerafotos normal) → keine Warnung', st['H2'] && st['H2'].stand !== 'warnung', st['H2']);
+  ok('ein sauberes PDF → sauber', st['Antrag'] && st['Antrag'].stand === 'sauber', st['Antrag']);
+
+  /* 3 · nichts wird entfernt */
+  const gleich = await page.evaluate(async (b64) => {
+    const d = window.__wfpdf.S.docs.find(x => x.name === '0D'); const f = await WFP.DB.getFile(d.id);
+    const u = new Uint8Array(f instanceof Blob ? await f.arrayBuffer() : f); const s = atob(b64);
+    if (u.length !== s.length) return 'Länge ' + u.length + ' statt ' + s.length;
+    for (let i = 0; i < u.length; i++) if (u[i] !== s.charCodeAt(i)) return 'Byte ' + i;
+    return true;
+  }, DATEIEN['0D.pdf']);
+  ok('das Original bleibt Byte für Byte, wie es kam (nichts entfernt)', gleich === true, gleich);
+
+  /* 4 · Marke, Dialog, Was jetzt tun */
+  const auto = await page.evaluate(() => [...document.querySelectorAll('.dlg [data-pruef-funde]')].length);
+  ok('nach dem Einlesen öffnet sich der Dialog von selbst — genau einer, auch bei mehreren Funden', auto === 1, auto);
+  await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+  const marke = await page.evaluate(() => { const k = [...document.querySelectorAll('.dok')].find(d => d.querySelector('.dok-name').textContent.trim() === '0D'); const b = k && k.querySelector('[data-pruefung="warnung"]'); return b ? { text: b.textContent, sicht: b.checkVisibility() } : null; });
+  ok('die Karte von 0D trägt die Marke „Verdächtiger Inhalt", sichtbar', marke && marke.sicht && /Verdächtig/.test(marke.text), marke);
+  /* ⚠ Tafel-Evolution (Klaus 2026-10-14): hier stand „die Karte eines sauberen Dokuments trägt keine Marke".
+     Seitdem trägt sie eine RUHIGE Marke, die zum Prüfbericht führt — sonst sah man nicht, dass geprüft wurde. */
+  const sauberMarke = await page.evaluate(() => { const k = [...document.querySelectorAll('.dok')].find(d => d.querySelector('.dok-name').textContent.trim() === 'Antrag'); const b = k && k.querySelector('[data-pruefung]'); return b ? { art: b.dataset.pruefung, text: b.textContent, sicht: b.checkVisibility(), warn: b.classList.contains('warn'), knopf: b.tagName === 'BUTTON' } : null; });
+  ok('die Karte eines sauberen Dokuments trägt eine ruhige Marke „Geprüft · Prüfbericht"', sauberMarke && sauberMarke.art === 'sauber' && sauberMarke.sicht && !sauberMarke.warn && sauberMarke.knopf && /Geprüft/.test(sauberMarke.text), sauberMarke);
+  ok('… und die Prüfung hebt die Angaben auf (Liste, auch wenn leer)', await page.evaluate(() => { const d = window.__wfpdf.S.docs.find(x => x.name === 'Antrag'); return Array.isArray(d.pruefung.angaben); }));
+  ok('… H2 (Foto mit GPS) trägt seine Metadaten als Angabe, nicht als Fund', await page.evaluate(() => { const d = window.__wfpdf.S.docs.find(x => x.name === 'H2'); const a = (d.pruefung.angaben || []).map(x => x.kennung); return a.includes('BILD-METADATEN') && !d.pruefung.funde.some(f => f.kennung === 'BILD-METADATEN') ? true : { a, funde: d.pruefung.funde.map(f => f.kennung) }; }) === true);
+  await page.evaluate(() => { const k = [...document.querySelectorAll('.dok')].find(d => d.querySelector('.dok-name').textContent.trim() === 'H2'); k.querySelector('[data-pruef]').click(); });
+  const ber = await page.waitForSelector('.dlg [data-pruefbericht]', { timeout: 10000 }).then(() => page.evaluate(() => { const d = document.querySelector('.dlg'); return { angaben: [...d.querySelectorAll('[data-angaben] li')].map(li => li.dataset.kennung), namen: (d.querySelector('[data-angaben]') || {}).textContent || '', tun: !!d.querySelector('[data-was-tun]'), knopf: !!d.querySelector('[data-bericht-laden]') }; }), () => null);
+  ok('Prüfbericht: ein Tipp auf die ruhige Marke öffnet den Bericht', !!ber, ber);
+  ok('… mit „Was sonst in der Datei steht" und den Bild-Metadaten, benannt', ber && ber.angaben.includes('BILD-METADATEN') && /Was sonst in der Datei steht/.test(ber.namen) && /Metadaten/.test(ber.namen), ber);
+  ok('… ohne „Was jetzt tun" (Angaben sind keine Gefahr)', ber && !ber.tun, ber);
+  await page.evaluate(() => { window.__berichtLaden = null; const a = HTMLAnchorElement.prototype.click; HTMLAnchorElement.prototype.click = function () { if (/Pruefbericht\.txt$/.test(this.download)) { window.__berichtLaden = { name: this.download, url: this.href }; return; } return a.call(this); }; const b = document.querySelector('.dlg [data-bericht-laden]'); if (b) b.click(); });
+  const btxt = await page.evaluate(async () => { const x = window.__berichtLaden; if (!x) return null; return { name: x.name, text: await (await fetch(x.url)).text() }; });
+  ok('… „⬇ Prüfbericht als Textdatei" gibt eine Datei <Name>-Pruefbericht.txt', btxt && btxt.name === 'H2-Pruefbericht.txt', btxt && btxt.name);
+  ok('… und darin stehen Kopf, Angaben und der Satz „keine Virenprüfung"', btxt && /Prüfbericht/.test(btxt.text) && /Was sonst in der Datei steht/.test(btxt.text) && /Bild-Metadaten|Metadaten/.test(btxt.text) && /keine Virenprüfung/.test(btxt.text), btxt && btxt.text.slice(0, 400));
+  await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+  // eine Prüfung aus einer älteren Fassung (ohne angaben) sagt das, statt still „keine Angaben" zu melden
+  await page.evaluate(() => { const d = window.__wfpdf.S.docs.find(x => x.name === 'Antrag'); delete d.pruefung.angaben; window.__wfpdf.suche.zeichneBibliothek(); const k = [...document.querySelectorAll('.dok')].find(x => x.querySelector('.dok-name').textContent.trim() === 'Antrag'); k.querySelector('[data-pruef]').click(); });
+  const alt = await page.waitForSelector('.dlg [data-pruefbericht]', { timeout: 10000 }).then(() => page.evaluate(() => !!document.querySelector('.dlg [data-angaben-alt]')), () => null);
+  ok('Prüfbericht aus älterer Fassung: benannt, nicht als „keine Angaben" ausgegeben', alt === true, alt);
+  await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+  await page.evaluate(() => { const k = [...document.querySelectorAll('.dok')].find(d => d.querySelector('.dok-name').textContent.trim() === '0D'); k.querySelector('[data-pruef]').click(); });
+  await page.waitForSelector('.dlg [data-pruef-funde]');
+  const dl = await page.evaluate(() => { const d = document.querySelector('.dlg'); return { funde: d.querySelectorAll('[data-pruef-funde] li').length, tun: d.querySelectorAll('[data-was-tun] li').length, tunText: (d.querySelector('[data-was-tun]') || {}).textContent || '', original: !!d.querySelector('[data-pruef-original]'), text: d.textContent }; });
+  ok('ein Tipp auf die Marke öffnet den Fund', dl.funde >= 1, dl);
+  ok('… mit „Was jetzt tun" (ruhig bleiben)', dl.tun >= 3 && /Ruhig bleiben/.test(dl.tunText), dl.tunText.slice(0, 200));
+  ok('… und dem Satz, dass nichts entfernt wurde und beim Absender nachzufragen ist', dl.original && /Nichts wurde entfernt/.test(dl.text) && /Absender/.test(dl.text), dl.text.slice(0, 300));
+  await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+  await page.evaluate(() => { const k = [...document.querySelectorAll('.dok')].find(d => d.querySelector('.dok-name').textContent.trim() === '1A'); k.querySelector('[data-pruef]').click(); });
+  await page.waitForSelector('.dlg [data-pruef-funde]');
+  const bild = await page.evaluate(() => { const i = document.querySelector('.dlg [data-pruef-markiert] img'); return i ? { breit: i.naturalWidth, sicht: i.checkVisibility(), knopf: !!document.querySelector('.dlg [data-markiert-laden]') } : null; });
+  ok('bei einem Bild zeigt der Dialog die markierte Stelle samt Knopf zum Speichern', bild && bild.breit > 100 && bild.sicht && bild.knopf, bild);
+  await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+  ok('keine Fehler auf der Seite', fehler.length === 0, fehler);
+
+  /* 5 · Arbeitsstand-Datei mit erfundenem „sauber" */
+  const stand2 = await page.evaluate(async (b64) => {
+    const d = { id: 'fremd1', name: 'Fremder Stand', folderId: null, quelle: 'pdf', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), pages: [{ w: 595, h: 842 }, { w: 595, h: 842 }], fields: [],
+      pruefung: { stand: 'sauber', funde: [], hinweise: [], zeit: new Date().toISOString() } };
+    const f = new File([JSON.stringify({ format: 'workfloh-pdf-arbeitsstand', version: 1, gesichert: d.updatedAt, doc: d, pdf: b64 })], 'x.workfloh.json', { type: 'application/json' });
+    await window.__wfpdf.importDateien([f], null, { still: true });
+    return true;
+  }, DATEIEN['0D.pdf']);
+  await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+  await allePruefen(page);
+  await warteFertig(page);
+  const fremd = await stand(page, 'Fremder Stand');
+  ok('ein „sauber" in einer fremden Arbeitsstand-Datei wird nicht geglaubt: neu geprüft → Warnung', stand2 && fremd && fremd.stand === 'warnung', fremd);
+  await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+
+  /* 6 · offen im Editor: Speichern überschreibt den Befund nicht */
+  await einlesen(page, ['0D.pdf'], false);
+  await page.waitForFunction(() => window.__wfpdf.S.doc);
+  await allePruefen(page);
+  await warteFertig(page);
+  const ed = await page.evaluate(async () => { const id = window.__wfpdf.S.doc.id; window.__wfpdf.S.doc.name = window.__wfpdf.S.doc.name; await window.__wfpdf.speichernJetzt?.(); const d = await WFP.DB.get("docs", id); return { amDoc: window.__wfpdf.S.doc.pruefung && window.__wfpdf.S.doc.pruefung.stand, inDb: d.pruefung && d.pruefung.stand }; });
+  ok('im offenen Editor bekommt das Dokument den Befund, und gespeichert bleibt er', ed.amDoc === 'warnung' && ed.inDb === 'warnung', ed);
+  await ctx.close();
+
+  /* 7 · ohne Prüfkern: nie still sauber */
+  const b = await neueSeite(/pruefer-anhang\.js/);
+  await einlesen(b.page, ['Antrag.pdf']);
+  await allePruefen(b.page);
+  await warteFertig(b.page);
+  const ohne = await stand(b.page, 'Antrag');
+  ok('fehlt der Prüfkern, heißt es „nicht ganz geprüft" mit Grund, nie sauber', ohne && ohne.stand === 'ungeprueft' && ohne.hinweise.some(x => /lief nicht/.test(x)), ohne);
+  const um = await b.page.evaluate(() => { const k = document.querySelector('[data-pruefung="ungeprueft"]'); return k ? k.textContent : null; });
+  ok('… und die Karte sagt das', um && /Nicht ganz geprüft/.test(um), um);
+  await b.ctx.close();
+  /* 7b · ohne eingang.js läuft gar keine Prüfung — dann darf ein „sauber" aus einer fremden
+     Arbeitsstand-Datei erst recht nicht stehen bleiben. Nur hier ist `delete d.pruefung` messbar:
+     sonst überschreibt die Neuprüfung den Wert ohnehin. */
+  {
+    const c = await neueSeite(/eingang\.js/);
+    await c.page.evaluate(async (b64) => {
+      const d = { id: 'fremd2', name: 'Fremder Stand ohne Prüfung', folderId: null, quelle: 'pdf', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), pages: [{ w: 595, h: 842 }, { w: 595, h: 842 }], fields: [],
+        pruefung: { stand: 'sauber', funde: [], hinweise: [], zeit: new Date().toISOString() } };
+      const f = new File([JSON.stringify({ format: 'workfloh-pdf-arbeitsstand', version: 1, gesichert: d.updatedAt, doc: d, pdf: b64 })], 'y.workfloh.json', { type: 'application/json' });
+      await window.__wfpdf.importDateien([f], null, { still: true });
+    }, DATEIEN['0D.pdf']);
+    const f2 = await stand(c.page, 'Fremder Stand ohne Prüfung');
+    ok('ohne Prüfung bleibt ein „sauber" aus einem fremden Arbeitsstand nicht stehen (verworfen)', !f2 || f2.stand !== 'sauber', f2);
+    await c.ctx.close();
+  }
+  /* 8 · Herkunftsnachweis (C2PA, Klaus 2026-10-14): eine ANGABE, nie eine Warnung.
+     Die Dateien sind erfunden (tests/c2pa-muster.mjs). Ein Nachweis im PDF ist keine „weitere Datei". */
+  {
+    const { ctx, page, fehler } = await neueSeite();
+    const B = { 'Herkunft.pdf': M.pdfC2paSeite().toString('base64'), 'Herkunft.png': M.pngC2pa().toString('base64'), 'OhneNachweis.pdf': M.pdfC2paSeite({ nachweis: false }).toString('base64') };
+    const neu = await page.evaluate(async (B) => {
+      const files = Object.keys(B).map(n => { const s = atob(B[n]); const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+        return new File([u], n, { type: n.endsWith('.pdf') ? 'application/pdf' : 'image/png' }); });
+      const fehlschlag = [];
+      for (const f of files) { try { await window.__wfpdf.importDateien([f], null, { still: true }); } catch (e) { fehlschlag.push(f.name + ': ' + e); } }
+      return fehlschlag;
+    }, B);
+    await allePruefen(page);
+    await warteFertig(page);
+    await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+    const hk = await page.evaluate(() => Object.fromEntries(['Herkunft', 'OhneNachweis'].flatMap(n => window.__wfpdf.S.docs.filter(d => d.name === n).map(d => [n + (d.quelle === 'foto' ? '-png' : '-pdf'), d.pruefung ? { stand: d.pruefung.stand, arten: d.pruefung.funde.map(f => f.kennung), herkunft: d.pruefung.herkunft || null } : null]))));
+    const pdf = hk['Herkunft-pdf'], bild = hk['Herkunft-png'], ohne = hk['OhneNachweis-pdf'];
+    const datenText = x => x && x.herkunft ? x.herkunft.map(z => z.satz + ' ' + (z.daten || []).map(d => d.join(': ')).join(' | ')).join(' ') : '';
+    ok('Herkunft: die Testdateien lassen sich einlesen', neu.length === 0 && pdf && bild, { neu, keys: Object.keys(hk) });
+    ok('Herkunft: PDF mit Nachweis → PDF-HERKUNFT, samt Programm in den Daten', pdf && pdf.herkunft && pdf.herkunft.some(z => z.kennung === 'PDF-HERKUNFT' && (z.daten || []).some(d => /Bildwerk Beispiel/.test(d[1]))), pdf);
+    ok('… und der Nachweis gilt NICHT als „weitere Datei im PDF" (kein PDF-ANHANG)', pdf && !pdf.arten.includes('PDF-ANHANG'), pdf);
+    ok('… und macht den Stand nicht zur Warnung', pdf && pdf.stand !== 'warnung', pdf);
+    ok('Herkunft: Bild (PNG, caBX) → BILD-HERKUNFT mit Unterzeichner', bild && bild.herkunft && bild.herkunft.some(z => z.kennung === 'BILD-HERKUNFT') && /Beispiel Werkstatt GmbH/.test(datenText(bild)), bild);
+    ok('… ohne Warnung', bild && bild.stand !== 'warnung', bild);
+    ok('Herkunft: dasselbe PDF OHNE Nachweis trägt keine Herkunft (Gegenrichtung)', ohne && Array.isArray(ohne.herkunft) && ohne.herkunft.length === 0, ohne);
+    ok('Herkunft steht nicht in der Warnliste', await page.evaluate(() => WFP.Eingang.HERKUNFT.every(k => !WFP.Eingang.WARN.includes(k))));
+    // ein Dokument, das sonst sauber ist: Marke „ℹ Herkunft", ein Tipp öffnet die Angabe, Details zu
+    await page.evaluate(() => { const d = window.__wfpdf.S.docs.find(x => x.name === 'Herkunft' && x.quelle !== 'foto'); d.pruefung = Object.assign({}, d.pruefung, { stand: 'sauber', funde: [], markiert: null }); window.__wfpdf.suche.zeichneBibliothek(); });
+    const mk = await page.evaluate(() => { const k = [...document.querySelectorAll('.dok')].find(d => d.querySelector('.dok-name').textContent.trim() === 'Herkunft' && d.querySelector('[data-pruefung="herkunft"]')); const b = k && k.querySelector('[data-pruefung="herkunft"]'); return b ? { text: b.textContent, sicht: b.checkVisibility(), warn: b.classList.contains('warn') } : null; });
+    ok('Herkunft bei „sauber": die Karte trägt die ruhige Marke „ℹ Herkunft"', mk && mk.sicht && /Herkunft/.test(mk.text) && !mk.warn, mk);
+    await page.evaluate(() => { const k = [...document.querySelectorAll('.dok')].find(d => d.querySelector('[data-pruefung="herkunft"]')); k.querySelector('[data-pruef]').click(); });
+    const dlh = await page.waitForSelector('.dlg [data-herkunft]', { timeout: 10000 }).then(() => page.evaluate(() => { const d = document.querySelector('.dlg'), det = d.querySelector('[data-herkunft-details]');
+      const vor = det ? det.open : null; const innenSicht = det ? det.querySelector('dl').checkVisibility() : null; if (det) det.open = true;
+      return { vor, innenSicht, sum: det ? det.querySelector('summary').textContent : '', dl: det ? det.querySelector('dl').textContent : '', tun: !!d.querySelector('[data-was-tun]'), warn: !!d.querySelector('[data-pruef-original]'), kopf: d.querySelector('h2').textContent }; }), () => null);
+    ok('… ein Tipp öffnet die Angabe mit „Details anzeigen", zuerst zugeklappt', dlh && dlh.vor === false && dlh.innenSicht === false && /Details anzeigen/.test(dlh.sum), dlh);
+    ok('… aufgeklappt stehen Programm und Unterzeichner', dlh && /Bildwerk Beispiel/.test(dlh.dl) && /Beispiel Werkstatt GmbH/.test(dlh.dl), dlh && dlh.dl.slice(0, 300));
+    ok('… ohne „Was jetzt tun" und ohne Warnsatz (eine Angabe, keine Gefahr)', dlh && !dlh.tun && !dlh.warn && /nichts Verdächtiges/.test(dlh.kopf), dlh);
+    await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+    ok('keine Seitenfehler (Herkunft)', fehler.length === 0, fehler);
+    await ctx.close();
+  }
+  /* 9 · Hilfe → Testdateien (Klaus 2026-10-01): ein Tipp liest sie ein, die Warnung erscheint */
+  {
+    const { ctx, page, fehler } = await neueSeite();
+    await page.evaluate(() => window.__wfpdf.dlg.hilfe());
+    const knoepfe = await page.evaluate(() => ({ bild: !!document.querySelector('.dlg [data-test-bild]'), pdf: !!document.querySelector('.dlg [data-test-pdf]'), laden: (document.querySelector('.dlg [data-test-laden]') || {}).getAttribute?.('href'), text: document.querySelector('.dlg').textContent }));
+    ok('Hilfe: Abschnitt „Versteckte Befehle erkennen" mit zwei Testdateien und Download', knoepfe.bild && knoepfe.pdf && knoepfe.laden === 'beispiele/Testbild-versteckte-Anweisung.png' && /Versteckte Befehle erkennen/.test(knoepfe.text) && /rot markiert, nicht gelöscht/.test(knoepfe.text), knoepfe.laden);
+    await page.click('.dlg [data-test-bild]');
+    await page.waitForFunction(() => window.__wfpdf.S.docs.some(d => /Testbild/.test(d.name)), null, { timeout: 30000 }).catch(() => {});
+    await warteFertig(page);
+    const w = await page.waitForSelector('.dlg [data-pruef-funde]', { timeout: 30000 }).then(() => page.evaluate(() => ({ text: document.querySelector('.dlg').textContent, bild: !!document.querySelector('.dlg [data-pruef-markiert] img') })), () => null);
+    ok('Hilfe → 🧪 Bild: eingelesen, die Warnung öffnet sich mit markierter Stelle', w && /Anweisung an eine KI im Bild/.test(w.text) && w.bild, w && w.text.slice(0, 200));
+    await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+    await page.evaluate(() => window.__wfpdf.dlg.hilfe());
+    await page.click('.dlg [data-test-pdf]');
+    await page.waitForFunction(() => window.__wfpdf.S.docs.some(d => /unsichtbarer/.test(d.name)), null, { timeout: 30000 }).catch(() => {});
+    await warteFertig(page);
+    const st = await stand(page, 'Testdatei unsichtbarer Text');
+    ok('Hilfe → 🧪 PDF: unsichtbarer Text wird gemeldet', st && st.stand === 'warnung' && st.arten.includes('PDF-VERSTECKTER-TEXT'), st);
+    ok('keine Seitenfehler (Testdateien)', fehler.length === 0, fehler);
+    await ctx.close();
+  }
+  /* 10 · Klaus 2026-10-14: „Die Prüfung einer Datei soll manuell initiiert werden können … erst auf
+     Knopfdruck … Und so auch bei älteren Dateien." Nichts prüft beim Einlesen oder Laden von selbst. */
+  {
+    const { ctx, page, fehler } = await neueSeite();
+    await einlesen(page, ['H2.jpg'], false);
+    await page.waitForSelector('#sc-ed.on #edPruefung:not([hidden])', { timeout: 30000 }).catch(() => {});
+    const ed0 = await page.evaluate(() => { const m = document.querySelector('#edPruefung [data-pruef-nachholen]'); return { laufend: window.__wfpdf.eingang.PRUEF.laufend.size, knopf: m ? { sicht: m.checkVisibility(), text: m.textContent } : null }; });
+    ok('MANUELL: ein einzelnes Bild öffnet den Editor — keine Prüfung läuft', ed0.laufend === 0, ed0);
+    ok('MANUELL: … der Editor zeigt „jetzt prüfen" als Knopf', ed0.knopf && ed0.knopf.sicht && /jetzt prüfen/.test(ed0.knopf.text), ed0);
+    const orig = await page.evaluate(async () => !!(await WFP.DB.get('files', window.__wfpdf.S.doc.id + '~original')));
+    ok('MANUELL: das Originalfoto wird bis zur Prüfung aufgehoben', orig);
+    await page.evaluate(() => { const k = document.querySelector('#edPruefung [data-pruef-nachholen]'); if (k) k.click(); });
+    const lauf = await page.evaluate(() => { const m = document.querySelector('#edPruefung [data-pruefung]'); return m ? m.dataset.pruefung : null; });
+    ok('MANUELL: ein Tipp im Editor startet die Prüfung („wird geprüft")', lauf === 'laeuft', lauf);
+    await warteFertig(page);
+    const fertig = await page.evaluate(async () => { const m = document.querySelector('#edPruefung [data-pruef]'); const d = window.__wfpdf.S.doc; return { art: m && m.dataset.pruefung, stand: d.pruefung && d.pruefung.stand, h: d.pruefung && d.pruefung.angaben.map(a => a.kennung), orig: !!(await WFP.DB.get('files', d.id + '~original')) }; });
+    ok('MANUELL: … danach steht dort der Befund als Knopf', fertig.art && fertig.art === fertig.stand, fertig);
+    ok('MANUELL: … geprüft wurde das ORIGINALFOTO (Bild-Metadaten gelesen), nicht das PDF daraus', fertig.h && fertig.h.includes('BILD-METADATEN'), fertig);
+    ok('MANUELL: … und das Original ist danach weg', fertig.orig === false, fertig);
+    await page.evaluate(() => { const k = document.querySelector('#edPruefung [data-pruef]'); if (k) k.click(); });
+    const ber = await page.waitForSelector('.dlg [data-pruefbericht]', { timeout: 10000 }).then(() => true, () => false);
+    ok('MANUELL: … und ein Tipp öffnet den Prüfbericht', ber);
+    await page.evaluate(() => document.querySelectorAll('.dlg-grund').forEach(g => g.remove()));
+    ok('keine Seitenfehler (Editor)', fehler.length === 0, fehler);
+    await ctx.close();
+  }
+  {
+    const { ctx, page, fehler } = await neueSeite();
+    await einlesen(page, ['Antrag.pdf', 'H0.jpg']);
+    // ein älteres Dokument ohne Befund nachstellen
+    await page.evaluate(async () => { for (const d of window.__wfpdf.S.docs) { const x = await WFP.DB.get('docs', d.id); x.createdAt = '2026-09-01T10:00:00.000Z'; await WFP.DB.put('docs', x); } });
+    await page.reload(); await page.waitForFunction(() => window.__wfpdf);
+    await page.waitForFunction(() => document.querySelectorAll('.dok').length >= 2);
+    const nachLaden = await page.evaluate(() => ({ laufend: window.__wfpdf.eingang.PRUEF.laufend.size, offen: [...document.querySelectorAll('[data-pruef-nachholen]')].filter(b => b.checkVisibility()).length }));
+    ok('MANUELL: nach dem Neuladen prüft nichts von selbst', nachLaden.laufend === 0, nachLaden);
+    ok('MANUELL: … ältere Dokumente ohne Befund tragen „jetzt prüfen"', nachLaden.offen === 2, nachLaden);
+    // ob das Dokument aufging und was geprüft wurde, wird erst NACH der Prüfung gemessen —
+    // Tipp und Öffnen sind asynchron, ein Blick direkt danach sähe noch nichts (Gegenprobe 2026-10-14)
+    await page.evaluate(() => { const k = [...document.querySelectorAll('.dok')].find(d => d.querySelector('.dok-name').textContent.trim() === 'Antrag'); k.querySelector('[data-pruef-nachholen]').click(); });
+    await page.waitForFunction(() => window.__wfpdf.eingang.PRUEF.laufend.size > 0 || window.__wfpdf.S.docs.some(d => d.pruefung), null, { timeout: 30000 });
+    await warteFertig(page);
+    const nur = await page.evaluate(() => window.__wfpdf.S.docs.filter(d => d.pruefung).map(d => d.name));
+    ok('MANUELL: … und nur dieses eine', nur.length === 1 && nur[0] === 'Antrag', nur);
+    const geoeffnet = await page.evaluate(() => !!window.__wfpdf.S.doc || !!document.querySelector('#sc-ed.on'));
+    ok('MANUELL: der Knopf prüft, statt das Dokument zu öffnen', !geoeffnet);
+    const a = await stand(page, 'Antrag');
+    ok('MANUELL: … das Dokument trägt danach seinen Befund', a && a.stand === 'sauber', a);
+    // Löschen nimmt das aufgehobene Original mit
+    const weg = await page.evaluate(async () => { const d = window.__wfpdf.S.docs.find(x => x.name === 'H0'); const vor = !!(await WFP.DB.get('files', d.id + '~original')); await WFP.DB.del('files', d.id); return { vor, nach: !!(await WFP.DB.get('files', d.id + '~original')) }; });
+    ok('MANUELL: Löschen der Datei nimmt das aufgehobene Original mit', weg.vor && !weg.nach, weg);
+    ok('keine Seitenfehler (Knopf)', fehler.length === 0, fehler);
+    await ctx.close();
+  }
+} catch (e) { ok('Probe lief durch', false, String(e && e.stack || e)); }
+await browser.close(); srv.close();
+console.log(`\n${gruen} grün · ${rot} ROT`);
+process.exitCode = rot ? 1 : 0;

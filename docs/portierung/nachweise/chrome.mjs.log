@@ -1,0 +1,51 @@
+  ✓ Dialog bietet „🌐 Mit Chrome übersetzen (Google)" an und nennt, dass der Text an Google geht
+  ✓ Fläche unten nennt den Weg: ⋮ → „Übersetzen" und Russisch
+  ✓ der Text der Seite steht als echter Text da (übersetzbar)
+  ✓ die App-Oberfläche ist für Chrome gesperrt (translate="no")
+  ✓ Ausgangssprache der Seite ist angesagt (lang="de")
+  ✓ ohne Chromes Übersetzung wartet die App (nichts wird als übersetzt angenommen)
+    gemessen: 3 Seiten über den Chrome-Weg in 1.9 s
+  ✓ Bericht: 3 von 3 Seiten, Hinweis „keine Gegenprobe auf dem Chrome-Weg"
+  ✓ … und kein Absatz als „nicht übersetzt" gemeldet (Hamburg bleibt Hamburg)
+  ✓ Ergebnis „Chrome [RU]": jede Seite an ihrem Platz, Chromes Text übernommen
+  ✓ … als Chrome-Weg vermerkt (de → ru)
+  ✓ Fläche wieder weg, <html lang> wieder wie vorher
+  ✓ App-Oberfläche blieb deutsch (nichts von Chrome übersetzt)
+  ✓ solange Chrome übersetzt anzeigt, bleibt die Sperre an der App
+  ✓ … und fällt, sobald Chrome wieder das Original zeigt
+  ✓ Übersetzung gewählt: im Dialog steht das ORIGINAL „Chrome", nicht „Chrome [RU]"
+  ✓ … mit Hinweis, warum (sonst zwei Sprachen übereinander), und „von" steht auf der Sprache des Originals (Deutsch)
+  ✓ Abbrechen beim Warten: Lauf „angehalten", kein Teil-PDF ohne Seiten, keine falsche Fehlermeldung
+  ✓ … Fläche entfernt, Sperre an der App wieder frei
+  ✓ im App-Fenster: unter „Mit Chrome übersetzen" stehen „In Chrome öffnen" und „Adresse kopieren"
+  ✓ … auch auf der Fläche, und der Wartesatz nennt den Knopf
+  ✓ Adresse trägt Dokument, Sprachen und Weg (ue, von=de, nach=en, weg=chrome)
+  ✓ Adresse ohne intent-Umweg (den gibt Android an die installierte App zurück)
+  ✓ der Lauf im App-Fenster hält an, bevor der Tab übernimmt
+  ✓ Rückweg: der Tab öffnet den Übersetzer mit demselben Dokument und denselben Sprachen
+  ✓ … „Mit Chrome übersetzen" ist hervorgehoben, die Adresse wieder sauber
+  ✓ im Tab steht oben: zurück in der App ⟳ (Aktualisieren) tippen
+  ✓ im Chrome-Tab keine „In Chrome öffnen"-Knöpfe (man ist ja schon dort)
+  ✓ Chrome übersetzt in die FALSCHE Sprache: die App sagt es und nennt den Weg (⋮ → Übersetzen → Englisch)
+  ✓ … und übernimmt nichts (noch keine Datei „Chrome [EN]")
+  ✓ Chrome übersetzt in eine ANDERE Schrift (Paschtu): die App sagt es
+  ✓ … und übernimmt auch das nicht
+  ✓ Ergebnis im Tab wird ein PDF wie in der App, mit Hinweis „Zurück in die App"
+  ✓ … und die App sieht es im selben Speicher („Chrome [EN]", Seite 1 übersetzt)
+  ✓ unbekanntes Dokument: Meldung „in diesem Browser nicht da", kein Dialog
+  ✓ Android: kein eigener „Teilen"-Knopf daneben (In Chrome öffnen IST Teilen)
+  ✓ … und der Knopf sagt, wohin: „Mit Browser öffnen zum Übersetzen" (auch im Text darüber)
+  ✓ „In Chrome öffnen" öffnet das Teilen-Fenster mit der Adresse des Übersetzers
+  ✓ … und zwar noch aus dem Tipp heraus (sonst verweigert Android das Teilen)
+  ✓ … der Hinweis sagt: den Browser „Chrome" wählen, kein anderes Übersetzungsprogramm
+  ✓ … kein Sprung: die App bleibt stehen, kein neues Fenster, keine Anleitung dazwischen
+  ✓ … und nirgends mehr ein Aufruf per intent:
+  ✓ selbst abgebrochen: keine Anleitung, keine Meldung darüber
+  ✓ Teilen geht nicht: Adresse kopiert + Anleitung zum Einfügen (ohne „Chrome starten")
+  ✓ … „OK" schließt die Anleitung
+  ✓ DeX (Linux-Kennung) im App-Fenster: der Knopf heißt „Mit Browser öffnen zum Übersetzen", kein „In Chrome öffnen"
+  ✓ … er teilt, aus dem Tipp heraus, und öffnet kein neues Fenster
+  ✓ keine Fehler in der Konsole
+
+47 grün · 0 ROT
+

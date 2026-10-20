@@ -1,0 +1,84 @@
+Workfloh PDF — Suche nach Bedeutung
+  ✓ Modul 03_embedding.js ist byte-1:1 aus Sage
+  ✓ Modul 04_match.js ist byte-1:1 aus Sage
+  ✓ Abschnitte: Name und Felder zuerst, ohne Seite (nichts zu markieren)
+  ✓ Abschnitte: eine Unterschrift (Bild) wird nicht eingeordnet
+  ✓ Abschnitte: je Seite mit Text, leere Seite übersprungen, Seitennummer stimmt
+  ✓ Abschnitte: die Lage ist die Hülle der Textstücke
+  ✓ Abschnitte: satzweise, keiner über 260 Zeichen
+  ✓ Abschnitte: jeder endet an einem Satzende
+  ✓ Abschnitte: kurz genug für EINEN Gedanken (keiner über zwei Mal STUECK_ZIEL)
+  ✓ Abschnitte: überlappen — das letzte Stück eines Abschnitts beginnt den nächsten
+  ✓ Abschnitte: nichts geht verloren (jeder Satz steht in einem Abschnitt)
+  ✓ Abschnitte: Zeilen, die mitten im Satz umbrechen, werden bis zum Satzende gesammelt
+  ✓ Abschnitte: ein überlanges Textstück wird geteilt, keiner über STUECK_MAX
+  ✓ Abschnitte: KEIN Deckel mehr — alle 200 Seiten sind eingeordnet
+  ✓ Fingerabdruck: trägt die Zerlegung (alte Vektoren aus der 500-Zeichen-Zeit werden neu eingeordnet)
+  ✓ Abschnitte: nimmt auch die vorbereitete Form der Suche ({ it: [...] })
+  ✓ Fingerabdruck: gleich bei gleichem Text
+  ✓ Fingerabdruck: anders, wenn ein Feld sich ändert
+  ✓ Ladestand: ohne Größenangabe keine Prozentzahl (null, unbestimmt)
+  ✓ Ladestand: über alle Dateien zusammengezählt (25 von 200 = 12,5 %)
+  ✓ Ladestand: „done" zählt die Datei voll (125 von 200)
+  ✓ Ladestand: nie über 100 %
+  ✓ Rangliste: jedes Dokument mit seinem BESTEN Abschnitt, beste zuerst
+  ✓ Rangliste: unter der Untergrenze wird nicht gezeigt, aber gezählt
+  ✓ Rangliste: mehrere Fassungen der Frage — die beste zählt
+  ✓ Rangliste: höchstens 12 gezeigt
+  ✓ Rangliste: relativ — gezeigt, was höchstens 0.04 hinter dem besten liegt (0,95 und 0,93, nicht 0,86)
+  ✓ Rangliste: die Grenze steht im Ergebnis (bester − Abstand)
+  ✓ Rangliste: nie unter der Untergrenze 0.8 — dann bleibt „gezeigt" leer
+  ✓ Rangliste: … und die 3 nächsten stehen als „schwach" da, beste zuerst
+  ✓ Rangliste: bei gleicher Nähe steht vorn, wer die Suchwörter hat
+  ✓ Rangliste: der Wort-Vorsprung ist höchstens 0.05, die angezeigte Nähe bleibt die echte
+  ✓ Rangliste: der Abschnitt MIT den Wörtern wird markiert, wenn er zusammen vorn liegt
+  ✓ Anfang: aus, mit einem Knopf zum Einschalten
+  ✓ Anfang: Modul 03 wird NICHT von selbst geladen
+  ✓ Aus: „Kündigung" findet nach Wörtern nichts, und nach Bedeutung wird nicht gesucht
+  ✓ Dialog: sagt VORHER, was aus dem Netz kommt (jsDelivr, eigener Server, Hugging Face, Größe)
+  ✓ Dialog: sagt, dass die Dokumente NICHT ins Netz gehen
+  ✓ Dialog: noch nichts geladen, solange nicht „Modell laden" gedrückt ist
+  ✓ Ladebalken: zeigt steigende Prozente (mindestens 4 verschiedene)
+  ✓ Ladebalken: erreicht 100 %
+  ✓ Ladeanzeige: der Text nennt die Prozent
+  ✓ Ladeanzeige: nennt, wie viel schon da ist (MB von MB)
+  ✓ Ladeanzeige: danach wird eingeordnet — mit Dokument und Seite
+  ✓ Bereit: sagt es, mit der Zahl der eingeordneten Dokumente
+  ✓ Bereit: die Wahl ist gemerkt
+  ✓ Bedeutung: „Kündigung" findet den Brief, in dem „Vertrag beenden" steht
+  ✓ Bedeutung: die Nähe steht an der Karte (ab 0,80)
+  ✓ Bedeutung: die Rechnung ist nicht dabei (unter der Schwelle)
+  ✓ Bedeutung: die Fundstelle sagt „Nach Bedeutung, Seite 1" und zeigt den Text
+  ✓ Bedeutung: die Grenze steht dabei (Nähe, Höchstzahl, „Rangfolge, keine Prozent")
+  ✓ Bedeutung: „Kein Dokument passt" sagt, dass es nach Bedeutung doch etwas gibt
+  ✓ Wort und Bedeutung: ein Wort-Treffer steht nur EINMAL (nicht noch einmal unter „Bedeutung")
+  ✓ Editor: aus der Bedeutungssuche geöffnet, ist der Abschnitt auf Seite 1 markiert
+  ✓ Neu geladen: startet von selbst wieder (die Wahl ist gemerkt)
+  ✓ Neu geladen: nichts wird neu eingeordnet — die Vektoren kommen aus dem Speicher
+  ✓ Geändert: genau das geänderte Dokument wird neu eingeordnet
+  ✓ neue Bytes werfen die alten Vektoren weg (sie werden neu eingeordnet)
+  ✓ Dialog (an): zeigt den Stand und „Ausschalten"
+  ✓ Aus: der Abschnitt „nach Bedeutung" verschwindet, der Knopf zum Einschalten ist wieder da
+  ✓ Aus: die Wahl ist gemerkt
+  ✓ keine Seitenfehler
+  ✓ Fehler: wird gesagt, mit dem Grund
+  ✓ Fehler: „Nochmal" steht da und versucht es wirklich noch einmal
+  ✓ Fehler: die Wortsuche läuft unberührt weiter
+  ✓ Handbuch: mehr Abschnitte als der alte Deckel von 80 (sonst misst der Rest nichts)
+  ✓ Handbuch: die Leiste nennt Dokument und Seite („Seite x von 30")
+  ✓ Handbuch: die Leiste sagt, dass Suchen schon geht
+  ✓ Handbuch: die Zeit je Seite wird GEMESSEN angezeigt (erst „wird gemessen", dann „≈ … s je Seite")
+  ✓ Handbuch: Suchen geht schon während des Einordnens, und es wird gesagt, dass noch etwas dazukommt
+  ✓ Handbuch: noch nicht fertig, als neu geladen wird (sonst misst das Fortsetzen nichts)
+  ✓ Handbuch: nach dem Neuladen geht es an derselben Stelle weiter (nur der Rest wird eingeordnet)
+  ✓ Handbuch: am Ende sind ALLE Abschnitte da, im Speicher wie im Vorrat
+  ✓ Handbuch: „Gewährleistung" findet den Satz auf der LETZTEN Seite (30)
+  ✓ Handbuch: die Fundstelle ist ein kurzer Abschnitt, nicht die halbe Seite
+  ✓ Lange Frage: bei gleicher Nähe steht vorn, wer die meisten Suchwörter hat (Miete vor Abo)
+  ✓ Lange Frage: die Fundstelle sagt, wie viele Suchwörter darin stehen („3 von 5")
+  ✓ keine Seitenfehler (Handbuch)
+  ✓ Schmal (360 px): Ladeanzeige passt in die Breite, nichts läuft quer
+  ✓ nichts ging ins Netz außer der eigenen Adresse (das Modell ist hier gestellt)
+
+80 grün · 0 ROT
+

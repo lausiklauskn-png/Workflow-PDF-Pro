@@ -1,0 +1,25 @@
+  ✓ CRC32 der Prüfzeichenkette „123456789" = cbf43926
+  ✓ gleiche Namen im ZIP werden unterschieden („a.pdf", „a (2).pdf")
+Workfloh PDF — Sortierung und Ordner-Ausgabe, Probe im Browser
+  ✓ Einlesen: Teil 1, Teil 2, Teil 10 — nicht „1, 10, 2"
+  ✓ Sortier-Auswahl steht über der Liste, vorgewählt „Name (1, 2 … 10)"
+  ✓ nach Name: Teil 1, Teil 2, Teil 10
+  ✓ nach Seitenzahl: 3, 2, 1 Seiten (Teil 10, 2, 1)
+  ✓ nach Dateigröße: der dicke Teil 2 zuerst
+  ✓ … und die Größe steht an jeder Karte
+  ✓ die Wahl übersteht das Neuladen (Einstellungen)
+  ✓ „📤 Ordner ausgeben" steht beim gewählten Ordner
+  ✓ der Dialog zeigt die Reihenfolge der Bibliothek
+  ✓ ZIP heißt wie der Ordner, und das Heruntergeladene ist genau diese Datei
+  ✓ ZIP ist gültig: 3 Einträge, Verzeichnis am Ende, jede Prüfsumme stimmt
+  ✓ … Einträge in der Reihenfolge Teil 1, 2, 10, Namen mit UTF-8-Marke
+  ✓ … „Original, unverändert" liefert die eingelesenen Bytes
+  ✓ … der Bericht nennt die Datei mit Größe
+  ✓ ein PDF, benannt wie der Ordner, mit 1 + 2 + 3 = 6 Seiten
+  ✓ … Seiten in der Reihenfolge Teil 1, Teil 2, Teil 10
+  ✓ Sortierung „Seitenzahl" → ZIP beginnt mit Teil 10
+  ✓ … „festes PDF" ist neu gebaut, nicht das Original
+  ✓ keine Fehler auf der Konsole
+
+21 grün · 0 ROT
+

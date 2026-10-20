@@ -1,0 +1,82 @@
+  ✓ Hilfe: der Knopf „🎬 Erklärvideo" steht da
+  ✓ Hilfe: der Link führt zur Webseite, in neuem Tab, ohne window.opener
+  ✓ Hilfe: der Link nennt Kapitel und das Video hochkant (die Kurzfassung ist von der Webseite genommen)
+  ✓ Hilfe: solange nicht getippt wird, geht KEIN Abruf zur Webseite
+  ✓ Deutsch: die deutsche Fassung
+  ✓ Deutsch: das passende Standbild
+  ✓ das Video hat Bedienelemente und lädt vorab nur die Eckdaten
+  ✓ Deutsch: kein Hinweis auf eine Ersatzsprache
+  ✓ Deutsch: „Neu“ nennt die Prüfung beim Einlesen (Auslieferungsprüfer + Sende-Prüfer) und den Weg zum Ausprobieren
+  ✓ online: der Offline-Hinweis ist verborgen
+  ✓ auf Tipp wird das Video wirklich von der Webseite geholt (Stellvertreter)
+  ✓ Schließen nimmt den Dialog samt Video weg
+  ✓ Kopfleiste 1280 px: 🎬 steht sichtbar direkt links neben „?"
+  ✓ Kopfleiste 1280 px: 🎬 ist treffbar (mindestens 30 px, nichts liegt darüber)
+  ✓ Kopfleiste 1280 px: vor dem Tipp geht nichts zur Webseite
+  ✓ Kopfleiste 1280 px: ein Tipp auf 🎬 öffnet das Erklärvideo
+  ✓ Kopfleiste 320 px: 🎬 steht sichtbar direkt links neben „?"
+  ✓ Kopfleiste 320 px: 🎬 ist treffbar (mindestens 30 px, nichts liegt darüber)
+  ✓ Kopfleiste 320 px: vor dem Tipp geht nichts zur Webseite
+  ✓ Kopfleiste 320 px: ein Tipp auf 🎬 öffnet das Erklärvideo
+  ✓ en: Fassung workfloh-pdf-quer-en.mp4
+  ✓ en: „Neu“ ist übersetzt
+  ✓ en: Hinweis auf die Ersatzsprache fehlt zu Recht
+  ✓ ru: Fassung workfloh-pdf-quer-ru.mp4
+  ✓ ru: „Neu“ ist übersetzt
+  ✓ ru: Hinweis auf die Ersatzsprache fehlt zu Recht
+  ✓ ar: Fassung workfloh-pdf-quer-en.mp4
+  ✓ ar: „Neu“ ist übersetzt
+  ✓ ar: Hinweis auf die Ersatzsprache steht da
+  ✓ de hochkant: das ganze Video hochkant (workfloh-pdf-hochvoll.mp4) mit seinem Standbild
+  ✓ de hochkant: das Video steht hochkant und ganz im Bild
+  ✓ de: nach dem Start lädt das Querformat verborgen und stumm mit
+  ✓ de gedreht auf quer: das Querformat, an DERSELBEN Stelle, läuft weiter
+  ✓ de quer: nur ein Video zu sehen, es steht quer
+  ✓ de zurück hochkant: wieder hochkant, an derselben Stelle
+  ✓ de: nach dem Schließen (Esc) wirft das Drehen keinen Fehler und legt kein Video an
+  ✓ ru hochkant: das ganze Video hochkant (workfloh-pdf-hochvoll-ru.mp4) mit seinem Standbild
+  ✓ ru hochkant: das Video steht hochkant und ganz im Bild
+  ✓ ru: nach dem Start lädt das Querformat verborgen und stumm mit
+  ✓ ru gedreht auf quer: das Querformat, an DERSELBEN Stelle, läuft weiter
+  ✓ ru quer: nur ein Video zu sehen, es steht quer
+  ✓ ru zurück hochkant: wieder hochkant, an derselben Stelle
+  ✓ ru: nach dem Schließen (Esc) wirft das Drehen keinen Fehler und legt kein Video an
+  ✓ de: zwei Knöpfe (Erklärvideo · Neu), „Erklärvideo" ist gewählt
+  ✓ de: beim Erklärvideo sind die Kapitel des kurzen Films verborgen
+  ✓ de: der kurze Film wird vor dem Tipp NICHT geholt
+  ✓ de: Knopf „Neu" → neu-befehle-quer.mp4 mit seinem Standbild, „Neu" ist gewählt
+  ✓ de: beim kurzen Film stehen 7 Kapitel mit Zeit da
+  ✓ de: Kapitel „Trick 2" springt im kurzen Film an 0:30 und spielt
+  ✓ de: gedreht bleibt es beim kurzen Film — hochkant neu-befehle-hoch.mp4
+  ✓ de: zurück zum Erklärvideo
+  ✓ de: ist das Erklärvideo zu Ende, läuft der kurze Film von selbst
+  ✓ ru: zwei Knöpfe (Erklärvideo · Neu), „Erklärvideo" ist gewählt
+  ✓ ru: beim Erklärvideo sind die Kapitel des kurzen Films verborgen
+  ✓ ru: der kurze Film wird vor dem Tipp NICHT geholt
+  ✓ ru: Knopf „Neu" → neu-befehle-quer-ru.mp4 mit seinem Standbild, „Neu" ist gewählt
+  ✓ ru: beim kurzen Film stehen 7 Kapitel mit Zeit da
+  ✓ ru: Kapitel sind übersetzt
+  ✓ ru: Kapitel „Trick 2" springt im kurzen Film an 0:30 und spielt
+  ✓ ru: gedreht bleibt es beim kurzen Film — hochkant neu-befehle-hoch-ru.mp4
+  ✓ ru: zurück zum Erklärvideo
+  ✓ ru: ist das Erklärvideo zu Ende, läuft der kurze Film von selbst
+  ✓ ar: zwei Knöpfe (Erklärvideo · Neu), „Erklärvideo" ist gewählt
+  ✓ ar: beim Erklärvideo sind die Kapitel des kurzen Films verborgen
+  ✓ ar: der kurze Film wird vor dem Tipp NICHT geholt
+  ✓ ar: Knopf „Neu" → neu-befehle-quer-en.mp4 mit seinem Standbild, „Neu" ist gewählt
+  ✓ ar: beim kurzen Film stehen 7 Kapitel mit Zeit da
+  ✓ ar: Kapitel „Trick 2" springt im kurzen Film an 0:30 und spielt
+  ✓ ar: gedreht bleibt es beim kurzen Film — hochkant neu-befehle-hoch-en.mp4
+  ✓ ar: zurück zum Erklärvideo
+  ✓ ar: ist das Erklärvideo zu Ende, läuft der kurze Film von selbst
+  ✓ offline: kein Video-Element
+  ✓ offline: der Hinweis ist zu sehen und nennt das Internet
+  ✓ offline: der Link zur Webseite bleibt
+  ✓ offline: nichts wurde abgerufen
+  ✓ Fehler beim Laden: das Video verschwindet
+  ✓ Fehler beim Laden: der Hinweis ist zu sehen
+  ✓ sw.js: Abrufe der Webseite werden durchgelassen, BEVOR der Vorrat greift
+  ✓ sw.js: die Webseite steht nicht in der SCHALE
+
+79 grün · 0 ROT
+

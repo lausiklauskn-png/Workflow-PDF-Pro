@@ -1,0 +1,133 @@
+
+> workfloh-pdf@1.0.0 test
+> node tests/syntax.mjs && node tests/manifest-id.mjs && node tests/e2e.mjs && node tests/uebersetzung.mjs && node tests/layout.mjs && node tests/behoerde.mjs && node tests/chrome.mjs && node tests/schrift.mjs && node tests/beispiele.mjs && node tests/sprache.mjs && node tests/suche.mjs && node tests/bedeutung.mjs && node tests/teile.mjs && node tests/ordner.mjs && node tests/bilder.mjs && node tests/kreis.mjs && node tests/scan.mjs && node tests/sprechen.mjs && node tests/bibliothek.mjs && node tests/teilen.mjs && node tests/schieber.mjs && node tests/video.mjs && node tests/eingang.mjs && node tests/sicherung.mjs && node tests/teilen-empfang.mjs && node tests/zuschneiden.mjs && node tests/knoten.mjs && node tests/reinigung.mjs
+
+  ✓ Syntax sw.js
+  ✓ Syntax assets/app.js
+  ✓ Syntax assets/bedeutung.js
+  ✓ Syntax assets/blatt.js
+  ✓ Syntax assets/db.js
+  ✓ Syntax assets/eingang.js
+  ✓ Syntax assets/erkennung.js
+  ✓ Syntax assets/export.js
+  ✓ Syntax assets/html-export.js
+  ✓ Syntax assets/pruefer-anhang.js
+  ✓ Syntax assets/pruefer-formate.js
+  ✓ Syntax assets/pruefer-mail.js
+  ✓ Syntax assets/reinigung.js
+  ✓ Syntax assets/sbkim-init.js
+  ✓ Syntax assets/scan-bild.js
+  ✓ Syntax assets/scanner.js
+  ✓ Syntax assets/schieber.js
+  ✓ Syntax assets/schluesseltresor.js
+  ✓ Syntax assets/sicherung.js
+  ✓ Syntax assets/siegel-inhalt.js
+  ✓ Syntax assets/sprache-texte.js
+  ✓ Syntax assets/sprache.js
+  ✓ Syntax assets/sprechen.js
+  ✓ Syntax assets/suche.js
+  ✓ Syntax assets/uebersetzung.js
+  ✓ Syntax assets/zip.js
+  ✓ Syntax tests/bedeutung.mjs
+  ✓ Syntax tests/behoerde.mjs
+  ✓ Syntax tests/beispiele.mjs
+  ✓ Syntax tests/bibliothek.mjs
+  ✓ Syntax tests/bilder.mjs
+  ✓ Syntax tests/c2pa-muster.mjs
+  ✓ Syntax tests/chrome.mjs
+  ✓ Syntax tests/e2e.mjs
+  ✓ Syntax tests/eingang.mjs
+  ✓ Syntax tests/gegenprobe_bedeutung.mjs
+  ✓ Syntax tests/gegenprobe_bibliothek.mjs
+  ✓ Syntax tests/gegenprobe_bilder.mjs
+  ✓ Syntax tests/gegenprobe_eingang.mjs
+  ✓ Syntax tests/gegenprobe_knoten.mjs
+  ✓ Syntax tests/gegenprobe_kreis.mjs
+  ✓ Syntax tests/gegenprobe_ordner.mjs
+  ✓ Syntax tests/gegenprobe_reinigung.mjs
+  ✓ Syntax tests/gegenprobe_scan.mjs
+  ✓ Syntax tests/gegenprobe_schieber.mjs
+  ✓ Syntax tests/gegenprobe_sicherung.mjs
+  ✓ Syntax tests/gegenprobe_sprechen.mjs
+  ✓ Syntax tests/gegenprobe_suche.mjs
+  ✓ Syntax tests/gegenprobe_teile.mjs
+  ✓ Syntax tests/gegenprobe_teilen.mjs
+  ✓ Syntax tests/gegenprobe_teilen_empfang.mjs
+  ✓ Syntax tests/knoten.mjs
+  ✓ Syntax tests/kreis.mjs
+  ✓ Syntax tests/layout.mjs
+  ✓ Syntax tests/manifest-id.mjs
+  ✓ Syntax tests/masse.mjs
+  ✓ Syntax tests/ordner.mjs
+  ✓ Syntax tests/reinigung.mjs
+  ✓ Syntax tests/scan.mjs
+  ✓ Syntax tests/schieber.mjs
+  ✓ Syntax tests/schrift.mjs
+  ✓ Syntax tests/sicherung.mjs
+  ✓ Syntax tests/sprache.mjs
+  ✓ Syntax tests/sprechen.mjs
+  ✓ Syntax tests/suche.mjs
+  ✓ Syntax tests/syntax.mjs
+  ✓ Syntax tests/teile.mjs
+  ✓ Syntax tests/teilen-empfang.mjs
+  ✓ Syntax tests/teilen.mjs
+  ✓ Syntax tests/uebersetzung.mjs
+  ✓ Syntax tests/video.mjs
+  ✓ Syntax tests/zuschneiden.mjs
+
+72 grün · 0 ROT
+  ✓ Rechnung: "./" wird zur Wurzel des Ursprungs (der Befund)
+  ✓ Rechnung: "/Workflow-PDF/" bleibt im App-Ordner
+  ✓ Rechnung: ohne id gilt die start_url
+  ✓ Rechnung: der Bereich "./" ist der App-Ordner
+  ✓ manifest.webmanifest: trägt eine eigene id
+  ✓ manifest.webmanifest: die id liegt im Bereich der App, nicht an der Wurzel von github.io
+
+6 grün · 0 ROT
+Workfloh PDF — Probe im Browser
+  ✓ Kopfleiste zeigt W-Floh und „Workfloh PDF"
+  ✓ PDF eingelesen, Editor zeigt 2 Seiten
+  ✓ vorhandenes PDF-Formularfeld übernommen (Kundennummer, Wert K-4711)
+  ✓ gedrehte Seite wird quer angezeigt (Breite > Höhe)
+  ✓ offline: Feld auf der Namenslinie gefunden und aus dem Text beschriftet
+  ✓ offline: Linie liegt unter dem Namensfeld (x≈18.5 %, Unterkante ≈ 17.1 %)
+  ✓ offline: „Geburtsdatum" wird als Datumsfeld vorgeschlagen
+  ✓ offline: Eingabe-Rahmen „Bemerkung" erkannt, mehrzeilig
+  ✓ offline: beide Kästchen erkannt
+  ✓ offline: Kundennummer-Feld nicht doppelt vorgeschlagen
+  ✓ Vorschlags-Band zeigt die Zahl der offenen Vorschläge
+  ✓ Vorschläge sind orange gestrichelt markiert
+  ✓ KI: je Seite ein Aufruf (2 Seiten)
+  ✓ KI: Namensfeld an die erkannte Linie eingerastet
+  ✓ KI: kein doppeltes Namensfeld (Linienvorschlag ersetzt)
+  ✓ KI: Typ E-Mail übernommen
+  ✓ KI: erkannter Text gespeichert
+  ✓ KI-Vorschläge ungeprüft bis zur Freigabe
+  ✓ „✓ Passt" bestätigt einen einzelnen Vorschlag
+  ✓ „Alle übernehmen" bestätigt alles
+  ✓ QR-Feld von Hand gesetzt und quadratisch
+  ✓ Ausfüllen: Werte stehen im Dokument
+  ✓ Link: E-Mail wird blau, unterstrichen, antippbar → mailto:, ✏️ daneben
+  ✓ Link: ✏️ öffnet das Feld zum Ändern
+  ✓ Link: ohne gültige Adresse kein Link
+  ✓ Link: ein Textfeld erkennt www…, …de, @ selbst — Zahl (Kundennummer!), Datum, Name, PLZ bleiben Text
+  ✓ Link: im Feld „Telefon" wird die Nummer ein Anruf
+  ✓ Link: Kundennummer wird zum Link, nicht zum Anruf
+  ✓ … ein Tipp zeigt die Dokumente mit dieser Kundennummer (hier: dieses)
+  ✓ … eine angebundene Kundenverwaltung bekommt die Nummer
+  ✓ Beschriftung Kunden-Nr. / Artikelnummer / Telefon → passende Feldart
+  ✓ Link: beim Drucken dunkel ohne Unterstrich und ohne ✏️
+  ✓ nach Neuladen: Dokument in der Bibliothek, Felder gespeichert
+  ✓ Bibliothek-Suche findet ein Dokument über einen Feldinhalt, und sagt es, wenn nichts passt
+  ✗ ROT: Abbruch → page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///tmp/wfpdf-Dqr4nH/html.html
+Call log:
+[2m  - navigating to "file:///tmp/wfpdf-Dqr4nH/html.html", waiting until "load"[22m
+
+    at /workspace/setup/workflow-pdf-baseline/tests/e2e.mjs:250:44
+
+34 grün · 1 ROT
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice

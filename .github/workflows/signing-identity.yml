@@ -1,0 +1,87 @@
+name: Dauerhafte Workflow-PDF-Pro-Signieridentität
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Einmalig anlegen oder vorhandene Identität prüfen
+        type: choice
+        options: [check, initialize]
+        default: check
+        required: true
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: workflow-pdf-pro-signing-identity
+  cancel-in-progress: false
+jobs:
+  identity:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: android-production
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Bestehende Identität und offene Initialisierung schützen
+        if: inputs.operation == 'initialize'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -e signing/android-release.enc.json || test -e signing/android-certificate.json; then
+            echo 'Identität bereits vorhanden. Kein neuer Schlüssel wird erzeugt.'
+            exit 1
+          fi
+          if test -n "$(git ls-remote origin refs/heads/signing/android-identity)"; then
+            echo 'Initialisierung ist bereits auf signing/android-identity vorhanden. Diese zuerst prüfen.'
+            exit 1
+          fi
+          releases=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=1" --jq 'length')
+          if test "$releases" -gt 0; then
+            echo 'Auslieferungen bereits vorhanden. Bestehenden Schlüssel wiederherstellen, keine neue Identität erzeugen.'
+            exit 1
+          fi
+      - name: Eigene Identität einmalig erstellen
+        if: inputs.operation == 'initialize'
+        env:
+          WF_PDF_SIGNING_UNLOCK: ${{ secrets.WF_PDF_SIGNING_UNLOCK }}
+          TMPDIR: ${{ runner.temp }}
+        run: node tools/signing/cli.mjs init
+      - name: Entschlüsselung und Zertifikatsbindung prüfen
+        env:
+          WF_PDF_SIGNING_UNLOCK: ${{ secrets.WF_PDF_SIGNING_UNLOCK }}
+          TMPDIR: ${{ runner.temp }}
+        run: node tools/signing/cli.mjs check
+      - name: Nur verschlüsselte Identität und öffentlichen Fingerabdruck sichern
+        if: always() && inputs.operation == 'initialize'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: workflow-pdf-pro-encrypted-signing-identity
+          path: |
+            signing/android-release.enc.json
+            signing/android-certificate.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Verschlüsselte Identität als eigenen PR bereitstellen
+        if: inputs.operation == 'initialize'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch -c signing/android-identity
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- signing/android-release.enc.json signing/android-certificate.json
+          git commit -m 'Eigene dauerhafte Android-Signieridentität verschlüsselt ablegen'
+          git push origin HEAD:refs/heads/signing/android-identity
+          gh pr create --base main --head signing/android-identity \
+            --title 'Dauerhafte Workflow-PDF-Pro-Signieridentität' \
+            --body 'Enthält ausschließlich die authentifiziert verschlüsselte eigene Signieridentität und den öffentlichen Zertifikatsfingerabdruck. Wiederherstellung wurde im Workflow geprüft. Die Entschlüsselungsfreigabe liegt separat im Secret WF_PDF_SIGNING_UNLOCK der Umgebung android-production. Unabhängige Sicherung der Freigabe und dieser Dateien vor der ersten Auslieferung sicherstellen.'

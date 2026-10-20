@@ -1,0 +1,255 @@
+[
+  {
+    "command": "node tests/syntax.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "72 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/manifest-id.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "6 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/e2e.mjs",
+    "status": 1,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "  ✗ ROT: Abbruch → page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///tmp/wfpdf-tNXD7z/html.html",
+      "34 grün · 1 ROT"
+    ]
+  },
+  {
+    "command": "node tests/uebersetzung.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "56 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/layout.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "21 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/behoerde.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "46 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/chrome.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "47 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/schrift.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "5 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/beispiele.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "17 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/sprache.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "49 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/suche.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "59 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/bedeutung.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "80 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/teile.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "28 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/ordner.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "21 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/bilder.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "20 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/kreis.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": true,
+    "summary": [
+      "  ⊘ nicht lauffähig: keine Schrift mit Kreis-Zeichen (/usr/share/fonts/truetype/freefont/FreeSans.ttf)"
+    ]
+  },
+  {
+    "command": "node tests/scan.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "119 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/sprechen.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "42 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/bibliothek.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "90 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/teilen.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "53 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/schieber.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "30 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/video.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "79 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/eingang.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "73 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/sicherung.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "50 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/teilen-empfang.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "22 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/zuschneiden.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "17 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/knoten.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "126 grün · 0 ROT"
+    ]
+  },
+  {
+    "command": "node tests/reinigung.mjs",
+    "status": 0,
+    "signal": null,
+    "skipped": false,
+    "summary": [
+      "62 grün · 0 ROT"
+    ]
+  }
+]

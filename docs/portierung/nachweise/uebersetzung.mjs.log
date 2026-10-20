@@ -1,0 +1,61 @@
+Workfloh PDF — Übersetzung, Probe im Browser
+  ✓ fragt nach dem Ordnernamen, vorbelegt mit dem Namen vom Gerät
+  ✓ eigener Ordner „Handbücher" für die Originale angelegt, markiert als Übersetzungs-Bereich
+  ✓ Übersetzen-Fenster öffnet sich danach von selbst, beide Dokumente gewählt
+  ✓ Messen: nennt Übersetzer, alle 6 Richtungen und die Textebene je Dokument
+  ✓ Dialog: gleiche Sprache hin und zurück sperrt die Knöpfe
+  ✓ Absätze richtig zusammengesetzt (3 Zeilen + Silbentrennung → ein Absatz)
+  ✓ zwei Stücke auf einer Zeile → ein Absatz; Spalten „Ort:" / „Datum:" bleiben getrennt
+  ✓ jede Zeichenkette hat ein Wort im Wörterbuch (nichts Unerwartetes)
+  ✓ Bericht nennt Seiten, Zeit je Seite, Größe und die gescannte Seite
+  ✓ Ergebnis liegt getrennt im Ordner „Handbücher · RU", Original bleibt in „Handbücher"
+  ✓ Gegenprobe liegt in eigenem Ordner „Handbücher · Gegenprobe RU→DE"
+  ✓ Original-PDF ist bytegleich wie eingelesen
+  ✓ gleiche Seitenzahl und Seitengrößen (auch gedreht und beschnitten) — keine Umbrüche verschoben
+  ✓ Kyrillisch: Noto Sans als Teilmenge eingebettet
+  ✓ russischer Text steht lesbar im PDF (Seite 1)
+  ✓ Übersetzung an der Stelle des Originals: Überschrift
+  ✓ … rechte Spalte („Datum:")
+  ✓ … auf der Seite mit senkrecht stehendem Text (Längs-/Querachse vertauscht)
+  ✓ … auf der beschnittenen Seite (CropBox versetzt)
+  ✓ … auf der Querformat-Seite mit aufrechtem Text
+  ✓ senkrecht stehender Text wird mitübersetzt (Seite 2 steht quer auf dem Schirm)
+  ✓ Handbuch: Aufzählungspunkte und Schritte bleiben einzelne Absätze
+  ✓ Handbuch: russische Liste steht im PDF
+  ✓ Warnkasten bleibt gelb (Abdeckung in der Hintergrundfarbe, nicht weiß)
+  ✓ … und die Übersetzung darin ist weiß geschrieben wie im Original (keine schwarze Schrift)
+  ✓ Bild auf der Handbuch-Seite unverändert (blau)
+  ✓ gescannte Seite bleibt, wie sie war (kein Text dazu)
+  ✓ Original abgedeckt: wo „Mai" stand und die Übersetzung nicht hinreicht, ist die Seite (fast) weiß
+  ✓ russische Überschrift ist sichtbar gezeichnet (Tinte im Bereich)
+  ✓ Gegenprobe liegt daneben und trägt den deutschen Text zurück
+  ✓ Gegenprobe übersetzt die gespeicherte Übersetzung zurück, nicht den Text unter dem Deckblatt
+  ✓ keine offenen Zwischenstände mehr in der Datenbank
+  ✓ KI: vor dem ersten Senden wird gefragt, nichts ist bis dahin gesendet
+  ✓ KI: „Abbrechen" sendet nichts
+  ✓ KI: Tempo-Limit wird sichtbar abgewartet, die Wartezeit des Anbieters (Retry-After 5 s) gilt
+  ✓ KI: 429 wird abgewartet und wiederholt (2 Anfragen für 1 Seite)
+  ✓ KI: gesendet wird nur Text (kein Bild), Modell mistral-small-latest, JSON verlangt
+  ✓ KI: Bericht nennt die Token
+  ✓ RU → EN: kyrillische Absätze gelesen, englischer Text steht im PDF
+  ✓ OCR: Text der gescannten Seite erkannt (Überschrift + Absatz)
+  ✓ OCR: Bericht nennt die Texterkennung
+  ✓ OCR: Übersetzung steht an der Stelle der Überschrift (Scan: 120 px/1240 → x≈58 pt, Grundlinie ≈ y 125 pt)
+  ✓ OCR: Abdeckung im Papierton des Scans, nicht reinweiß
+    gemessen: 1 gescannte Seite mit OCR in 1.4 s (inkl. einmaligem Laden der Texterkennung)
+  ✓ Fortschritt zeigt „Seite N von M"
+  ✓ Abbrechen hält nach der laufenden Seite an, Zwischenstand gespeichert
+  ✓ bei Abbruch kein vollständiges Ergebnis angelegt
+  ✓ … aber ein Teil-PDF „[EN, Teil N von 6]" mit allen 6 Seiten
+  ✓ … fertige Seiten übersetzt, der Rest steht im Original
+  ✓ … und der Bericht bietet es zum Öffnen an
+  ✓ Fortsetzen übersetzt nur die fehlenden Seiten
+  ✓ … und das Ergebnis hat alle 6 Seiten, jede an ihrem Platz übersetzt
+  ✓ … und das Teil-PDF ist durch das vollständige ersetzt
+  ✓ Kontingent erschöpft: Bericht nennt den Grund und „2 von 6 Seiten"
+  ✓ … Teil-PDF mit 2 übersetzten Seiten liegt bereit
+  ✓ … und „Teilübersetzung öffnen" zeigt es im Editor
+  ✓ keine Fehler in der Konsole (außer der gestellten 429)
+
+56 grün · 0 ROT
+

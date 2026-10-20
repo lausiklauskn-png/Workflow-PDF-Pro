@@ -1,0 +1,24 @@
+  ✓ das Logo-Zeichen „M" wird nicht als Absatz übersetzt
+  ✓ die Ziffern in den Kreisen werden nicht übersetzt
+  ✓ drei Schritte = drei Absätze (nicht zusammengeworfen)
+  ✓ … und die roten Kreise bleiben rot (nicht abgedeckt)
+  ✓ drei Ankreuz-Zeilen = drei Absätze
+  ✓ Kasten: Überschrift getrennt vom Text
+  ✓ Kasten: die zwei Textzeilen bleiben EIN Absatz (der Kastenrand trennt sie nicht)
+  ✓ freier Platz rechts: die längere Übersetzung von „Name:" behält die Schriftgröße 10
+  ✓ gleiche Originalgröße in einer Spalte → gleiche Schriftgröße in der Übersetzung
+  ✓ Liste mit einem eingeengten Punkt: alle Punkte der Spalte gleich groß (angeglichen)
+  ✓ Abdeckung nur über den Zeilen: der Stempel neben der kurzen Zeile bleibt blau
+  ✓ Bild mit Text auf einer Seite MIT Textebene: mit „Text in Bildern mitübersetzen" wird der Text im Bild gelesen und übersetzt
+  ✓ … und der Bericht nennt die Texterkennung
+  ✓ HTML zum Ausfüllen trägt die Sprache der Übersetzung (ru), das Original bleibt de
+  ✓ Beschriftungs-Spalte: jede Beschriftung ein eigener Absatz (neben IHREM Feld)
+  ✓ … und jede steht in der Übersetzung auf der Höhe ihres Feldes
+  ✓ Überschrift „1. Angaben zum Termin" getrennt von der Beschriftung „Datum:"
+  ✓ gewöhnlicher Absatz (11 pt Zeilenabstand) bleibt EIN Absatz
+  ✓ Schriftfarbe: der dunkle Kern gewinnt gegen die zahlreicheren hellen Kantenpixel
+  ✓ kleine dunkelgraue Beschriftungen bleiben dunkel (nicht blassgrau)
+  ✓ keine Fehler in der Konsole
+
+21 grün · 0 ROT
+

@@ -1,0 +1,13 @@
+# Signierschlüssel dürfen nur als authentifiziert verschlüsseltes Paket ins Repo.
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.key
+*.p8
+.signing-local/
+
+# Auslieferungen gehören in GitHub Releases.
+release-files/
+*.apk
+*.aab

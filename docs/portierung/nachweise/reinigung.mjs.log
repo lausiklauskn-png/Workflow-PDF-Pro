@@ -1,0 +1,66 @@
+Workfloh PDF — Reinigung vor der KI
+  ✓ assets/reinigung.js meldet sich (WFP.Reinigung)
+  ✓ schwarze Schrift auf Weiß ist sichtbar
+  ✓ weiß auf weiß (keine Tinte an der Stelle) ist versteckt
+  ✓ blass (Abstand 17 zum Grund) ist versteckt
+  ✓ … hellgrau mit Abstand 60 gilt als sichtbar (Gegenrichtung)
+  ✓ dunkel auf gleich dunklem Grund ist versteckt
+  ✓ helle Schrift auf dunklem Grund ist sichtbar
+  ✓ Schrift unter 1,5 pt ist winzig — auch wenn dort Tinte ist
+  ✓ ganz außerhalb des Bildes ist versteckt
+  ✓ reinigeRoh nimmt das versteckte Stück heraus und lässt das sichtbare
+  ✓ … schräger Text wird nicht beurteilt und bleibt (benannte Grenze)
+  ✓ … das Original der Stücke bleibt unverändert
+  ✓ zudecken: der blasse Text ist danach weg
+  ✓ … und nur an seiner Stelle (Schwarz darunter bleibt)
+  ✓ JPEG: EXIF, XMP, IPTC und Kommentar sind heraus
+  ✓ … alles andere bleibt Byte für Byte (JFIF, ICC-Farbprofil, Adobe, Tabellen, Bilddaten)
+  ✓ … ein JPEG ohne Metadaten bleibt dasselbe Objekt
+  ✓ … kein JPEG: unverändert und als nicht geprüft benannt
+  ✓ … ein abgeschnittenes JPEG: unverändert, nicht geprüft (nichts geraten)
+  ✓ … dieselbe Reinigung für die Datenadresse, die zur KI geht
+  ✓ Vermerk: dasselbe Stück auf derselben Seite steht einmal da, eine andere Seite zählt neu
+  ✓ … ein anderer Weg (Felder erkennen statt Übersetzen) wird eigens vermerkt
+  ✓ … mit Zeit, Weg, Seite, Text und Grund
+  ✓ … ein langer Text wird gekürzt abgelegt
+  ✓ … und die Liste hat einen Deckel
+  ✓ … eine leere Liste legt nichts an
+  ✓ reinigung.js steht in der Seite VOR app.js und im Offline-Vorrat
+  ✓ gereinigt wird jeder Weg, der das Gerät verlässt (KI und Chrome), nur der Übersetzer im Browser nicht
+  ✓ vier Test-PDFs eingelesen
+  ✓ Übersetzen über die KI hält an, sobald versteckter Text da ist
+  ✓ … und bis dahin ist NICHTS an die KI gegangen
+  ✓ … der Halt nennt die versteckten Stücke (weiß, winzig, unsichtbar gesetzt, blass)
+  ✓ … mit Grund und Seite
+  ✓ „Abbrechen": keine einzige Anfrage an die KI
+  ✓ … und kein Vermerk am Dokument (es wurde nichts entfernt, weil nichts ging)
+  ✓ der Halt: „Abbrechen" gibt nein und legt am Dokument keinen Vermerk ab
+  ✓ der Halt: „Ohne ihn senden" gibt ja und vermerkt das Stück
+  ✓ zweiter Lauf: der Halt kommt wieder (einmal je Sendevorgang)
+  ✓ „Ohne ihn senden": der sichtbare Text ging an die KI
+  ✓ … der versteckte Text steht in KEINER Anfrage
+  ✓ … der Bericht nennt, dass etwas nicht mitgeschickt wurde
+  ✓ Vermerk am Dokument: vier Stücke, Weg „uebersetzung", Seite 1
+  ✓ … mit den Gründen „winzig" und „unsichtbar"
+  ✓ … das Original ist unverändert (Datei Byte für Byte)
+  ✓ Prüfbericht: Abschnitt „Vor dem Senden an eine KI entfernt" mit den Stücken
+  ✓ … und in der Textdatei des Prüfberichts
+  ✓ sauberes PDF: kein Halt, die Übersetzung läuft durch
+  ✓ … und kein Vermerk
+  ✓ Chrome-Weg: der Halt kommt, BEVOR der Text auf Chromes Fläche steht
+  ✓ … auf Chromes Fläche steht der sichtbare Text
+  ✓ … und KEIN versteckter Text (er geht nicht an Google)
+  ✓ … vermerkt mit dem Weg „chrome"
+  ✓ … und der Prüfbericht nennt „Übersetzen mit Chrome"
+  ✓ Felder erkennen hält ebenfalls an, bevor das Bild hinausgeht
+  ✓ das Bild ging hinaus (nach „Ohne ihn senden")
+  ✓ … ohne Bild-Metadaten (kein EXIF/XMP/IPTC/Kommentar im JPEG)
+  ✓ … und das Farbprofil der Leinwand gilt nicht als Metadaten (kein Vermerk „ICC")
+  ✓ … der sichtbare Satz ist im Bild (Gegenrichtung)
+  ✓ … der blasse Text ist ohne Reinigung im Bild messbar (sonst misst die Zeile darunter nichts)
+  ✓ … und im Bild an die KI zugedeckt
+  ✓ Vermerk: dieselben Stücke jetzt auch mit Weg „erkennung"
+  ✓ keine Fehler auf der Seite
+
+62 grün · 0 ROT
+

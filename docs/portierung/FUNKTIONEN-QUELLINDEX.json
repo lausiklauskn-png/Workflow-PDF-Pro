@@ -1,0 +1,7256 @@
+[
+  {
+    "source": "assets/app.js",
+    "line": 35,
+    "function": "lesen",
+    "parameters": "k"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 36,
+    "function": "einstSpeichern",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 46,
+    "function": "toast",
+    "parameters": "txt, aktion"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 51,
+    "function": "hops",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 52,
+    "function": "dialog",
+    "parameters": "html, onMount"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 63,
+    "function": "frage",
+    "parameters": "titel, text, ja, nein"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 73,
+    "function": "kiReiniger",
+    "parameters": "weg"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 75,
+    "function": "halt",
+    "parameters": "d, liste"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 87,
+    "function": "eingabe",
+    "parameters": "titel, label, wert"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 98,
+    "function": "fortschritt",
+    "parameters": "titel, abbrechen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 126,
+    "function": "laden",
+    "parameters": "dateiname, bytes, typ"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 136,
+    "function": "ladeBibliothek",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 145,
+    "function": "offeneVorschlaege",
+    "parameters": "d"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 167,
+    "function": "sortiere",
+    "parameters": "liste"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 181,
+    "function": "zeichneBibliothek",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 268,
+    "function": "karte",
+    "parameters": "d, fund"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 285,
+    "function": "ganzNachOben",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 288,
+    "function": "kartenBinden",
+    "parameters": "g, FUND"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 308,
+    "function": "fundZeilen",
+    "parameters": "r"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 319,
+    "function": "suchStand",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 334,
+    "function": "skriptLaden",
+    "parameters": "src"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 341,
+    "function": "modulLaden",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 349,
+    "function": "bedeutungZeichnen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 379,
+    "function": "bedeutungDialog",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 394,
+    "function": "bedeutungAus",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 400,
+    "function": "bedeutungStarten",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 433,
+    "function": "vektorenAusSpeicher",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 451,
+    "function": "vektorenNachholen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 509,
+    "function": "bedeutungSuchen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 532,
+    "function": "wortAnteil",
+    "parameters": "q"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 545,
+    "function": "bedeutungZusatz",
+    "parameters": "FUND, imOrdner"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 573,
+    "function": "bedeutungZeile",
+    "parameters": "fund"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 586,
+    "function": "seitenText",
+    "parameters": "pdf"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 603,
+    "function": "textAblegen",
+    "parameters": "id, seiten"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 605,
+    "function": "texteNachholen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 624,
+    "function": "neuerOrdner",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 629,
+    "function": "verschieben",
+    "parameters": "id"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 654,
+    "function": "wahlUmschalten",
+    "parameters": "id"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 659,
+    "function": "wahlEnde",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 660,
+    "function": "wahlMarken",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 667,
+    "function": "wahlLeiste",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 688,
+    "function": "inOrdner",
+    "parameters": "ids, folderId"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 699,
+    "function": "ziehenBinden",
+    "parameters": "el, id"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 708,
+    "function": "ziehStart",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 716,
+    "function": "ziehGeist",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 717,
+    "function": "ziehZiel",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 736,
+    "function": "ziehRollen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 741,
+    "function": "ziehAus",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 774,
+    "function": "nimmEintraege",
+    "parameters": "d"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 775,
+    "function": "teilenDocs",
+    "parameters": "ids"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 817,
+    "function": "duplizieren",
+    "parameters": "id"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 823,
+    "function": "loeschen",
+    "parameters": "id"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 831,
+    "function": "loeschenMehrere",
+    "parameters": "ids"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 850,
+    "function": "bildNormalisieren",
+    "parameters": "file"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 872,
+    "function": "seitenInfo",
+    "parameters": "pdf"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 880,
+    "function": "vorschaubild",
+    "parameters": "pdf"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 888,
+    "function": "vorhandeneFelder",
+    "parameters": "pdf"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 909,
+    "function": "neuesDok",
+    "parameters": "name, bytes, quelle, folderId, original, pruefen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 925,
+    "function": "dokErsetzen",
+    "parameters": "alt, name, bytes"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 946,
+    "function": "eingangPruefen",
+    "parameters": "id, name, bytes, originalWeg"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 974,
+    "function": "markeErneuern",
+    "parameters": "id"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 985,
+    "function": "pruefKnopfBinden",
+    "parameters": "wo, id"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 996,
+    "function": "pruefungNachholen",
+    "parameters": "ids"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1009,
+    "function": "pruefMarke",
+    "parameters": "d"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1024,
+    "function": "edPruefungZeigen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1031,
+    "function": "pruefBerichtText",
+    "parameters": "d, kopf, zeit, tun"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1056,
+    "function": "kiEntferntHtml",
+    "parameters": "d"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1062,
+    "function": "pruefDialog",
+    "parameters": "id"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1098,
+    "function": "zuB64",
+    "parameters": "u8"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1099,
+    "function": "ausB64",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1100,
+    "function": "standDatei",
+    "parameters": "doc, bytes"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1104,
+    "function": "staendeEinlesen",
+    "parameters": "dateien"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1128,
+    "function": "speichernDialog",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1144,
+    "function": "importDateien",
+    "parameters": "dateien, ordnerName, opt"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1188,
+    "function": "scanStarten",
+    "parameters": "ziel, start"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1214,
+    "function": "oeffneDok",
+    "parameters": "id, fund"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1245,
+    "function": "imDokSuchen",
+    "parameters": "q, stumm"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1258,
+    "function": "funde_neu_zeichnen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1262,
+    "function": "zeichneSuchZahl",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1267,
+    "function": "springeZuFund",
+    "parameters": "i"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1277,
+    "function": "fundMarken",
+    "parameters": "fund"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1283,
+    "function": "zeichneFunde",
+    "parameters": "i, lage"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1297,
+    "function": "schliesseEditor",
+    "parameters": "ohneHistory"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1308,
+    "function": "speichern",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1309,
+    "function": "speichernJetzt",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1312,
+    "function": "seitenBreite",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1313,
+    "function": "zeichneSeiten",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1333,
+    "function": "seiteRendern",
+    "parameters": "i"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1344,
+    "function": "zoom",
+    "parameters": "f"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1346,
+    "function": "feldText",
+    "parameters": "f"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1350,
+    "function": "qrSvg",
+    "parameters": "text"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1354,
+    "function": "zeichneFelder",
+    "parameters": "i"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1361,
+    "function": "feldElement",
+    "parameters": "f"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1409,
+    "function": "linkZiel",
+    "parameters": "typ, v"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1424,
+    "function": "linkFeld",
+    "parameters": "f, inp, el"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1446,
+    "function": "nrGleich",
+    "parameters": "a, b"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1447,
+    "function": "dokeMitNummer",
+    "parameters": "art, nr"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1451,
+    "function": "nummerOeffnen",
+    "parameters": "art, nr"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1465,
+    "function": "ziehen",
+    "parameters": "e, f, el, art"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1485,
+    "function": "markiere",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1486,
+    "function": "feldSetzen",
+    "parameters": "seite, e, lage"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1497,
+    "function": "platzierenStart",
+    "parameters": "t"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1504,
+    "function": "zeichneModus",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1512,
+    "function": "zeichneBand",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1524,
+    "function": "zeichneFuss",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1574,
+    "function": "unterschreiben",
+    "parameters": "f"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1606,
+    "function": "zuschneiden",
+    "parameters": "c"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1616,
+    "function": "feldLoeschen",
+    "parameters": "f"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1621,
+    "function": "erkannterText",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1631,
+    "function": "seiteDialog",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1641,
+    "function": "dateienAnhaengen",
+    "parameters": "files"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1649,
+    "function": "seitenAnhaengen",
+    "parameters": "teile"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1676,
+    "function": "seiteZuschneiden",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1717,
+    "function": "erkennenDialog",
+    "parameters": "ids"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1751,
+    "function": "erkenneViele",
+    "parameters": "ids, mitKi"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1770,
+    "function": "typAusLabel",
+    "parameters": "f"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1784,
+    "function": "inhaltUebernehmen",
+    "parameters": "felder, items, ctx, W, H"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1816,
+    "function": "kiSeitenBild",
+    "parameters": "p, vp, c, kand, seite"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1838,
+    "function": "erkenneDok",
+    "parameters": "d, bytes, mitKi, melde, rein"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1925,
+    "function": "formatText",
+    "parameters": "d"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1932,
+    "function": "ausgabeBytes",
+    "parameters": "doc, bytes, m"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1944,
+    "function": "ordnerAusgabe",
+    "parameters": "o"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1997,
+    "function": "exportDialog",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2052,
+    "function": "jobLesen",
+    "parameters": "id"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2063,
+    "function": "stammOrdner",
+    "parameters": "q"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2068,
+    "function": "abkoemmling",
+    "parameters": "x, o"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2069,
+    "function": "ergebnisOrdner",
+    "parameters": "d, schluessel, zusatz"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2081,
+    "function": "uebersetzenStart",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2106,
+    "function": "beispieleLaden",
+    "parameters": "nur"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2126,
+    "function": "ueEinlesen",
+    "parameters": "dateien, ordnerName"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2138,
+    "function": "ueFotoAblegen",
+    "parameters": "bytes"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2156,
+    "function": "chromeTabAdresse",
+    "parameters": "l"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2180,
+    "function": "chromeHinweis",
+    "parameters": "url, kopiert"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2191,
+    "function": "inChromeOeffnen",
+    "parameters": "l, vorher"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2218,
+    "function": "chromeTabKnoepfe",
+    "parameters": "el, lage, vorher"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2233,
+    "function": "zurueckBand",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2241,
+    "function": "chromeTabRueckweg",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2263,
+    "function": "originalVon",
+    "parameters": "d"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2278,
+    "function": "dateiGroesse",
+    "parameters": "id"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2280,
+    "function": "teilPlanZeigen",
+    "parameters": "dl, g, zu"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2305,
+    "function": "teileAnlegen",
+    "parameters": "d, plan"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2333,
+    "function": "uebersetzenDialog",
+    "parameters": "ids, alleGewaehlt, opt"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2409,
+    "function": "uebersetzerErzeugen",
+    "parameters": "weg, von, nach, mitRueck, knopf, zu, ids"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2445,
+    "function": "felderUebersetzen",
+    "parameters": "felder, uebersetzer, mitLabel"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2459,
+    "function": "rueckwegMoeglich",
+    "parameters": "d"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2461,
+    "function": "rueckwegDialog",
+    "parameters": "id, opt"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2496,
+    "function": "rueckwegLaufen",
+    "parameters": "d, src, von, nach, uebersetzer, weg"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2532,
+    "function": "messen",
+    "parameters": "docs"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2554,
+    "function": "uebersetzeViele",
+    "parameters": "ids, von, nach, hin, zurueck, weg"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2662,
+    "function": "spracheWaehlen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2684,
+    "function": "spracheingabe",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2692,
+    "function": "spracheKnopf",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2720,
+    "function": "dauerStand",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2721,
+    "function": "dauerBitten",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2728,
+    "function": "sicherungErinnerung",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2740,
+    "function": "sicherungDialog",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2803,
+    "function": "einstellungen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2850,
+    "function": "installHinweis",
+    "parameters": "fertig"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2876,
+    "function": "videoFuer",
+    "parameters": "lang, hoch, teil"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2884,
+    "function": "erklaervideo",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2959,
+    "function": "hilfe",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 2997,
+    "function": "start",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 3109,
+    "function": "geteiltUebernehmen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 3129,
+    "function": "oeffnenMitEmpfangen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/bedeutung.js",
+    "line": 57,
+    "function": "stuecke",
+    "parameters": "doc, seiten"
+  },
+  {
+    "source": "assets/bedeutung.js",
+    "line": 102,
+    "function": "signatur",
+    "parameters": "st"
+  },
+  {
+    "source": "assets/bedeutung.js",
+    "line": 112,
+    "function": "ladeStand",
+    "parameters": "dateien, d"
+  },
+  {
+    "source": "assets/bedeutung.js",
+    "line": 132,
+    "function": "rangliste",
+    "parameters": "qv, vek, dot, opt"
+  },
+  {
+    "source": "assets/blatt.js",
+    "line": 20,
+    "function": "grau",
+    "parameters": "canvas"
+  },
+  {
+    "source": "assets/blatt.js",
+    "line": 33,
+    "function": "otsu",
+    "parameters": "g"
+  },
+  {
+    "source": "assets/blatt.js",
+    "line": 45,
+    "function": "groessteFlaeche",
+    "parameters": "m, w, h"
+  },
+  {
+    "source": "assets/blatt.js",
+    "line": 60,
+    "function": "huelle",
+    "parameters": "pts"
+  },
+  {
+    "source": "assets/blatt.js",
+    "line": 70,
+    "function": "vierEcken",
+    "parameters": "h"
+  },
+  {
+    "source": "assets/blatt.js",
+    "line": 90,
+    "function": "finden",
+    "parameters": "canvas"
+  },
+  {
+    "source": "assets/blatt.js",
+    "line": 120,
+    "function": "homographie",
+    "parameters": "von, nach"
+  },
+  {
+    "source": "assets/blatt.js",
+    "line": 136,
+    "function": "entzerren",
+    "parameters": "canvas, ecken, quer"
+  },
+  {
+    "source": "assets/blatt.js",
+    "line": 160,
+    "function": "aufA4",
+    "parameters": "canvas"
+  },
+  {
+    "source": "assets/db.js",
+    "line": 14,
+    "function": "open",
+    "parameters": ""
+  },
+  {
+    "source": "assets/db.js",
+    "line": 31,
+    "function": "tx",
+    "parameters": "store, mode, fn"
+  },
+  {
+    "source": "assets/eingang.js",
+    "line": 63,
+    "function": "skript",
+    "parameters": "src"
+  },
+  {
+    "source": "assets/eingang.js",
+    "line": 71,
+    "function": "bereit",
+    "parameters": ""
+  },
+  {
+    "source": "assets/eingang.js",
+    "line": 85,
+    "function": "markiert",
+    "parameters": "A, bytes, befunde"
+  },
+  {
+    "source": "assets/eingang.js",
+    "line": 97,
+    "function": "pruefen",
+    "parameters": "name, bytes"
+  },
+  {
+    "source": "assets/eingang.js",
+    "line": 121,
+    "function": "wasTun",
+    "parameters": "kennung"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 14,
+    "function": "linienErkennung",
+    "parameters": "imgData"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 111,
+    "function": "flaechen",
+    "parameters": "px, W, H"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 151,
+    "function": "kaestchen",
+    "parameters": "dark, W, H"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 195,
+    "function": "beschrifte",
+    "parameters": "felder, textItems"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 247,
+    "function": "markiertesBild",
+    "parameters": "canvas, kand"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 260,
+    "function": "promptMitKandidaten",
+    "parameters": "kand"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 271,
+    "function": "fehlerText",
+    "parameters": "resp"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 279,
+    "function": "kiAnfrage",
+    "parameters": "cfg, bildDataUrl, prompt"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 298,
+    "function": "kiTest",
+    "parameters": "cfg"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 312,
+    "function": "kiAuswerten",
+    "parameters": "text, bild"
+  },
+  {
+    "source": "assets/erkennung.js",
+    "line": 348,
+    "function": "zusammenfuehren",
+    "parameters": "ki, linien, kein"
+  },
+  {
+    "source": "assets/export.js",
+    "line": 11,
+    "function": "invert",
+    "parameters": "t"
+  },
+  {
+    "source": "assets/export.js",
+    "line": 19,
+    "function": "saeubern",
+    "parameters": "font, s"
+  },
+  {
+    "source": "assets/export.js",
+    "line": 31,
+    "function": "datumText",
+    "parameters": "v"
+  },
+  {
+    "source": "assets/export.js",
+    "line": 36,
+    "function": "umbrechen",
+    "parameters": "font, text, size, breite"
+  },
+  {
+    "source": "assets/export.js",
+    "line": 50,
+    "function": "passendeGroesse",
+    "parameters": "font, text, bw, bh, mehrzeilig"
+  },
+  {
+    "source": "assets/export.js",
+    "line": 63,
+    "function": "feldName",
+    "parameters": "f, vergeben"
+  },
+  {
+    "source": "assets/export.js",
+    "line": 74,
+    "function": "brauchtUnicode",
+    "parameters": "font, s"
+  },
+  {
+    "source": "assets/export.js",
+    "line": 83,
+    "function": "exportieren",
+    "parameters": "doc, bytes, modus, opt"
+  },
+  {
+    "source": "assets/export.js",
+    "line": 223,
+    "function": "bilderZuPdf",
+    "parameters": "bilder"
+  },
+  {
+    "source": "assets/html-export.js",
+    "line": 10,
+    "function": "htmlFormular",
+    "parameters": "doc, bytes"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 41,
+    "function": "alsBytes",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 42,
+    "function": "latin1",
+    "parameters": "b, von, bis"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 50,
+    "function": "gross",
+    "parameters": "n"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 53,
+    "function": "artVon",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 77,
+    "function": "istText",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 92,
+    "function": "jpegPruefen",
+    "parameters": "b, melde, texte"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 137,
+    "function": "herkunftMelden",
+    "parameters": "teile, melde"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 151,
+    "function": "exifHatGps",
+    "parameters": "b, t, bis"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 160,
+    "function": "pngPruefen",
+    "parameters": "b, melde, texte"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 178,
+    "function": "webpPruefen",
+    "parameters": "b, melde, texte"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 202,
+    "function": "utf8oderLatin1",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 205,
+    "function": "ucs2",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 210,
+    "function": "exifTexte",
+    "parameters": "b, t, bis, texte"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 214,
+    "function": "ifdLesen",
+    "parameters": "ifd, tiefe"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 236,
+    "function": "xmlEntity",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 241,
+    "function": "xmpTexte",
+    "parameters": "b, texte"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 255,
+    "function": "iptcTexte",
+    "parameters": "b, von, bis, texte"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 265,
+    "function": "entpacken",
+    "parameters": "daten"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 271,
+    "function": "lies",
+    "parameters": ""
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 286,
+    "function": "pngTextLesen",
+    "parameters": "typ, schl, d, texte"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 304,
+    "function": "metatextPruefen",
+    "parameters": "texte, melde, hinweise, stand"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 326,
+    "function": "anhaengsel",
+    "parameters": "b, ende, melde"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 341,
+    "function": "svgPruefen",
+    "parameters": "b, melde"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 357,
+    "function": "entitaeten",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 365,
+    "function": "zipEintraege",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 379,
+    "function": "zipLesen",
+    "parameters": "b, e"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 391,
+    "function": "officePruefen",
+    "parameters": "b, name, melde"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 448,
+    "function": "pfade",
+    "parameters": "neu"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 449,
+    "function": "pdfjsHolen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 468,
+    "function": "pdfSeitentext",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 497,
+    "function": "absolut",
+    "parameters": "u"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 498,
+    "function": "tesseractHolen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 521,
+    "function": "bildLesen",
+    "parameters": "quelle, bis"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 532,
+    "function": "kasten",
+    "parameters": "li"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 561,
+    "function": "bildQuelle",
+    "parameters": "b, art"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 577,
+    "function": "bildtextPruefen",
+    "parameters": "text, wo, melde, hinweise, boxen"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 600,
+    "function": "kontrastStrecken",
+    "parameters": "d, w, h"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 624,
+    "function": "gestreckt",
+    "parameters": "c"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 637,
+    "function": "woerter",
+    "parameters": "t"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 638,
+    "function": "neueZeilen",
+    "parameters": "erste, zweite"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 648,
+    "function": "blassPruefen",
+    "parameters": "blass, alle, melde, hinweise, alleBoxen"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 659,
+    "function": "bildTextPruefen",
+    "parameters": "b, art, melde, hinweise, stand"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 696,
+    "function": "seiteLeinwand",
+    "parameters": "doc, nr, mitKaesten"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 711,
+    "function": "wortKaesten",
+    "parameters": "items, vp"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 728,
+    "function": "tinteIm",
+    "parameters": "c, k"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 736,
+    "function": "seiteLesen",
+    "parameters": "doc, nr"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 737,
+    "function": "scanSeitenLesen",
+    "parameters": "doc, leer, melde, hinweise, stand"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 794,
+    "function": "versteckteWoerter",
+    "parameters": "fehlt, kaesten, tinte"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 800,
+    "function": "aehnlich",
+    "parameters": "a, b"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 810,
+    "function": "vergleiche",
+    "parameters": "textebene, bildzeilen"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 830,
+    "function": "gegenlesen",
+    "parameters": "doc, seiten, gesamt, leer, melde, hinweise, stand"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 872,
+    "function": "pdfTextPruefen",
+    "parameters": "b, melde, hinweise, stand"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 913,
+    "function": "htmlPruefen",
+    "parameters": "b, melde, hinweise, stand"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 958,
+    "function": "lsbBytes",
+    "parameters": "d, n, kanaele, anzahl"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 967,
+    "function": "lsbDruckbar",
+    "parameters": "x"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 968,
+    "function": "lsbTextOk",
+    "parameters": "t"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 970,
+    "function": "bildpunkteLesen",
+    "parameters": "d, w, h"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 989,
+    "function": "verdachtPruefen",
+    "parameters": "name, bytes"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 991,
+    "function": "melde",
+    "parameters": "k, satz, box"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 992,
+    "function": "aus",
+    "parameters": "geprueft, grund"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1063,
+    "function": "wasTun",
+    "parameters": "kennung"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1074,
+    "function": "marken",
+    "parameters": "befunde"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1085,
+    "function": "markieren",
+    "parameters": "bytes, befunde"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1121,
+    "function": "dateitextPruefen",
+    "parameters": "text, melde, hinweise, stand"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1144,
+    "function": "ungeprueft",
+    "parameters": "stand, satz"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1148,
+    "function": "pruefe",
+    "parameters": "name, bytes"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1150,
+    "function": "melde",
+    "parameters": "k, satz, box, daten"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1208,
+    "function": "vonB64",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1215,
+    "function": "vonQP",
+    "parameters": "s, wort"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1225,
+    "function": "dekod",
+    "parameters": "b, cs"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1228,
+    "function": "kopfWort",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1233,
+    "function": "kopfTeilen",
+    "parameters": "roh"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1239,
+    "function": "dateiname",
+    "parameters": "k"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1246,
+    "function": "ausMail",
+    "parameters": "roh"
+  },
+  {
+    "source": "assets/pruefer-anhang.js",
+    "line": 1248,
+    "function": "teil",
+    "parameters": "x, tiefe"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 41,
+    "function": "istFreigestellt",
+    "parameters": "pfad"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 134,
+    "function": "istIban",
+    "parameters": "roh"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 154,
+    "function": "maskiere",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 172,
+    "function": "fuellwoerter",
+    "parameters": ""
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 184,
+    "function": "pruefeText",
+    "parameters": "text, pfad, erlaubt"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 278,
+    "function": "alsLatin1",
+    "parameters": "bytes"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 288,
+    "function": "objektVor",
+    "parameters": "roh, pos"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 303,
+    "function": "ohneEndzeile",
+    "parameters": "bytes"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 309,
+    "function": "entpacke",
+    "parameters": "roheBytes"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 357,
+    "function": "bytesAus",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 363,
+    "function": "dekodiere",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 373,
+    "function": "utf8",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 380,
+    "function": "literal",
+    "parameters": "text, pos"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 403,
+    "function": "hexZk",
+    "parameters": "hex"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 412,
+    "function": "zkWert",
+    "parameters": "text, m"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 419,
+    "function": "sauberZk",
+    "parameters": "w"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 423,
+    "function": "ohneEntities",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 442,
+    "function": "jumbf",
+    "parameters": "b, von, bis, tiefe, aus"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 474,
+    "function": "cbor",
+    "parameters": "b, start"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 476,
+    "function": "zahl",
+    "parameters": "info"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 484,
+    "function": "lies",
+    "parameters": "tiefe"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 522,
+    "function": "zertNamen",
+    "parameters": "der"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 563,
+    "function": "nameVon",
+    "parameters": "x"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 575,
+    "function": "c2paLesen",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 590,
+    "function": "kind",
+    "parameters": "k, re"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 591,
+    "function": "inhalt",
+    "parameters": "k"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 664,
+    "function": "pruefePdf",
+    "parameters": "bytes, erlaubt"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 680,
+    "function": "melde",
+    "parameters": "pos, kennung, satz"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 712,
+    "function": "aktionenIn",
+    "parameters": "text, versatz, herkunft"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 734,
+    "function": "objektText",
+    "parameters": "pos"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 773,
+    "function": "nachweisLesen",
+    "parameters": "n"
+  },
+  {
+    "source": "assets/pruefer-formate.js",
+    "line": 790,
+    "function": "metaIn",
+    "parameters": "text, versatz, herkunft"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 182,
+    "function": "maskiere",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 188,
+    "function": "kern",
+    "parameters": "wirt"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 198,
+    "function": "wirtAus",
+    "parameters": "adresse"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 207,
+    "function": "entitaeten",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 224,
+    "function": "ausQP",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 231,
+    "function": "ausBase64",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 244,
+    "function": "alsText",
+    "parameters": "roh, zeichensatz"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 264,
+    "function": "kopfWert",
+    "parameters": "kopfText, name"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 296,
+    "function": "entpackeTeil",
+    "parameters": "kopfText, koerper"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 312,
+    "function": "istText",
+    "parameters": "typ"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 317,
+    "function": "dateiname",
+    "parameters": "kopfText"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 330,
+    "function": "zerlege",
+    "parameters": "roh, tiefe"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 481,
+    "function": "pruefeMail",
+    "parameters": "roh"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 493,
+    "function": "zeileVon",
+    "parameters": "pos"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 507,
+    "function": "zeileMit",
+    "parameters": "re, auch"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 517,
+    "function": "melde",
+    "parameters": "zeile, kennung, satz"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 533,
+    "function": "nimmZiel",
+    "parameters": "adresse, zeile"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 594,
+    "function": "inLink",
+    "parameters": "pos"
+  },
+  {
+    "source": "assets/pruefer-mail.js",
+    "line": 931,
+    "function": "seiteAus",
+    "parameters": "roh"
+  },
+  {
+    "source": "assets/reinigung.js",
+    "line": 35,
+    "function": "kasten",
+    "parameters": "img, x0, y0, x1, y1"
+  },
+  {
+    "source": "assets/reinigung.js",
+    "line": 41,
+    "function": "tinte",
+    "parameters": "img, k"
+  },
+  {
+    "source": "assets/reinigung.js",
+    "line": 51,
+    "function": "versteckt",
+    "parameters": "stueck, img, massstab"
+  },
+  {
+    "source": "assets/reinigung.js",
+    "line": 62,
+    "function": "reinigeRoh",
+    "parameters": "roh, img, massstab"
+  },
+  {
+    "source": "assets/reinigung.js",
+    "line": 76,
+    "function": "zudecken",
+    "parameters": "img, stueck, massstab"
+  },
+  {
+    "source": "assets/reinigung.js",
+    "line": 99,
+    "function": "jpegOhneMeta",
+    "parameters": "u8"
+  },
+  {
+    "source": "assets/reinigung.js",
+    "line": 119,
+    "function": "ausB64",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/reinigung.js",
+    "line": 120,
+    "function": "zuB64",
+    "parameters": "u8"
+  },
+  {
+    "source": "assets/reinigung.js",
+    "line": 122,
+    "function": "datenAdresseOhneMeta",
+    "parameters": "url"
+  },
+  {
+    "source": "assets/reinigung.js",
+    "line": 133,
+    "function": "vermerken",
+    "parameters": "d, liste, weg, zeit"
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 51,
+    "function": "gnText",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 52,
+    "function": "geraetename",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 55,
+    "function": "anzeigeName",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 56,
+    "function": "namensfelderAbgleichen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 62,
+    "function": "geraetenameFeldEinhaengen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 63,
+    "function": "versuch",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 119,
+    "function": "pause",
+    "parameters": "f"
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 123,
+    "function": "naechste",
+    "parameters": "i, fertig"
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 138,
+    "function": "lampe",
+    "parameters": "id, klasse"
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 146,
+    "function": "pulsSetzen",
+    "parameters": "id"
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 152,
+    "function": "lampenVerdrahten",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 163,
+    "function": "leisteVerdrahten",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 166,
+    "function": "setze",
+    "parameters": "offen"
+  },
+  {
+    "source": "assets/sbkim-init.js",
+    "line": 185,
+    "function": "starten",
+    "parameters": ""
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 30,
+    "function": "sortiere",
+    "parameters": "pts"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 38,
+    "function": "ausScanic",
+    "parameters": "c"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 44,
+    "function": "abstand",
+    "parameters": "a, b, w, h"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 48,
+    "function": "flaeche",
+    "parameters": "e"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 53,
+    "function": "taugt",
+    "parameters": "e, w, h"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 70,
+    "function": "entscheiden",
+    "parameters": "eing, w, h"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 88,
+    "function": "seitenMass",
+    "parameters": "ecken, format, dpi"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 103,
+    "function": "homographie",
+    "parameters": "von, nach"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 117,
+    "function": "entzerren",
+    "parameters": "src, ecken, W, H"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 136,
+    "function": "drehen",
+    "parameters": "img, n"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 147,
+    "function": "helligkeit",
+    "parameters": "d, n"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 150,
+    "function": "hintergrund",
+    "parameters": "L, w, h"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 191,
+    "function": "schaerfen",
+    "parameters": "L, w, h, staerke"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 208,
+    "function": "filtern",
+    "parameters": "img, modus, opt"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 249,
+    "function": "textFarben",
+    "parameters": "img, box"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 270,
+    "function": "zeilenLage",
+    "parameters": "z, W, H"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 286,
+    "function": "kopieGroessen",
+    "parameters": "lagen"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 293,
+    "function": "zeilenBand",
+    "parameters": "l, rand"
+  },
+  {
+    "source": "assets/scan-bild.js",
+    "line": 303,
+    "function": "bildAuftrag",
+    "parameters": "o"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 30,
+    "function": "vorschauDpi",
+    "parameters": ""
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 43,
+    "function": "fotoLesen",
+    "parameters": "file"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 59,
+    "function": "zuCanvas",
+    "parameters": "img"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 63,
+    "function": "scanicLaden",
+    "parameters": ""
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 67,
+    "function": "erkennen",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 84,
+    "function": "schluessel",
+    "parameters": "s, dpi, mitText"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 88,
+    "function": "seiteRechnen",
+    "parameters": "s, dpi, mitText"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 98,
+    "function": "vorschau",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 108,
+    "function": "textAnwenden",
+    "parameters": "c, img, s"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 140,
+    "function": "schreibe",
+    "parameters": "x, t, l, fs, winkel, farbe, st"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 152,
+    "function": "kopieRechnen",
+    "parameters": "s, dpi, durchsichtig"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 170,
+    "function": "kopieVorschau",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 179,
+    "function": "ocrWorker",
+    "parameters": "sprache"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 188,
+    "function": "ocrSeite",
+    "parameters": "s, dpi"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 210,
+    "function": "schriftFuer",
+    "parameters": "pdf, texte"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 220,
+    "function": "jpeg",
+    "parameters": "c, q"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 221,
+    "function": "eigeneDpi",
+    "parameters": "s, mindest"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 225,
+    "function": "pdfBauen",
+    "parameters": "melde"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 276,
+    "function": "oeffnen",
+    "parameters": "opt"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 320,
+    "function": "schliessen",
+    "parameters": ""
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 328,
+    "function": "hinzu",
+    "parameters": "dateien, o"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 351,
+    "function": "melden",
+    "parameters": ""
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 357,
+    "function": "zeichne",
+    "parameters": ""
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 363,
+    "function": "zeichneBuehne",
+    "parameters": ""
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 379,
+    "function": "lupeGroesse",
+    "parameters": "W, H"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 382,
+    "function": "lupeLage",
+    "parameters": "x, y, d, W, H"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 390,
+    "function": "zeichneZuschnitt",
+    "parameters": "b, s"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 440,
+    "function": "zeichneErgebnis",
+    "parameters": "b, s"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 483,
+    "function": "zeileAendern",
+    "parameters": "s, i"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 514,
+    "function": "kiBildBauen",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 523,
+    "function": "zuChatGPT",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 539,
+    "function": "zeichneWerkzeug",
+    "parameters": ""
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 622,
+    "function": "zeichneLeiste",
+    "parameters": ""
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 638,
+    "function": "formatIst",
+    "parameters": ""
+  },
+  {
+    "source": "assets/scanner.js",
+    "line": 645,
+    "function": "zeichneFuss",
+    "parameters": ""
+  },
+  {
+    "source": "assets/schieber.js",
+    "line": 36,
+    "function": "stilEinmal",
+    "parameters": "doc"
+  },
+  {
+    "source": "assets/schieber.js",
+    "line": 41,
+    "function": "an",
+    "parameters": "leiste"
+  },
+  {
+    "source": "assets/schieber.js",
+    "line": 97,
+    "function": "stop",
+    "parameters": ""
+  },
+  {
+    "source": "assets/schieber.js",
+    "line": 104,
+    "function": "beobachte",
+    "parameters": "wurzel, selektor"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 75,
+    "function": "pruefeForm",
+    "parameters": "roh"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 135,
+    "function": "zufall",
+    "parameters": "n"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 140,
+    "function": "bytesZuB64u",
+    "parameters": "bytes"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 145,
+    "function": "b64uZuBytes",
+    "parameters": "str"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 154,
+    "function": "ableiten",
+    "parameters": "passwort, salz"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 165,
+    "function": "zu",
+    "parameters": "passwort, klartext"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 185,
+    "function": "auf",
+    "parameters": "passwort, paket"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 197,
+    "function": "istPaketForm",
+    "parameters": "d"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 201,
+    "function": "istPaket",
+    "parameters": "d"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 232,
+    "function": "einlegen",
+    "parameters": "ablage, passwort, schluessel"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 250,
+    "function": "holen",
+    "parameters": "ablage, passwort"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 263,
+    "function": "liegtEtwas",
+    "parameters": "ablage"
+  },
+  {
+    "source": "assets/schluesseltresor.js",
+    "line": 270,
+    "function": "werfen",
+    "parameters": "ablage"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 27,
+    "function": "originalName",
+    "parameters": "name"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 36,
+    "function": "zuB64",
+    "parameters": "bytes"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 42,
+    "function": "vonB64",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 47,
+    "function": "alsBytes",
+    "parameters": "b"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 57,
+    "function": "inhaltBauen",
+    "parameters": "db"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 69,
+    "function": "inhaltLesen",
+    "parameters": "obj"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 79,
+    "function": "verschliessen",
+    "parameters": "pw, db"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 85,
+    "function": "oeffnen",
+    "parameters": "pw, datei"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 98,
+    "function": "zusammenfuehren",
+    "parameters": "db, inhalt"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 120,
+    "function": "tageSeit",
+    "parameters": "iso, jetzt"
+  },
+  {
+    "source": "assets/sicherung.js",
+    "line": 121,
+    "function": "erinnernNoetig",
+    "parameters": "anzahlDocs, zuletztIso, spaeter, jetzt"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 45,
+    "function": "muster",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 56,
+    "function": "einsetzen",
+    "parameters": "v, caps"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 62,
+    "function": "nach",
+    "parameters": "k, tief = 0"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 80,
+    "function": "nachZeile",
+    "parameters": "k"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 91,
+    "function": "T",
+    "parameters": "deutsch"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 117,
+    "function": "skelett",
+    "parameters": "el"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 119,
+    "function": "lauf",
+    "parameters": "n"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 140,
+    "function": "aufbauen",
+    "parameters": "el, wert, vorlage"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 142,
+    "function": "sammle",
+    "parameters": "n"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 168,
+    "function": "richElement",
+    "parameters": "el"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 203,
+    "function": "textKnoten",
+    "parameters": "n"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 217,
+    "function": "attribute",
+    "parameters": "el"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 240,
+    "function": "walk",
+    "parameters": "root"
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 257,
+    "function": "anwenden",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 294,
+    "function": "start",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sprache.js",
+    "line": 299,
+    "function": "speichern",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 54,
+    "function": "stilEinmal",
+    "parameters": "doc"
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 59,
+    "function": "fehlerText",
+    "parameters": "e"
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 69,
+    "function": "zusammenfuegen",
+    "parameters": "teile"
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 81,
+    "function": "anhaengen",
+    "parameters": "opt"
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 101,
+    "function": "feldAuf",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 112,
+    "function": "feldZu",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 120,
+    "function": "saeule",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 134,
+    "function": "textJetzt",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 135,
+    "function": "aus",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 143,
+    "function": "stop",
+    "parameters": ""
+  },
+  {
+    "source": "assets/sprechen.js",
+    "line": 144,
+    "function": "start",
+    "parameters": ""
+  },
+  {
+    "source": "assets/suche.js",
+    "line": 19,
+    "function": "falte",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/suche.js",
+    "line": 32,
+    "function": "daten",
+    "parameters": "text"
+  },
+  {
+    "source": "assets/suche.js",
+    "line": 42,
+    "function": "datumVonWort",
+    "parameters": "w"
+  },
+  {
+    "source": "assets/suche.js",
+    "line": 52,
+    "function": "anfrage",
+    "parameters": "q"
+  },
+  {
+    "source": "assets/suche.js",
+    "line": 59,
+    "function": "trifft",
+    "parameters": "tok, b"
+  },
+  {
+    "source": "assets/suche.js",
+    "line": 69,
+    "function": "vorbereiten",
+    "parameters": "seiten"
+  },
+  {
+    "source": "assets/suche.js",
+    "line": 84,
+    "function": "stellen",
+    "parameters": "tok, seite"
+  },
+  {
+    "source": "assets/suche.js",
+    "line": 100,
+    "function": "sucheDok",
+    "parameters": "doc, seiten, toks"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 41,
+    "function": "kreisInhalt",
+    "parameters": "ch"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 50,
+    "function": "kreisZurueck",
+    "parameters": "orig, text"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 65,
+    "function": "bloecke",
+    "parameters": "page"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 95,
+    "function": "zeichenNormal",
+    "parameters": "s"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 105,
+    "function": "gruppieren",
+    "parameters": "teile, o, bild"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 186,
+    "function": "seitenBild",
+    "parameters": "page, scale"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 197,
+    "function": "farben",
+    "parameters": "canvas, scale, b"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 228,
+    "function": "seitenPruefer",
+    "parameters": "canvas, scale"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 233,
+    "function": "tinte",
+    "parameters": "x0, y0, x1, y1"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 245,
+    "function": "breite",
+    "parameters": "x0, y0, x1, y1"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 257,
+    "function": "leereZeile",
+    "parameters": "x0, y0, x1, y1"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 269,
+    "function": "frei",
+    "parameters": "b, andere, grenzeR"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 296,
+    "function": "ocrStarten",
+    "parameters": "basis, von"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 307,
+    "function": "bildFlaechen",
+    "parameters": "page"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 336,
+    "function": "bildZeileTaugt",
+    "parameters": "t, sicherheit"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 345,
+    "function": "ocrBloecke",
+    "parameters": "worker, canvas, scale, dx = 0, dy = 0, imBild = false"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 362,
+    "function": "saetze",
+    "parameters": "t, max"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 375,
+    "function": "browserDa",
+    "parameters": ""
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 377,
+    "function": "browserVerfuegbar",
+    "parameters": "von, nach"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 382,
+    "function": "browserUebersetzer",
+    "parameters": "von, nach, meldeLaden"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 449,
+    "function": "falscheSchrift",
+    "parameters": "text, nach"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 459,
+    "function": "chromeUebersetzer",
+    "parameters": "von, nach, opt"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 478,
+    "function": "auf",
+    "parameters": ""
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 538,
+    "function": "kiPrompt",
+    "parameters": "von, nach"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 547,
+    "function": "jsonAus",
+    "parameters": "text"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 568,
+    "function": "kiUebersetzer",
+    "parameters": "cfg, von, nach"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 583,
+    "function": "frage",
+    "parameters": "liste"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 597,
+    "function": "frage1",
+    "parameters": "liste"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 620,
+    "function": "fehlerObj",
+    "parameters": "r"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 626,
+    "function": "fehler",
+    "parameters": "r"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 663,
+    "function": "teilPlan",
+    "parameters": "groesse, seiten, jeTeil"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 688,
+    "function": "lauf",
+    "parameters": "opt"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 779,
+    "function": "rueck",
+    "parameters": "stand, uebersetzer, opt"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 798,
+    "function": "umbrechen",
+    "parameters": "font, text, size, breite"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 808,
+    "function": "saeubern",
+    "parameters": "font, s"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 815,
+    "function": "schriftLaden",
+    "parameters": "basis"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 823,
+    "function": "pdfBauen",
+    "parameters": "bytes, seiten, schrift, opt"
+  },
+  {
+    "source": "assets/uebersetzung.js",
+    "line": 921,
+    "function": "anzeige",
+    "parameters": "page"
+  },
+  {
+    "source": "assets/zip.js",
+    "line": 9,
+    "function": "crc32",
+    "parameters": "u8"
+  },
+  {
+    "source": "assets/zip.js",
+    "line": 11,
+    "function": "dosZeit",
+    "parameters": "d"
+  },
+  {
+    "source": "assets/zip.js",
+    "line": 17,
+    "function": "eindeutig",
+    "parameters": "namen"
+  },
+  {
+    "source": "assets/zip.js",
+    "line": 26,
+    "function": "zip",
+    "parameters": "dateien, jetzt"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 207,
+    "function": "makeError",
+    "parameters": "name, message, cause"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 218,
+    "function": "InvalidStoreNameError",
+    "parameters": "message"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 219,
+    "function": "EnsureStoreError",
+    "parameters": "message, cause"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 221,
+    "function": "assertKnownStore",
+    "parameters": "storeName"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 230,
+    "function": "applyMigration",
+    "parameters": "db, version"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 319,
+    "function": "attachVersionChangeHandler",
+    "parameters": "db"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 339,
+    "function": "closeConnectionAndWait",
+    "parameters": "db"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 347,
+    "function": "requestStoragePersist",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 400,
+    "function": "init",
+    "parameters": "options"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 446,
+    "function": "probeCurrentDbIdentity",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 483,
+    "function": "confirmIdentityStoreMissing",
+    "parameters": "name"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 488,
+    "function": "finish",
+    "parameters": "value, db"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 514,
+    "function": "repointOrReject",
+    "parameters": "explicitSuffix"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 543,
+    "function": "openWithName",
+    "parameters": "effectiveName"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 706,
+    "function": "openFreshAtDbVersion",
+    "parameters": "resolve, reject"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 779,
+    "function": "openProbe",
+    "parameters": "name"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 829,
+    "function": "deleteDb",
+    "parameters": "name"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 864,
+    "function": "checkRequiredStores",
+    "parameters": "db"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 883,
+    "function": "openExact",
+    "parameters": "name, version"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 921,
+    "function": "wrapRequest",
+    "parameters": "req, opLabel"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 963,
+    "function": "isConnectionClosing",
+    "parameters": "err"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 968,
+    "function": "beginTx",
+    "parameters": "storeName, mode"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 984,
+    "function": "get",
+    "parameters": "storeName, key"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 991,
+    "function": "put",
+    "parameters": "storeName, key, value"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1016,
+    "function": "del",
+    "parameters": "storeName, key"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1023,
+    "function": "all",
+    "parameters": "storeName"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1051,
+    "function": "clear",
+    "parameters": "storeName"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1063,
+    "function": "ensureStore",
+    "parameters": "storeName"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1085,
+    "function": "ensureStoreInner",
+    "parameters": "storeName"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1181,
+    "function": "readAllSbkimStoresRaw",
+    "parameters": "name"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1195,
+    "function": "finish",
+    "parameters": "result"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1213,
+    "function": "maybeDone",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1234,
+    "function": "copyMissingEntries",
+    "parameters": "storeName, entries, summary"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1269,
+    "function": "migrateIdentityFrom",
+    "parameters": "oldDbName"
+  },
+  {
+    "source": "sbkim/01_storage.js",
+    "line": 1313,
+    "function": "getStore",
+    "parameters": "storeName"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 110,
+    "function": "makeError",
+    "parameters": "name, message, cause"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 120,
+    "function": "InvalidBackupPasswordError",
+    "parameters": "message"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 121,
+    "function": "BackupDecryptError",
+    "parameters": "message, cause"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 122,
+    "function": "BackupVersionMismatchError",
+    "parameters": "message"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 123,
+    "function": "BackupSchemaError",
+    "parameters": "message"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 124,
+    "function": "BackupOverwriteError",
+    "parameters": "message"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 125,
+    "function": "UnknownIdentityError",
+    "parameters": "message"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 126,
+    "function": "RemoveActiveIdentityError",
+    "parameters": "message"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 128,
+    "function": "getSubtle",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 140,
+    "function": "getStorage",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 152,
+    "function": "base64urlEncode",
+    "parameters": "bytes"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 160,
+    "function": "base64urlDecode",
+    "parameters": "str"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 169,
+    "function": "utf8Encode",
+    "parameters": "str"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 176,
+    "function": "derivePbkdf2AesGcmKey",
+    "parameters": "password, salt, iterations"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 197,
+    "function": "canonicalize",
+    "parameters": "value"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 209,
+    "function": "canonicalJsonBytes",
+    "parameters": "obj"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 214,
+    "function": "deriveNodeIdFromPublicKey",
+    "parameters": "publicKey"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 221,
+    "function": "deriveNodeIdFromJwk",
+    "parameters": "publicJwk"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 252,
+    "function": "dispatchAliveOnce",
+    "parameters": "nodeId"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 271,
+    "function": "init",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 279,
+    "function": "ensureReady",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 288,
+    "function": "ensureIdentityStores",
+    "parameters": "key"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 316,
+    "function": "ensureMetaStore",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 330,
+    "function": "loadIdentity",
+    "parameters": "key"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 376,
+    "function": "getOrCreateIdentity",
+    "parameters": "key"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 427,
+    "function": "getActiveIdentityKey",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 444,
+    "function": "setActiveIdentity",
+    "parameters": "key"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 474,
+    "function": "listIdentities",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 489,
+    "function": "removeIdentity",
+    "parameters": "key, options"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 607,
+    "function": "getNodeId",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 620,
+    "function": "getPublicKeyJwk",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 633,
+    "function": "validateSporeMeta",
+    "parameters": "meta"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 662,
+    "function": "sanitizeSnippetVectors",
+    "parameters": "list"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 691,
+    "function": "generateOwnSpore",
+    "parameters": "meta, key"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 762,
+    "function": "getOwnSpore",
+    "parameters": "key"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 783,
+    "function": "regenerateOwnSpore",
+    "parameters": "updates, key"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 789,
+    "function": "pickStr",
+    "parameters": "u, b"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 790,
+    "function": "pickArr",
+    "parameters": "u, b"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 841,
+    "function": "checkRequiredFields",
+    "parameters": "spore"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 849,
+    "function": "majorVersion",
+    "parameters": "v"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 855,
+    "function": "verifyForeignSpore",
+    "parameters": "spore"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 921,
+    "function": "signDetached",
+    "parameters": "obj, key"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 932,
+    "function": "verifyDetached",
+    "parameters": "obj, signature, publicKeyJwk"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 948,
+    "function": "resetIdentityCache",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 962,
+    "function": "buildIdentityEntry",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 1009,
+    "function": "exportBackup",
+    "parameters": "password"
+  },
+  {
+    "source": "sbkim/02_spore.js",
+    "line": 1103,
+    "function": "importBackup",
+    "parameters": "blob, password, options"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 157,
+    "function": "makeError",
+    "parameters": "name, message, cause"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 166,
+    "function": "getSubtle",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 178,
+    "function": "probeDependencies",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 192,
+    "function": "getStorage",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 193,
+    "function": "getSpore",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 194,
+    "function": "getMatch",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 204,
+    "function": "siblingsStoreName",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 208,
+    "function": "anastomosisLogStoreName",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 212,
+    "function": "ensureSlotStores",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 220,
+    "function": "base64urlEncode",
+    "parameters": "bytes"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 228,
+    "function": "base64urlDecode",
+    "parameters": "str"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 237,
+    "function": "utf8Encode",
+    "parameters": "str"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 242,
+    "function": "canonicalize",
+    "parameters": "value"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 254,
+    "function": "canonicalJsonBytesWithoutSignature",
+    "parameters": "envelopeLike"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 266,
+    "function": "signEnvelope",
+    "parameters": "unsigned, privateKey"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 272,
+    "function": "verifyEnvelope",
+    "parameters": "envelope, publicKeyJwk"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 297,
+    "function": "randomNonceB64",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 307,
+    "function": "majorVersion",
+    "parameters": "v"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 313,
+    "function": "nowIso",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 363,
+    "function": "dispatchHandshakeEvent",
+    "parameters": "outcome, peerNodeId, direction"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 381,
+    "function": "nextLogKey",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 397,
+    "function": "init",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 428,
+    "function": "ensureReady",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 432,
+    "function": "loadOwnPrivateKey",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 462,
+    "function": "loadOwnDomainVector",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 480,
+    "function": "setupServiceWorkerBridge",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 513,
+    "function": "setupBroadcastChannelBridge",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 560,
+    "function": "postChannelEnvelope",
+    "parameters": "request, timeoutMs"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 643,
+    "function": "sendViaChannel",
+    "parameters": "targetSpore, request, preScore, httpCause, opSlot, timeoutMs"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 662,
+    "function": "resolveNostrRelayClient",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 679,
+    "function": "resolveMatchModule",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 686,
+    "function": "pruneNostrSeen",
+    "parameters": "nowMs"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 699,
+    "function": "nostrNonceSeen",
+    "parameters": "nonce, nowMs"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 704,
+    "function": "nostrRememberNonce",
+    "parameters": "nonce, nowMs"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 709,
+    "function": "tagValue",
+    "parameters": "event, name"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 723,
+    "function": "buildNostrEventBody",
+    "parameters": "tagName, targetId, requestNonce, contentObj"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 742,
+    "function": "sendViaNostr",
+    "parameters": "targetSpore, request, preScore, opSlot, timeoutMs"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 774,
+    "function": "onReplyEvent",
+    "parameters": "event"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 842,
+    "function": "queryNostr",
+    "parameters": "targetNodeId, text, options"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 894,
+    "function": "onQueryReplyEvent",
+    "parameters": "event"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 956,
+    "function": "handleIncomingNostrQuery",
+    "parameters": "client, event"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1043,
+    "function": "listenNostr",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1060,
+    "function": "onRequestEvent",
+    "parameters": "event"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1069,
+    "function": "onQueryEvent",
+    "parameters": "event"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1074,
+    "function": "stopListenNostr",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1085,
+    "function": "handleIncomingNostrRequest",
+    "parameters": "client, event"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1138,
+    "function": "parseTransport",
+    "parameters": "options"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1159,
+    "function": "shouldAutoFallback",
+    "parameters": "httpResponse, parsedJson"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1176,
+    "function": "upsertSibling",
+    "parameters": "entry, slotKey"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1196,
+    "function": "logEntry",
+    "parameters": "peerId, outcome, slotKey"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1215,
+    "function": "handshake",
+    "parameters": "targetSpore, ownDomainVector, options"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1225,
+    "function": "_doHandshake",
+    "parameters": "targetSpore, ownDomainVector, options"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1434,
+    "function": "consumeResponse",
+    "parameters": "targetSpore, responseJson, preScore, opSlot"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1498,
+    "function": "receiveHandshake",
+    "parameters": "request"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1514,
+    "function": "_doReceiveHandshake",
+    "parameters": "request"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1627,
+    "function": "checkRequestFields",
+    "parameters": "req"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1637,
+    "function": "pickPeerDomainVector",
+    "parameters": "request"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1648,
+    "function": "buildResponse",
+    "parameters": "extra, request, slotKey"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1688,
+    "function": "listSiblings",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1704,
+    "function": "forgetSibling",
+    "parameters": "nodeId"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1721,
+    "function": "_buildSignedRequest",
+    "parameters": "senderPrivateKey, senderSpore, senderDomainVector, toNodeId"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1752,
+    "function": "_verifyResponseSignature",
+    "parameters": "response, receiverPublicKeyJwk"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1756,
+    "function": "_setOwnDomainVector",
+    "parameters": "vec"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1774,
+    "function": "_setTransport",
+    "parameters": "t"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1793,
+    "function": "_clearChannelState",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1803,
+    "function": "_setNostrRelayClient",
+    "parameters": "client"
+  },
+  {
+    "source": "sbkim/05_anastomose.js",
+    "line": 1821,
+    "function": "_clearNostrSeen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 57,
+    "function": "toHex",
+    "parameters": "bytes"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 62,
+    "function": "fromHex",
+    "parameters": "h"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 68,
+    "function": "getSubtle",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 76,
+    "function": "sha256Hex",
+    "parameters": "str"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 94,
+    "function": "makeClient",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 109,
+    "function": "liveSockets",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 122,
+    "function": "ensureConnections",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 126,
+    "function": "maybeResolve",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 188,
+    "function": "okEmpfangen",
+    "parameters": "url, id, ok, nachricht"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 197,
+    "function": "verbindungZu",
+    "parameters": "url"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 208,
+    "function": "liveUrls",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 217,
+    "function": "dispatchEvent",
+    "parameters": "subId, ev"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 228,
+    "function": "finalizeEvent",
+    "parameters": "body"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 239,
+    "function": "publish",
+    "parameters": "body"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 258,
+    "function": "abschluss",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 287,
+    "function": "subscribe",
+    "parameters": "filter, onEvent"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 297,
+    "function": "unsubscribe",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 312,
+    "function": "istRelaisAdresse",
+    "parameters": "url"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 317,
+    "function": "configure",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/05b_nostr_relay.js",
+    "line": 352,
+    "function": "close",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 117,
+    "function": "makeError",
+    "parameters": "name, message, cause"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 126,
+    "function": "getSubtle",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 138,
+    "function": "probeDependencies",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 151,
+    "function": "getStorage",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 152,
+    "function": "getSpore",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 164,
+    "function": "siblingsStoreName",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 167,
+    "function": "anastomosisLogStoreName",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 170,
+    "function": "legacyInboxStoreName",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 173,
+    "function": "heteroInboxStoreName",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 176,
+    "function": "heteroOutboxStoreName",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 180,
+    "function": "ensureSlotStores",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 191,
+    "function": "base64urlEncode",
+    "parameters": "bytes"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 199,
+    "function": "base64urlDecode",
+    "parameters": "str"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 208,
+    "function": "utf8Encode",
+    "parameters": "str"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 213,
+    "function": "canonicalize",
+    "parameters": "value"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 225,
+    "function": "canonicalJsonBytesWithoutSignature",
+    "parameters": "envelopeLike"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 237,
+    "function": "signEnvelope",
+    "parameters": "unsigned, privateKey"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 243,
+    "function": "verifyEnvelope",
+    "parameters": "envelope, publicKeyJwk"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 268,
+    "function": "randomBytesB64",
+    "parameters": "n"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 278,
+    "function": "majorVersion",
+    "parameters": "v"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 284,
+    "function": "nowIso",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 285,
+    "function": "nowMs",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 310,
+    "function": "init",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 341,
+    "function": "ensureReady",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 345,
+    "function": "loadOwnPrivateKey",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 376,
+    "function": "setupServiceWorkerBridge",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 401,
+    "function": "listSiblingsForBroadcast",
+    "parameters": "slotKey"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 430,
+    "function": "prepareSelfApoptose",
+    "parameters": "reason"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 473,
+    "function": "confirmSelfApoptose",
+    "parameters": "token, reason"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 622,
+    "function": "_sendLegacyForIdentity",
+    "parameters": "key, reason"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 715,
+    "function": "dispatchLegacyOnce",
+    "parameters": "legacyMessage, sibling"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 767,
+    "function": "receiveLegacy",
+    "parameters": "incomingLegacy"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 877,
+    "function": "checkLegacyFields",
+    "parameters": "legacy"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 888,
+    "function": "buildLegacyResponse",
+    "parameters": "extra, incomingLegacy, slotKey"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 924,
+    "function": "listLegacy",
+    "parameters": "key"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 951,
+    "function": "forgetExpiredSiblings",
+    "parameters": "maxAgeMs, key"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 1015,
+    "function": "_buildSignedLegacyMessage",
+    "parameters": "reason"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 1043,
+    "function": "_addPseudoSibling",
+    "parameters": "sib"
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 1060,
+    "function": "_clearPseudoSiblings",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/07_apoptose.js",
+    "line": 1066,
+    "function": "_advanceTokenClock",
+    "parameters": "ms"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 232,
+    "function": "sprache",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 244,
+    "function": "T",
+    "parameters": "de"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 256,
+    "function": "zaehlText",
+    "parameters": "n"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 260,
+    "function": "Tf",
+    "parameters": "de"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 309,
+    "function": "nowIso",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 319,
+    "function": "dispatchPostmessageEvent",
+    "parameters": "op, decision"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 335,
+    "function": "dispatchFremdAlertEvent",
+    "parameters": "kind, decision, bufferSize"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 351,
+    "function": "warn",
+    "parameters": "message, cause"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 358,
+    "function": "info",
+    "parameters": "message"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 365,
+    "function": "pruneSeenNonces",
+    "parameters": "nowMs"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 376,
+    "function": "prunePendingQueries",
+    "parameters": "nowMs"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 386,
+    "function": "isHttpOrigin",
+    "parameters": "s"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 427,
+    "function": "kurzText",
+    "parameters": "s, max"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 441,
+    "function": "feldNamen",
+    "parameters": "o"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 457,
+    "function": "absenderArt",
+    "parameters": "event"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 480,
+    "function": "nachLadenMs",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 487,
+    "function": "tabSichtbar",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 499,
+    "function": "herkunftDetails",
+    "parameters": "event"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 528,
+    "function": "safeUserAgentHint",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 538,
+    "function": "isValidEntry",
+    "parameters": "entry"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 545,
+    "function": "normalizeEntry",
+    "parameters": "raw"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 561,
+    "function": "resolveLampElement",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 573,
+    "function": "updateLampAlertState",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 588,
+    "function": "pulseLamp",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 610,
+    "function": "recordEntry",
+    "parameters": "rawEntry"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 631,
+    "function": "notifyListeners",
+    "parameters": "entry"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 647,
+    "function": "listFremdzugriff",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 657,
+    "function": "subscribeFremdzugriff",
+    "parameters": "cb"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 660,
+    "function": "noopUnsubscribe",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 664,
+    "function": "unsubscribe",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 672,
+    "function": "clearFremdzugriff",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 684,
+    "function": "recordForTest",
+    "parameters": "entry"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 699,
+    "function": "recordPostMessageEntry",
+    "parameters": "event, op, nonce, decision, extraDetails"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 737,
+    "function": "isValidSporeRefPayload",
+    "parameters": "p"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 744,
+    "function": "isValidHintPayload",
+    "parameters": "p"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 752,
+    "function": "isValidQueryPayload",
+    "parameters": "p"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 767,
+    "function": "queryWithInclusion",
+    "parameters": "match, text, k"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 799,
+    "function": "cacheSporeRef",
+    "parameters": "origin, payload"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 815,
+    "function": "sendQueryResultReply",
+    "parameters": "event, inReplyToNonce, results, errorReason"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 840,
+    "function": "dispatchOp",
+    "parameters": "event, op, nonce, payload"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 957,
+    "function": "handlePostMessage",
+    "parameters": "event"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1045,
+    "function": "subscribeBroadcastChannel",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1080,
+    "function": "mountFremdzugriffModal",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1266,
+    "function": "entryErklaerung",
+    "parameters": "entry"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1319,
+    "function": "renderModalRow",
+    "parameters": "entry"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1345,
+    "function": "renderModalNote",
+    "parameters": "entry"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1356,
+    "function": "renderModalContents",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1376,
+    "function": "notifyModal",
+    "parameters": "entry"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1392,
+    "function": "openFremdzugriffModal",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1421,
+    "function": "closeFremdzugriffModal",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1446,
+    "function": "readSnapshot",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1585,
+    "function": "computeQuotaWarningLevel",
+    "parameters": "est"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1599,
+    "function": "hashNodeIdToBase64url",
+    "parameters": "nodeId"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1614,
+    "function": "init",
+    "parameters": "options"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1710,
+    "function": "attachLampClickHandler",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1730,
+    "function": "setQueryJudge",
+    "parameters": "cfg"
+  },
+  {
+    "source": "sbkim/15_membran.js",
+    "line": 1738,
+    "function": "setQueryInclusion",
+    "parameters": "cfg"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 254,
+    "function": "isAspect4",
+    "parameters": "a"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 462,
+    "function": "sprache",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 474,
+    "function": "T",
+    "parameters": "de"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 581,
+    "function": "warn",
+    "parameters": "message, cause"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 588,
+    "function": "nowIso",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 594,
+    "function": "siegelStufe",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 602,
+    "function": "applyStufeToBadge",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 620,
+    "function": "playStufenwechselAnimation",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 640,
+    "function": "onHandshakeEvent",
+    "parameters": "event"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 653,
+    "function": "registerHandshakeListener",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 665,
+    "function": "escapeAttr",
+    "parameters": "str"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 676,
+    "function": "checkModuleSurface",
+    "parameters": "entry"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 695,
+    "function": "buildModuleStatuses",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 711,
+    "function": "deriveCertified",
+    "parameters": "statuses"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 720,
+    "function": "collectFailedIds",
+    "parameters": "statuses"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 733,
+    "function": "defaultRepoUrl",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 753,
+    "function": "resolveRepoUrl",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 767,
+    "function": "buildExplanationSnapshot",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 808,
+    "function": "emptySnapshot",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 821,
+    "function": "resolveBadgeAnchor",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 834,
+    "function": "escapeXmlText",
+    "parameters": "s"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 848,
+    "function": "effectiveRibbonText",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 856,
+    "function": "renderWappenSvg",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 883,
+    "function": "buildBadgeElement",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 904,
+    "function": "mountBadge",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 947,
+    "function": "setupBadgeMountObserver",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 986,
+    "function": "disconnectMountObserver",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 997,
+    "function": "attachBadgeClickHandler",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1019,
+    "function": "playFirstBootAnimation",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1045,
+    "function": "showAndockHint",
+    "parameters": "text"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1053,
+    "function": "onAndockClick",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1080,
+    "function": "buildAndockBlock",
+    "parameters": "doc"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1135,
+    "function": "mountSiegelModal",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1331,
+    "function": "statusMarkerDot",
+    "parameters": "status"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1342,
+    "function": "statusLabel",
+    "parameters": "status"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1353,
+    "function": "renderBronzeHinweisBlock",
+    "parameters": "modalRoot"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1381,
+    "function": "renderModalContents",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1516,
+    "function": "openModal",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1536,
+    "function": "closeModal",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1552,
+    "function": "init",
+    "parameters": "options"
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1662,
+    "function": "isCertified",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1666,
+    "function": "getExplanation",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1671,
+    "function": "getCertifiedModules",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1681,
+    "function": "getAspects",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1697,
+    "function": "snapshotPflichtModuleSpec",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16_siegel.js",
+    "line": 1717,
+    "function": "_resetMycelConnectedForTest",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 46,
+    "function": "cfg",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 348,
+    "function": "sprache",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 355,
+    "function": "T",
+    "parameters": "de"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 363,
+    "function": "Tf",
+    "parameters": "de"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 375,
+    "function": "downloadJson",
+    "parameters": "filename, obj"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 393,
+    "function": "sporeFileName",
+    "parameters": "nodeId"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 404,
+    "function": "kennungsTeil",
+    "parameters": "nodeId"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 413,
+    "function": "sicherungsKennung",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 425,
+    "function": "autoGrow",
+    "parameters": "ta"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 443,
+    "function": "eigenTextSchluessel",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 448,
+    "function": "hatEigenenText",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 453,
+    "function": "merkeEigenenText",
+    "parameters": "beschreibung"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 462,
+    "function": "aktivesFach",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 470,
+    "function": "injectIntoSiegel",
+    "parameters": "modal"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 513,
+    "function": "buildSemantikBlock",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 660,
+    "function": "inhaltsSchnipsel",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 673,
+    "function": "vektorFuerSpore",
+    "parameters": "beschreibung, say"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 675,
+    "function": "ausBeschreibung",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 713,
+    "function": "naechsteEmbeddingVersion",
+    "parameters": "neuerVektor"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 731,
+    "function": "reSignWithDescription",
+    "parameters": "ta, btn, out"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 733,
+    "function": "say",
+    "parameters": "msg, bad"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 800,
+    "function": "buildSchutzInfoBlock",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 835,
+    "function": "openSchutzModal",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 857,
+    "function": "closeSchutzModal",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 871,
+    "function": "schritt",
+    "parameters": "nr, titel, knopf, extra"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 878,
+    "function": "buildWizardDialog",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 907,
+    "function": "out",
+    "parameters": "id, msg, bad"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 1073,
+    "function": "afterRestore",
+    "parameters": "res"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 1108,
+    "function": "shortNode",
+    "parameters": "id"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 1112,
+    "function": "refreshWizardIdentities",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 1162,
+    "function": "switchWizardIdentity",
+    "parameters": "key"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 1179,
+    "function": "redrawSemantikBlock",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 1185,
+    "function": "openWizard",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 1190,
+    "function": "closeWiz",
+    "parameters": "d"
+  },
+  {
+    "source": "sbkim/16b_andock_wizard.js",
+    "line": 1193,
+    "function": "watch",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 168,
+    "function": "netRaum",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 169,
+    "function": "netFragen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 171,
+    "function": "netCodeNorm",
+    "parameters": "code"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 174,
+    "function": "netSubtle",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 178,
+    "function": "netHex",
+    "parameters": "buf"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 183,
+    "function": "netZuB64",
+    "parameters": "u"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 184,
+    "function": "netAusB64",
+    "parameters": "b"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 186,
+    "function": "newNetCode",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 198,
+    "function": "netAbleiten",
+    "parameters": "code"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 217,
+    "function": "setNetwork",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 251,
+    "function": "netBereit",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 260,
+    "function": "netPacke",
+    "parameters": "obj, tag"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 273,
+    "function": "netEmpfange",
+    "parameters": "ev, tag, handle, warten"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 297,
+    "function": "checkNetSetting",
+    "parameters": "s"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 316,
+    "function": "netStore",
+    "parameters": "store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 320,
+    "function": "netSchluessel",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 323,
+    "function": "loadNetwork",
+    "parameters": "store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 335,
+    "function": "readNetwork",
+    "parameters": "store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 347,
+    "function": "saveNetwork",
+    "parameters": "setting, store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 357,
+    "function": "clearNetwork",
+    "parameters": "store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 363,
+    "function": "applyNetwork",
+    "parameters": "setting"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 391,
+    "function": "resolveRelay",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 398,
+    "function": "resolveAnastomose",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 402,
+    "function": "resolveSpore",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 411,
+    "function": "resolveVerifier",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 418,
+    "function": "resolveMatch",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 423,
+    "function": "resolveStorage",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 431,
+    "function": "resolveEmbedding",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 436,
+    "function": "nowSec",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 447,
+    "function": "cosine",
+    "parameters": "a, b"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 456,
+    "function": "checkMeaning",
+    "parameters": "spore"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 457,
+    "function": "out",
+    "parameters": "status, score, snippets, reason"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 510,
+    "function": "meaningFails",
+    "parameters": "c"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 514,
+    "function": "toVec",
+    "parameters": "arr"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 532,
+    "function": "relatednessForCards",
+    "parameters": "cards, ownSpore"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 573,
+    "function": "rankCardsByQuery",
+    "parameters": "cards, queryVec, opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 614,
+    "function": "vouchVorn",
+    "parameters": "c"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 642,
+    "function": "currentNetAdmin",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 678,
+    "function": "powSha256",
+    "parameters": "str"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 707,
+    "function": "powNullBits",
+    "parameters": "hex"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 716,
+    "function": "powBasis",
+    "parameters": "z"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 724,
+    "function": "powPruefen",
+    "parameters": "z"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 732,
+    "function": "powRechnen",
+    "parameters": "z"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 751,
+    "function": "idListe",
+    "parameters": "x"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 754,
+    "function": "buergenSchluessel",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 755,
+    "function": "buergenLesen",
+    "parameters": "store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 773,
+    "function": "buergenSchreiben",
+    "parameters": "o, store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 780,
+    "function": "loadVouchContacts",
+    "parameters": "store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 781,
+    "function": "saveVouchContacts",
+    "parameters": "list, store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 792,
+    "function": "vouchPruefen",
+    "parameters": "z, jetzt"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 822,
+    "function": "vouchEchtMerken",
+    "parameters": "k"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 826,
+    "function": "widerrufGrundOk",
+    "parameters": "g"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 837,
+    "function": "widerrufSchluessel",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 838,
+    "function": "widerrufeLesen",
+    "parameters": "store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 848,
+    "function": "widerrufeMerken",
+    "parameters": "neu, store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 862,
+    "function": "loadSeenRevocations",
+    "parameters": "store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 865,
+    "function": "vouchKanten",
+    "parameters": "zettel, jetzt, gespeichert"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 890,
+    "function": "vouchTrust",
+    "parameters": "cards, opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 945,
+    "function": "vouchAusstellen",
+    "parameters": "art, subjectId, opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 969,
+    "function": "sasSchluessel",
+    "parameters": "sp"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 974,
+    "function": "vouchSafetyNumber",
+    "parameters": "fremd"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 998,
+    "function": "issuedMerken",
+    "parameters": "z"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1007,
+    "function": "issuedEntfernen",
+    "parameters": "subjectId"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1014,
+    "function": "cardIssued",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1021,
+    "function": "empfehlungenAbholen",
+    "parameters": "ownId, cards, zettel"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1048,
+    "function": "createVouch",
+    "parameters": "subjectId, opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1053,
+    "function": "createRevocation",
+    "parameters": "subjectId, reason"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1063,
+    "function": "vouchExpiring",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1088,
+    "function": "answerOnlyVouched",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1092,
+    "function": "setAnswerOnlyVouched",
+    "parameters": "an, store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1099,
+    "function": "absenderVerbuergt",
+    "parameters": "q"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1108,
+    "function": "addCarried",
+    "parameters": "z, store"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1117,
+    "function": "cardCarried",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1128,
+    "function": "vouchPassOn",
+    "parameters": "z"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1151,
+    "function": "sperreSchluessel",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1153,
+    "function": "sperreForm",
+    "parameters": "z, admin, jetzt"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1170,
+    "function": "sperrePruefen",
+    "parameters": "z, jetzt"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1181,
+    "function": "sperreSpeicherLesen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1188,
+    "function": "sperreSpeicherSchreiben",
+    "parameters": "z"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1197,
+    "function": "sperreSetzen",
+    "parameters": "z"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1201,
+    "function": "sperreUebernehmen",
+    "parameters": "z, speichern"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1211,
+    "function": "sperreLaden",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1221,
+    "function": "isBlocked",
+    "parameters": "id"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1226,
+    "function": "sperrIds",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1228,
+    "function": "createBlocklist",
+    "parameters": "ids"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1247,
+    "function": "blockId",
+    "parameters": "nodeId"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1255,
+    "function": "addBlocklist",
+    "parameters": "z"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1262,
+    "function": "currentBlocklist",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1269,
+    "function": "signalListening",
+    "parameters": "active"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1279,
+    "function": "getOwnLiveSpore",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1297,
+    "function": "dbHasIdentity",
+    "parameters": "dbName"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1308,
+    "function": "finish",
+    "parameters": "has"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1329,
+    "function": "ensureIdentity",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1375,
+    "function": "cleanupSharedOrigin",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1388,
+    "function": "done",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1420,
+    "function": "repairAndReconnect",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1497,
+    "function": "applyOpts",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1526,
+    "function": "init",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1537,
+    "function": "configure",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1544,
+    "function": "bestaetigungAus",
+    "parameters": "a"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1555,
+    "function": "doAnnounce",
+    "parameters": "own, ohneWarten"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1609,
+    "function": "announce",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1624,
+    "function": "connectAndAnnounce",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1658,
+    "function": "discover",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1691,
+    "function": "onEvent",
+    "parameters": "ev"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1695,
+    "function": "karteNehmen",
+    "parameters": "ev, card"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1859,
+    "function": "handshakeCard",
+    "parameters": "card, opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1937,
+    "function": "antwortOhneSig",
+    "parameters": "a"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1942,
+    "function": "zettelSignieren",
+    "parameters": "zettel"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1953,
+    "function": "zettelPruefen",
+    "parameters": "a, erwartetVon"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1967,
+    "function": "ergebnisseLesen",
+    "parameters": "a"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 1983,
+    "function": "resolveQueryMatch",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2005,
+    "function": "ensureAnswerCorpus",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2018,
+    "function": "qidSeen",
+    "parameters": "qid"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2019,
+    "function": "rememberQid",
+    "parameters": "qid"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2023,
+    "function": "forgetQid",
+    "parameters": "qid"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2028,
+    "function": "underRateLimit",
+    "parameters": "unsigniert, ohneAufwand"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2039,
+    "function": "enableAnswering",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2067,
+    "function": "onQuery",
+    "parameters": "ev"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2071,
+    "function": "frageNehmen",
+    "parameters": "q"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2143,
+    "function": "warmUpAnswerer",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2153,
+    "function": "disableAnswering",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2159,
+    "function": "askNode",
+    "parameters": "target, text, opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2185,
+    "function": "finish",
+    "parameters": "res"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2196,
+    "function": "onRes",
+    "parameters": "ev"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2203,
+    "function": "antwortNehmen",
+    "parameters": "a"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2259,
+    "function": "fetchAnswers",
+    "parameters": "qids, opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2287,
+    "function": "finish",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2300,
+    "function": "onRes",
+    "parameters": "ev"
+  },
+  {
+    "source": "sbkim/23_rendezvous.js",
+    "line": 2304,
+    "function": "antwortSammeln",
+    "parameters": "a"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 765,
+    "function": "sprache",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 777,
+    "function": "T",
+    "parameters": "de"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 795,
+    "function": "_shortNodeId",
+    "parameters": "id"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 798,
+    "function": "renderIncoming",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 809,
+    "function": "startIncomingWatch",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 834,
+    "function": "startIdentityWatch",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 865,
+    "function": "pendingKey",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 866,
+    "function": "loadPending",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 870,
+    "function": "savePending",
+    "parameters": "list"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 874,
+    "function": "pruneMail",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 891,
+    "function": "normQ",
+    "parameters": "s"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 892,
+    "function": "dedupeKey",
+    "parameters": "text, toName"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 893,
+    "function": "recordOpenQuestion",
+    "parameters": "res, card, text"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 927,
+    "function": "mailUnreadCount",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 931,
+    "function": "updateMailBadge",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 938,
+    "function": "recheckMail",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 966,
+    "function": "reAskOpen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 986,
+    "function": "clearMail",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 988,
+    "function": "timeAgo",
+    "parameters": "ts"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1000,
+    "function": "deleteMailEntry",
+    "parameters": "qid"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1006,
+    "function": "mailLines",
+    "parameters": "list"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1026,
+    "function": "renderMail",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1083,
+    "function": "markMailSeen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1091,
+    "function": "onMailClick",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1128,
+    "function": "doc",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1129,
+    "function": "rdv",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1133,
+    "function": "embedMod",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1135,
+    "function": "matchMod",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1137,
+    "function": "sporeMod",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1144,
+    "function": "refreshStatus",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1194,
+    "function": "backupStampKey",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1195,
+    "function": "loadBackupStamp",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1198,
+    "function": "saveBackupStamp",
+    "parameters": "day"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1202,
+    "function": "backupMod",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1206,
+    "function": "errText",
+    "parameters": "e"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1207,
+    "function": "isoDay",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1213,
+    "function": "kennungsTeil",
+    "parameters": "st"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1222,
+    "function": "readIdentityState",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1251,
+    "function": "refreshIdentityBox",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1306,
+    "function": "idBtnCss",
+    "parameters": "primary"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1311,
+    "function": "idNote",
+    "parameters": "text, warn"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1316,
+    "function": "idField",
+    "parameters": "placeholder, type"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1323,
+    "function": "setIdForm",
+    "parameters": "node"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1334,
+    "function": "idCancelBtn",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1343,
+    "function": "downloadJson",
+    "parameters": "obj, filename"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1368,
+    "function": "openBackupForm",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1384,
+    "function": "buildBackupForm",
+    "parameters": "s"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1431,
+    "function": "runImport",
+    "parameters": "blob, pw, force"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1457,
+    "function": "openImportForm",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1496,
+    "function": "openCleanupForm",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1546,
+    "function": "siegelBadge",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1551,
+    "function": "renderWerkstattRow",
+    "parameters": "row"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1571,
+    "function": "askBeforeCreate",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1587,
+    "function": "kiProviders",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1592,
+    "function": "accent",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1594,
+    "function": "el",
+    "parameters": "tag, css, text"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1612,
+    "function": "tipsEnabled",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1615,
+    "function": "setTipsOff",
+    "parameters": "off"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1618,
+    "function": "ensureTipEl",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1631,
+    "function": "showTip",
+    "parameters": "target, text"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1647,
+    "function": "hideTip",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1650,
+    "function": "adoptTips",
+    "parameters": "root"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1690,
+    "function": "stilEinhaengen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1704,
+    "function": "cornerCss",
+    "parameters": "corner, panel"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1715,
+    "function": "setOut",
+    "parameters": "text"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1716,
+    "function": "appendOut",
+    "parameters": "text"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1721,
+    "function": "imRaum",
+    "parameters": "res"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1722,
+    "function": "ablehnungen",
+    "parameters": "res"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1730,
+    "function": "ohneBestaetigung",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1733,
+    "function": "clear",
+    "parameters": "node"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1741,
+    "function": "startModelProgress",
+    "parameters": "baseText"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1758,
+    "function": "stopModelProgress",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1769,
+    "function": "loadPos",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1778,
+    "function": "savePos",
+    "parameters": "x, y"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1781,
+    "function": "clampInts",
+    "parameters": "x, y, node"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1813,
+    "function": "applyPos",
+    "parameters": "node, p"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1874,
+    "function": "findeAnker",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1880,
+    "function": "andocken",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1903,
+    "function": "abdocken",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1941,
+    "function": "obenGueltig",
+    "parameters": "o"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1948,
+    "function": "findeObereLeiste",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1977,
+    "function": "obereKante",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1984,
+    "function": "obenPunkt",
+    "parameters": "ob, node"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 1997,
+    "function": "setzeOben",
+    "parameters": "ob"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2009,
+    "function": "istOben",
+    "parameters": "r"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2010,
+    "function": "obenAus",
+    "parameters": "r"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2016,
+    "function": "saveOben",
+    "parameters": "ob, p"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2020,
+    "function": "makeDraggable",
+    "parameters": "node, handle"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2077,
+    "function": "end",
+    "parameters": "ev"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2119,
+    "function": "netzB64",
+    "parameters": "text"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2124,
+    "function": "netzAusB64",
+    "parameters": "b"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2132,
+    "function": "netzLink",
+    "parameters": "setting"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2139,
+    "function": "netzAusLink",
+    "parameters": "hash"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2150,
+    "function": "netzAdressePutzen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2158,
+    "function": "netzLage",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2166,
+    "function": "netzZeigen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2180,
+    "function": "netzMeldung",
+    "parameters": "text"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2181,
+    "function": "netzAusFeldern",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2185,
+    "function": "netzFelderFuellen",
+    "parameters": "s"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2194,
+    "function": "netzUebernehmen",
+    "parameters": "setting"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2213,
+    "function": "netzZurueck",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2224,
+    "function": "netzLinkZeigen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2243,
+    "function": "netzBeitrittFragen",
+    "parameters": "setting"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2268,
+    "function": "kopieren",
+    "parameters": "text"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2275,
+    "function": "bauBuergenFeld",
+    "parameters": "c"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2360,
+    "function": "ablaufZeigen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2381,
+    "function": "buergenZeigen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2416,
+    "function": "buergenEinfuegen",
+    "parameters": "roh"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2441,
+    "function": "istNetzadmin",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2453,
+    "function": "sperreZeigen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2470,
+    "function": "sperreEinfuegen",
+    "parameters": "roh"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2482,
+    "function": "bauSperrBox",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2522,
+    "function": "bauSperrKnopf",
+    "parameters": "c, rowEl, bs"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2543,
+    "function": "bauBuergenBox",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2593,
+    "function": "bauNetzBox",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2664,
+    "function": "netzStart",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2693,
+    "function": "mount",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 2740,
+    "function": "refreshTipBtn",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3145,
+    "function": "configModule",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3155,
+    "function": "ensureRdv",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3163,
+    "function": "onRepair",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3194,
+    "function": "onConnect",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3233,
+    "function": "onAnnounce",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3249,
+    "function": "onDiscover",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3267,
+    "function": "onAutoAsk",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3282,
+    "function": "autoAskDone",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3310,
+    "function": "renderCards",
+    "parameters": "cards, opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3453,
+    "function": "onAsk",
+    "parameters": "card"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3464,
+    "function": "populateKiProviders",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3478,
+    "function": "safeMod",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3482,
+    "function": "kiSecretName",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3484,
+    "function": "askVaultPassword",
+    "parameters": "purpose"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3490,
+    "function": "askVaultHint",
+    "parameters": "purpose"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3499,
+    "function": "updateKiVaultButtons",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3506,
+    "function": "onKiSaveToVault",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3520,
+    "function": "onKiUnlockVault",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3546,
+    "function": "updateKiKeyLink",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3554,
+    "function": "onToggleKiRichter",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3570,
+    "function": "renderAnswer",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3579,
+    "function": "cosineLines",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3643,
+    "function": "setVoiceHint",
+    "parameters": "t"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3657,
+    "function": "voiceLangKey",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3658,
+    "function": "storedVoiceLang",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3662,
+    "function": "rememberVoiceLang",
+    "parameters": "code"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3667,
+    "function": "voiceLang",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3679,
+    "function": "buildVoiceLangPicker",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3708,
+    "function": "applyAskDirection",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3719,
+    "function": "onVoiceClick",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3760,
+    "function": "renderAskSuccess",
+    "parameters": "card, res, text"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3774,
+    "function": "giveUpOrFallback",
+    "parameters": "r, res, card, text, fallbackCards"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3795,
+    "function": "askWithRetry",
+    "parameters": "r, card, text, allowRetry, fallbackCards"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3824,
+    "function": "onToggleAnswering",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3843,
+    "function": "onHandshake",
+    "parameters": "card"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3849,
+    "function": "line",
+    "parameters": "s"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3865,
+    "function": "show",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3885,
+    "function": "hide",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3898,
+    "function": "closeAll",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3902,
+    "function": "isOpen",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3903,
+    "function": "toggle",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3905,
+    "function": "applyOpts",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3923,
+    "function": "init",
+    "parameters": "opts"
+  },
+  {
+    "source": "sbkim/23_rendezvous_ui.js",
+    "line": 3946,
+    "function": "markBackupMade",
+    "parameters": ""
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 66,
+    "function": "weierstrass",
+    "parameters": "x"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 78,
+    "function": "assertJacPoint",
+    "parameters": "other"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 305,
+    "function": "constTimeNegate",
+    "parameters": "condition, item"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 441,
+    "function": "sliceDER",
+    "parameters": "s"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 444,
+    "function": "parseDERInt",
+    "parameters": "data"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 458,
+    "function": "parseDERSignature",
+    "parameters": "data"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 538,
+    "function": "concatBytes",
+    "parameters": "...arrays"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 553,
+    "function": "bytesToHex",
+    "parameters": "uint8a"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 563,
+    "function": "numTo32bStr",
+    "parameters": "num"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 570,
+    "function": "numTo32b",
+    "parameters": "num"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 576,
+    "function": "numberToHexUnpadded",
+    "parameters": "num"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 580,
+    "function": "hexToNumber",
+    "parameters": "hex"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 586,
+    "function": "hexToBytes",
+    "parameters": "hex"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 603,
+    "function": "bytesToNumber",
+    "parameters": "bytes"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 606,
+    "function": "ensureBytes",
+    "parameters": "hex"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 609,
+    "function": "normalizeScalar",
+    "parameters": "num"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 616,
+    "function": "mod",
+    "parameters": "a, b = CURVE.P"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 620,
+    "function": "pow2",
+    "parameters": "x, power"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 629,
+    "function": "sqrtMod",
+    "parameters": "x"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 656,
+    "function": "invert",
+    "parameters": "number, modulo = CURVE.P"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 675,
+    "function": "invertBatch",
+    "parameters": "nums, p = CURVE.P"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 692,
+    "function": "bits2int_2",
+    "parameters": "bytes"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 697,
+    "function": "truncateHash",
+    "parameters": "hash, truncateOnly = false"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 776,
+    "function": "isWithinCurveOrder",
+    "parameters": "num"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 779,
+    "function": "isValidFieldElement",
+    "parameters": "num"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 782,
+    "function": "kmdToSig",
+    "parameters": "kBytes, m, d, lowS = true"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 803,
+    "function": "normalizePrivateKey",
+    "parameters": "key"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 828,
+    "function": "normalizePublicKey",
+    "parameters": "publicKey"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 837,
+    "function": "normalizeSignature",
+    "parameters": "signature"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 849,
+    "function": "getPublicKey",
+    "parameters": "privateKey, isCompressed = false"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 852,
+    "function": "recoverPublicKey",
+    "parameters": "msgHash, signature, recovery, isCompressed = false"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 855,
+    "function": "isProbPub",
+    "parameters": "item"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 867,
+    "function": "getSharedSecret",
+    "parameters": "privateA, publicB, isCompressed = false"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 876,
+    "function": "bits2int",
+    "parameters": "bytes"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 880,
+    "function": "bits2octets",
+    "parameters": "bytes"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 885,
+    "function": "int2octets",
+    "parameters": "num"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 888,
+    "function": "initSigArgs",
+    "parameters": "msgHash, privateKey, extraEntropy"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 906,
+    "function": "finalizeSig",
+    "parameters": "recSig, opts"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 912,
+    "function": "sign",
+    "parameters": "msgHash, privKey, opts = {}"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 921,
+    "function": "signSync",
+    "parameters": "msgHash, privKey, opts = {}"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 932,
+    "function": "verify",
+    "parameters": "signature, msgHash, publicKey, opts = vopts"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 962,
+    "function": "schnorrChallengeFinalize",
+    "parameters": "ch"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 991,
+    "function": "schnorrGetPublicKey",
+    "parameters": "privateKey"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 1050,
+    "function": "schnorrSign",
+    "parameters": "msg, privKey, auxRand"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 1053,
+    "function": "schnorrSignSync",
+    "parameters": "msg, privKey, auxRand"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 1056,
+    "function": "initSchnorrVerify",
+    "parameters": "signature, message, publicKey"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 1067,
+    "function": "finalizeSchnorrVerify",
+    "parameters": "r, P, s, e"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 1073,
+    "function": "schnorrVerify",
+    "parameters": "signature, message, publicKey"
+  },
+  {
+    "source": "sbkim/noble-secp256k1.js",
+    "line": 1083,
+    "function": "schnorrVerifySync",
+    "parameters": "signature, message, publicKey"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 920,
+    "function": "startSprache",
+    "parameters": ""
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 938,
+    "function": "zeige",
+    "parameters": "sp"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 952,
+    "function": "aufraeumen",
+    "parameters": ""
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 958,
+    "function": "hin",
+    "parameters": "el"
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 961,
+    "function": "zurueck",
+    "parameters": ""
+  },
+  {
+    "source": "sicherheit.html",
+    "line": 971,
+    "function": "springe",
+    "parameters": "link, ziel"
+  },
+  {
+    "source": "sw.js",
+    "line": 53,
+    "function": "teilenEmpfangen",
+    "parameters": "r"
+  }
+]

@@ -1,0 +1,9 @@
+  ✓ Rechnung: "./" wird zur Wurzel des Ursprungs (der Befund)
+  ✓ Rechnung: "/Workflow-PDF/" bleibt im App-Ordner
+  ✓ Rechnung: ohne id gilt die start_url
+  ✓ Rechnung: der Bereich "./" ist der App-Ordner
+  ✓ manifest.webmanifest: trägt eine eigene id
+  ✓ manifest.webmanifest: die id liegt im Bereich der App, nicht an der Wurzel von github.io
+
+6 grün · 0 ROT
+

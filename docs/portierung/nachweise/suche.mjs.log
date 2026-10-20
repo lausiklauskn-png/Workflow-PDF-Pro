@@ -1,0 +1,63 @@
+Workfloh PDF — Suche
+  ✓ Umlaut: „Mueller" findet „Müller"
+  ✓ Umlaut: „muller" findet „Müller"
+  ✓ Umlaut: „Müller" findet „MUELLER"
+  ✓ ß: „Strasse" findet „Straße"
+  ✓ Nummer: „kd4711" findet „KD-4711"
+  ✓ Nummer: „KD-4711" findet „KD 4711"
+  ✓ Datum: „3.9.2026" findet „03.09.2026"
+  ✓ Datum: „2026-09-03" findet „03.09.26"
+  ✓ Datum ohne Jahr: „03.09." findet „3.9.2026"
+  ✓ Datum: „03.09.2026" findet NICHT „04.09.2026"
+  ✓ Datum: ein ungültiges Datum (31.13.) ist kein Datum
+  ✓ Kyrillisch bleibt suchbar
+  ✓ leere Suche ergibt keine Suchwörter
+  ✓ mehrere Wörter: jedes darf auf einer anderen Seite stehen
+  ✓ mehrere Wörter: fehlt eines, passt das Dokument nicht (UND)
+  ✓ ein Feld-Treffer trägt Feld, Seite und Lage
+  ✓ ein Seiten-Treffer trägt die Lage des Textstücks
+  ✓ ein Wort über zwei Textstücke wird markiert (Hülle beider)
+  ✓ ohne Seitentext sucht es trotzdem in Name und Feldern
+  ✓ Trefferzahl: zwei Stellen auf einer Seite zählen zwei
+  ✓ Trefferzahl: Name und Seitenstellen zusammen (1 + 2 = 3)
+  ✓ Ordner: der Ordnername zählt als Fundstelle
+  ✓ Ordner: ohne Ordnernamen kein Ordner-Treffer
+  ✓ beim Einlesen wird der Seitentext erfasst
+  ✓ Bibliothek: „Mueller" findet das Dokument über seinen SEITENTEXT
+  ✓ Bibliothek: die Fundstelle sagt, wo — „Auf Seite 1" und der Text
+  ✓ Bibliothek: „kd4711" findet „KD-" | „4711" auf Seite 2
+  ✓ Bibliothek: ein Datum ohne Jahr trifft nur das richtige Dokument
+  ✓ Bibliothek: Kundenname + Datum (anders geschrieben) finden den Auftrag
+  ✓ Bibliothek: zwei Wörter aus zwei Dokumenten → keins (UND)
+  ✓ Bibliothek: ein Wortteil genügt („schaufenster" in „Schaufensterfolie")
+  ✓ Tastatur: Lupe/Enter sucht, ohne die Seite neu zu laden
+  ✓ Suchfeld: Lupe und Mikrofon stehen im Feld
+  ✓ Trefferzahl: am Dokument steht, wie oft es trifft (Müller steht zweimal)
+  ✓ Trefferzahl: der Knopf „Alle" zählt die Treffer zusammen
+  ✓ Trefferzahl: „Alle" = Summe der Dokumente
+  ✓ Trefferzahl: ohne Suche keine Zahl
+  ✓ Ordner: sein Name findet das Dokument darin („Im Ordnernamen")
+  ✓ Ordner: jeder Ordner-Knopf zeigt seine Trefferzahl (hier 0, Alle 2)
+  ✓ Ordner: gewählt, sucht sie nur darin — und sagt es
+  ✓ Ordner: „In allen Ordnern suchen" findet es wieder
+  ✓ Dokument: ohne Suche geöffnet ist das Suchfeld leer
+  ✓ Dokument: alle Stellen markiert, „1 / 2"
+  ✓ Dokument: Lupe/Enter springt zum nächsten Treffer („2 / 2")
+  ✓ Dokument: nach dem letzten kommt wieder der erste
+  ✓ Dokument: ▲ geht zurück (vom ersten zum letzten)
+  ✓ Dokument: antippen blendet eine aus, der Zähler zieht nach
+  ✓ Dokument: kein Treffer wird gesagt, keine Markierung
+  ✓ Dokument: beim Schließen wird das Suchfeld geleert
+  ✓ Editor: die Fundstelle ist auf Seite 1 markiert, dort wo „Müller" steht
+  ✓ Editor: antippen blendet genau diese Markierung aus
+  ✓ Editor: nach dem Antippen steht noch eine Markierung (Vorbedingung für die Prüfungen danach)
+  ✓ Editor: beim Umschalten kommt die ausgeblendete Markierung nicht wieder, die übrigen bleiben
+  ✓ Editor: ohne Suche geöffnet → keine Markierung
+  ✓ Speicher: neue Bytes werfen den alten Seitentext weg
+  ✓ Bibliothek: fehlt der Seitentext noch, sagt die Suche das
+  ✓ Bibliothek: nachgeholter Seitentext wird gefunden, der Hinweis ist weg
+  ✓ nach dem Neuladen: der Seitentext kommt aus dem Speicher
+  ✓ kein Seitenfehler
+
+59 grün · 0 ROT
+
