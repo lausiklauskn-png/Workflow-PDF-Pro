@@ -221,3 +221,30 @@ Die Workflows sind erst nach Übernahme auf `main` bei GitHub registriert und st
 - `check` von `main` (Stand `5c9c869`): Lauf 39473308583 grün – das Paket aus dem
   Repo lässt sich mit der Freigabe entschlüsseln und passt zum Zertifikats-Pin. Keine App, kein Release; der Veröffentlichungs-Workflow bleibt
   gesperrt, bis App, Build und Nachweise vorliegen.
+
+## Nachgemessen aus Claude Code (2026-10-20, nach der Einrichtung)
+
+Stand `main` `f403aa1`. Gemessen mit `gh api` und dem GitHub-MCP-Werkzeug dieser Sitzung.
+
+| Recht | Ergebnis Claude Code |
+|---|---|
+| Git lesen, Push-Probelauf | ja (`github-access.mjs --probe-write`) |
+| API lesen; Repo-Rechte der Verbindung | ja; `admin/maintain/push` gemeldet, Repo öffentlich |
+| Branches pushen, PRs anlegen | ja |
+| PR mergen | Recht gemeldet (`admin`); nicht ausgeführt, ohne Klaus' Wort wird nichts auf `main` gemergt |
+| Workflow-Läufe und Schritte lesen | ja (Läufe 39472967095 `initialize` und 39473308583 `check` grün gelesen) |
+| Workflow starten (`workflow_dispatch`), **in diesem Repo** | **nein** – `check` per API und per MCP je 403 „Resource not accessible by integration“ |
+| Environments, Secrets, Actions-Einstellungen | **nein** – der Sitzungsproxy sperrt diese Pfade; ob das Secret da ist, belegt nur ein grüner `check`-Lauf |
+| Branch-Schutz lesen | nein (403); Rulesets: keine |
+| Releases | 0 vorhanden; Anlegen nicht versucht (keine App). Ausgeliefert wird ohnehin mit dem `GITHUB_TOKEN` des Workflows, nicht mit dem Token einer KI |
+
+Lokale Prüfungen auf `f403aa1`: `test-release-policy` 3/3, `test-identity` 7/7,
+`test-unlock-file` 3/3, `verify-upstream` 191/191 bytegleich. `test-apk` 0/6 –
+`aapt` fehlt, weil `dl.google.com` im Claude-Container gesperrt ist (ungeprüft, nicht rot im Code).
+
+Folge für den gemeinsamen Ablauf: Claude Code kann alles bis auf das **Starten**
+eines Workflows (Identitäts-`check`, Release). Das startet Klaus mit „Run workflow“
+oder Codex, sofern dessen Verbindung Actions-Schreibrecht hat. `request-release.mjs`
+aus Claude Code endet deshalb mit 403. Die Rechte von Codex sind aus dieser Sitzung
+nicht messbar; Codex prüft sie selbst mit `github-access.mjs --probe-write` und
+einem `check`-Lauf.
