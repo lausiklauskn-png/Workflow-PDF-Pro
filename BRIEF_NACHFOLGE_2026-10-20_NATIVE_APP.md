@@ -311,3 +311,19 @@ einer regulären Pro-Version und vollständiger Funktionsübernahme.
 
 Diese Sitzung endet mit diesem Brief. **Die Implementierung von Workflow PDF Pro
 beginnt erst in der Nachfolgesitzung in diesem Zielrepository.**
+
+## Ergänzender Nutzerauftrag: SD-Karte und eigener Speicherort (20.10.2026)
+
+Workflow PDF Pro soll wie Private Brain Pro einen frei wählbaren Speicherordner
+einschließlich SD-Karte anbieten, in dem die App ihre Dokumente und Arbeitsdaten
+dauerhaft speichern kann. Das Speicher-/Tresor-Grundgerüst von Private Brain Pro
+verwenden, mit eigener Workflow-PDF-Pro-Identität und erhaltenen Schutzfunktionen.
+Speicherortwahl, Passwortschutz, Sperren/Entsperren, Übernahme vorhandener Daten
+und Öffnen eines vorhandenen eigenen Tresors berücksichtigen. Nur PDF-Exporte in
+einem Ordner erfüllen diesen Auftrag nicht. Der vollständige Quellkern und das
+bisherige Sicherungsformat bleiben erhalten; komplexe Änderungen vorher besprechen.
+
+Konkrete Anforderungen, gelesener Referenzstand, belegte Grenzen und offene
+Anbindung stehen in [Speicherort und Tresor](docs/portierung/SPEICHERORT-UND-TRESOR.md).
+Dies ist ein zusätzlicher Bauauftrag, kein bereits implementierter oder geprüfter
+Speicherweg.

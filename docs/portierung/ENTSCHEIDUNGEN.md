@@ -66,6 +66,12 @@ wurden für keinen neuen Anbieter behauptet; Arbeitszeiten sind nicht geschätzt
 
 ## Weitere Grenzen vor einer Änderung
 
+Neuer verbindlicher Nutzerauftrag vom 20.10.2026: frei gewählter Speicherort
+einschließlich SD-Karte für Dokumente und App-Arbeitsdaten, mit dem Speicher-/
+Tresor-Grundgerüst von Private Brain Pro. Details, aktueller Referenzstand und
+offene Entscheidungen zur Kernanbindung: [Speicherort und Tresor](SPEICHERORT-UND-TRESOR.md).
+Keine bereits gebaute Funktion und keine Freigabe für beliebige Kernänderungen.
+
 - Quelle bietet ausdrücklich keine Virenprüfung. Alle vorhandenen Schutzfunktionen
   werden übernommen; ein zusätzlicher Virenscanner wäre eine eigene Entscheidung.
 - Native Spracheingabe kann sich bei Verfügbarkeit/Anbieter/Offlineverhalten von

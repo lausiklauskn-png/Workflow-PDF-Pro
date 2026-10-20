@@ -140,6 +140,27 @@ Varianten benannt; die native Abnahme muss jede davon ausüben.
 | F121 | **Netzwahl**: Öffentlich/eigenes Netz, Beitrittslink, Geräte-/Netzspeicher, Membran allowedOrigins leer | `assets/sbkim-init.js:1` | knoten | Deep-Link/Relaisadapter; keine fremden Schlüssel übernehmen; **offen** |
 | F122 | **Lizenzen/Datenschutz**: LICENSE, RECHTE, THIRD_PARTY, impressum und Sicherheitshilfe erhalten | `assets/app.js:2959` `hilfe` | schieber | native Hosting-/Adapterangaben nach gewähltem Weg ergänzen; **offen** |
 
+## Zusätzlicher nativer Speicherauftrag vom 20.10.2026
+
+Diese zwölf Zeilen ergänzen die 122 Bestandsfunktionen. Grundlage und gelesene
+Referenz: [Speicherort und Tresor](SPEICHERORT-UND-TRESOR.md). Keine der folgenden
+Funktionen ist bereits in Workflow PDF Pro implementiert oder nativ abgenommen.
+
+| ID | Beauftragtes Verhalten | Zuordnung / offener Nachweis |
+|---|---|---|
+| N001 | Speicherort wählen: Gerät, SD-Karte, anderer freigegebener Ordner | nativer SAF-Adapter; echte Anbieter und SD-Karte prüfen |
+| N002 | Eigenen Workflow-PDF-Pro-Ordner anbieten; Wahl ändern und erneut öffnen | dauerhafte Rechte über Neustart/Update; Abbruch ohne Änderung |
+| N003 | Dokumenttresor mit Passwort einrichten, sperren und entsperren | Private-Brain-Grundgerüst mit eigener Identität; Passwortdialog nativ |
+| N004 | Optional auf diesem Gerät entsperrt halten | Android Keystore; Passwort bleibt für anderes Gerät erforderlich |
+| N005 | PDFs, Originalfotos und Arbeitsstände im gewählten Ordner erhalten | vollständige Dateien/Metadaten; Originalbytes, Felder und Verknüpfungen prüfen |
+| N006 | Übersetzungsfortschritt, Teilergebnisse und Entfernungsvermerke erhalten | separate `ue:*`-Datensätze; Neustart und Fortsetzen ohne Verlust |
+| N007 | App-Arbeitsdaten, Suchzustände und Einstellungen berücksichtigen | vollständige Speicherinventur; Caches/Modelle explizit zuordnen; keine automatische Schlüsselübernahme |
+| N008 | Vorhandene Daten nach Rückfrage übernehmen | vollständig schreiben/prüfen; Abbruch, Stromverlust und doppelte IDs prüfen |
+| N009 | Vorhandenen eigenen Tresor mit Passwort auf neuem Gerät öffnen | Wiederherstellen ohne Überschreiben; Dateien/Felder/Übersetzungsstände abgleichen |
+| N010 | Nicht erreichbaren, vollen oder beschädigten Speicher ehrlich behandeln | keine leere Ersatzbibliothek, keine Erfolgsmeldung; erneute Freigabe und Manipulation prüfen |
+| N011 | Ordnerwechsel und interne Arbeitskopien nachvollziehbar behandeln | alte Daten erhalten; dauerhafte externe Ablage von Zusatzkopie unterscheiden; konkrete Anbindung vor Einbau besprechen |
+| N012 | Bisherige Sicherungen, Schutzfunktionen und künftige Plattformen erhalten | alte Sicherungen les-/erzeugbar; DE/EN/RU/AR; Windows-/iOS-Adapter und plattformübergreifende Öffnung separat prüfen |
+
 ## Bestehende Grenzen und Widersprüche
 
 - Normale Importe werden manuell geprüft; ältere Hilfetexte behaupten noch automatische

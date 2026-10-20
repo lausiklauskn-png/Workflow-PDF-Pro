@@ -8,6 +8,10 @@
   vorher mit Klaus anhand konkreter Möglichkeiten besprechen.
 - Bestand und aktuelle Nachweise: `docs/portierung/README.md`.
   Historische Tests oder simulierte Übersetzung sind keine neuen Geräteprüfungen.
+- Verbindlicher zusätzlicher Speicherauftrag: `docs/portierung/SPEICHERORT-UND-TRESOR.md`
+  lesen. SD-Karte/frei gewählter Ordner für Dokumente und App-Arbeitsdaten,
+  Private-Brain-Pro-Speicher-/Tresor-Grundgerüst wiederverwenden. Kein bloßer
+  Export als vollständige externe Ablage; komplexe Kernanbindung vorher besprechen.
 - Signierung und GitHub-Zugang für Claude Code **und** Codex:
   `docs/SIGNIERUNG-UND-GITHUB.md` lesen. Beide verwenden denselben Release-Workflow.
   GitHub-Anmeldung und Android-Signierschlüssel sind getrennte Berechtigungen.

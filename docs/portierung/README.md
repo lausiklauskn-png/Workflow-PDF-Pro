@@ -2,14 +2,18 @@
 
 Verbindlicher Auftrag: [Nachfolgebrief](../../BRIEF_NACHFOLGE_2026-10-20_NATIVE_APP.md).
 
-1. [Funktionsmatrix](FUNKTIONSMATRIX.md): 122 Funktionszeilen, vorhandenes Verhalten,
-   Quellstellen, bestehende Tests und noch offene native Anbindung.
+1. [Funktionsmatrix](FUNKTIONSMATRIX.md): 122 Bestandsfunktionen plus zwölf
+   Anforderungen an den nativen Speicher, vorhandenes Verhalten, Quellstellen,
+   bestehende Tests und noch offene native Anbindung.
 2. [Aktueller Prüfstand](PRUEFSTAND.md): nur die in dieser Sitzung ausgeführten
    Prüfungen; Rohbefunde unter `nachweise/`.
 3. [Entscheidungspunkte](ENTSCHEIDUNGEN.md): Zielsysteme und Chrome-Transport,
    konkrete Optionen mit Empfehlung und Grenzen. A ist zur Erprobung gewählt; Plattformfolge Android/DeX, Windows, iOS ist festgehalten. Genaue Geräteversionen sind offen.
 4. `QUELLDATEIEN-SHA256.json`: vollständiges Manifest des übernommenen Quellstands;
    `BEDIENELEMENTE.json` und `FUNKTIONEN-QUELLINDEX.json`: ergänzende Quellindices.
+5. [Speicherort und Tresor](SPEICHERORT-UND-TRESOR.md): verbindlicher Zusatzauftrag
+   SD-Karte/freier Ordner, Wiederverwendung des Private-Brain-Pro-Grundgerüsts,
+   offene Anbindung und Abgrenzung zur bisherigen Sicherung.
 
 Der ursprüngliche Bestand von Workflow-PDF-Pro blieb erhalten. Unter
 `upstream/workflow-pdf/` liegen sämtliche 191 Quelldateien bytegleich aus
@@ -49,4 +53,8 @@ Workflow-PDF-Pro-Tests.
 
 Aktueller Folgeschritt: [Chrome-Transporterprobung](../../native/chrome/README.md) mit 11 bestandenen Host-/Browserprüfungen. Keine native oder echte Google-Übersetzung daraus ableiten.
 
-Gemeinsame Signierung und Veröffentlichung für Claude Code und Codex: [Einrichtung und tatsächliche Zugriffsgrenzen](../SIGNIERUNG-UND-GITHUB.md). Noch kein produktiver Schlüssel und kein ausgeliefertes natives Paket.
+Gemeinsame Signierung und Veröffentlichung für Claude Code und Codex:
+[Einrichtung und tatsächliche Zugriffsgrenzen](../SIGNIERUNG-UND-GITHUB.md).
+Die dauerhafte Signieridentität wurde inzwischen eingerichtet und auf GitHub
+wiederhergestellt/geprüft; siehe dort die verlinkten Läufe. Noch kein ausgeliefertes
+natives Paket. Diese frühere Prüfung wurde für die Speicherergänzung nicht neu ausgeführt.
