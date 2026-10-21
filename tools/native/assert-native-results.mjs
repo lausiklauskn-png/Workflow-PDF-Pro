@@ -11,7 +11,7 @@ for(const path of paths){
   const cases=[...xml.matchAll(/<testcase\b([^>]+)>?/g)];assert.equal(cases.length,Number(attrs.tests));tests+=cases.length;
   for(const entry of cases){const name=entry[1].match(/classname="([^"]+)"/)?.[1];assert.ok(name);classes.add(name.split('.').at(-1));}
 }
-for(const name of required)assert.ok(classes.has(name),'Missing executed class '+name);assert.ok(tests>=44,'Incomplete product suite');
+for(const name of required)assert.ok(classes.has(name),'Missing executed class '+name);assert.ok(tests>=45,'Incomplete product suite');
 const source=JSON.parse(await readFile('docs/portierung/QUELLDATEIEN-SHA256.json','utf8'));
 const installation=JSON.parse(await readFile('android/app/build/outputs/apk/debug/app-debug.apk.installation.json','utf8'));
 assert.equal(installation.applicationId,'de.familyprojekt.workflowpdf.pro.debug');assert.equal(installation.commit,process.env.GITHUB_SHA);assert.equal(installation.developmentProbe,true);assert.equal(installation.reinstallPreservesData,true);

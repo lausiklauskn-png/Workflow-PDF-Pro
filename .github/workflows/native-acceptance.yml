@@ -70,10 +70,8 @@ jobs:
           profile: ${{ matrix.profile }}
           ram-size: 4096M
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
-          script: |
-            bash tools/native/run-connected.sh
-            python3 tools/native/verify-signed-install.py android/app/build/outputs/apk/debug/app-debug.apk --development-probe
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back emulated -camera-front none
+          script: bash tools/native/run-product-suite.sh
       - name: Tatsächliche Produktfälle vollständig verlangen
         env:
           ANDROID_TEST_API: ${{ matrix.api }}
@@ -86,6 +84,7 @@ jobs:
             work/acceptance/
             android/app/build/outputs/androidTest-results/
             android/app/build/reports/
+            android/app/build/outputs/apk/debug/*.installation.json
           if-no-files-found: error
           retention-days: 7
   native-smoke:
@@ -105,7 +104,7 @@ jobs:
           for(const api of [31,35]){
             const proof=JSON.parse(await readFile(`evidence/native-acceptance-${api}/work/acceptance/native-${api}.json`));
             assert.equal(proof.commit,process.env.GITHUB_SHA);assert.equal(proof.api,api);
-            assert.ok(proof.tests>=44);assert.equal(proof.reinstallPreservesData,true);for(const key of ['failures','errors','skipped'])assert.equal(proof[key],0);
+            assert.ok(proof.tests>=45);assert.equal(proof.reinstallPreservesData,true);for(const key of ['failures','errors','skipped'])assert.equal(proof[key],0);
           }
           console.log('Vollständige Originalkette und Produktprüfungen auf Android 12/15 bestanden. Physische Samsung-Hardware und manuelle Chrome-Menüübersetzung werden dadurch nicht behauptet.');
           JS

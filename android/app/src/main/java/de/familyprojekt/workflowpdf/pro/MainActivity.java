@@ -54,6 +54,13 @@ public class MainActivity extends BridgeActivity {
         super.onSaveInstanceState(state);
         if(incomingReceipt!=null)state.putParcelable(RECEIPT_STATE,incomingReceipt);
     }
+    @Override public void onResume(){
+        super.onResume();
+        ChromeRuntime.MAIN.post(()->{
+            ChromeRuntime.Item item=ChromeRuntime.current;
+            if(item!=null&&item.needsOpen)try{ChromeRuntime.open(this,item);}catch(Exception error){ChromeRuntime.stop(item.session.id,error.getMessage());}
+        });
+    }
     android.content.Intent incomingForLaunch(android.content.Intent delivered){
         if(restoreIncoming){restoreIncoming=false;return incomingReceipt;}return delivered;
     }

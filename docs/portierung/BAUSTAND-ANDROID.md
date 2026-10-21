@@ -717,3 +717,25 @@ Die neue Chrome-Großabsatzprobe besteht einschließlich Fehler im zweiten
 Übertragungsrahmen ohne Übernahme einer halben Seite; fehlendes Chrome wird
 als konkreter Installationsfehler gemeldet und nicht als Nutzerabbruch versteckt.
 Fokussierter neuer Chrome-Browserlauf 6/6 bestanden.
+
+## Präzisierung Blattmodell und Hintergrundtransport
+
+Die lokale Gegenprobe mit unverändertem Scanic zeigt: Ein vollständig weißes
+Prüfbild ohne sichtbaren Blattrand ergibt korrekt „unsicher / ganzes Foto“,
+keinen Modellfehler (`mlFehler` leer). Mit weißem Blatt auf dunklem Rand liefern
+Modell und klassische Blatterkennung übereinstimmende Ecken; Modellkonfidenz
+0,9576, tatsächliche ML-Inferenz 16,90 ms im lokalen Chromium. Das native
+Prüfbild bildet jetzt denselben sichtbaren Bogen ab. Keine Schutzschwelle und
+kein Source-Modell geändert. Der Emulator stellt eine emulierte Rückkamera bereit,
+damit der echte native Kamerapfad auflösbar ist; die Gegenprobe ersetzt die
+Kameraaktivität weiterhin ausdrücklich durch eine synthetische JPEG-Rückgabe.
+
+Chrome wird bei inzwischen unsichtbarer Hauptaktivität nicht fälschlich als
+geöffnet markiert. Die laufende Meldung bietet dann sichtbar die Rückkehr zur
+App an; aus der wieder sichtbaren App wird Chrome geöffnet. Wird die zugehörige
+WebView tatsächlich zerstört, wird die alte Sitzung beendet; fertige Seitenjobs
+bleiben für Fortsetzung erhalten. Neuer native Gegenfall dafür kompiliert,
+Freigabe verlangt nun mindestens 45 tatsächliche native Fälle. Späte Aufrufe
+dürfen auch keinen neuen lokalen Modellclient für eine zerstörte Aktivität anlegen.
+Die Neuinstallationsprobe läuft unabhängig von fehlgeschlagenen Produktfällen
+weiter, bewahrt aber deren Fehlerstatus vollständig. Kein Gate wird umgangen.

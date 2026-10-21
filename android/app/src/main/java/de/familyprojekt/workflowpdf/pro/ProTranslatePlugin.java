@@ -11,11 +11,13 @@ import java.util.*;
 @CapacitorPlugin(name="WorkflowTranslate")
 public final class ProTranslatePlugin extends Plugin {
     private final Map<String,Translator> clients=new HashMap<>();
+    private boolean destroyed;
     private boolean valid(PluginCall call){
         String from=call.getString("from"),to=call.getString("to");List<String> supported=Arrays.asList("de","en","ru");
         return supported.contains(from)&&supported.contains(to)&&!Objects.equals(from,to);
     }
     @PluginMethod public void availability(PluginCall call){getActivity().runOnUiThread(()->{
+        if(destroyed){call.reject("LOCAL_TRANSLATOR_CLOSED");return;}
         if(!valid(call)){call.resolve(new JSObject().put("status","unavailable"));return;}
         RemoteModelManager.getInstance().getDownloadedModels(TranslateRemoteModel.class).addOnSuccessListener(models->{
             Set<String> downloaded=new HashSet<>();for(TranslateRemoteModel model:models)downloaded.add(model.getLanguage());downloaded.add("en");
@@ -23,6 +25,7 @@ public final class ProTranslatePlugin extends Plugin {
         }).addOnFailureListener(error->call.reject("LOCAL_MODELS_UNAVAILABLE"));
     });}
     @PluginMethod public void create(PluginCall call){getActivity().runOnUiThread(()->{
+        if(destroyed){call.reject("LOCAL_TRANSLATOR_CLOSED");return;}
         if(!valid(call)){call.reject("LOCAL_LANGUAGE_PAIR_UNAVAILABLE");return;}
         Translator client=Translation.getClient(new TranslatorOptions.Builder().setSourceLanguage(call.getString("from")).setTargetLanguage(call.getString("to")).build());
         String id=UUID.randomUUID().toString();clients.put(id,client);
@@ -39,5 +42,5 @@ public final class ProTranslatePlugin extends Plugin {
         }).addOnFailureListener(error->call.reject("LOCAL_TRANSLATION_FAILED"));
     });}
     @PluginMethod public void destroy(PluginCall call){getActivity().runOnUiThread(()->{Translator client=clients.remove(call.getString("id"));if(client!=null)client.close();call.resolve();});}
-    @Override protected void handleOnDestroy(){getActivity().runOnUiThread(()->{for(Translator client:clients.values())client.close();clients.clear();});}
+    @Override protected void handleOnDestroy(){getActivity().runOnUiThread(()->{destroyed=true;for(Translator client:clients.values())client.close();clients.clear();});}
 }

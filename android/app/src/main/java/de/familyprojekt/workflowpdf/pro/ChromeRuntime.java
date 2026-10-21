@@ -21,7 +21,7 @@ final class ChromeRuntime {
     static final class Item {
         final ChromeSession session;
         final CompletableFuture<String> ready=new CompletableFuture<>();
-        ChromeService service;int startId;boolean opened,ended;
+        ChromeService service;int startId;boolean opened,needsOpen,ended;
         Item(ChromeSession session){this.session=session;}
     }
     static void channel(Context context){
@@ -69,10 +69,16 @@ final class ChromeRuntime {
         }catch(Exception error){stop(id,"CHROME_FOREGROUND_UNAVAILABLE");service.stopSelfResult(startId);}
     }
     static Notification notification(Context context,Item item){
-        String language=item.session.language,title="Übersetzung läuft",text="Lokale Verbindung zu Chrome aktiv. Zum Abbrechen tippen.",cancel="Abbrechen";
-        if("en".equals(language)){title="Translation in progress";text="Local connection to Chrome active. Tap to cancel.";cancel="Cancel";}
-        if("ru".equals(language)){title="Идёт перевод";text="Локальное соединение с Chrome активно.";cancel="Отменить";}
-        if("ar".equals(language)){title="الترجمة قيد التشغيل";text="الاتصال المحلي بمتصفح Chrome نشط.";cancel="إلغاء";}
+        String language=item.session.language,title="Übersetzung läuft",text=item.opened?"Lokaler Textaustausch mit Chrome. Abbruch über die Schaltfläche.":"Übersetzung wird vorbereitet. Abbruch über die Schaltfläche.",cancel="Abbrechen";
+        if("en".equals(language)){title="Translation in progress";text=item.opened?"Local text exchange with Chrome. Use the button to cancel.":"Preparing translation. Use the button to cancel.";cancel="Cancel";}
+        if("ru".equals(language)){title="Идёт перевод";text=item.opened?"Локальный обмен текстом с Chrome. Для отмены нажмите кнопку.":"Подготовка перевода. Для отмены нажмите кнопку.";cancel="Отменить";}
+        if("ar".equals(language)){title="الترجمة قيد التشغيل";text=item.opened?"تبادل نصي محلي مع Chrome. استخدم الزر للإلغاء.":"جارٍ تجهيز الترجمة. استخدم الزر للإلغاء.";cancel="إلغاء";}
+        if(item.needsOpen){
+            text="Zum Öffnen von Chrome zur App wechseln.";
+            if("en".equals(language))text="Return to the app to open Chrome.";
+            if("ru".equals(language))text="Вернитесь в приложение, чтобы открыть Chrome.";
+            if("ar".equals(language))text="عُد إلى التطبيق لفتح Chrome.";
+        }
         Intent cancelIntent=new Intent(context,ChromeService.class).setAction(CANCEL).setData(Uri.parse("workflow-chrome:"+item.session.id)).putExtra(ID,item.session.id);
         PendingIntent cancelPending=PendingIntent.getService(context,0,cancelIntent,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         Intent open=new Intent(context,MainActivity.class).setAction(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -84,9 +90,12 @@ final class ChromeRuntime {
     }
     static void open(Activity activity,Item item)throws Exception{
         if(item.opened)return;
+        if(!(activity instanceof androidx.lifecycle.LifecycleOwner)||!((androidx.lifecycle.LifecycleOwner)activity).getLifecycle().getCurrentState().isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)){
+            item.needsOpen=true;activity.getSystemService(NotificationManager.class).notify(9301,notification(activity,item));return;
+        }
         Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(item.session.browserUrl())).addCategory(Intent.CATEGORY_BROWSABLE);
         String[] packages={"com.android.chrome","com.chrome.beta","com.chrome.dev","com.chrome.canary"};
-        for(String name:packages){intent.setPackage(name);if(intent.resolveActivity(activity.getPackageManager())!=null){activity.startActivity(intent);item.opened=true;return;}}
+        for(String name:packages){intent.setPackage(name);if(intent.resolveActivity(activity.getPackageManager())!=null){activity.startActivity(intent);item.opened=true;item.needsOpen=false;activity.getSystemService(NotificationManager.class).notify(9301,notification(activity,item));return;}}
         throw new IOException("CHROME_NOT_INSTALLED");
     }
 }

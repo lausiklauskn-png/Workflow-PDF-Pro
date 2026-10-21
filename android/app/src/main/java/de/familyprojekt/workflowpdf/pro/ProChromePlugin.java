@@ -11,6 +11,8 @@ import org.json.JSONArray;
 @CapacitorPlugin(name="WorkflowChrome",permissions={@Permission(alias="notifications",strings={Manifest.permission.POST_NOTIFICATIONS})})
 public final class ProChromePlugin extends Plugin {
     private BiConsumer<String,String> events;
+    private String ownedId;
+    private boolean destroyed;
     @Override public void load(){
         events=(id,reason)->notifyListeners("stopped",new JSObject().put("id",id).put("reason",reason));
         ChromeRuntime.MAIN.post(()->ChromeRuntime.listener=events);
@@ -31,9 +33,14 @@ public final class ProChromePlugin extends Plugin {
     });}
     private void start(PluginCall call){
         try{
+            if(destroyed)throw new java.io.IOException("CHROME_APP_CLOSED");
             if(!getActivity().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED))throw new java.io.IOException("CHROME_START_IN_APP");
             ChromeRuntime.begin(getContext(),call.getString("von"),call.getString("nach"),call.getString("language","de"))
-                .whenComplete((id,error)->{if(error!=null)call.reject("CHROME_FOREGROUND_UNAVAILABLE");else call.resolve(new JSObject().put("id",id));});
+                .whenComplete((id,error)->{
+                    if(error!=null)call.reject("CHROME_FOREGROUND_UNAVAILABLE");
+                    else if(destroyed){ChromeRuntime.stop(id,"CHROME_APP_CLOSED");call.reject("CHROME_APP_CLOSED");}
+                    else{ownedId=id;call.resolve(new JSObject().put("id",id));}
+                });
         }catch(Exception error){call.reject(error.getMessage());}
     }
     @PluginMethod public void translate(PluginCall call){getActivity().runOnUiThread(()->{
@@ -48,5 +55,5 @@ public final class ProChromePlugin extends Plugin {
         }catch(Exception error){if(item!=null)ChromeRuntime.stop(item.session.id,error.getMessage());call.reject(error.getMessage());}
     });}
     @PluginMethod public void close(PluginCall call){ChromeRuntime.MAIN.post(()->{ChromeRuntime.stop(call.getString("id"),"CHROME_CANCELLED");call.resolve();});}
-    @Override protected void handleOnDestroy(){ChromeRuntime.MAIN.post(()->{if(ChromeRuntime.listener==events)ChromeRuntime.listener=null;});}
+    @Override protected void handleOnDestroy(){ChromeRuntime.MAIN.post(()->{destroyed=true;if(ChromeRuntime.listener==events)ChromeRuntime.listener=null;if(ownedId!=null)ChromeRuntime.stop(ownedId,"CHROME_APP_CLOSED");});}
 }

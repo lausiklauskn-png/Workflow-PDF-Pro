@@ -102,4 +102,14 @@ public final class NativeChromeTest {
             main(()->second.service.onTimeout(second.startId,1));stopped();assertTrue(second.session.closed());
         }finally{main(()->{if(ChromeRuntime.current!=null)ChromeRuntime.stop(ChromeRuntime.current.session.id,"TEST_END");});}
     }
+    @Test public void backgroundActivityDefersBrowserOpeningWithVisibleReturnActionInsteadOfClaimingItOpened()throws Exception{
+        grant();try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
+            ChromeRuntime.Item item=begin();AtomicReference<MainActivity> activity=new AtomicReference<>();scenario.onActivity(activity::set);
+            CompletableFuture<JSONObject> pending=item.session.offer(new JSONArray().put("Synthetic pending page"));scenario.moveToState(androidx.lifecycle.Lifecycle.State.CREATED);
+            AtomicReference<Exception> error=new AtomicReference<>();main(()->{try{ChromeRuntime.open(activity.get(),item);}catch(Exception failure){error.set(failure);}});
+            assertNull(error.get());assertTrue(item.needsOpen);assertFalse(item.opened);assertFalse(pending.isDone());
+            long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);String text="";while(System.nanoTime()<end){text=notice().extras.getString(Notification.EXTRA_TEXT);if(text.contains("zur App"))break;Thread.sleep(50);}assertTrue(text,text.contains("zur App"));
+            main(()->ChromeRuntime.stop(item.session.id,"CHROME_CANCELLED"));stopped();assertTrue(pending.isCompletedExceptionally());
+        }finally{main(()->{if(ChromeRuntime.current!=null)ChromeRuntime.stop(ChromeRuntime.current.session.id,"TEST_END");});}
+    }
 }
