@@ -1,0 +1,148 @@
+name: Windows-App (Tauri) – Bau und Abnahme
+# Baut den Windows-Host um den unveränderten Kern, prüft den Tresor gegen das
+# Android-Format und übt die Produktfälle im echten WebView2-Fenster einer still
+# installierten App aus. Der GitHub-Rechner ist nicht Klaus' PC.
+on:
+  push:
+    branches: ['claude/windows-**', 'main']
+    paths: ['windows/**', 'native/**', 'upstream/**', 'tools/native/**', '.github/workflows/windows-app.yml']
+  pull_request:
+    paths: ['windows/**', 'native/**', 'upstream/**', 'tools/native/**', '.github/workflows/windows-app.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-app-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kern-und-format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Tresor, Empfang, Übergaben und Chrome-Sitzung (Rust)
+        working-directory: windows/core
+        run: cargo test --release
+      - name: Gegenprobe Android-Tresorformat <-> Windows
+        run: windows/core/compat/run.sh
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 75
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Zeilenenden unverändert lassen (bytegleicher Kern)
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Kern bytegleich prüfen
+        run: |
+          npm ci
+          npm run verify:upstream
+      - name: Werkzeuge
+        working-directory: windows
+        run: npm ci
+      - name: Prüfbau (mit lokalem Prüfzugang) bauen
+        working-directory: windows
+        run: |
+          npx tauri build --features messprobe
+          New-Item -ItemType Directory -Force ../pruef-out | Out-Null
+          Copy-Item (Get-ChildItem src-tauri/target/release/bundle/nsis -Filter *-setup.exe).FullName ../pruef-out/pruefbau-setup.exe
+      - name: Auslieferungsbau bauen
+        working-directory: windows
+        run: |
+          npx tauri build
+          New-Item -ItemType Directory -Force ../auslieferung | Out-Null
+          $version = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
+          $name = "Workflow-PDF-Pro-Windows-$version-Setup.exe"
+          $f = Get-ChildItem src-tauri/target/release/bundle/nsis -Filter *-setup.exe | Select-Object -First 1
+          Copy-Item $f.FullName "../auslieferung/$name"
+          $f = Get-Item "../auslieferung/$name"
+          $h = (Get-FileHash $f.FullName -Algorithm SHA256).Hash.ToLower()
+          "$h  $name" | Set-Content -NoNewline -Encoding ascii "../auslieferung/$name.sha256"
+          "::notice title=Installer::$name $($f.Length) Bytes SHA-256 $h"
+      - name: Abnahme im WebView2-Fenster
+        timeout-minutes: 35
+        env:
+          WFP_PRUEF_ARBEIT: ${{ runner.temp }}\wfp-arbeit
+          WFP_PRUEF_SPEICHERN: ${{ runner.temp }}\wfp-speichern
+          WFP_PRUEF_IMPORT: ${{ runner.temp }}\wfp-import
+          WFP_PRUEF_TRESOR: ${{ runner.temp }}\wfp-usb-stick
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $appDir = Join-Path $env:LOCALAPPDATA 'Workflow PDF Pro'
+          $exe = Join-Path $appDir 'workflow-pdf-pro.exe'
+          $env:WFP_APP_EXE = $exe
+          New-Item -ItemType Directory -Force $env:WFP_PRUEF_TRESOR | Out-Null
+          $rot = @()
+          function Wait-Run($file, $arguments) {
+            $p = Start-Process -FilePath $file -ArgumentList $arguments -PassThru
+            if (!$p.WaitForExit(180000)) { $p | Stop-Process -Force; throw "Zeitgrenze: $file" }
+            if ($p.ExitCode -ne 0) { throw "Fehlgeschlagen ($($p.ExitCode)): $file $arguments" }
+          }
+          function Start-App { Start-Process -FilePath $exe | Out-Null; Start-Sleep 5 }
+          function Stop-App { Get-Process workflow-pdf-pro, chrome -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep 3 }
+          function Phase($name) {
+            Start-App
+            node windows/pruefung/abnahme.mjs $name "pruef-out/$name.json"
+            if ($LASTEXITCODE -ne 0) { $script:rot += $name }
+            Stop-App
+          }
+          Wait-Run 'pruef-out/pruefbau-setup.exe' '/S'
+          $reg = Get-ItemProperty 'HKCU:\Software\Classes\.pdf\OpenWithProgids' -ErrorAction SilentlyContinue
+          "Öffnen mit eingetragen: $($null -ne $reg.'WorkflowPDFPro.Dokument')" | Tee-Object -Append pruef-out/ablauf.txt
+          $default = (Get-ItemProperty 'HKCU:\Software\Classes\.pdf' -ErrorAction SilentlyContinue).'(default)'
+          "Standard-App für .pdf unverändert: $($default -ne 'WorkflowPDFPro.Dokument')" | Tee-Object -Append pruef-out/ablauf.txt
+          Phase erst
+          Phase neustart
+          Rename-Item $env:WFP_PRUEF_TRESOR "$($env:WFP_PRUEF_TRESOR)-abgezogen"
+          Phase abgezogen
+          Rename-Item "$($env:WFP_PRUEF_TRESOR)-abgezogen" $env:WFP_PRUEF_TRESOR
+          Wait-Run (Join-Path $appDir 'uninstall.exe') '/S'
+          Start-Sleep 5
+          "Nach Deinstallation Programm vorhanden: $(Test-Path $exe)" | Tee-Object -Append pruef-out/ablauf.txt
+          $reg = Get-ItemProperty 'HKCU:\Software\Classes\.pdf\OpenWithProgids' -ErrorAction SilentlyContinue
+          "Öffnen mit nach Deinstallation entfernt: $($null -eq $reg.'WorkflowPDFPro.Dokument')" | Tee-Object -Append pruef-out/ablauf.txt
+          Wait-Run 'pruef-out/pruefbau-setup.exe' '/S'
+          Phase neuinstallation
+          Wait-Run (Join-Path $appDir 'uninstall.exe') '/S'
+          # Der ausgelieferte Bau startet, öffnet aber keinen Prüfzugang.
+          $setup = (Get-ChildItem auslieferung -Filter *-setup.exe).FullName
+          Wait-Run $setup '/S'
+          Start-App
+          $open = $false
+          try { Invoke-WebRequest http://127.0.0.1:9222/json -UseBasicParsing -TimeoutSec 5 | Out-Null; $open = $true } catch { }
+          $running = $null -ne (Get-Process workflow-pdf-pro -ErrorAction SilentlyContinue)
+          "Auslieferungsbau läuft: $running / Prüfzugang offen: $open" | Tee-Object -Append pruef-out/ablauf.txt
+          Stop-App
+          Wait-Run (Join-Path $appDir 'uninstall.exe') '/S'
+          if ($open -or !$running) { $rot += 'auslieferungsbau' }
+          if ($rot.Count) { throw "Rote Phasen: $($rot -join ', ')" }
+      - name: Ergebnisse als Hinweis zeigen
+        if: always()
+        run: |
+          if (!(Test-Path pruef-out)) { exit 0 }
+          Get-ChildItem pruef-out -Filter *.json | ForEach-Object {
+            $t = (Get-Content $_.FullName -Raw) -replace '%','%25' -replace "`r",'' -replace "`n",'%0A'
+            if ($t.Length -gt 3800) { $t = $t.Substring(0,3800) }
+            Write-Output "::notice title=Abnahme $($_.BaseName)::$t"
+          }
+          if (Test-Path pruef-out/ablauf.txt) { Write-Output "::notice title=Ablauf::$((Get-Content pruef-out/ablauf.txt) -join ' | ')" }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: windows-abnahme
+          path: |
+            pruef-out/*.json
+            pruef-out/*.png
+            pruef-out/ablauf.txt
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: windows-installer
+          path: auslieferung/
+          retention-days: 14
