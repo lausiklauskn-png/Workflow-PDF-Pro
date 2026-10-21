@@ -38,6 +38,20 @@ Plan-vor-Code gilt. Diese Punkte entscheidet Klaus. Jeweils eine Empfehlung gebe
 | Speicherort | Arbeitsdatenbank in `%APPDATA%` + frei gewählter Rechnerordner/USB-Laufwerk als verschlüsselte Hauptablage | Wie unter Android (`SPEICHERORT-UND-TRESOR.md`): Ordnerwechsel ohne Datenverlust, keine stille leere Ersatzbibliothek. |
 | Chrome-Übersetzung (Variante A) | Übergabe an installiertes Chrome/Edge und Rückweg | Unter Windows eigener Weg nötig. Vorher mit Klaus besprechen, falls A dort nicht trägt. |
 
+### Codex' Vorschlag vom 2026-10-21 (von Klaus weitergegeben, deckt sich mit diesem Brief)
+
+- Ein gemeinsamer Anwendungscode, daraus parallel Android-APK und Windows-Installer (`Workflow-PDF-Pro-Setup.exe`
+  oder `.msi`, auf Wunsch zusätzlich portabel). Dateiauswahl, Speichern, Drucken, Teilen je Plattform angebunden.
+- Bevorzugt **Tauri**; Electron nur, wenn die PDF-Verarbeitung eine mitgelieferte Chromium-Umgebung braucht.
+  **Zuerst prüfen** (Webkern, pdf.js/pdf-lib/Tesseract/WASM, Android-Abhängigkeiten in `native/`), dann mit Tauri erproben
+  und das Ergebnis mit Klaus entscheiden.
+- Eine freigegebene Version (z. B. Tag `v1.x.y`) baut **beide** Pakete aus demselben Stand und veröffentlicht sie mit
+  Versionshinweisen. Nicht jeder Commit geht an Nutzer.
+- Die Windows-App prüft eine Update-Adresse und bietet „Version x ist verfügbar – herunterladen und installieren“ an,
+  mit signierten Update-Paketen (Tauri-Updater-Schlüssel nur verschlüsselt/als Secret, nie in Git oder Chat).
+- Android bei direktem APK-Download: Update-Hinweis in der App, Installation bestätigt der Nutzer.
+- Eine neue Browserfassung (PWA) aktualisiert installierte Apps nicht; dafür ist die Veröffentlichungskette da.
+
 ## 4. Bauen
 
 - Eigener Ordner (z. B. `windows/`) und eigene Adapter (`native/windows-*.js` oder ein Brückenmodul).
