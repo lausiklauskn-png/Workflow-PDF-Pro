@@ -42,6 +42,18 @@ final class IncomingFiles implements AutoCloseable {
             uris.put(UUID.randomUUID().toString(),uri);
         }
     }
+    static Intent sanitize(Intent intent)throws IOException {
+        // Retain only our routing fields and content URIs, never arbitrary
+        // sender parcelables, text, nested intents or other private extras.
+        try(IncomingFiles files=new IncomingFiles(null,intent)){
+            ArrayList<Uri> selected=new ArrayList<>(files.uris.values());
+            Intent clean=new Intent(intent.getAction()).setType(intent.getType()).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            if(Intent.ACTION_VIEW.equals(intent.getAction()))clean.setDataAndType(selected.get(0),intent.getType());
+            else if(Intent.ACTION_SEND.equals(intent.getAction())&&selected.size()==1)clean.putExtra(Intent.EXTRA_STREAM,selected.get(0));
+            else { clean.setAction(Intent.ACTION_SEND_MULTIPLE);clean.putParcelableArrayListExtra(Intent.EXTRA_STREAM,selected); }
+            return clean;
+        }
+    }
     JSONArray describe()throws Exception {
         JSONArray out=new JSONArray();
         for(Map.Entry<String,Uri> entry:uris.entrySet()){

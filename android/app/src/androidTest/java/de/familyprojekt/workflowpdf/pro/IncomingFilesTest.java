@@ -52,4 +52,9 @@ public final class IncomingFilesTest {
             try{files.read(ticket,0);fail("Removed file accepted");}catch(FileNotFoundException expected){}
         }
     }
+    @Test public void savedRoutingRetainsOnlyContentStreamsNotSenderExtras()throws Exception{
+        Intent sender=new Intent(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM,first).putExtra(Intent.EXTRA_TEXT,"private sender text").putExtra("unexpected","discard");
+        Intent clean=IncomingFiles.sanitize(sender);assertFalse(clean.hasExtra(Intent.EXTRA_TEXT));assertFalse(clean.hasExtra("unexpected"));
+        try(IncomingFiles files=new IncomingFiles(context.getContentResolver(),clean)){assertEquals(1,files.describe().length());}
+    }
 }

@@ -22,8 +22,8 @@ public final class ProIncomingPlugin extends Plugin {
     private void accept(Intent intent){
         if(intent==null||!Arrays.asList(Intent.ACTION_SEND,Intent.ACTION_SEND_MULTIPLE,Intent.ACTION_VIEW).contains(intent.getAction()))return;
         Intent delivered;
-        try{delivered=new Intent(intent);delivered.putExtra(DELIVERY,UUID.randomUUID().toString());}
-        catch(RuntimeException malformed){
+        try{delivered=IncomingFiles.sanitize(intent);delivered.putExtra(DELIVERY,UUID.randomUUID().toString());}
+        catch(Exception malformed){
             // Malformed sender parcelables must produce a dismissible error,
             // never crash the exported Activity while its plugins are loading.
             delivered=new Intent(intent.getAction()).putExtra(DELIVERY,UUID.randomUUID().toString());
