@@ -33,6 +33,14 @@ Klaus wählt für die Windows-Ausgabe **Tauri 2** (gemeinsamer Webkern, eigene W
 eines Neubaus als eigene Windows-App. Electron bleibt Rückfall, wenn WebView2 gemessen nicht trägt. Auftrag:
 `BRIEF_NACHFOLGE_2026-10-21_WINDOWS.md`.
 
+**Messung vom 21.10.2026 (Lauf 39667843502, GitHub-Windows-Rechner, WebView2/Edge 154):** Der unveränderte Kern
+trägt in WebView2: Einlesen, PDF-Ausgaben, Tesseract, pdf.js, Service Worker, Datenerhalt nach Neustart und
+Neuinstallation. `Translator` meldet für alle sechs DE/RU/EN-Paare `unavailable`. Es bleibt bei Tauri und ohne
+Electron; der Chrome-Weg A wird unter Windows gebraucht. Technische Umsetzungsentscheidungen nach Logik und
+Nutzerfreundlichkeit (kein Mehrkostenpunkt): NSIS pro Benutzer ohne Adminrechte; zunächst unsigniert mit
+SmartScreen-Hinweis (Zertifikat kostet Geld, Entscheidung bei Klaus); „Öffnen mit“ ohne Änderung der Standard-App;
+Tresor im gleichen Format wie Android. Baustand: `BAUSTAND-WINDOWS.md`.
+
 ## Google-/Chrome-Übersetzung
 
 **Neueste ausdrückliche Entscheidung vom 21.10.2026:** Nach der erneuten

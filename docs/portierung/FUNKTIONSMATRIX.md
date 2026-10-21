@@ -182,3 +182,22 @@ Emulatornachweise stehen in [BAUSTAND-ANDROID.md](BAUSTAND-ANDROID.md).
 - API-Schlüssel bleiben bisher unverschlüsselt in localStorage. Nicht als nativen
   Schlüsseltresor bezeichnen. Der gepinnte Tresor schützt Sicherungsdateien.
 - Keine native Abnahme, Gerätemessung oder reguläre Auslieferung erfolgt.
+
+## Windows (Tauri 2, WebView2) – Zuordnung, Stand 21.10.2026
+
+Der Kern und `native/*.js` laufen unverändert; die Gerätefunktionen stellt der
+Windows-Host über dieselbe Schnittstelle bereit. Nachweise und Laufnummern:
+[BAUSTAND-WINDOWS.md](BAUSTAND-WINDOWS.md). Der GitHub-Windows-Rechner ist kein
+Gerät von Klaus; „am PC nicht gemessen“ gilt bis zu seiner Bestätigung.
+
+| Bereich (IDs) | Windows-Umsetzung | Benannte Grenze |
+|---|---|---|
+| Bibliothek, Editor, Erkennung, Ausgaben, Suche, Sicherung (F001–F048 ohne Gerätewege) | unveränderter Kern in WebView2 | – |
+| Dateien importieren (F002), Drag-and-drop (F004) | Systemdialog der WebView2; Ablegen im Fenster über den Kern | Ablegen nicht automatisch geprüft |
+| Ordner importieren (F003) | Ordnerdialog von Windows, nur lesend, Unterordner | – |
+| Teilen empfangen / Öffnen mit (F005/F006) | „Öffnen mit“ (OpenWithProgids), Ziehen auf das Programmsymbol, Zweitstart; privater Eingang wie Android | kein „Teilen an“ aus anderen Windows-Apps |
+| Speichern, Ansehen/Drucken, Teilen, Links (F037–F048) | Speichern unter mit Prüfsumme; Druck über Standard-PDF-App; Teilen-Fenster von Windows, sonst Explorer; Standard-App für Links | keine Zustellbestätigung |
+| Scanner/Kamera (F049 ff.) | Bilder/Fotos über Dateiauswahl; Kamera über WebView2 | Kameraaufnahme am PC nicht gemessen |
+| Übersetzen | Chrome-Weg A (lokale Sitzung, Laufhinweis mit Abbrechen); KI mit eigenem Schlüssel | kein Geräte-Übersetzer (ML Kit fehlt, WebView2-Translator `unavailable`) |
+| Spracheingabe | Spracherkennung der WebView2 | kein eigener Adapter, nicht gemessen |
+| Speicherort und Tresor (N001–N012) | frei gewählter Ordner/USB-Stick, Format wie Android (Gegenprobe), Passwortfenster, DPAPI | – |

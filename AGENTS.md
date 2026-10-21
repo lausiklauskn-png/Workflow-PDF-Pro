@@ -3,7 +3,10 @@
 - Wiederaufnahme, tatsächliche Zugriffsprüfung und Bauumgebung: `docs/FOLGESITZUNG.md`.
   Eigene bestehende GitHub-Verbindung nutzen; Signierfreigabe bleibt in Actions.
   Aktueller Zusatzbrief: `BRIEF_NACHFOLGE_2026-10-21_ANDROID_APK_AUSGELIEFERT.md`.
-  Windows (nächster Schritt, Claude Code): `BRIEF_NACHFOLGE_2026-10-21_WINDOWS.md`.
+  Windows (Tauri 2, Claude Code): `BRIEF_NACHFOLGE_2026-10-21_WINDOWS.md`, Stand in
+  `docs/portierung/BAUSTAND-WINDOWS.md`. Windows-Teile liegen nur unter `windows/` und in
+  `.github/workflows/windows-*.yml`; `native/*.js` laufen dort unverändert über eine Brücke.
+  Änderungen an `native/*.js` wirken auf Android **und** Windows: beide Prüfketten grün halten.
   Historische Baufortsetzung: `BRIEF_NACHFOLGE_2026-10-21_APP_FERTIGSTELLEN.md`.
 
 - Verbindlich: `BRIEF_NACHFOLGE_2026-10-20_NATIVE_APP.md` vollständig lesen.
