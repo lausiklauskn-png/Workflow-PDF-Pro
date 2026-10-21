@@ -800,3 +800,17 @@ und Abbruch. Eine zusätzliche Android-Chooser-Gegenprobe prüft app-eigene
 Lesefreigaben für zwei Dateien und bestätigt auch bei Schließen keine Zustellung.
 Die Oberfläche stellt diese Zustellungsgrenze ausdrücklich klar. Die Freigabe
 verlangt deshalb mindestens 47 Produktfälle einschließlich NativeOutputTest.
+
+## Zusätzliche Chrome-Gegenprobe vor Freigabe
+
+Freigabelauf `39607829521` auf `45fb0625fcb993244e7868a972d0c002ac3977f8`
+bestand die vollständige Originalkette und alle 33 nativen Browser-Einträge.
+Die zusätzliche echte Loopback-/Browser-Gegenprobe fand einen Wettlauf: Der
+unveränderte Übersetzer verwirft beim Benutzerabbruch seinen wartenden Auftrag;
+der Helfer durfte daraus nicht gleichzeitig eine `/result`-Fehlermeldung senden.
+Er merkt den Abbruch nun synchron und wartet auf `/cancel`, während tatsächliche
+Übersetzungsfehler weiter als Fehler zurückgehen. Alle elf Transportfälle wurden
+lokal erneut ausgeführt und bestanden (7,820 s); die neue CI-Runde bleibt bis zu
+ihrem Abschluss offen. Der WebView-Prüfstand desselben Laufs wurde tatsächlich
+vollständig erfasst: Google System WebView 124.0.6367.219 aus dem API-35-SDK,
+unveränderte signaturgeprüfte Pakete und commitgebundene SHA-256-Liste.

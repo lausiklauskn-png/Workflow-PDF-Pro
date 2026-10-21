@@ -1,7 +1,7 @@
 // Host-neutral browser half of trial A. Uses the byte-identical original engine.
 (async () => {
   'use strict';
-  let key = location.hash.slice(1), engine, lastId = 0;
+  let key = location.hash.slice(1), engine, lastId = 0, cancelled=false, cancelling;
   history.replaceState(null, '', '/');
   const status = document.getElementById('status');
   let language=0;
@@ -39,7 +39,7 @@
       document.getElementById('return').textContent=say('back');
       if (!engine) {
         engine = WFP.Uebersetzung.chromeUebersetzer(next.von, next.nach);
-        engine.beimHalt = () => { request('/cancel', {}).catch(() => {}); };
+        engine.beimHalt = () => { cancelled=true;cancelling=request('/cancel', {}).catch(() => {}); };
       }
       status.textContent = say('translate');
       try {
@@ -49,7 +49,10 @@
         const list = document.querySelector('#wfp-chrome [data-liste]'); if (list) list.replaceChildren();
         status.textContent = say('done');
       } catch (error) {
-        await request('/result', { id: next.id, error: 'translation-failed' }).catch(() => {});
+        // The engine rejects its waiter on an explicit user cancellation too.
+        // Keep that action distinct from a failed translation on both hosts.
+        if(cancelled)await cancelling;
+        else await request('/result', { id: next.id, error: 'translation-failed' }).catch(() => {});
         throw error;
       }
     }
