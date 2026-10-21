@@ -837,3 +837,15 @@ für die sichtbare Leiste. Vor OK wird die tatsächliche EditText-Eingabe geprü
 bei einem weiteren Fehler werden die sichtbaren Emulatorbeschriftungen genannt.
 Die endgültige Freigabe bleibt bis zur erfolgreichen gemeinsamen Wiederholung
 einschließlich der Browser-Abbruchkorrektur offen.
+
+Die erneute Runde `39610007468` auf `f937f1f` bestand wieder alle 47 nativen
+Fälle auf beiden Android-Ständen und den vollständigen Browser-/Transportweg.
+Android 12 bestand erneut auch die sichtbare Neuinstallation. Die neue
+EditText-Gegenprüfung zeigte beim Android-15-Installationsprüfer präziser:
+Der Ordnerdialog war vor der Texteingabe gar nicht geöffnet; die noch sichtbare
+Bibliothek enthielt weiterhin das Suchfeld. Die frühere Vermutung eines bloß
+abgeschnittenen langen Namens ist damit nicht belegt. Der Prüfer verlangt nun
+vor Eingabe ausdrücklich die Dialogüberschrift und das fokussierte Eingabefeld.
+Er tippt erst bei über zwei UI-Abbilder stabilen Koordinaten und wiederholt nur
+das Öffnen des sichtbaren Dialogs bei noch umgebrochener Startkopfzeile. Eine
+fehlende Ordneranlage oder fehlender Datenerhalt bleibt ein harter Fehler.

@@ -33,6 +33,14 @@ def wait_node(predicate,seconds=45):
 def tap(node):
     bounds=list(map(int,re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',node['bounds']).groups()))
     adb('shell','input','tap',(bounds[0]+bounds[2])//2,(bounds[1]+bounds[3])//2)
+def stable_tap(predicate):
+    deadline=time.monotonic()+30;previous=None
+    while time.monotonic()<deadline:
+        node=wait_node(predicate,10)
+        if node.get('bounds')==previous:
+            tap(node);return
+        previous=node.get('bounds')
+    raise RuntimeError('Visible control did not settle before tapping')
 def launch():
     result=adb('shell','am','start','-W','-n',package+'/de.familyprojekt.workflowpdf.pro.MainActivity')
     if 'Status: ok' not in result:raise RuntimeError('Regular application did not launch')
@@ -51,11 +59,20 @@ if 'package:'+package in existing:
     # production installation, and retain all data for the following reinstall.
     adb('uninstall',package)
 adb('install','-r',apk);launch()
-tap(wait_node(lambda node:node.get('text','').strip() in ['＋ Ordner','+ Ordner','＋ Folder','+ Folder']))
-tap(wait_node(lambda node:node.get('class')=='android.widget.EditText'))
+folder_button=lambda node:node.get('text','').strip() in ['＋ Ordner','+ Ordner','＋ Folder','+ Folder']
+for attempt in range(3):
+    stable_tap(folder_button)
+    try:
+        # The phone header finishes its identity/status layout after startup.
+        # Require the actual dialog, never type into the library search field.
+        wait_node(lambda node:node.get('text') in ['Neuer Ordner','New folder'],5)
+        break
+    except RuntimeError:
+        if attempt==2:raise
+wait_node(lambda node:node.get('class')=='android.widget.EditText' and node.get('focused')=='true')
 adb('shell','input','text',marker)
 wait_node(lambda node:node.get('class')=='android.widget.EditText' and node.get('text')==marker)
-tap(wait_node(lambda node:node.get('text')=='OK'))
+stable_tap(lambda node:node.get('text')=='OK')
 wait_node(lambda node:marker in node.get('text',''))
 adb('shell','am','force-stop',package)
 adb('install','-r',apk);launch()
