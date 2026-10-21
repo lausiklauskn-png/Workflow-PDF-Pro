@@ -341,3 +341,25 @@ erfolgreich; API-lesbare XML-Annotation von Job 119143630487 meldet **20 Tests,
 aktiviert; diese 20 Fälle sind die bestehenden nativen Komponentenfälle.
 Startsperre und zusätzliche Löschabbruchfälle kamen erst nach `01eaec6` hinzu
 und sind durch diesen Lauf ausdrücklich noch nicht im CI nachgewiesen.
+
+### Bestätigter Folgelauf auf `a1c0de8`
+
+[Actions-Lauf 39577609845](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39577609845)
+bestand vollständig: Originalkette mit 28 Skripten, Browser-/Datei-/Ordnerfälle,
+Release-Auftragsgegenprobe, drei Codec-, vier Transport-, 22 Journal- und fünf
+Startsperren-Testeinträge. Android-Bau, Lint/JVM und Emulator ebenfalls erfolgreich;
+die XML-Annotation meldet erneut **20 Fälle, 0 Fehler, 0 ausgelassen**. Damit sind
+auch die nach `01eaec6` ergänzten Prüfungen neu im CI bestätigt. Die folgenden
+Änderungen betreffen nur Dokumentation dieser Ergebnisse und Entscheidungen.
+
+Nächster notwendiger Integrationsschritt: die bestehende Datenbank vor dem
+Erfassen durch `app.js` kontrolliert hinter die Startsperre stellen, native
+Entsperr-/Fehleroberfläche und explizite Migration/Ordnerwechsel anschließen.
+Dabei ausstehende Autospeicherungen und aktuelle Editorwerte vor einer
+Umstellung erhalten; ein bloßes Neuladen darf offene Werte nicht verwerfen.
+Erst nach bestätigtem Tresorschreiben lokale Dateibytes durch Referenzen ersetzen.
+Ein neuer/leerer Tresor, ein vorhandener eigener Tresor und fehlende Freigaben
+sind unterschiedliche Vorgänge. Fehler dürfen keine interne Ersatzbibliothek
+erzeugen; fremde/konfligierende Kennungen nicht überschreiben. Einstellungen
+explizit anhand SPEICHERINVENTAR.md zuordnen. Alle bereits gewählten Arbeiten
+sind weiterhin autorisiert; keine erneute Journal-/Dienstfreigabe erforderlich.

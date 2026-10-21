@@ -113,4 +113,13 @@ Wiederanlaufjournal und Chrome-Vordergrunddienst mit sichtbarer Benachrichtigung
 und Abbruch sind gewählt (siehe `docs/portierung/ENTSCHEIDUNGEN.md`). Nicht erneut
 als offen behandeln. Die Umsetzung und tatsächliche Geräteabnahme bleiben davon
 getrennt; der neue Journal-/DB-Baustein ist noch nicht im Produkt aktiviert.
+
+Aktueller Implementierungsnachweis: `a1c0de8`, Actions-Lauf `39577609845`
+vollständig grün (Originalkette, neue Journal-/Startsperrenfälle, Android mit
+20 Emulatorfällen). `native/vault-journal.js`, `vault-db.js`, `vault-gate.js`
+sind weiterhin getrennte Factories ohne produktive Aktivierung. Die nachfolgenden
+Commits dokumentieren Ergebnisse/Entscheidungen. Nächste Integrationsgrenze und
+offene Autospeicher-/Migrations-/Geräteprüfungen stehen am Ende von
+`docs/portierung/BAUSTAND-ANDROID.md`. Kein vollständiger Tresor und kein
+fertiger Chrome-Dienst aus dem grünen Komponentenlauf ableiten.
 Abhängigkeiten nicht mit `npm ci` während eines Gradle-/Lint-Laufs neu erzeugen.
