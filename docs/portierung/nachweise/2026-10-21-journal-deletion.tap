@@ -1,0 +1,32 @@
+▶ restart replays every interrupted durable write boundary before allowing reads
+  ✔ boundary 1 (8.41782ms)
+  ✔ boundary 2 (1.905003ms)
+  ✔ boundary 3 (4.258142ms)
+  ✔ boundary 4 (2.200915ms)
+  ✔ boundary 5 (1.46679ms)
+  ✔ boundary 6 (2.845144ms)
+✔ restart replays every interrupted durable write boundary before allowing reads (22.83013ms)
+✔ an index quota failure retains the encrypted redo payload and never reports saved (1.443864ms)
+✔ file replacement/deletion invalidates every vector block and preserves the original lifecycle and translation jobs (5.593499ms)
+✔ unreachable/locked storage blocks even translation-job reads and cannot become a missing job or empty library (1.720364ms)
+✔ damaged or foreign journals fail closed without modifying local records (1.064575ms)
+✔ callers cannot mutate queued values; writes and reads retain call order (0.646406ms)
+✔ stale file references are rejected rather than returning a different document version (0.932251ms)
+▶ interrupted deletion cannot resurrect an original photo or stale search blocks on restart
+  ✔ delete boundary 1 (4.342503ms)
+  ✔ delete boundary 2 (3.577828ms)
+  ✔ delete boundary 3 (1.569531ms)
+  ✔ delete boundary 4 (1.76595ms)
+  ✔ delete boundary 5 (1.767043ms)
+  ✔ delete boundary 6 (2.936091ms)
+  ✔ delete boundary 7 (1.304705ms)
+  ✔ delete boundary 8 (1.494043ms)
+✔ interrupted deletion cannot resurrect an original photo or stale search blocks on restart (19.954236ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 64.81606

@@ -111,3 +111,19 @@ test('stale file references are rejected rather than returning a different docum
   await f.records.save('selected','files',{id:'d',bytes:new Uint8Array([9])});
   await assert.rejects(db.getFile('d'),/VAULT_RECORD_CHANGED/);
 });
+test('interrupted deletion cannot resurrect an original photo or stale search blocks on restart',async t=>{
+  // Journal, PDF/original/text/head/block deletion, local commit, done marker.
+  for(let boundary=1;boundary<=8;boundary++)await t.test('delete boundary '+boundary,async()=>{
+    const f=fixture(),a=f.restart();await a.journal.recover();
+    await a.db.putFile('d',new Uint8Array([1]));
+    await a.db.put('files',{id:'d~original',name:'unexamined.jpg',bytes:new Uint8Array([7])});
+    await a.db.put('files',{id:'ue:d:de-ru',job:{page:7}});
+    await a.db.put('texte',{id:'d',text:'old text'});
+    await a.db.put('vektoren',{id:'d',n:1});await a.db.put('vektoren',{id:'d#00000',values:[1]});
+    f.cut(boundary);await assert.rejects(a.db.del('files','d'),/POWER_INTERRUPTED/);
+    f.resume();const b=f.restart();await b.journal.recover();
+    assert.equal(await b.db.getFile('d'),null);assert.equal(await b.db.get('files','d~original'),undefined);
+    assert.equal(await b.db.get('texte','d'),undefined);assert.deepEqual(await b.db.keys('vektoren'),[]);
+    assert.equal((await b.db.get('files','ue:d:de-ru')).job.page,7);
+  });
+});

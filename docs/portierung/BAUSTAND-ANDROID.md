@@ -320,3 +320,11 @@ mit anschließendem leeren Job, verspätete Wertänderung und eine bereits warte
 Mutation nach fehlgeschlagenem Lesen sind getrennt geprüft. Das sind lokale
 Protokoll-/Nebenläufigkeitsprüfungen, keine native Passwortdialog-/Geräteabnahme.
 Die Sperre ist weiterhin eine Factory, keine schon injizierte Startoberfläche.
+
+Ergänzende lokale Gegenprobe: Abbruch nach jedem der acht dauerhaften Schritte
+beim Löschen von PDF, Originalfoto, Text, Vektorkopf und -block, Index und
+Abschlussmarker. Nach Wiederaufnahme bleiben Dokument/Original/Suchindex entfernt,
+der separate Übersetzungsjob bleibt erhalten. Der erweiterte Journallauf besteht
+jetzt **22 Testeinträge**, 0 Fehler/ausgelassen; Rohbericht
+`nachweise/2026-10-21-journal-deletion.tap`. Die früher genannten 13 Einträge
+bezeichnen den vorherigen, kleineren Lauf, keine weiteren Geräteprüfungen.
