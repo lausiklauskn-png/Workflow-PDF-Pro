@@ -1,9 +1,11 @@
 # Workflow PDF Pro auf Android
 
-Die reguläre APK wird unter [GitHub Releases](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases)
-bereitgestellt. Eine Veröffentlichung ist erst nach erfolgreicher Freigabe und
-Prüfung der tatsächlich signierten APK belegt; der aktuelle Baustand nennt die
-jeweiligen Nachweise.
+**[Workflow PDF Pro 1.0.0 als APK herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.0/Workflow-PDF-Pro-1.0.0.apk)**
+
+Die reguläre APK ist veröffentlicht. Signatur, öffentliche Downloadbytes und
+tatsächliche Produktionsinstallation mit erhaltenen Daten nach erneuter
+APK-Installation sind geprüft. Die Veröffentlichung enthält Prüfsumme und
+Signatur-/Installationsnachweise; der Android-Baustand nennt die genauen Läufe.
 
 ## Erstinstallation
 

@@ -1,0 +1,169 @@
+{
+  "release": "v1.0.0",
+  "releaseCommit": "cf32a13a0b51433cf73a59ad2a76d4892f2a83a2",
+  "releaseUrl": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.0",
+  "apkBytes": 81619142,
+  "signingReceipt": {
+    "applicationId": "de.familyprojekt.workflowpdf.pro",
+    "versionName": "1.0.0",
+    "versionCode": 1,
+    "commit": "cf32a13a0b51433cf73a59ad2a76d4892f2a83a2",
+    "certificateSha256": "0da805c9ad11ded86227fa4398e9237766f9f2d12bec66d65cb20309cbea3837",
+    "apkSha256": "ca4df652472c08d23ab3e7dde44da5328bb84f10bac032ad294f74f952f097f6",
+    "filename": "Workflow-PDF-Pro-1.0.0.apk"
+  },
+  "productionInstallation": {
+    "applicationId": "de.familyprojekt.workflowpdf.pro",
+    "apkSha256": "ca4df652472c08d23ab3e7dde44da5328bb84f10bac032ad294f74f952f097f6",
+    "commit": "cf32a13a0b51433cf73a59ad2a76d4892f2a83a2",
+    "versionCode": 1,
+    "api": 31,
+    "firstInstall": true,
+    "reinstallPreservesData": true,
+    "developmentProbe": false,
+    "probe": "visible WebView UI; folder retained across signed APK reinstall; no debug JS access"
+  },
+  "acceptanceRun": 39618209136,
+  "nativeSmokeCheck": 119291199794,
+  "nativeReports": [
+    {
+      "artifact": "native-acceptance-31-1",
+      "commit": "cf32a13a0b51433cf73a59ad2a76d4892f2a83a2",
+      "api": 31,
+      "webview": {
+        "package": "com.google.android.webview",
+        "version": "124.0.6367.219"
+      },
+      "tests": 47,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "reinstallPreservesData": true,
+      "classes": [
+        "FolderImportTest",
+        "IncomingFilesTest",
+        "IncomingInboxTest",
+        "NativeChromeTest",
+        "NativeCoreProductTest",
+        "NativeDocumentVaultTest",
+        "NativeFoundationTest",
+        "NativeIncomingTest",
+        "NativeOutputTest",
+        "NativePickerProductTest",
+        "NativeSpeechTest",
+        "NativeTranslateTest",
+        "NativeVaultProductTest"
+      ],
+      "sourceCommit": "7227c543d4a536cf8f3354a56fbba7574645703e",
+      "kind": "actual Android instrumentation; camera/speech activity fixtures are synthetic; local ML translation, OCR and scanner model are real"
+    },
+    {
+      "artifact": "native-acceptance-35-1",
+      "commit": "cf32a13a0b51433cf73a59ad2a76d4892f2a83a2",
+      "api": 35,
+      "webview": {
+        "package": "com.google.android.webview",
+        "version": "124.0.6367.219"
+      },
+      "tests": 47,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "reinstallPreservesData": true,
+      "classes": [
+        "FolderImportTest",
+        "IncomingFilesTest",
+        "IncomingInboxTest",
+        "NativeChromeTest",
+        "NativeCoreProductTest",
+        "NativeDocumentVaultTest",
+        "NativeFoundationTest",
+        "NativeIncomingTest",
+        "NativeOutputTest",
+        "NativePickerProductTest",
+        "NativeSpeechTest",
+        "NativeTranslateTest",
+        "NativeVaultProductTest"
+      ],
+      "sourceCommit": "7227c543d4a536cf8f3354a56fbba7574645703e",
+      "kind": "actual Android instrumentation; camera/speech activity fixtures are synthetic; local ML translation, OCR and scanner model are real"
+    }
+  ],
+  "productionReleaseRun": 39620394480,
+  "publicDownloadByteVerifiedByPublisher": true,
+  "localDownloadedApkSha256Verified": true,
+  "localApksignerV2V3AndExistingCertificateVerified": true,
+  "physicalSamsungAcceptance": "pending",
+  "actualChromeMenuTranslationOnSamsung": "pending",
+  "additionalMainAcceptance": {
+    "run": 39620337637,
+    "attempt": 2,
+    "nativeSmokeCheck": 119305514696,
+    "result": "success",
+    "inheritedSuccessfulSourceAndTabletChecks": true,
+    "reports": [
+      {
+        "artifact": "native-acceptance-31-1",
+        "commit": "cf32a13a0b51433cf73a59ad2a76d4892f2a83a2",
+        "api": 31,
+        "webview": {
+          "package": "com.google.android.webview",
+          "version": "124.0.6367.219"
+        },
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reinstallPreservesData": true,
+        "classes": [
+          "FolderImportTest",
+          "IncomingFilesTest",
+          "IncomingInboxTest",
+          "NativeChromeTest",
+          "NativeCoreProductTest",
+          "NativeDocumentVaultTest",
+          "NativeFoundationTest",
+          "NativeIncomingTest",
+          "NativeOutputTest",
+          "NativePickerProductTest",
+          "NativeSpeechTest",
+          "NativeTranslateTest",
+          "NativeVaultProductTest"
+        ],
+        "sourceCommit": "7227c543d4a536cf8f3354a56fbba7574645703e",
+        "kind": "actual Android instrumentation; camera/speech activity fixtures are synthetic; local ML translation, OCR and scanner model are real"
+      },
+      {
+        "artifact": "native-acceptance-35-2",
+        "commit": "cf32a13a0b51433cf73a59ad2a76d4892f2a83a2",
+        "api": 35,
+        "webview": {
+          "package": "com.google.android.webview",
+          "version": "124.0.6367.219"
+        },
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reinstallPreservesData": true,
+        "classes": [
+          "FolderImportTest",
+          "IncomingFilesTest",
+          "IncomingInboxTest",
+          "NativeChromeTest",
+          "NativeCoreProductTest",
+          "NativeDocumentVaultTest",
+          "NativeFoundationTest",
+          "NativeIncomingTest",
+          "NativeOutputTest",
+          "NativePickerProductTest",
+          "NativeSpeechTest",
+          "NativeTranslateTest",
+          "NativeVaultProductTest"
+        ],
+        "sourceCommit": "7227c543d4a536cf8f3354a56fbba7574645703e",
+        "kind": "actual Android instrumentation; camera/speech activity fixtures are synthetic; local ML translation, OCR and scanner model are real"
+      }
+    ]
+  }
+}

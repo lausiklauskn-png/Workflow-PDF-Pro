@@ -884,3 +884,43 @@ fehlendem neuestem Bericht, fremdem Commit und unvollständigem Ergebnis sind
 lokal bestanden; diese Logiknachweise ersetzen keine Android-Produkttests.
 Die App-Implementierung bleibt hierbei unverändert. Der neue CI-Commit muss
 seine vollständige gemeinsame Freigabe erneut tatsächlich bestehen.
+
+## Reguläre Android-APK 1.0.0 veröffentlicht
+
+[Direkter APK-Download](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.0/Workflow-PDF-Pro-1.0.0.apk).
+Release-/Tag-Commit `cf32a13a0b51433cf73a59ad2a76d4892f2a83a2`,
+Buildnummer 1, Produktions-App-ID `de.familyprojekt.workflowpdf.pro`.
+Nachweis: `nachweise/2026-10-21-native-production-release.json`.
+
+Freigabelauf `39618209136` ist vollständig einschließlich native-smoke
+`119291199794` erfolgreich: Originalkette, 33 Browserfälle, elf Chrome-
+Transportfälle, Speicher-/Release-Gegenproben, sieben Artefakt-Gate-Gegenproben,
+Bau/Lint/JVM und je 47 native Fälle auf Android 12 und 15 ohne Fehler/Skips
+einschließlich sichtbarer Erst-/Neuinstallation. Eindeutige Berichtspakete
+und die unveränderten Freigabebedingungen wurden tatsächlich gemeinsam ausgeführt.
+Der geprüfte Commit ging per Fast-forward auf main; PR #8 ist zusammengeführt.
+
+Der gemeinsame reguläre Release `39620394480` bestand die tatsächliche
+Signierung mit der vorhandenen Identität und auf API31 die sichtbare
+Produktionsinstallation, Ordneranlage, erneute APK-Installation und erhaltenen
+Ordner (`developmentProbe:false`). Anschließend wurde regulär veröffentlicht
+und der öffentliche Download bytegleich geprüft. Dieselbe APK wurde lokal
+heruntergeladen, erneut gehasht und mit apksigner verifiziert: v2/v3 gültig,
+bestehender öffentlicher Zertifikats-Pin. SHA-256:
+`ca4df652472c08d23ab3e7dde44da5328bb84f10bac032ad294f74f952f097f6`.
+Keine Signieridentität ersetzt, kein Klartextschlüssel übertragen.
+
+Der zusätzliche identische main-Lauf `39620337637` bestand ebenfalls 47
+Telefon-Produktfälle, scheiterte danach beim ADB/UIAutomator-Dump-Transport
+Die reguläre Telefonwiederholung in Versuch 2 bestand inzwischen ebenfalls
+47 Produktfälle, sichtbare Erst-/Neuinstallation und die gemeinsame Freigabe
+`119305514696`. Quell-/Tabletprüfungen wurden aus dem ersten erfolgreichen
+Versuch wiederverwendet. Der frühere Transportfehler wird nicht als erfolgreicher
+Installationsnachweis jenes Versuchs ausgegeben.
+Die veröffentlichte APK beruht auf den oben vollständig erfolgreichen
+Freigabe- und Produktionsinstallationsnachweisen.
+
+Das Quellrepo und alle 191 Herkunftsdateien bleiben unverändert. Die physische
+Abnahme auf Galaxy Tab S6/S21, reale Chrome-Menüübersetzung sowie Windows und
+iOS sind nächste Arbeiten. Spätere Dokumentationscommits verändern die APK
+unter v1.0.0 nicht und sind keine neu ausgeführten Produktprüfungen.

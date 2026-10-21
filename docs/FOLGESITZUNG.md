@@ -1,7 +1,8 @@
 # Selbstständig weiterarbeiten: Codex und Claude Code
 
 Aktueller kopierbarer Nachfolgeauftrag:
-`BRIEF_NACHFOLGE_2026-10-21_APP_FERTIGSTELLEN.md`. Er ergänzt den weiterhin
+`BRIEF_NACHFOLGE_2026-10-21_ANDROID_APK_AUSGELIEFERT.md`. Er ergänzt die historischen
+Baufortsetzungen und den weiterhin
 verbindlichen Originalbrief vom 20.10.2026.
 
 Neueste Weisung der Fortsetzung: Der Nutzer hat nach der erneuten Gegenüberstellung
@@ -12,7 +13,9 @@ nach Logik und Nutzerfreundlichkeit treffen; vollständige Kernübernahme und
 Prüfgrenzen erhalten. Nicht erneut nach der Dienstentscheidung fragen.
 Aktuelle Speicheranbindung und Nachweise stehen am Ende von BAUSTAND-ANDROID.md.
 
-Aktuell vollständig belegter Telefonstand: `ee72241`, [Actions 39600105556](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39600105556): vollständige Originalkette, 33 native Browserfälle, zehn JVM- und 45 Android-15-Fälle ohne Fehler/Skips. Produktive Tresoranbindung, dauerhafter Eingang, lokaler Chrome-Dienst/Transport, Android-Sprache und lokale Modelle sind implementiert. Die noch offene vollständige Freigabe verlangt zusätzlich Android 12 mit aktualisierter WebView und tatsächlichen Neuinstallations-/Datenerhaltbeleg. Aktuelle Nacharbeiten: optionale Google-SDK-Initialisierung nach Zustimmung, Laufzeitprüfung, Druck außerhalb des UI-Threads und die gemeinsame aktualisierte Emulator-Systemkomponente. Neueste Einzelheiten am Ende von BAUSTAND-ANDROID.md. Noch keine reguläre Veröffentlichung daraus ableiten.
+Regulär veröffentlicht: **[Android-APK 1.0.0](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.0)** aus `cf32a13a0b51433cf73a59ad2a76d4892f2a83a2`. Vollständige Freigabe einschließlich native-smoke: [39618209136](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39618209136), je 47 native Fälle auf Android 12/15 ohne Fehler/Skips und sichtbare Erst-/Neuinstallation. Gemeinsamer tatsächlicher Signier-/Releaseweg: [39620394480](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39620394480), Produktions-App-ID, bestehender Zertifikats-Pin, signierte Erstinstallation mit Datenerhalt und bytegleich geprüfter öffentlicher Download. Dieser Release ist der belegte Erstinstallationsstand; spätere Dokumentationscommits erzeugen keine weitere APK-Version. Physische Samsung-Abnahme sowie Windows und iOS bleiben nächste Arbeiten.
+
+Historischer Telefonstand davor: `ee72241`, [Actions 39600105556](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39600105556), 45 Android-15-Fälle. Dessen offene Android-12-/Installations-/SDK-/Druckarbeiten sind im oben genannten Release inzwischen umgesetzt. Frühere Fehler bleiben am Ende von BAUSTAND-ANDROID.md dokumentiert.
 
 Historischer Empfangsabschnitt dieser Fortsetzung: `2c16888`,
 [Actions 39584646803](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39584646803)
@@ -26,7 +29,7 @@ Lauf und dessen korrigierter Listenervertrag stehen am Ende des Baustands.
 
 Zielgeräte inzwischen vom Nutzer genannt: Samsung Galaxy Tab S6 und Galaxy S21,
 nach seiner Auskunft möglichst aktuell gehalten. Exakte Android-/One-UI-/Chrome-/
-WebView-Versionen noch nicht gemessen. Keine reale Installation oder Abnahme
+WebView-Versionen noch nicht gemessen. Keine physische Samsung-Installation oder Abnahme
 daraus ableiten. Tablet/DeX und Telefon in der Geräteabnahme berücksichtigen.
 
 Zuerst `AGENTS.md`, den vollständigen Nachfolgebrief und die aktuellen Dateien
