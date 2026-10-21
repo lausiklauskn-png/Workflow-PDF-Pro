@@ -101,3 +101,15 @@ Installer `Workflow-PDF-Pro-Windows-1.0.1-Setup.exe`, 15.147.379 Bytes (Größe 
 Nicht automatisch geprüft: echtes Drucken, Teilen-Fenster von Windows, Ablegen von Dateien im
 Fenster, Kamera, Spracheingabe und die eigentliche Übersetzung in Chrome (sie braucht eine Bedienung
 in Chrome). Nichts davon ist auf Klaus' PC gemessen.
+
+## Veröffentlichung 1.0.1 (21.10.2026)
+
+- main-Commit `e824e73` (Squash von PR #11), Bau- und Abnahmelauf auf main 39678618984 grün.
+- Veröffentlichungslauf 39679944807 (`windows-release.yml`): Er nimmt genau den im Abnahmelauf
+  gebauten Installer, ohne neu zu bauen. Danach wird die Datei unabhängig heruntergeladen und mit
+  Prüfsumme und Größe verglichen.
+- Release `windows-v1.0.1`, nicht als „latest“ markiert. Android `v1.0.1` bleibt die Hauptveröffentlichung.
+- `Workflow-PDF-Pro-Windows-1.0.1-Setup.exe`, 15.147.075 Bytes,
+  SHA-256 `f7d5bffd800c7bd01915744d71aea42b3f7c6b05c3de60a37ecc2f18d179a099`. Zusätzlich aus
+  dieser Sitzung heruntergeladen und gegengeprüft: gleich (NSIS-Installer, PE32).
+- Unsigniert. Auf Klaus' Windows-PC nicht gemessen.
