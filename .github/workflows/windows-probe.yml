@@ -20,6 +20,8 @@ jobs:
       run:
         shell: pwsh
     steps:
+      - name: Zeilenenden unverändert lassen (bytegleicher Kern)
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -80,6 +82,7 @@ jobs:
       - name: Messwerte als Hinweis zeigen
         if: always()
         run: |
+          if (!(Test-Path probe-out)) { exit 0 }
           Get-ChildItem probe-out -Filter *.json | ForEach-Object {
             $t = (Get-Content $_.FullName -Raw) -replace '%','%25' -replace "`r",'' -replace "`n",'%0A'
             if ($t.Length -gt 3800) { $t = $t.Substring(0,3800) }
