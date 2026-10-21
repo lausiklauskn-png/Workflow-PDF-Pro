@@ -18,6 +18,9 @@ try {
   const filename = 'Workflow-PDF-Pro-' + tag.slice(1) + '.apk';
   const apk = path.resolve(folder, filename), receipt = JSON.parse(await readFile(apk + '.json', 'utf8'));
   validateReceipt(receipt, tag, commit);
+  const installation = JSON.parse(await readFile(apk + '.installation.json', 'utf8'));
+  if (installation.applicationId !== receipt.applicationId || installation.commit !== commit || installation.apkSha256 !== receipt.apkSha256 || installation.versionCode !== receipt.versionCode || installation.firstInstall !== true || installation.reinstallPreservesData !== true || installation.developmentProbe !== false || installation.api < 31)
+    throw new Error('Tatsächliche signierte Erstinstallation mit Datenerhalt ist nicht vollständig belegt.');
   const sha = bytes => createHash('sha256').update(bytes).digest('hex');
   if (sha(await readFile(apk)) !== receipt.apkSha256) throw new Error('APK wurde nach der Signaturprüfung verändert.');
   const remoteTag = spawnSync('git', ['ls-remote', '--tags', 'https://github.com/' + repo + '.git', 'refs/tags/' + tag], { encoding: 'utf8' });
@@ -37,7 +40,7 @@ try {
     validateReceipt(previous, latest.tag_name, previous.commit);
     validateUpdate(receipt, previous);
   }
-  run(['release', 'create', tag, apk, apk + '.sha256', apk + '.json', '--repo', repo, '--target', commit, '--title', 'Workflow PDF Pro ' + receipt.versionName, '--generate-notes', '--draft']); created = true;
+  run(['release', 'create', tag, apk, apk + '.sha256', apk + '.json', apk + '.installation.json', '--repo', repo, '--target', commit, '--title', 'Workflow PDF Pro ' + receipt.versionName, '--generate-notes', '--draft']); created = true;
   run(['release', 'edit', tag, '--repo', repo, '--draft=false', '--latest']);
   const downloaded = path.join(dir, filename);
   const url = 'https://github.com/' + repo + '/releases/download/' + tag + '/' + filename;

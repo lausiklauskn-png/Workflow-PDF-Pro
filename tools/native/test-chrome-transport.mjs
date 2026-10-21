@@ -127,7 +127,7 @@ test('Adapter öffnet vor erstem Text nichts und kann auch während des Öffnens
 
 test('Browser-Helfer und echter Loopback-Transport: zwei Seiten und unveränderter Originalkern', { timeout: 20000 }, async () => {
   const host = await openChromeTransport({ von: 'de', nach: 'ru' });
-  const browser = await chromium.launch({ executablePath: '/usr/bin/chromium' });
+  const browser = await chromium.launch(process.env.WFP_CHROMIUM ? {executablePath:process.env.WFP_CHROMIUM} : {});
   try {
     const page = await browser.newPage();
     const outgoing = [], errors = [];
@@ -163,7 +163,7 @@ test('Browser-Helfer und echter Loopback-Transport: zwei Seiten und unverändert
 
 test('Browser-Abbrechen erreicht die wartende App über den echten Transport', { timeout: 15000 }, async () => {
   const host = await openChromeTransport({ von: 'de', nach: 'en' });
-  const browser = await chromium.launch({ executablePath: '/usr/bin/chromium' });
+  const browser = await chromium.launch(process.env.WFP_CHROMIUM ? {executablePath:process.env.WFP_CHROMIUM} : {});
   try {
     const pending = host.translate(['Nichts ungefragt übersetzen']);
     const rejection = assert.rejects(pending, /cancelled-in-browser/);
@@ -185,7 +185,7 @@ test('Unveränderte App: Reinigung vor Transport, Abbruch ohne Senden, PDF und V
     } catch { res.writeHead(404); res.end(); }
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  const browser = await chromium.launch({ executablePath: '/usr/bin/chromium' });
+  const browser = await chromium.launch(process.env.WFP_CHROMIUM ? {executablePath:process.env.WFP_CHROMIUM} : {});
   const hosts = []; let adapter, opened = 0;
   const sent = [];
   try {

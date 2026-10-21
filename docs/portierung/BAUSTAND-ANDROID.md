@@ -645,3 +645,45 @@ plus Sammeltest bestanden, insgesamt sieben Einträge. Neue echte ML-Kit-
 Modell-/Sechspaarprüfung und Binder-Sprachprüfung mit ausschließlich im Debugbau
 enthaltenem synthetischem Android-Sprachdienst sind kompiliert. Ausführung folgt;
 keine echte Spracherkennung oder Modellübersetzung vorab behauptet.
+
+## Echte Android-Modelle bestanden; vollständige Freigabeprüfung vorbereitet
+
+CI `39594634590` auf `89ea38b1abbbe9496c7002ff4a726f3455951d17` erfolgreich:
+Originalkette, alle Adapter-/Speicherbrowserfälle, Bau/Lint/JVM und **40 echte
+Android-15-Fälle, 0 Fehler/Skips, 96,192 s**. Enthalten sind erstmals tatsächliche
+ML-Kit-Modell-Downloads und Übersetzungen in allen sechs DE/EN/RU-Richtungen sowie
+die reale Android-Erkennungsbinderkette mit ausdrücklich synthetischem Debug-
+Sprachdienst. Keine Mikrofon-/Google-Spracherkennungsqualität daraus abgeleitet.
+Rohbefund `nachweise/2026-10-21-native-models-ci.json`. Paralleler PR-Lauf ebenfalls
+erfolgreich; beide vorherigen instabilen Befunde sind damit erneut geprüft.
+
+Neu zur Abnahme ergänzt und lokal kompiliert: echter WebView-PDF-/Formular-/
+Unicode-/Vorlagen-/HTML-/ZIP- und verschlüsselter Sicherungsrückweg, tatsächliche
+gebündelte Scanic- und Tesseract-Modelle bis zum durchsuchbaren PDF, ursprüngliche
+Systemdateiauswahl sowie Kamera-Abbruch und synthetische JPEG-Rückgabe durch den
+realen Berechtigungs-/FileProvider-Weg. Hardware und Kamera-App liefern in dieser
+Gegenprobe ausdrücklich synthetische Dateien. Echte Samsung-Hardware bleibt
+anschließend durch die gewünschte Erstinstallation zu prüfen.
+
+Die neue Freigabekette `native-acceptance.yml` verlangt zusätzlich zur vollständigen
+Originalkette beide Androidstände 12/API31 im Tabletprofil und 15/API35 im
+Telefonprofil, mindestens 44 tatsächlich ausgeführte native Produktfälle ohne
+Fehler/Skips und den Datenerhalt über APK-Neuinstallation durch die sichtbare
+Oberfläche. Erst deren erfolgreicher Sammeljob heißt `native-smoke`. Der frühere
+Foundation-Job wird weder umbenannt noch als vollständige Abnahme ausgegeben.
+Der reguläre Signierweg bleibt main-exakt und verwendet dieselbe Identität.
+Vor Veröffentlichung wird zusätzlich die tatsächlich signierte reguläre APK
+installiert, über die Oberfläche ein Ordner angelegt und nach erneuter Installation
+dessen Erhalt geprüft. Der veröffentlichte Installationsbeleg ist an APK-Hash,
+Commit und reguläre App-ID gebunden; Debug-Prüfbelege werden abgewiesen.
+
+Die Chrome-Fabrik unterscheidet Transportfehler von Nutzerabbruch, damit z. B.
+fehlendes Chrome als Fehler sichtbar bleibt. Größere Absatzmengen werden in
+kleinen Rahmen übertragen; außergewöhnlich große Einzelabsätze verwenden die
+vorhandene Quell-Satzzerlegung und werden vor der PDF-Übernahme wieder demselben
+Absatz zugeordnet. Die frühere technische 16-MiB-Eingangsgrenze begrenzt dadurch
+nicht mehr die Dokument-/Seitengröße; nichts wird abgeschnitten. Der Server
+behält eine begrenzte Nachrichtengröße zum Schutz vor defekten Browserantworten.
+Bei gesperrtem Tresor wird die Dokumentoberfläche verborgen. Der Speicherdialog
+benennt die tatsächliche Hauptablage und behauptet bei aktiver Tresoranbindung
+keine ausschließliche Browserablage mehr. Quellmodule bleiben bytegleich.

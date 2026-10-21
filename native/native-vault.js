@@ -19,6 +19,8 @@
     cancel:['Abbrechen','Cancel','Отмена','إلغاء'],
     writing:['Wird verschlüsselt gespeichert …','Saving encrypted data …','Сохранение зашифрованных данных …','جارٍ حفظ البيانات المشفرة …'],
     saved:['Im Tresor gespeichert und geprüft.','Saved and verified in the vault.','Сохранено и проверено в хранилище.','تم الحفظ والتحقق في الخزنة.'],
+    stored:['✓ Auf diesem Gerät gespeichert.','✓ Saved on this device.','✓ Сохранено на этом устройстве.','✓ تم الحفظ على هذا الجهاز.'],
+    durable:['Dokument und Arbeitsstand liegen im gewählten verschlüsselten Tresor. Die interne Datenbank dient als Arbeitsindex. Zusätzliche Sicherungen lassen sich wie bisher erstellen.','The document and working state are in your selected encrypted vault. The internal database is a working index. Additional backups remain available.','Документ и рабочее состояние находятся в выбранном зашифрованном хранилище. Внутренняя база служит рабочим индексом. Дополнительные резервные копии доступны.','المستند وحالة العمل في الخزنة المشفرة المحددة. قاعدة البيانات الداخلية فهرس للعمل. يمكنك إنشاء نسخ احتياطية إضافية.'],
     blocked:['Speicher gesperrt oder nicht erreichbar. Die Bibliothek wird nicht durch eine leere ersetzt.','Storage is locked or unavailable. The library will not be replaced by an empty one.','Хранилище заблокировано или недоступно. Библиотека не будет заменена пустой.','التخزين مقفل أو غير متاح. لن تُستبدل المكتبة بمكتبة فارغة.'],
     conflict:['Gleiche Kennungen mit anderem Inhalt gefunden. Es wurde nichts überschrieben. Bitte einen neuen leeren Zielordner wählen.','Conflicting IDs contain different data. Nothing was overwritten. Choose a new empty destination folder.','Найдены одинаковые идентификаторы с разным содержимым. Ничего не перезаписано. Выберите новую пустую папку.','وُجدت معرفات متطابقة بمحتوى مختلف. لم تُستبدل أي بيانات. اختر مجلداً جديداً فارغاً.'],
     failed:['Speichern/Übernahme nicht abgeschlossen. Bisherige Daten bleiben erhalten. Erneut versuchen.','Save/transfer did not complete. Existing data is retained. Retry.','Сохранение/перенос не завершены. Прежние данные сохранены. Повторите попытку.','لم يكتمل الحفظ أو النقل. تبقى البيانات السابقة محفوظة. أعد المحاولة.'],
@@ -98,6 +100,7 @@
       localStorage.setItem('wfp_native_preferences_loaded',selected.id);location.reload();return gate.db;
     }
     gate.resume(bound);
+    delete document.documentElement.dataset.wfpVaultLocked;
     panel?.close();panel?.remove();panel=null;
     return gate.db;
   }
@@ -134,6 +137,7 @@
   }
   async function manage(locked=false,error){
     if(operation)return;
+    if(locked)document.documentElement.dataset.wfpVaultLocked='';
     panel?.close();panel?.remove();panel=document.createElement('dialog');panel.className='native-vault-dialog';panel.dataset.keinUe='';
     const h=document.createElement('h2'),text=document.createElement('p'),explain=document.createElement('p'),actions=document.createElement('div');
     h.textContent=t('title');text.textContent=locked?t('blocked'):active?t('folder')+(active.state.folder||''):t('internal');explain.textContent=t('notice');
@@ -168,6 +172,13 @@
     }
     const storage=document.getElementById('stSpeicher');
     if(storage&&active){const text=t('folder')+(active.state.folder||'');if(storage.textContent!==text){storage.dataset.keinUe='';storage.textContent=text;}}
+    for(const dialog of document.querySelectorAll('.dlg')){
+      if(!dialog.querySelector('h2')?.textContent.startsWith('💾')||!dialog.querySelector('[data-dl]'))continue;
+      const paragraphs=dialog.querySelectorAll(':scope > p');if(paragraphs.length<2)continue;
+      const first=active?t('saved'):t('stored');
+      if(paragraphs[0].textContent!==first){paragraphs[0].dataset.keinUe='';paragraphs[0].textContent=first;}
+      if(active&&paragraphs[1].textContent!==t('durable')){paragraphs[1].dataset.keinUe='';paragraphs[1].textContent=t('durable');}
+    }
   });observe.observe(document.body,{childList:true,subtree:true});
   // Portable preferences are saved independently of local secrets/consents.
   const set=Storage.prototype.setItem;

@@ -13,3 +13,4 @@ html[data-wfp-native] { overscroll-behavior: none; }
 .native-vault-dialog{max-width:36rem;width:calc(100% - 2rem);max-height:85dvh;overflow:auto;border:1px solid #888;border-radius:.5rem;padding:1rem;color:var(--text,#17202a);background:var(--papier,#fff)}
 .native-vault-dialog::backdrop{background:#0009}.native-vault-dialog button{margin:.4rem .4rem .4rem 0}
 #nativeVaultStatus{position:fixed;z-index:20001;bottom:.5rem;inset-inline:.5rem;max-width:36rem;padding:.5rem;background:#fff3cd;color:#222;border:1px solid #897332}
+html[data-wfp-vault-locked] body > :not(.native-vault-dialog):not(#nativeVaultStatus){visibility:hidden!important}
