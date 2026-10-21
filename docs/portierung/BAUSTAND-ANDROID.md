@@ -825,3 +825,15 @@ Baugrundlagen-Erfolg ersetzt den vollständigen native-smoke nicht. Die
 Druck-Gegenprobe startet den Layout-Aufruf nun zusätzlich ausdrücklich auf dem
 UI-Thread und verlangt den Rückruf vom Hintergrundarbeiter; diese Verstärkung
 kompiliert lokal erfolgreich und wird in der nächsten Runde ausgeführt.
+
+Android 12 im Tabletprofil hat auf `45fb062` auch die vollständigen **47 Fälle
+und die sichtbare Erst-/Neuinstallation mit Datenerhalt** bestanden (Job
+`119250060864`, Freigabelauf `39607829521`). Damit ist die aktualisierte
+System-WebView auf dem älteren Android tatsächlich ausgeführt und wirksam.
+Auf Android 15 im selben Freigabelauf bestanden ebenfalls alle 47 Fälle;
+der anschließende UI-Prüfer erkannte den langen Ordnernamen im schmalen
+Telefonprofil nicht vollständig. Der synthetische Prüfname ist nun kurz genug
+für die sichtbare Leiste. Vor OK wird die tatsächliche EditText-Eingabe geprüft;
+bei einem weiteren Fehler werden die sichtbaren Emulatorbeschriftungen genannt.
+Die endgültige Freigabe bleibt bis zur erfolgreichen gemeinsamen Wiederholung
+einschließlich der Browser-Abbruchkorrektur offen.

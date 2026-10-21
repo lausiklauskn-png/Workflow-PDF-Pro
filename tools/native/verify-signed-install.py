@@ -9,7 +9,9 @@ import xml.etree.ElementTree as ET
 apk=Path(sys.argv[1]).resolve()
 development='--development-probe' in sys.argv[2:]
 package='de.familyprojekt.workflowpdf.pro'+('.debug' if development else '')
-marker='Release-Installationspruefung'
+# Keep the synthetic folder fully visible in a narrow phone's horizontal bar;
+# accessibility may omit the clipped end of a long label despite valid storage.
+marker='WF-Probe'
 def adb(*args):
     result=subprocess.run(['adb',*map(str,args)],text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=45)
     if result.returncode:raise RuntimeError('ADB '+str(args[:3])+': '+(result.stdout+result.stderr)[-3000:])
@@ -18,7 +20,7 @@ def hierarchy():
     adb('shell','uiautomator','dump','--compressed','/sdcard/workflow-release-probe.xml')
     return ET.fromstring(adb('exec-out','cat','/sdcard/workflow-release-probe.xml'))
 def wait_node(predicate,seconds=45):
-    deadline=time.monotonic()+seconds
+    deadline=time.monotonic()+seconds;root=ET.Element('hierarchy')
     while time.monotonic()<deadline:
         try:
             root=hierarchy()
@@ -26,7 +28,8 @@ def wait_node(predicate,seconds=45):
                 if predicate(node.attrib):return node.attrib
         except (ET.ParseError,subprocess.CalledProcessError):pass
         time.sleep(.5)
-    raise RuntimeError('Expected release UI element not found')
+    visible=[node.get('text','') for node in root.iter('node') if node.get('text')]
+    raise RuntimeError('Expected release UI element not found; visible emulator labels: '+repr(visible)[-3000:])
 def tap(node):
     bounds=list(map(int,re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',node['bounds']).groups()))
     adb('shell','input','tap',(bounds[0]+bounds[2])//2,(bounds[1]+bounds[3])//2)
@@ -51,6 +54,7 @@ adb('install','-r',apk);launch()
 tap(wait_node(lambda node:node.get('text','').strip() in ['＋ Ordner','+ Ordner','＋ Folder','+ Folder']))
 tap(wait_node(lambda node:node.get('class')=='android.widget.EditText'))
 adb('shell','input','text',marker)
+wait_node(lambda node:node.get('class')=='android.widget.EditText' and node.get('text')==marker)
 tap(wait_node(lambda node:node.get('text')=='OK'))
 wait_node(lambda node:marker in node.get('text',''))
 adb('shell','am','force-stop',package)
