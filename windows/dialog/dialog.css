@@ -1,0 +1,13 @@
+:root { color-scheme: light dark; --rand: #c8c8c8; --text: #1a1a1a; --grund: #ffffff; --akzent: #c62828; }
+@media (prefers-color-scheme: dark) { :root { --rand: #555; --text: #f2f2f2; --grund: #202124; } }
+html, body { margin: 0; background: var(--grund); color: var(--text); font: 16px/1.4 "Segoe UI", system-ui, sans-serif; }
+main { padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+h1 { font-size: 19px; margin: 0; }
+input[type=password] { font: inherit; padding: 9px 10px; border: 1px solid var(--rand); border-radius: 6px; background: transparent; color: inherit; }
+label { display: flex; gap: 8px; align-items: flex-start; }
+label input { margin-top: 4px; width: 18px; height: 18px; }
+.zeile { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+button { font: inherit; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--rand); background: transparent; color: inherit; cursor: pointer; }
+button.haupt { background: var(--akzent); border-color: var(--akzent); color: #fff; }
+button:disabled { opacity: .5; cursor: default; }
+#status { min-height: 1.4em; color: var(--akzent); margin: 0; }

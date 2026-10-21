@@ -1,0 +1,18 @@
+[package]
+name = "wfp-core"
+version = "1.0.1"
+description = "Plattformneutraler Kern des Windows-Hosts: Tresorformat PBV1, Dokumenttresor, Empfang, Übergaben, Chrome-Sitzung"
+edition = "2021"
+publish = false
+license = "UNLICENSED"
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+aes-gcm = "0.10"
+hmac = "0.12"
+sha2 = "0.10"
+getrandom = "0.2"
+base64 = "0.22"
+uuid = { version = "1", features = ["v4"] }
+unicode-normalization = "0.1"
+zeroize = "1"

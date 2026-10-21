@@ -5,7 +5,8 @@
   "version": "1.0.1",
   "identifier": "de.familyprojekt.workflowpdf.pro",
   "build": {
-    "frontendDist": "../../www"
+    "frontendDist": "../dist",
+    "beforeBuildCommand": "node tools/build-web.mjs"
   },
   "app": {
     "withGlobalTauri": false,
@@ -17,8 +18,7 @@
   "bundle": {
     "active": true,
     "targets": [
-      "nsis",
-      "msi"
+      "nsis"
     ],
     "publisher": "Workflow PDF Pro",
     "shortDescription": "Formulare einlesen, Felder setzen, als PDF ausgeben",
@@ -36,12 +36,15 @@
       "nsis": {
         "installMode": "currentUser",
         "languages": [
-          "German"
-        ]
-      },
-      "wix": {
-        "language": "de-DE"
+          "German",
+          "English",
+          "Russian",
+          "Arabic"
+        ],
+        "installerHooks": "../installer/hooks.nsh"
       }
-    }
+    },
+    "copyright": "Workflow PDF Pro",
+    "category": "Productivity"
   }
 }
