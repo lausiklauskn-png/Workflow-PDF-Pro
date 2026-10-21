@@ -52,6 +52,39 @@ public final class NativeFoundationTest {
             }
         } finally { instrumentation.removeMonitor(monitor); }
     }
+    @Test public void nativeFolderPickerCancellationLeavesLibraryUnchanged() throws Exception {
+        android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        android.content.IntentFilter filter = new android.content.IntentFilter(android.content.Intent.ACTION_OPEN_DOCUMENT_TREE);
+        android.app.Instrumentation.ActivityMonitor monitor = new android.app.Instrumentation.ActivityMonitor(filter,
+            new android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_CANCELED, null), true);
+        instrumentation.addMonitor(monitor);
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            await(scenario, "Boolean(window.__wfpdf && window.WFPNativeImport)");
+            evaluate(scenario, "window.__folderBefore=__wfpdf.S.docs.length;WFPNativeImport.choose(document.getElementById('inOrdner')).then(()=>window.__folderCancelled=true);true");
+            await(scenario, "window.__folderCancelled === true");
+            assertEquals("true", evaluate(scenario, "__wfpdf.S.docs.length === __folderBefore && !document.getElementById('nativeImportStatus')"));
+            assertEquals(1, monitor.getHits());
+        } finally { instrumentation.removeMonitor(monitor); }
+    }
+    @Test public void selectedFolderPassesRealJavaChunksToOriginalInput() throws Exception {
+        android.app.Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        android.content.Context context = instrumentation.getTargetContext();
+        String authority = context.getPackageName() + ".fixture.documents";
+        context.getContentResolver().call(android.net.Uri.parse("content://" + authority), "fixture-reset", null, null);
+        android.content.Intent result = new android.content.Intent().setData(android.provider.DocumentsContract.buildTreeDocumentUri(authority,"sourceA"))
+            .addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        android.app.Instrumentation.ActivityMonitor monitor = new android.app.Instrumentation.ActivityMonitor(
+            new android.content.IntentFilter(android.content.Intent.ACTION_OPEN_DOCUMENT_TREE),
+            new android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_OK, result), true);
+        instrumentation.addMonitor(monitor);
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            await(scenario, "Boolean(window.__wfpdf && window.WFPNativeImport)");
+            evaluate(scenario, "document.getElementById('inOrdner').onchange=async e=>{const f=e.target.files[0],b=new Uint8Array(await f.arrayBuffer());window.__folderBytes=b.length===300000&&b.every((x,i)=>x===i%251)&&f.webkitRelativePath==='sourceA/one.txt';};WFPNativeImport.choose(document.getElementById('inOrdner')).then(()=>window.__folderDone=true);true");
+            await(scenario, "window.__folderDone === true");
+            assertEquals("true", evaluate(scenario, "window.__folderBytes === true"));
+            assertEquals(1, monitor.getHits());
+        } finally { instrumentation.removeMonitor(monitor); }
+    }
     @Test public void androidBackCancelsSafetyPromptBeforeSendingAndReturnsFromEditor() throws Exception {
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             await(scenario, "Boolean(window.__wfpdf && window.PDFLib)");

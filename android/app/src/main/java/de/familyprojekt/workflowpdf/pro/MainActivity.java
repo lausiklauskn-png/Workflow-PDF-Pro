@@ -10,6 +10,7 @@ import androidx.activity.OnBackPressedCallback;
 public class MainActivity extends BridgeActivity {
     @Override public void onCreate(Bundle state) {
         registerPlugin(ProFilesPlugin.class);
+        registerPlugin(ProImportPlugin.class);
         super.onCreate(state);
         bridge.setWebViewClient(new BridgeWebViewClient(bridge) {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {

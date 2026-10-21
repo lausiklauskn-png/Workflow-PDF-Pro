@@ -22,7 +22,7 @@ test('bundle contains the complete public runtime and unchanged protected files'
   const html = await readFile(join(root, 'www/index.html'), 'utf8');
   assert.match(html, /<title>Workflow PDF Pro/);
   assert.ok(html.indexOf('native/native-bootstrap.js') < html.indexOf('assets/app.js'));
-  for (const name of ['native-bootstrap.js','native-files.js','native.css']) {
+  for (const name of ['native-bootstrap.js','native-files.js','native-import.js','native.css']) {
     assert.ok(html.includes('native/' + name + '?v=' + digest(await readFile(join(root,'www/native',name)))));
   }
 });

@@ -8,7 +8,7 @@ export const root = fileURLToPath(new URL('../../', import.meta.url));
 export const runtimeRoots = ['assets/', 'vendor/', 'icons/', 'sbkim/', 'beispiele/'];
 export const runtimeFiles = ['index.html', 'sw.js', 'manifest.webmanifest', 'impressum.html',
   'sicherheit.html', 'LICENSE', 'RECHTE.md', 'THIRD_PARTY.md'];
-export const nativeFiles = ['native-bootstrap.js', 'native-files.js', 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
+export const nativeFiles = ['native-bootstrap.js', 'native-files.js', 'native-import.js', 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
 export const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 
 // This allowlist is deliberately independent of a recursive checkout copy.
@@ -57,7 +57,7 @@ export async function prepareWeb(out = join(root, 'www')) {
   // Classic deferred scripts preserve source execution order. The source worker stays intact:
   // model caches and share receipt must remain functional in the native host as well.
   html = replaceOnce(html, '<script defer src="assets/app.js?v=67"></script>',
-    '<script defer src="' + adapterUrl('native-bootstrap.js') + '"></script>\n<script defer src="' + adapterUrl('native-files.js') + '"></script>\n<script defer src="assets/app.js?v=67"></script>');
+    '<script defer src="' + adapterUrl('native-bootstrap.js') + '"></script>\n<script defer src="' + adapterUrl('native-files.js') + '"></script>\n<script defer src="' + adapterUrl('native-import.js') + '"></script>\n<script defer src="assets/app.js?v=67"></script>');
   await rm(out, { recursive: true, force: true });
   await mkdir(out, { recursive: true });
   const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding and adapter tags'], files: [] };

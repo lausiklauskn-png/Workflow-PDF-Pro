@@ -141,3 +141,59 @@ verwendet getrennte App-Einstellungsräume im selben Emulator, kein physisches
 zweites Gerät. Eine echte SD-Karte, die Bibliotheksanbindung sowie Windows/iOS
 sind weiterhin offen. Der Erfolg dieser Komponenten ist keine vollständige
 native-smoke-Abnahme und keine Freigabe einer regulären APK.
+
+## Fortsetzung 21.10.2026: nativer Ordnerimport
+
+Übernommen wurde der saubere Bauzweig `628d2ca`, einschließlich des inzwischen
+auf `a19d82d` stehenden main. Alle sieben Remotezweige wurden vor Änderungen
+abgefragt; keine fremde Arbeit zurückgesetzt oder überschrieben. Quell-main
+erneut `7227c543d4a536cf8f3354a56fbba7574645703e`, Quellcheckout sauber.
+
+Neu: `FolderImport` / `ProImportPlugin` mit lesender SAF-Ordnerauswahl und
+undurchsichtigen, widerrufbaren Dateitickets. Unterordner, Unicode-Namen und
+leere Dateien bleiben erhalten; nicht erreichbare Dateien melden einen Fehler.
+Der Webadapter `native-import.js` bedient beide bestehenden Ordner-Dateieingaben
+(Bibliothek und Übersetzungsbereich). Erst nach vollständigem Lesen wird deren
+unveränderter `change`-Handler ausgelöst. Abbruch oder Lesefehler gibt keinen
+halben Ordner als vollständige Auswahl weiter. Die bestehende PDF-/Bild-/
+Arbeitsstand-Importlogik, manuelle Schutzprüfung, natürliche Pfadsortierung und
+Ordnerzuordnung bleiben im Quellkern. Es werden keine Quelldateien verändert,
+keine dauerhafte Ordnerfreigabe für diesen einmaligen Import und keine
+Schreibrechte verlangt. Das ist unabhängig vom dauerhaften Tresor.
+
+Neu lokal tatsächlich ausgeführt:
+- Herkunftsprüfung: 191/191 unverändert.
+- `WFP_CHROMIUM=/usr/bin/chromium npm run test:native-web`: 10 Node-Testeinträge
+  bestanden (einschließlich fünf neuer Ordnerfälle und ihres Sammeltests),
+  0 fehlgeschlagen/übersprungen. Echte Browser-/PDF-Importe; Android-Schnittstelle
+  dabei gestellt. Mehrteiliger Transport bis 600001 Bytes, Unicode-Pfade,
+  Abbruch, spätere Lesefehler, leere ungültige Antwort, Originalbytes und
+  weiterhin ungeprüfter Dokumentstatus geprüft. Im ersten Versuch wartete der
+  Test mit einem asynchronen Prädikat zu früh; auf den tatsächlichen Abschluss
+  des Bibliotheksladens korrigiert, danach vollständig bestanden.
+- Unveränderte Codec-/Transportgegenproben: 7/7 bestanden, keine Geräteprüfung.
+- Eigene vorhandene GitHub-Verbindung: Git lesen, API/Actions lesen und
+  Push-Dry-Run erfolgreich. **Direkter Dispatch wirklich ausgeführt**:
+  Signieridentitäts-`check` von main `a19d82d` im
+  [Lauf 39568357544](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39568357544)
+  erfolgreich. Bestehende Identität benutzt, keine Schlüssel neu erzeugt oder
+  ausgelesen. Noch kein tatsächlicher Release-Schreibvorgang.
+
+Vier neue echte DocumentsProvider-Komponentenfälle und zwei WebView-/Java-
+Brückenfälle sind ergänzt. Deren Ausführung wird separat mit CI-Lauf/Commit
+festgehalten; bloßes Kompilieren zählt nicht als bestandener Emulatorlauf.
+Lokale Arbeitsprotokolle liegen in `work/`, nicht in der APK. Der erste
+SDK-Aufbau scheiterte am HTTP-503 des Build-Tools-Downloads, Wiederholung
+installierte die Werkzeuge; ADB ist lokal wegen des nicht beschreibbaren
+Standard-Benutzerverzeichnisses weiterhin nicht startbar. Kein echtes Gerät,
+keine SD-Karte und kein lokaler Emulator nachgewiesen.
+
+Weiter offen: Speicheradapter samt Einstellungen, Wiederanlauf/Übernahme und
+Tresorwechsel; nativer Chrome-Transport; SEND/SEND_MULTIPLE/VIEW; übrige
+Funktionsmatrix und vollständige native Freigabe. Vor Kopplung der Speicher
+wurde das konkrete Wiederanlaufjournal mit Alternative zur Entscheidung
+vorgelegt; Antwort noch offen. Auch die Frage zum Chrome-Vordergrunddienst
+bleibt offen. Keine Zustimmung aus Schweigen abgeleitet. Große Ordner müssen
+zusätzlich auf dem Zielgerät hinsichtlich Speicherverbrauch geprüft werden:
+der Webadapter baut die Dateiauswahl vollständig vor der Übergabe auf.
+Keine reguläre APK freigegeben und kein Releasegate abgeschaltet.

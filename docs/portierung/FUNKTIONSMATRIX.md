@@ -19,7 +19,7 @@ Varianten benannt; die native Abnahme muss jede davon ausüben.
 |---|---|---|---|---|
 | F001 | **Bibliothek**: Alle, Ohne Ordner, eigene und Übersetzungsordner; Dokumentzahlen und leere Zustände | `assets/app.js:181` `zeichneBibliothek` | bibliothek,ordner,sprache | lokaler Webkern/IndexedDB; **offen** |
 | F002 | **Dateien importieren**: PDF, Bild, mehrere Dateien, Arbeitsstand; Dateifehler einzeln melden | `assets/app.js:1144` `importDateien` | e2e,eingang | System-Dateiauswahl und content-URI lesen; **offen** |
-| F003 | **Ordner importieren**: Ganzen Ordner einlesen, natürliche Dateireihenfolge, Ordnername | `assets/app.js:1144` `importDateien` | ordner | nativer Ordnerwähler; Freigaben und Wiederwahl prüfen; **offen** |
+| F003 | **Ordner importieren**: Ganzen Ordner einlesen, natürliche Dateireihenfolge, Ordnername | `assets/app.js:1144` `importDateien` | ordner | SAF-Ordneradapter mit unverändertem Importhandler gebaut; fünf neue Browserfälle mit gestellter Brücke bestanden; native Komponenten-/Brückenfälle und echte Anbieter-/Geräteprüfung siehe BAUSTAND-ANDROID.md; **Gesamtabnahme offen** |
 | F004 | **Drag-and-drop**: Dateien in Bibliothek ziehen | `assets/app.js:2997` `start` | e2e | WebView/Desktop-Dateiübergabe prüfen; **offen** |
 | F005 | **Teilen empfangen**: Worker-POST, Übernahmespeicher leeren, keine/leere/fehlerhafte Dateien melden | `assets/app.js:3109` `geteiltUebernehmen` | teilen-empfang | Android SEND/SEND_MULTIPLE und iOS-Share-Erweiterung gesondert; **offen** |
 | F006 | **Öffnen mit**: launchQueue-Dateien lesen, PDF/Bilder übernehmen | `assets/app.js:3129` `oeffnenMitEmpfangen` | teilen-empfang | native Dateizuordnung und Neustart-/Warmstart-Übergabe; **offen** |
