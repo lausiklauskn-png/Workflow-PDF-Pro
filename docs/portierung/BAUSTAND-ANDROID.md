@@ -328,3 +328,16 @@ der separate Übersetzungsjob bleibt erhalten. Der erweiterte Journallauf besteh
 jetzt **22 Testeinträge**, 0 Fehler/ausgelassen; Rohbericht
 `nachweise/2026-10-21-journal-deletion.tap`. Die früher genannten 13 Einträge
 bezeichnen den vorherigen, kleineren Lauf, keine weiteren Geräteprüfungen.
+
+### Neuer vollständiger CI-Nachweis auf `01eaec6`
+
+[Actions-Lauf 39576626957](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39576626957)
+und der zusätzliche PR-Lauf 39576635719 bestanden vollständig. Web-Job:
+unveränderte Originalkette mit 28 Skripten, Bundle-/Datei-/Ordnerprüfungen,
+Release-Auftragsgegenprobe sowie Codec-/Transport- und die ersten 13 Journal-
+Testeinträge. Android-Job: Build/Lint/JVM und echte Android-15-Emulatorprüfung
+erfolgreich; API-lesbare XML-Annotation von Job 119143630487 meldet **20 Tests,
+0 Fehler, 0 ausgelassen**. Die Journal-Factory ist dabei nicht in der Android-App
+aktiviert; diese 20 Fälle sind die bestehenden nativen Komponentenfälle.
+Startsperre und zusätzliche Löschabbruchfälle kamen erst nach `01eaec6` hinzu
+und sind durch diesen Lauf ausdrücklich noch nicht im CI nachgewiesen.
