@@ -466,3 +466,35 @@ Warmstarts bleiben davon unberührt. Senderextras werden weiterhin verworfen,
 Routingdaten erhalten. Der noch nötige neue Emulatorlauf ist gesondert zu
 ergänzen. Die unzugängliche Actions-Logdownload-Domain wurde nicht umgangen;
 konkrete XML-Fehler wurden über die vorhandenen GitHub-Check-Annotationen gelesen.
+
+### Bestätigter korrigierter CI-Lauf auf `2c16888`
+
+[Actions 39584646803](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39584646803)
+auf `2c168888c8d9f8db1e860f4d0b23ff066ba1d14b` ist vollständig erfolgreich.
+Der Web-Job bestand die vollständige unveränderte Originalkette mit 28 Skripten,
+18 native Browser-Testeinträge (einschließlich sieben Empfangsgegenproben),
+Release-Auftragsgegenprobe und Codec-/Transport-/Journal-/Startsperrenfälle.
+Android-Bau, Lint und JVM bestanden. Die XML-Annotation von Job `119170428054`
+bestätigt **27 ausgeführte Android-15-Emulatorfälle, 0 Fehler, 0 ausgelassen**
+(41,231 s Instrumentierung). Darunter sind die bisherigen 20 Fälle und sieben
+neue Empfangsfälle: vier ContentResolver-/Intent-Komponentenfälle sowie echter
+Kaltstart mit bestätigter Activity-Neuerstellung, zwei gleiche getrennte
+Warmstart-Aktionen und VIEW bis zum unveränderten PDF-Import mit Originalbytes,
+Formularwert und ungeprüftem Status. Die drei zuvor fehlgeschlagenen neuen
+Startfälle sind damit tatsächlich neu bestanden, nicht nur lokal kompiliert.
+
+Lokale Korrekturläufe: Empfangsprobe mit synchronem Capacitor-Listener 8/8;
+vollständiger Android-Bau/Lint/JVM/Test-APK nach Zustandsisolierung erfolgreich
+(23 s), abschließende Test-APK-Kompilierung 12 s. Die neue CI-Hilfe
+`tools/native/run-connected.sh` behält den echten Gradle-Rückgabewert bei und
+gibt nur bei Fehlern begrenzte AndroidRuntime-/WebView-Fehler als API-lesbare
+Hinweise aus. Keine Prüfung abgeschaltet oder umbenannt, kein Releasegate geöffnet.
+
+Rohbefund mit Lauf, exaktem Commit, Jobs und originalen XML-Annotationen:
+`nachweise/2026-10-21-native-intake-ci.json`. Diese nachfolgenden Änderungen
+dokumentieren nur das Ergebnis; die Implementierung ist durch den obigen Commit
+belegt. Keine echte SD-Karte, kein physisches Zielgerät, keine reale Google-
+Übersetzung oder dauerhafte Importsicherung gegen Prozessende aus dem Emulator
+ableiten. Produktiver Tresor, Migration/Ordnerwechsel, Einstellungen, Chrome-
+Hin-/Rücktransport und vollständiges `native-smoke` bleiben offen. Kein Merge
+auf main und keine reguläre APK-Veröffentlichung.

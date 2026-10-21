@@ -10,6 +10,16 @@ die historischen Zustimmungsvermerke weiter unten; siehe ENTSCHEIDUNGEN.md.
 Native SEND/VIEW-Anbindung wurde danach unabhängig weitergebaut, aktuelle
 Prüfungen und verbleibende Lebenszyklusgrenzen am Ende von BAUSTAND-ANDROID.md.
 
+Aktueller Implementierungsnachweis dieser Fortsetzung: `2c16888`,
+[Actions 39584646803](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39584646803)
+vollständig grün: Originalkette, 18 native Browser-Testeinträge,
+Speicher-/Release-Auftragsgegenproben und **27 Android-15-Emulatorfälle** ohne
+Fehler/ausgelassene Fälle. SEND/SEND_MULTIPLE/VIEW sind angebunden; der aktuelle
+bereinigte Empfangszustand übersteht Activity-Neuerstellung. Die vollständige
+Warteschlange ist weiterhin nicht gegen Prozessende gesichert. Tresor-/Migration-
+und Chrome-Produktanbindung bleiben offen. Details, der zuvor fehlgeschlagene
+Lauf und dessen korrigierter Listenervertrag stehen am Ende des Baustands.
+
 Zuerst `AGENTS.md`, den vollständigen Nachfolgebrief und die aktuellen Dateien
 unter `docs/portierung/` lesen. Quellrepo und `upstream/workflow-pdf` unverändert
 lassen. Das Ziel bleibt die vollständige reguläre native App; ein gebauter Host

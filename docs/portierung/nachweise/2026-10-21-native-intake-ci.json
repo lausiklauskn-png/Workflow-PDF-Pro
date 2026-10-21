@@ -1,0 +1,37 @@
+{
+  "conclusion": "success",
+  "databaseId": 39584646803,
+  "headSha": "2c168888c8d9f8db1e860f4d0b23ff066ba1d14b",
+  "jobs": [
+    {
+      "databaseId": 119170427839,
+      "name": "previous-failure-context",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "databaseId": 119170428054,
+      "name": "android-foundation",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "databaseId": 119170428299,
+      "name": "web-core",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39584646803",
+  "nativeXmlAnnotations": [
+    {
+      "title": "Native Prüfergebnisse",
+      "message": "{'name': 'de.familyprojekt.workflowpdf.pro.FolderImportTest', 'tests': '27', 'failures': '0', 'errors': '0', 'skipped': '0', 'time': '41.231', 'timestamp': '2026-10-21T10:31:02', 'hostname': 'localhost'}"
+    },
+    {
+      "title": "Native Prüfergebnisse",
+      "message": "android/app/build/outputs/androidTest-results/connected/debug/TEST-emulator-5554 - 15-_app-.xml"
+    }
+  ]
+}
