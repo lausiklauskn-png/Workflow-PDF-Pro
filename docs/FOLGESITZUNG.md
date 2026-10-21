@@ -1,5 +1,9 @@
 # Selbstständig weiterarbeiten: Codex und Claude Code
 
+Aktueller kopierbarer Nachfolgeauftrag:
+`BRIEF_NACHFOLGE_2026-10-21_APP_FERTIGSTELLEN.md`. Er ergänzt den weiterhin
+verbindlichen Originalbrief vom 20.10.2026.
+
 Zuerst `AGENTS.md`, den vollständigen Nachfolgebrief und die aktuellen Dateien
 unter `docs/portierung/` lesen. Quellrepo und `upstream/workflow-pdf` unverändert
 lassen. Das Ziel bleibt die vollständige reguläre native App; ein gebauter Host
