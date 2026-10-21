@@ -23,11 +23,12 @@ test('native Chrome factory preserves the original cleaning and PDF pipeline',as
         addListener(name,fn){f.events.push(fn);return{remove(){}};},
         async begin(options){const id='session-'+(++f.sequence);f.begins.push({id,...options});return{id};},
         async translate({id,texte}){
-          f.sent.push({id,texte});if(f.mode==='fail')throw Error('CHROME_CANCELLED');
+          f.sent.push({id,texte});if(f.mode==='fail')throw Error('CHROME_CANCELLED');if(f.mode==='missing')throw Error('CHROME_NOT_INSTALLED');
+          if(f.mode==='fail-frame'&&f.sent.length>f.failAt)throw Error('CHROME_TRANSLATION_FAILED');
           if(f.mode==='wait')return new Promise((resolve,reject)=>{f.reject=reject;});
           return {texte:texte.map(x=>'[en] '+x),stat:{zeichen:f.sent.reduce((n,p)=>n+p.texte.join('').length,0),anfragen:f.sent.length,ohne:0}};
         },
-        async close({id}){f.closed.push(id);}
+        async close({id}){f.closed.push(id);f.events.forEach(e=>e({id,reason:'CHROME_CANCELLED'}));}
       }}};
     });
     await page.goto('http://127.0.0.1:'+server.address().port+'/');await page.waitForFunction(()=>window.__wfpdf&&window.PDFLib);
@@ -52,6 +53,15 @@ test('native Chrome factory preserves the original cleaning and PDF pipeline',as
     await page.evaluate(()=>document.querySelectorAll('.dlg [data-x]').forEach(b=>b.click()));
     await t.test('notification cancellation stops the active factory once and rejects late work',async()=>{
       const proof=await page.evaluate(async()=>{const fn=WFP.Uebersetzung.chromeUebersetzer('de','ru');let stops=0;fn.beimHalt=()=>stops++;await new Promise(r=>setTimeout(r,0));const id=chromeFixture.begins.at(-1).id;chromeFixture.events.forEach(e=>e({id:'stale',reason:'CHROME_CANCELLED'}));chromeFixture.events.forEach(e=>e({id,reason:'CHROME_CANCELLED'}));chromeFixture.events.forEach(e=>e({id,reason:'CHROME_CANCELLED'}));let rejected=false;try{await fn(['must not be sent']);}catch{rejected=true;}return{stops,rejected,sent:chromeFixture.sent.some(p=>p.texte.includes('must not be sent'))};});assert.deepEqual(proof,{stops:1,rejected:true,sent:false});
+    });
+    await t.test('missing Chrome remains an actionable error rather than a fabricated user cancellation',async()=>{
+      const result=await page.evaluate(async()=>{chromeFixture.mode='missing';const fn=WFP.Uebersetzung.chromeUebersetzer('de','en');let stops=0;fn.beimHalt=()=>stops++;let error;try{await fn(['Synthetic sample']);}catch(e){error=e.message;}return{stops,error};});assert.equal(result.stops,0);assert.match(result.error,/Chrome installieren/);
+    });
+    await t.test('very large paragraph crosses multiple bounded frames; a later failed frame returns no partial page',async()=>{
+      const result=await page.evaluate(async()=>{
+        const large='Synthetischer langer Inhalt. '.repeat(30000),before=chromeFixture.sent.length;chromeFixture.mode='ok';const fn=WFP.Uebersetzung.chromeUebersetzer('de','en');const out=await fn([large]);fn.zu();const frames=chromeFixture.sent.slice(before);const sent=frames.flatMap(f=>f.texte).join(' ').replace(/\s+/g,' ').trim();
+        chromeFixture.mode='fail-frame';chromeFixture.failAt=chromeFixture.sent.length+1;const fail=WFP.Uebersetzung.chromeUebersetzer('de','en');let partial=false,failed=false;try{await fail([large]);partial=true;}catch{failed=true;}return{frames:frames.length,bounded:frames.every(f=>new TextEncoder().encode(JSON.stringify(f.texte)).length<=524288),preserved:sent===large.trim(),paragraphs:out.length,partial,failed};
+      });assert.ok(result.frames>1);assert.deepEqual({...result,frames:undefined},{frames:undefined,bounded:true,preserved:true,paragraphs:1,partial:false,failed:true});
     });
     assert.deepEqual(errors,[]);await page.close();
   }finally{await browser?.close();await new Promise(r=>server.close(r));}

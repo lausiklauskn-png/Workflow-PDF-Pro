@@ -32,6 +32,7 @@
     ready.catch(()=>{});
     function stop(closeNative=true,notify=true){
       state.closed=true;
+      if(!notify&&active===state)active=null;
       if(closeNative&&state.id)void api.close({id:state.id}).catch(()=>{});
       if(notify&&!state.halted){state.halted=true;if(state.fn.beimHalt)state.fn.beimHalt();}
     }
@@ -68,7 +69,7 @@
       }catch(error){stop(true,cancelled(error?.message));throw Error(message(error?.message));}
     };
     state.fn=fn;fn.art='chrome';fn.stat=stat;fn.halt=()=>stop();
-    fn.zu=()=>{state.closed=true;if(state.id)void api.close({id:state.id}).catch(()=>{});if(active===state)active=null;};
+    fn.zu=()=>{state.closed=true;if(active===state)active=null;if(state.id)void api.close({id:state.id}).catch(()=>{});};
     return fn;
   };
 })();

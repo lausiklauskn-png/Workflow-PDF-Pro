@@ -23,7 +23,7 @@ import org.json.JSONArray;
 /** App-created export tickets only. JavaScript never supplies a filesystem path or content URI. */
 @CapacitorPlugin(name = "WorkflowFiles")
 public final class ProFilesPlugin extends Plugin {
-    private final ExecutorService worker = Executors.newSingleThreadExecutor();
+    private final PluginWorker worker = new PluginWorker("exports");
     private final Map<String, Transfer> transfers = new HashMap<>();
     private String saving;
     private static final int CHUNK = 262144;
@@ -32,7 +32,7 @@ public final class ProFilesPlugin extends Plugin {
     }
     private interface Work { JSObject run() throws Exception; }
     private void work(PluginCall call, Work fn) {
-        worker.execute(() -> {
+        worker.submit(call, () -> {
             try { call.resolve(fn.run()); }
             catch (Exception error) { call.reject(error instanceof SecurityException ? "FILE_PERMISSION" : "FILE_OPERATION_FAILED"); }
         });
@@ -102,7 +102,7 @@ public final class ProFilesPlugin extends Plugin {
         });
     }
     @PluginMethod public void save(PluginCall call) {
-        worker.execute(() -> {
+        worker.submit(call, () -> {
             try {
                 Transfer t = transfer(call.getString("id"), true);
                 if (saving != null) { call.reject("FILE_BUSY"); return; }
@@ -118,7 +118,7 @@ public final class ProFilesPlugin extends Plugin {
     }
     @ActivityCallback private void saved(PluginCall call, ActivityResult result) {
         if (call == null) { worker.execute(() -> saving = null); return; }
-        worker.execute(() -> {
+        worker.submit(call, () -> {
             try {
                 Transfer t = transfer(saving, true);
                 if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null || result.getData().getData() == null) {
@@ -139,7 +139,7 @@ public final class ProFilesPlugin extends Plugin {
         });
     }
     @PluginMethod public void share(PluginCall call) {
-        worker.execute(() -> {
+        worker.submit(call, () -> {
             try {
                 JSONArray ids = call.getArray("ids", new com.getcapacitor.JSArray());
                 ArrayList<Uri> uris = new ArrayList<>(); String mime = null;
@@ -186,7 +186,7 @@ public final class ProFilesPlugin extends Plugin {
         });
     }
     @PluginMethod public void print(PluginCall call) {
-        worker.execute(() -> {
+        worker.submit(call, () -> {
             try {
                 Transfer t = transfer(call.getString("id"), true);
                 if (!"application/pdf".equals(t.mime)) throw new IOException();
@@ -200,4 +200,9 @@ public final class ProFilesPlugin extends Plugin {
             } catch (Exception error) { call.reject("PRINT_UNAVAILABLE"); }
         });
     }
+    @Override protected void handleOnDestroy(){worker.close(()->{
+        // Finished shared files may still be read by the receiving application.
+        for(Transfer transfer:transfers.values())if(!transfer.finished){transfer.file.delete();transfer.file.getParentFile().delete();}
+        transfers.clear();
+    });}
 }

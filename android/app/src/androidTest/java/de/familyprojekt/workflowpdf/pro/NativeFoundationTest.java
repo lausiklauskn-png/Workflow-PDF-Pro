@@ -60,6 +60,8 @@ public final class NativeFoundationTest {
         instrumentation.addMonitor(monitor);
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             await(scenario, "Boolean(window.__wfpdf && window.WFPNativeImport)");
+            evaluate(scenario,"window.__loadedDocs=null;WFP.DB.all('docs').then(d=>window.__loadedDocs=d.length);true");
+            await(scenario,"window.__loadedDocs!==null && __wfpdf.S.docs.length===__loadedDocs");
             evaluate(scenario, "window.__folderBefore=__wfpdf.S.docs.length;WFPNativeImport.choose(document.getElementById('inOrdner')).then(()=>window.__folderCancelled=true);true");
             await(scenario, "window.__folderCancelled === true");
             assertEquals("true", evaluate(scenario, "__wfpdf.S.docs.length === __folderBefore && !document.getElementById('nativeImportStatus')"));

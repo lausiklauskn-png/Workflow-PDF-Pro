@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 
 @CapacitorPlugin(name="WorkflowIncoming")
 public final class ProIncomingPlugin extends Plugin {
-    private final ExecutorService worker=Executors.newSingleThreadExecutor();
+    private final PluginWorker worker=new PluginWorker("incoming");
     private IncomingInbox inbox;
     private final ArrayDeque<Intent> unstaged=new ArrayDeque<>();
     private static final String DELIVERY="de.familyprojekt.workflowpdf.pro.INCOMING_DELIVERY";
@@ -39,18 +39,18 @@ public final class ProIncomingPlugin extends Plugin {
         Intent receipt=delivered;
         worker.execute(()->{unstaged.add(receipt);try{flush();}catch(Exception error){/* pending retries and reports an explicit failure. */}notifyListeners("available",new JSObject());});
     }
-    @PluginMethod public void pending(PluginCall call){worker.execute(()->{
+    @PluginMethod public void pending(PluginCall call){worker.submit(call,()->{
         try{
             flush();call.resolve(new JSObject(inbox().pending().toString()));
         }catch(Exception error){call.reject("INCOMING_STORAGE_UNAVAILABLE");}
     });}
-    @PluginMethod public void read(PluginCall call){worker.execute(()->{
+    @PluginMethod public void read(PluginCall call){worker.submit(call,()->{
         try{
             byte[] bytes=inbox().read(call.getString("batch"),call.getString("id"),ProFilesPlugin.integer(call.getData().opt("offset")));
             call.resolve(new JSObject().put("data",Base64.encodeToString(bytes,Base64.NO_WRAP)).put("done",inbox().done()));
         }catch(Exception error){call.reject("INCOMING_READ_FAILED");}
     });}
-    @PluginMethod public void acknowledge(PluginCall call){worker.execute(()->{
+    @PluginMethod public void acknowledge(PluginCall call){worker.submit(call,()->{
         String id=call.getString("id");
         try{inbox().acknowledge(id,Boolean.TRUE.equals(call.getBoolean("discard",false)));}
         catch(Exception error){call.reject("INCOMING_INVALID_TRANSFER");return;}
@@ -61,8 +61,8 @@ public final class ProIncomingPlugin extends Plugin {
             call.resolve();
         });
     });}
-    @PluginMethod public void history(PluginCall call){worker.execute(()->{try{call.resolve(new JSObject().put("receipts",inbox().history()));}catch(Exception error){call.reject("INCOMING_STORAGE_UNAVAILABLE");}});}
-    @PluginMethod public void restore(PluginCall call){worker.execute(()->{try{inbox().restore(call.getString("id"));notifyListeners("available",new JSObject());call.resolve();}catch(Exception error){call.reject("INCOMING_OPERATION_FAILED");}});}
-    @PluginMethod public void discardArchived(PluginCall call){worker.execute(()->{try{inbox().discardArchived(call.getString("id"));call.resolve();}catch(Exception error){call.reject("INCOMING_OPERATION_FAILED");}});}
-    @Override protected void handleOnDestroy(){worker.execute(()->{if(inbox!=null)inbox.close();});worker.shutdown();}
+    @PluginMethod public void history(PluginCall call){worker.submit(call,()->{try{call.resolve(new JSObject().put("receipts",inbox().history()));}catch(Exception error){call.reject("INCOMING_STORAGE_UNAVAILABLE");}});}
+    @PluginMethod public void restore(PluginCall call){worker.submit(call,()->{try{inbox().restore(call.getString("id"));notifyListeners("available",new JSObject());call.resolve();}catch(Exception error){call.reject("INCOMING_OPERATION_FAILED");}});}
+    @PluginMethod public void discardArchived(PluginCall call){worker.submit(call,()->{try{inbox().discardArchived(call.getString("id"));call.resolve();}catch(Exception error){call.reject("INCOMING_OPERATION_FAILED");}});}
+    @Override protected void handleOnDestroy(){worker.close(()->{if(inbox!=null)inbox.close();});}
 }

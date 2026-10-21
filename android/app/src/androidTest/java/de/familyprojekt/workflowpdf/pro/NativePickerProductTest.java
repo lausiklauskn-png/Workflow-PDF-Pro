@@ -5,6 +5,8 @@ import android.content.*;
 import android.graphics.*;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+import android.os.SystemClock;
+import android.view.MotionEvent;
 import android.provider.*;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -29,6 +31,13 @@ public final class NativePickerProductTest {
     private void until(ActivityScenario<MainActivity> scenario,String js)throws Exception{
         long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(70);while(System.nanoTime()<end){if("true".equals(eval(scenario,js)))return;Thread.sleep(150);}fail("Timed out: "+js);
     }
+    private void tap(ActivityScenario<MainActivity> scenario,String expression)throws Exception{
+        String json=(String)new JSONTokener(eval(scenario,"JSON.stringify((()=>{const el="+expression+";el.scrollIntoView({block:'center'});const r=el.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2,width:innerWidth};})())")).nextValue();
+        org.json.JSONObject point=new org.json.JSONObject(json);AtomicReference<float[]> screen=new AtomicReference<>();
+        scenario.onActivity(activity->{int[] origin=new int[2];android.webkit.WebView view=activity.getBridge().getWebView();view.getLocationOnScreen(origin);float scale=view.getWidth()/(float)point.optDouble("width");screen.set(new float[]{origin[0]+(float)point.optDouble("x")*scale,origin[1]+(float)point.optDouble("y")*scale});});
+        long now=SystemClock.uptimeMillis();float[] xy=screen.get();MotionEvent down=MotionEvent.obtain(now,now,MotionEvent.ACTION_DOWN,xy[0],xy[1],0),up=MotionEvent.obtain(now,now+80,MotionEvent.ACTION_UP,xy[0],xy[1],0);
+        instrumentation.sendPointerSync(down);instrumentation.sendPointerSync(up);down.recycle();up.recycle();
+    }
     @Test public void actualSystemFileChooserReturnsOriginalPdfToUnchangedCore()throws Exception{
         String authority=context.getPackageName()+".fixture.documents";context.getContentResolver().call(Uri.parse("content://"+authority),"fixture-reset",null,null);AtomicInteger hits=new AtomicInteger();
         Instrumentation.ActivityMonitor monitor=new Instrumentation.ActivityMonitor(){
@@ -42,7 +51,7 @@ public final class NativePickerProductTest {
             until(scenario,"Boolean(window.__wfpdf&&window.PDFLib)");
             eval(scenario,"window.__pickerPdf=null;(async()=>{const p=await PDFLib.PDFDocument.create();p.addPage();const b=await p.save();let text='';for(const byte of b)text+=String.fromCharCode(byte);window.__pickerPdf=btoa(text);})();true");until(scenario,"typeof window.__pickerPdf==='string'");
             String base64=(String)new JSONTokener(eval(scenario,"__pickerPdf")).nextValue();File file=new File(context.getCacheDir(),"fixture-documents/sourceA/Picker product.pdf");try(FileOutputStream out=new FileOutputStream(file)){out.write(android.util.Base64.decode(base64,android.util.Base64.NO_WRAP));}
-            eval(scenario,"document.getElementById('inDatei').click();true");until(scenario,"Boolean(__wfpdf.S.docs.find(d=>d.name==='Picker product'))");assertEquals(1,hits.get());
+            tap(scenario,"document.getElementById('inDatei').parentElement");until(scenario,"Boolean(__wfpdf.S.docs.find(d=>d.name==='Picker product'))");assertEquals(1,hits.get());
             eval(scenario,"window.__pickerProof=null;(async()=>{const doc=(await WFP.DB.all('docs')).find(d=>d.name==='Picker product');let b='';for(const byte of await WFP.DB.getFile(doc.id))b+=String.fromCharCode(byte);window.__pickerProof=btoa(b)===__pickerPdf&&!doc.pruefung;})();true");until(scenario,"window.__pickerProof!==null");assertEquals("true",eval(scenario,"__pickerProof"));
         }finally{instrumentation.removeMonitor(monitor);}
     }
@@ -61,10 +70,12 @@ public final class NativePickerProductTest {
         };
         instrumentation.addMonitor(monitor);
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
-            until(scenario,"Boolean(window.__wfpdf&&window.WFP?.Scanner)");eval(scenario,"window.__cameraBefore=__wfpdf.S.docs.length;__wfpdf.dlg.scanStarten('bibliothek','kamera');true");
+            until(scenario,"Boolean(window.__wfpdf&&window.WFP?.Scanner)");
+            eval(scenario,"window.__loadedDocs=null;WFP.DB.all('docs').then(d=>window.__loadedDocs=d.length);true");until(scenario,"window.__loadedDocs!==null&&__wfpdf.S.docs.length===__loadedDocs");
+            eval(scenario,"window.__cameraBefore=__wfpdf.S.docs.length;__wfpdf.dlg.scanStarten('bibliothek');true");tap(scenario,"document.querySelector('[data-kamera]')");
             long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(10);while(hits.get()==0&&System.nanoTime()<end)Thread.sleep(100);assertEquals(1,hits.get());
             assertEquals("true",eval(scenario,"WFP.Scanner.zustand().seiten.length===0&&__wfpdf.S.docs.length===__cameraBefore"));
-            eval(scenario,"WFP.Scanner.schliessen();true");cancel.set(false);eval(scenario,"__wfpdf.dlg.scanStarten('bibliothek','kamera');true");
+            eval(scenario,"WFP.Scanner.schliessen();true");cancel.set(false);eval(scenario,"__wfpdf.dlg.scanStarten('bibliothek');true");tap(scenario,"document.querySelector('[data-kamera]')");
             until(scenario,"Boolean(WFP.Scanner.zustand()?.seiten[0]?.erkennung)");if(failure.get()!=null)throw failure.get();assertEquals(2,hits.get());
             assertEquals("true",eval(scenario,"WFP.Scanner.zustand().seiten.length===1&&WFP.Scanner.zustand().seiten[0].foto.width===1200&&__wfpdf.S.docs.length===__cameraBefore"));eval(scenario,"WFP.Scanner.schliessen();true");
         }finally{instrumentation.removeMonitor(monitor);}

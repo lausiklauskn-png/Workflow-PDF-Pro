@@ -687,3 +687,33 @@ behält eine begrenzte Nachrichtengröße zum Schutz vor defekten Browserantwort
 Bei gesperrtem Tresor wird die Dokumentoberfläche verborgen. Der Speicherdialog
 benennt die tatsächliche Hauptablage und behauptet bei aktiver Tresoranbindung
 keine ausschließliche Browserablage mehr. Quellmodule bleiben bytegleich.
+
+## Erste vollständige Freigaberunde: Befunde und gezielte Korrekturen
+
+Lauf `39596824164` auf `35f9125` ist **nicht freigegeben**: Original-/Browserkette
+grün, Tablet-Prozessabsturz bei verspätetem Pluginaufruf nach Worker-Shutdown;
+Telefonrunde 44 Fälle ausgeführt mit fünf Befunden. Neue Gegenproben zeigen
+erfolgreiche OCR/durchsuchbares PDF, aber fehlende Scanic-Modellantwort.
+Unicode-Gegenprobe hatte die im Produkt übliche fontkit-Vorbereitung ausgelassen;
+sie lädt jetzt denselben Original-Schriftpfad. Datei-/Kameraauswahl wurde durch
+programmatische DOM-Klicks ohne Benutzeraktivierung nicht geöffnet; die Prüfung
+verwendet nun reale Android-Berührungsereignisse. Ein Ordner-Abbruchfall wartete
+nicht auf die ursprüngliche asynchrone Bibliotheksfüllung; diese wird vor dem
+Vergleich abgewartet. Das Scanic-Problem wird mit dem ursprünglichen Modellfehler
+weiter diagnostiziert und noch nicht als gelöst behauptet.
+
+Die echte Lebenszykluskorrektur führt die Pluginarbeit je Speicher-/Import-/
+Exportbereich seriell über Activity-Grenzen. Bereits angenommene Arbeiten laufen
+vor dem Aufräumen zu Ende. Nach Zerstörung eintreffende Aufrufe werden sichtbar
+abgewiesen statt eine RejectedExecutionException bis in die App zu werfen.
+Zwei neue JVM-Regressionen prüfen Reihenfolge, doppelte Zerstörung, verspätete
+Aufrufe und das Lesen der Nachfolgeinstanz nach alten Schreibaufträgen.
+
+Zusätzlich wurden explizite Android-12-Datenextraktionsregeln ergänzt: keine
+automatische Cloud-/Geräteübertragung von gerätelokalen API-Schlüsseln,
+Identitäten, WebView-Arbeitsdaten oder Freigaben. Ausdrücklich gewählte Tresore
+und bestehende verschlüsselte Sicherungen bleiben davon unabhängig.
+Die neue Chrome-Großabsatzprobe besteht einschließlich Fehler im zweiten
+Übertragungsrahmen ohne Übernahme einer halben Seite; fehlendes Chrome wird
+als konkreter Installationsfehler gemeldet und nicht als Nutzerabbruch versteckt.
+Fokussierter neuer Chrome-Browserlauf 6/6 bestanden.

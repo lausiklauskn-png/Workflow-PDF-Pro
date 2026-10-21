@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @CapacitorPlugin(name="WorkflowImport")
 public final class ProImportPlugin extends Plugin {
-    private final ExecutorService worker=Executors.newSingleThreadExecutor();
+    private final PluginWorker worker=new PluginWorker("import");
     private final AtomicBoolean choosing=new AtomicBoolean();
     private FolderImport folder;
     @PluginMethod public void chooseFolder(PluginCall call){
@@ -24,20 +24,20 @@ public final class ProImportPlugin extends Plugin {
     @ActivityCallback private void chosen(PluginCall call,ActivityResult result){
         if(call==null){choosing.set(false);return;}
         if(result.getResultCode()!=Activity.RESULT_OK||result.getData()==null||result.getData().getData()==null){choosing.set(false);call.resolve(new JSObject().put("cancelled",true));return;}
-        worker.execute(()->{
+        worker.submit(call,()->{
             try{
                 if(folder!=null)folder.close();folder=new FolderImport(getContext().getContentResolver());
                 call.resolve(new JSObject().put("files",folder.inspect(result.getData().getData())));
             }catch(Exception error){if(folder!=null)folder.close();folder=null;choosing.set(false);call.reject("IMPORT_FOLDER_UNAVAILABLE");}
         });
     }
-    @PluginMethod public void read(PluginCall call){worker.execute(()->{
+    @PluginMethod public void read(PluginCall call){worker.submit(call,()->{
         try{
             if(folder==null)throw new java.io.IOException();String id=call.getString("id");
             byte[] data=folder.read(id,ProFilesPlugin.integer(call.getData().opt("offset")));
             call.resolve(new JSObject().put("data",Base64.encodeToString(data,Base64.NO_WRAP)).put("done",folder.done(id)));
         }catch(Exception error){call.reject("IMPORT_READ_FAILED");}
     });}
-    @PluginMethod public void release(PluginCall call){worker.execute(()->{if(folder!=null)folder.close();folder=null;choosing.set(false);call.resolve();});}
-    @Override protected void handleOnDestroy(){worker.execute(()->{if(folder!=null)folder.close();});worker.shutdown();}
+    @PluginMethod public void release(PluginCall call){worker.submit(call,()->{if(folder!=null)folder.close();folder=null;choosing.set(false);call.resolve();});}
+    @Override protected void handleOnDestroy(){worker.close(()->{if(folder!=null)folder.close();});}
 }
