@@ -1,0 +1,20 @@
+[package]
+name = "workflow-pdf-pro"
+version = "1.0.1"
+description = "Workflow PDF Pro für Windows"
+edition = "2021"
+publish = false
+license = "UNLICENSED"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true
