@@ -25,6 +25,19 @@ final class VaultLocations {
     private static boolean valid(String id) { return id!=null&&id.matches("[a-f0-9]{64}"); }
     private String storage(String id) { return namespace+"-"+id; }
     String primary() { return prefs.getString("primary",null); }
+    String migration(){return prefs.getString("migration",null);}
+    void prepareMigration(String id)throws Exception{
+        ensureIdle();if(!get(id).state().optBoolean("unlocked"))throw new IOException("VAULT_LOCKED");
+        String previous=migration();if(previous!=null&&!previous.equals(id))throw new IOException("VAULT_BUSY");
+        if(!prefs.edit().putString("migration",id).commit())throw new IOException("VAULT_UNAVAILABLE");
+    }
+    void cancelMigration()throws Exception{
+        ensureIdle();if(!prefs.edit().remove("migration").commit())throw new IOException("VAULT_UNAVAILABLE");
+    }
+    void completeMigration(String id)throws Exception{
+        ensureIdle();if(!id.equals(migration())||!get(id).state().optBoolean("unlocked"))throw new IOException("VAULT_RECOVERY_REQUIRED");
+        if(!prefs.edit().putString("primary",id).remove("migration").commit())throw new IOException("VAULT_UNAVAILABLE");
+    }
     DocumentVault candidate() { return new DocumentVault(context,namespace+"-candidate-"+UUID.randomUUID(),alias); }
     DocumentVault get(String requested)throws IOException {
         String id=requested==null?primary():requested;

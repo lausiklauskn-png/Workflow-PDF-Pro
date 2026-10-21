@@ -77,6 +77,30 @@ public final class NativeDocumentVaultTest {
         try {a.finish(ticket,99);fail("Incomplete write accepted");}catch(IOException expected){assertEquals("VAULT_INVALID_TRANSFER",expected.getMessage());}
         a.abort(ticket);assertArrayEquals(new byte[]{1,2,3},read(a,"x"));
     }
+    @Test public void batchWritesStayInvisibleToReopenUntilOneCommitAndAbortRestoresEverything()throws Exception{
+        reset();DocumentVault a=fresh("batch");a.initialize(a.inspect(tree()),PASSWORD,false);write(a,"old",new byte[]{1});
+        a.beginBatch();write(a,"old",new byte[]{9});write(a,"new",new byte[]{7});
+        DocumentVault before=fresh("batch-before");before.open(before.inspect(tree()),PASSWORD,false);
+        assertArrayEquals(new byte[]{1},read(before,"old"));assertFalse(before.info("files","new").getBoolean("exists"));before.closeWorking();
+        a.abortBatch();assertArrayEquals(new byte[]{1},read(a,"old"));assertFalse(a.info("files","new").getBoolean("exists"));
+        a.beginBatch();write(a,"old",new byte[]{2});write(a,"new",new byte[]{3});a.commitBatch();a.closeWorking();
+        DocumentVault after=fresh("batch-after");after.open(after.inspect(tree()),PASSWORD,false);
+        assertArrayEquals(new byte[]{2},read(after,"old"));assertArrayEquals(new byte[]{3},read(after,"new"));
+    }
+    @Test public void batchCommitFailureCannotReplacePreviousDurableGeneration()throws Exception{
+        reset();DocumentVault a=fresh("batch-failure");a.initialize(a.inspect(tree()),PASSWORD,false);write(a,"x",new byte[]{4});
+        a.beginBatch();write(a,"x",new byte[]{9});
+        context().getContentResolver().call(Uri.parse("content://"+context().getPackageName()+".fixture.documents"),"fixture-broken",null,null);
+        try{a.commitBatch();fail("Failed index committed");}catch(IOException expected){}a.abortBatch();
+        assertArrayEquals(new byte[]{4},read(a,"x"));
+    }
+    @Test public void migrationPointerSurvivesRestartAndPrimaryChangesOnlyOnCompletion()throws Exception{
+        reset();String name="test-migration-pointer";context().getSharedPreferences(name,0).edit().clear().commit();
+        VaultLocations places=new VaultLocations(context(),name,"test-migration-key");DocumentVault vault=places.candidate();vault.initialize(vault.inspect(tree()),PASSWORD,true);
+        String target=places.adopt(vault);places.prepareMigration(target);assertNull(places.primary());places.close();
+        VaultLocations resumed=new VaultLocations(context(),name,"test-migration-key");assertEquals(target,resumed.migration());assertNull(resumed.primary());
+        resumed.completeMigration(target);assertEquals(target,resumed.primary());assertNull(resumed.migration());resumed.close();
+    }
     @Test public void corruptCiphertextIsRejectedBeforeReturningPlaintext() throws Exception {
         reset();DocumentVault a=fresh("a");a.initialize(a.inspect(tree()),PASSWORD,false);byte[] value=new byte[600001];write(a,"x",value);
         File target=Arrays.stream(Objects.requireNonNull(folder().listFiles())).filter(f->f.getName().endsWith(".wpv")&&f.length()>500000).findFirst().get();

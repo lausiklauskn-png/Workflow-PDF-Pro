@@ -5,7 +5,7 @@ import { join, extname, resolve } from 'node:path';
 import { createServer } from 'node:http';
 import { chromium } from 'playwright-core';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
-import { prepareWeb, root, digest, isRuntime } from './prepare-web.mjs';
+import { prepareWeb, root, digest, isRuntime, vaultFiles } from './prepare-web.mjs';
 
 const receipt = await prepareWeb();
 test('bundle contains the complete public runtime and unchanged protected files', async () => {
@@ -22,9 +22,12 @@ test('bundle contains the complete public runtime and unchanged protected files'
   const html = await readFile(join(root, 'www/index.html'), 'utf8');
   assert.match(html, /<title>Workflow PDF Pro/);
   assert.ok(html.indexOf('native/native-bootstrap.js') < html.indexOf('assets/app.js'));
-  for (const name of ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native.css']) {
+  for (const name of ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js',...vaultFiles,'native.css']) {
     assert.ok(html.includes('native/' + name + '?v=' + digest(await readFile(join(root,'www/native',name)))));
   }
+  assert.ok(html.indexOf('assets/db.js')<html.indexOf('native/native-vault.js'));
+  assert.ok(html.indexOf('native/vault-gate.js')<html.indexOf('native/native-vault.js'));
+  assert.ok(html.indexOf('native/native-vault.js')<html.indexOf('assets/app.js'));
 });
 test('bundle excludes development material, signing files and private data', async () => {
   async function walk(path, relative = '') {

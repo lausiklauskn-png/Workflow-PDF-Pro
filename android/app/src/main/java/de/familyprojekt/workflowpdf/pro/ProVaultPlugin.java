@@ -35,6 +35,13 @@ public final class ProVaultPlugin extends Plugin {
     private void work(PluginCall call,Work task){worker.execute(()->{try{call.resolve(JSObject.fromJSONObject(task.run()));}catch(Exception error){String code=code(error);call.reject(code,code);}});}
     @PluginMethod public void state(PluginCall call){work(call,()->locations.state(call.getString("location")));}
     @PluginMethod public void locations(PluginCall call){work(call,()->new JSONObject().put("items",locations.list()));}
+    @PluginMethod public void migration(PluginCall call){work(call,()->new JSONObject().put("location",locations.migration()==null?JSONObject.NULL:locations.migration()));}
+    @PluginMethod public void prepareMigration(PluginCall call){work(call,()->{locations.prepareMigration(call.getString("location"));return new JSONObject().put("saved",true);});}
+    @PluginMethod public void completeMigration(PluginCall call){work(call,()->{locations.completeMigration(call.getString("location"));return locations.state(null);});}
+    @PluginMethod public void cancelMigration(PluginCall call){work(call,()->{locations.cancelMigration();return new JSONObject().put("saved",true);});}
+    @PluginMethod public void beginBatch(PluginCall call){work(call,()->{vault(call).beginBatch();return new JSONObject().put("started",true);});}
+    @PluginMethod public void commitBatch(PluginCall call){work(call,()->{vault(call).commitBatch();return new JSONObject().put("saved",true);});}
+    @PluginMethod public void abortBatch(PluginCall call){work(call,()->{vault(call).abortBatch();return new JSONObject().put("aborted",true);});}
     @PluginMethod public void setPrimary(PluginCall call){work(call,()->{locations.select(call.getString("location"));return locations.state(null);});}
     @PluginMethod public void volumes(PluginCall call){work(call,()->{
         JSONArray out=new JSONArray();StorageManager storage=(StorageManager)getContext().getSystemService(Context.STORAGE_SERVICE);

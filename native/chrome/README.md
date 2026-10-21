@@ -4,10 +4,10 @@ Klaus hat Variante A am 20.10.2026 zur Erprobung ausgewählt. Plattformfolge:
 Android/Samsung DeX → Windows → iOS. Klaus nennt inzwischen Galaxy Tab S6 und
 Galaxy S21 als Zielgeräte; genaue Android-/Chrome-/WebView-Versionen sind ungemessen.
 
-Neueste Nutzerweisung in der Fortsetzung vom 21.10.2026: Die zusätzliche
-Vordergrunddienstentscheidung ist wieder ausdrücklich offen. Das überstimmt die
-historische Zustimmung unter Punkt 2 unten. Erneute begründete Auswahl vorgelegt;
-bis zu einer Antwort keinen Dienst aktivieren. Variante A bleibt gewählt.
+Neueste Nutzerweisung in der Fortsetzung vom 21.10.2026: Nach der erneuten Auswahl
+ist der Vordergrunddienst mit sichtbarer Benachrichtigung und Abbruch gewählt.
+Anschließend selbstständige Fertigstellung ohne weitere Rückfragen bis zur
+signierten Erstinstallations-APK beauftragt. Variante A bleibt gewählt.
 
 ## Vorliegende Umsetzung
 

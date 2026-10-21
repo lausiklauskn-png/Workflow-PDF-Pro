@@ -498,3 +498,53 @@ belegt. Keine echte SD-Karte, kein physisches Zielgerät, keine reale Google-
 ableiten. Produktiver Tresor, Migration/Ordnerwechsel, Einstellungen, Chrome-
 Hin-/Rücktransport und vollständiges `native-smoke` bleiben offen. Kein Merge
 auf main und keine reguläre APK-Veröffentlichung.
+
+## Nächster Bauabschnitt: produktive Tresoranbindung und explizite Übernahme
+
+Klaus hat nach der erneuten Auswahl den Vordergrunddienst gewählt und beauftragt,
+ohne weitere Rückfragen selbstständig bis zur signierten Erstinstallations-APK
+fertigzubauen. Vollständiger Kern, Schutzmodule und Sicherungen bleiben erhalten.
+Ausgangspunkt dieses Abschnitts: sauberer Bauzweig `85a8c38`, alle Remotezweige
+erneut gelesen, main weiterhin `a19d82d`. Kein Reset, Force-Push oder Worktree.
+
+Neu angebunden: `ProVaultPlugin` ist registriert, die bisherigen Factories werden
+vor dem Erfassen von WFP.DB durch app.js geladen. `native-vault.js` installiert
+die Startsperre, internen Standard ohne SD, native Passwort-/Ordnerbrücke,
+Sperren/Entsperren und einen zusätzlichen Knopf im bestehenden Speicherbereich
+der Einstellungen. Originaler PDF-/Import-/Sicherungs-/Schutzcode unverändert.
+
+`DocumentVault` bereitet Übernahmen in einer eigenen verschlüsselten Generation
+vor und bestätigt den Zielindex erst gemeinsam. Abbruch vor diesem Punkt gibt
+die bisherige Zielgeneration wieder frei; bisherige Bibliothek bleibt erhalten.
+Ein gerätelokaler Wiederanlaufvermerk überbrückt die danach folgende einzelne
+IndexedDB-Transaktion und die Auswahl des nativen Hauptorts. Bestehende Ordner
+werden nicht gelöscht; kollidierende Kennungen mit anderem Inhalt werden vor
+Übernahme abgewiesen. Die Kopie wird datensatzweise transportiert, nicht als
+ein JSON mit sämtlichen PDFs aufgebaut. Dateien liegen intern nach Bestätigung
+als Versionsreferenzen. Separate ue:-Jobs, Originalfotos, Felder, Vermerke und
+Text-/Vektorblöcke werden vollständig mitgenommen.
+
+Ein verlorener interner Index wird aus dem gewählten Haupttresor rekonstruiert;
+gesperrte/fehlende Freigaben erzeugen keine leere Ersatzbibliothek. Bei erneuter
+Freigabe einer identischen Tresorkopie werden bekannte Versionen vor Neubindung
+der Ortsreferenzen geprüft. Alte/andere Dateiversionen werden abgewiesen.
+Portable Einstellungen besitzen eine ausdrückliche Allowlist. API-Schlüssel,
+Anbietereinwilligungen, SBKIM-Identitäten, Modell- und Eingangscaches bleiben
+gerätelokal; bisheriges Sicherungsformat unverändert.
+
+Neu lokal ausgeführt: fünf Produkt-Browserfälle plus Sammeltest bestanden
+(echter Kern/IndexedDB, Android-Transport gestellt): interner Start, ausdrückliche
+Übernahme/Neustart, Entsperren, vollständig geleerter interner Index und
+Speicherfehler ohne Überschreiben eines Übersetzungsjobs. Sieben neue Protokoll-
+und Präferenzfälle bestanden, zusätzlich die fünf bestehenden Startsperrenfälle.
+Der vorherige volle native Browserlauf mit 23 Einträgen und vorhandene 34
+Codec-/Transport-/Journal-/Gate-Einträge waren ebenfalls grün; der zusätzliche
+Indexverlustfall ist im späteren fokussierten Lauf enthalten. Kein neuer
+Android-Erfolg aus Browserattrappen abgeleitet.
+
+Aktueller Android-Bau/Lint/JVM/Test-APK lokal erfolgreich (23 s). Drei neue echte
+SAF-/Batch-/Migrationszeigerfälle und ein durchgängiger Produktfall von Original-
+PDF/Formular/Foto/Job über Verschlüsselung bis zum internen Referenzindex und
+Activity-Neustart sind kompiliert. Deren CI-Ausführung ist gesondert zu ergänzen.
+Keine vollständige App-Abnahme: Chrome-Dienst/Transport, Sprache, weitere
+Gerätefunktionen und reguläre Freigabe bleiben im Bau. Releasegates unverändert.

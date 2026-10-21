@@ -4,11 +4,13 @@ Aktueller kopierbarer Nachfolgeauftrag:
 `BRIEF_NACHFOLGE_2026-10-21_APP_FERTIGSTELLEN.md`. Er ergänzt den weiterhin
 verbindlichen Originalbrief vom 20.10.2026.
 
-Neueste Weisung der Fortsetzung: Der Nutzer hat die zusätzliche Chrome-
-Vordergrunddienstentscheidung ausdrücklich als offen bezeichnet. Dies überstimmt
-die historischen Zustimmungsvermerke weiter unten; siehe ENTSCHEIDUNGEN.md.
-Native SEND/VIEW-Anbindung wurde danach unabhängig weitergebaut, aktuelle
-Prüfungen und verbleibende Lebenszyklusgrenzen am Ende von BAUSTAND-ANDROID.md.
+Neueste Weisung der Fortsetzung: Der Nutzer hat nach der erneuten Gegenüberstellung
+den Chrome-Vordergrunddienst mit sichtbarer Benachrichtigung und Abbruch gewählt
+und danach die selbstständige Fertigstellung ohne weitere Rückfragen bis zur
+signierten Erstinstallations-APK beauftragt. Notwendige technische Entscheidungen
+nach Logik und Nutzerfreundlichkeit treffen; vollständige Kernübernahme und
+Prüfgrenzen erhalten. Nicht erneut nach der Dienstentscheidung fragen.
+Aktuelle Speicheranbindung und Nachweise stehen am Ende von BAUSTAND-ANDROID.md.
 
 Aktueller Implementierungsnachweis dieser Fortsetzung: `2c16888`,
 [Actions 39584646803](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39584646803)

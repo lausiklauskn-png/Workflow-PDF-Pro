@@ -10,3 +10,6 @@ html[data-wfp-native] { overscroll-behavior: none; }
 #nativeImportStatus{position:fixed;z-index:100;bottom:1rem;left:1rem;right:1rem;padding:.75rem;background:var(--papier,#fff);color:var(--text,#17202a);border:1px solid currentColor;border-radius:.5rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
 #nativeIncoming{position:fixed;z-index:101;bottom:max(1rem,env(safe-area-inset-bottom));inset-inline:1rem;padding:.75rem;background:var(--papier,#fff);color:var(--text,#17202a);border:1px solid currentColor;border-radius:.5rem;max-height:45dvh;overflow:auto;overflow-wrap:anywhere}
 #nativeIncoming p{margin:.25rem 0 .5rem}#nativeIncoming button{margin-inline-end:.5rem}
+.native-vault-dialog{max-width:36rem;width:calc(100% - 2rem);max-height:85dvh;overflow:auto;border:1px solid #888;border-radius:.5rem;padding:1rem;color:var(--text,#17202a);background:var(--papier,#fff)}
+.native-vault-dialog::backdrop{background:#0009}.native-vault-dialog button{margin:.4rem .4rem .4rem 0}
+#nativeVaultStatus{position:fixed;z-index:20001;bottom:.5rem;inset-inline:.5rem;max-width:36rem;padding:.5rem;background:#fff3cd;color:#222;border:1px solid #897332}

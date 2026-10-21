@@ -29,12 +29,16 @@ Sprachpaare, Berechtigungen und Geräteadapter messen.
 
 ## Google-/Chrome-Übersetzung
 
-**Aktuelle Weisung dieser Fortsetzung vom 21.10.2026:** Klaus bezeichnet die
-zusätzliche Vordergrunddienstentscheidung ausdrücklich wieder als offen. Diese
-neuere Weisung hat Vorrang vor den unten dokumentierten historischen Zusagen.
-Vordergrunddienst und manuelle Rückkehr wurden erneut mit Vor-/Nachteilen und
-Empfehlung vorgelegt; bis zu einer neuen Antwort keine Dienstaktivierung.
-Chrome-Variante A und die bereits gewählte Journalarchitektur bleiben bestehen.
+**Neueste ausdrückliche Entscheidung vom 21.10.2026:** Nach der erneuten
+Gegenüberstellung wählt Klaus den Vordergrunddienst mit sichtbarer
+Laufbenachrichtigung und Abbruch. Anschließend beauftragt er, den gesamten Auftrag
+erneut zusammenzuführen, ohne weitere Rückfragen selbstständig fertigzubauen und
+die signierte APK zur Erstinstallation bereitzustellen. Notwendige technische
+Umsetzungsentscheidungen dürfen nach Logik und Nutzerfreundlichkeit getroffen
+werden. Chrome-Variante A, vollständige Übernahme, Journalarchitektur, eigene
+Signieridentität und ehrliche Prüf-/Freigabegrenzen bleiben verbindlich. Keine
+Freigabe für heimliche neue Onlinedienste, Schlüsselübertragung oder reduzierte
+Preview. Die zuvor erneut offene Frage ist damit beantwortet.
 
 ### Belegtes Problem
 

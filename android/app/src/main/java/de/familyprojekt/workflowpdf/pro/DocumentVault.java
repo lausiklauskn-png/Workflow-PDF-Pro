@@ -31,6 +31,9 @@ final class DocumentVault {
     private final String deviceAlias;
     private Place active;
     private final Map<String, Pending> pending = new HashMap<>();
+    private Batch batch;
+    private static final class Batch { Place place; JSONObject index; Set<String> created=new HashSet<>(); }
+    private JSONObject visibleIndex(Place p){return batch!=null&&batch.place==p?batch.index:p.index;}
     static final class Place { Uri tree; String root, id, label; byte[] key; long revision; JSONObject index = new JSONObject(); List<String> setupObjects; }
     static final class Entry { String id, name, mime; }
     static final class Pending { String store, id; File file; long size; Place place; JSONObject reference; }
@@ -206,7 +209,7 @@ final class DocumentVault {
         open(p, password, remember);
     }
     void open(Place candidate, CharSequence password, boolean remember) throws Exception {
-        if (!pending.isEmpty()) throw failure("VAULT_BUSY");
+        if (transferring()) throw failure("VAULT_BUSY");
         Entry header = child(candidate, candidate.root, HEADER);
         if (header == null) throw failure("VAULT_NOT_FOUND");
         JSONObject meta = new JSONObject(new String(small(candidate, header.id, 65536), StandardCharsets.UTF_8));
@@ -226,7 +229,7 @@ final class DocumentVault {
         } finally { Arrays.fill(pw, (byte) 0); if (derived != null) Arrays.fill(derived, (byte) 0); if (active != candidate && candidate.key != null) Arrays.fill(candidate.key, (byte) 0); }
     }
     void initialize(Place candidate, CharSequence password, boolean remember) throws Exception {
-        if (!pending.isEmpty()) throw failure("VAULT_BUSY");
+        if (transferring()) throw failure("VAULT_BUSY");
         if (Normalizer.normalize(password, Normalizer.Form.NFC).codePointCount(0, Normalizer.normalize(password, Normalizer.Form.NFC).length()) < 10) throw failure("VAULT_PASSWORD_SHORT");
         if (existing(candidate)) throw failure("VAULT_FILE_EXISTS");
         candidate.setupObjects = new ArrayList<>();
@@ -272,13 +275,13 @@ final class DocumentVault {
     }
     private void clearActive() { if (active != null && active.key != null) Arrays.fill(active.key, (byte) 0); active = null; }
     boolean configured() { return prefs.contains("tree"); }
-    boolean transferring() { return !pending.isEmpty(); }
+    boolean transferring() { return !pending.isEmpty()||batch!=null; }
     String identity() { return prefs.getString("id", ""); }
     String locationId() throws Exception {
         return VaultCrypto.hex(MessageDigest.getInstance("SHA-256").digest(bytes(prefs.getString("tree", "")+"|"+prefs.getString("root", "")+"|"+identity())));
     }
     void rehome(String preferences) throws Exception {
-        if (!pending.isEmpty()) throw failure("VAULT_BUSY");
+        if (transferring()) throw failure("VAULT_BUSY");
         SharedPreferences next=context.getSharedPreferences(preferences,Context.MODE_PRIVATE);
         if (identity().equals(next.getString("id", "")) && prefs.getLong("revision",0)<next.getLong("revision",0)) throw failure("VAULT_DAMAGED");
         SharedPreferences.Editor editor=next.edit().clear();
@@ -310,10 +313,12 @@ final class DocumentVault {
         return state;
     }
     void lock() throws Exception {
+        abortBatch();
         for (Pending p : pending.values()) p.file.delete(); pending.clear(); clearActive();
         if (!prefs.edit().remove("remember").commit()) throw failure("VAULT_UNAVAILABLE");
     }
     void closeWorking() {
+        abortBatch();
         for (Pending p : pending.values()) p.file.delete(); pending.clear(); clearActive();
     }
     String begin(String store, String id) throws Exception {
@@ -340,15 +345,16 @@ final class DocumentVault {
         try {
             String hash=VaultCrypto.hex(ProFilesPlugin.hash(new FileInputStream(p.file)));
             file = encrypted(place, logical, new FileInputStream(p.file));
-            JSONObject next = new JSONObject(place.index.toString());
+            JSONObject next = new JSONObject(visibleIndex(place).toString());
             JSONObject entry=new JSONObject().put("store",p.store).put("id",p.id).put("file",file).put("size",size).put("hash",hash);
             if(p.reference!=null)entry.put("reference",p.reference);
             next.put(logical,entry);
-            index(place, next); committed = true;
+            if(batch!=null){batch.index=next;batch.created.add(file);}else index(place, next);
+            committed = true;
         } finally { abort(ticket); if (!committed && file != null) deleteName(place, file); }
     }
     JSONObject info(String store, String id) throws Exception {
-        Place p = require(); JSONObject record = p.index.optJSONObject(recordName(store, id));
+        Place p = require(); JSONObject record = visibleIndex(p).optJSONObject(recordName(store, id));
         if(record==null)return new JSONObject().put("exists",false);
         JSONObject info=new JSONObject().put("exists",true).put("size",record.getLong("size")).put("hash",record.getString("hash"));
         if(record.has("reference"))info.put("reference",record.getJSONObject("reference"));
@@ -358,7 +364,7 @@ final class DocumentVault {
         return read(store,id,offset,null);
     }
     byte[] read(String store,String id,long offset,String expectedHash)throws Exception {
-        Place p = require(); String name = recordName(store, id); JSONObject record = p.index.optJSONObject(name);
+        Place p = require(); String name = recordName(store, id); JSONObject record = visibleIndex(p).optJSONObject(name);
         if (record == null) throw failure("VAULT_RECORD_NOT_FOUND");
         if(expectedHash!=null&&!expectedHash.equals(record.optString("hash")))throw failure("VAULT_RECORD_CHANGED");
         try (VaultCrypto.Reader reader = reader(p, record.getString("file"), name)) {
@@ -368,15 +374,28 @@ final class DocumentVault {
     }
     JSONArray list(String store) throws Exception {
         Place p = require(); if (!STORES.contains(store)) throw failure("VAULT_INVALID_RECORD");
-        JSONArray out = new JSONArray(); Iterator<String> keys = p.index.keys();
-        while (keys.hasNext()) { JSONObject entry = p.index.getJSONObject(keys.next()); if (store.equals(entry.getString("store"))) out.put(entry.getString("id")); }
+        JSONObject view=visibleIndex(p);JSONArray out = new JSONArray(); Iterator<String> keys = view.keys();
+        while (keys.hasNext()) { JSONObject entry = view.getJSONObject(keys.next()); if (store.equals(entry.getString("store"))) out.put(entry.getString("id")); }
         return out;
     }
     void remove(String store, String id, boolean prefix) throws Exception {
-        Place p = require(); recordName(store, id); JSONObject next = new JSONObject(p.index.toString()); Iterator<String> keys = p.index.keys();
-        while (keys.hasNext()) { String key = keys.next(); JSONObject entry = p.index.getJSONObject(key);
+        Place p = require(); recordName(store, id);JSONObject view=visibleIndex(p); JSONObject next = new JSONObject(view.toString()); Iterator<String> keys = view.keys();
+        while (keys.hasNext()) { String key = keys.next(); JSONObject entry = view.getJSONObject(key);
             if (store.equals(entry.getString("store")) && (id.equals(entry.getString("id")) || (prefix && entry.getString("id").startsWith(id + "#")))) next.remove(key);
         }
-        index(p, next);
+        if(batch!=null)batch.index=next;else index(p, next);
+    }
+    void beginBatch()throws Exception{
+        if(transferring())throw failure("VAULT_BUSY");
+        Place p=require();Batch next=new Batch();next.place=p;next.index=new JSONObject(p.index.toString());batch=next;
+    }
+    void commitBatch()throws Exception{
+        if(batch==null||batch.place!=require()||!pending.isEmpty())throw failure("VAULT_BUSY");
+        index(batch.place,batch.index);batch=null;
+    }
+    void abortBatch(){
+        if(batch==null)return;
+        for(Pending item:pending.values())item.file.delete();pending.clear();
+        Batch old=batch;batch=null;for(String name:old.created)deleteName(old.place,name);
     }
 }

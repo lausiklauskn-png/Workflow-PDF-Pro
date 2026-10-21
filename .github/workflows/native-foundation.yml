@@ -70,7 +70,7 @@ jobs:
         run: node --test tools/signing/test-request-release.mjs
       - name: Binäre Tresor-Datensätze und Übersetzungsstände prüfen
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
-        run: node --test tools/native/test-vault-codec.mjs tools/native/test-vault-records.mjs tools/native/test-vault-journal.mjs tools/native/test-vault-gate.mjs
+        run: node --test tools/native/test-vault-codec.mjs tools/native/test-vault-records.mjs tools/native/test-vault-journal.mjs tools/native/test-vault-gate.mjs tools/native/test-vault-migration.mjs
       - name: Reinigung nach vorzeitig beendeter Originalkette gesondert prüfen
         if: ${{ failure() && steps.dependencies.outcome == 'success' }}
         run: node upstream/workflow-pdf/tests/reinigung.mjs
