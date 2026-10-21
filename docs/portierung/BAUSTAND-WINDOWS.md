@@ -81,3 +81,23 @@ Ergebnisse stehen am Ende dieser Datei, mit Laufnummer.
   heruntergeladen und über die vorhandene installiert. Die Daten bleiben dabei erhalten.
 
 ## Ergebnisse
+
+### Lauf 39677170096 (Commit b393047, `windows-latest`, WebView2/Edge 154): grün
+
+| Phase | Ergebnis |
+|---|---|
+| Installation | stilles NSIS-Setup pro Benutzer; „Öffnen mit“ für .pdf eingetragen; Standard-App für .pdf unverändert |
+| erst | Brücke aktiv (Plattform `windows`, alle Adapter geladen, Chrome-Transport ersetzt); Formular eingelesen (2 Seiten, Feld „Müller“, Original per SHA-256 gleich); ausfüllbar/fest/Vorlage als PDF; Texterkennung „Antrag Bewohnerparkausweis“; Speichern unter mit Prüfsummenvergleich; Ordner mit Unterordner eingelesen (+2 Dokumente); Tresor über Passwortfenster in einem leeren Ordner angelegt, Übernahme von 3 Dokumenten (11 Datensätze, 16 Dateien), keine PDF-Klartexte im Ordner; „Öffnen mit“ über Zweitstart (+1 Dokument, Hinweis sichtbar); Chrome-Sitzung mit Laufhinweis gestartet, Chrome geöffnet, über „Abbrechen“ beendet (`CHROME_CANCELLED`) |
+| neustart | Tresor ohne Passwort entsperrt (DPAPI), 4 Dokumente, Original aus dem Tresor; Sperren → gesperrt; falsches Passwort abgewiesen („Keine Daten wurden zurückgesetzt“); richtiges Passwort öffnet, 4 Dokumente |
+| abgezogen | Tresorordner umbenannt: `VAULT_FOLDER_UNAVAILABLE`, Hinweis „Die Bibliothek wird nicht durch eine leere ersetzt“ |
+| Deinstallation | Programm entfernt, „Öffnen mit“-Einträge entfernt |
+| neuinstallation | Tresor entsperrt, 4 Dokumente erhalten |
+| Auslieferungsbau | startet; kein Prüfzugang offen |
+
+Linux-Teil im selben Lauf: `cargo test` und Gegenprobe Android ↔ Windows grün.
+Installer `Workflow-PDF-Pro-Windows-1.0.1-Setup.exe`, 15.147.379 Bytes (Größe und Prüfsumme
+ändern sich mit jedem Bau; maßgeblich ist die `.sha256`-Datei der Veröffentlichung).
+
+Nicht automatisch geprüft: echtes Drucken, Teilen-Fenster von Windows, Ablegen von Dateien im
+Fenster, Kamera, Spracheingabe und die eigentliche Übersetzung in Chrome (sie braucht eine Bedienung
+in Chrome). Nichts davon ist auf Klaus' PC gemessen.
