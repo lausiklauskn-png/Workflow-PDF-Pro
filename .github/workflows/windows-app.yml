@@ -57,11 +57,14 @@ jobs:
         run: |
           npx tauri build
           New-Item -ItemType Directory -Force ../auslieferung | Out-Null
+          $version = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
+          $name = "Workflow-PDF-Pro-Windows-$version-Setup.exe"
           $f = Get-ChildItem src-tauri/target/release/bundle/nsis -Filter *-setup.exe | Select-Object -First 1
-          Copy-Item $f.FullName ../auslieferung/
+          Copy-Item $f.FullName "../auslieferung/$name"
+          $f = Get-Item "../auslieferung/$name"
           $h = (Get-FileHash $f.FullName -Algorithm SHA256).Hash.ToLower()
-          "$h  $($f.Name)" | Set-Content -NoNewline -Encoding ascii "../auslieferung/$($f.Name).sha256"
-          "::notice title=Installer::$($f.Name) $($f.Length) Bytes SHA-256 $h"
+          "$h  $name" | Set-Content -NoNewline -Encoding ascii "../auslieferung/$name.sha256"
+          "::notice title=Installer::$name $($f.Length) Bytes SHA-256 $h"
       - name: Abnahme im WebView2-Fenster
         timeout-minutes: 35
         env:

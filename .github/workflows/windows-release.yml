@@ -1,0 +1,100 @@
+name: Workflow PDF Pro für Windows veröffentlichen
+# Veröffentlicht genau den Installer, der im Lauf "Windows-App (Tauri)" für diesen
+# main-Commit gebaut und abgenommen wurde. Kein Neubau, kein Vorschau-Kanal.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Windows-Tag, z. B. windows-v1.0.1 (muss zur Version in tauri.conf.json passen)
+        required: true
+        type: string
+      commit:
+        description: Vollständiger, zuvor geprüfter main-Commit
+        required: true
+        type: string
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: workflow-pdf-pro-windows-release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Geprüften Stand und abgenommenen Installer verlangen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_COMMIT: ${{ inputs.commit }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REPOSITORY" == 'lausiklauskn-png/Workflow-PDF-Pro' ]]
+          [[ "$EXPECTED_COMMIT" =~ ^[a-f0-9]{40}$ && "$EXPECTED_COMMIT" == "$GITHUB_SHA" ]]
+          [[ "$RELEASE_TAG" =~ ^windows-v((0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*))$ ]]
+          version="${BASH_REMATCH[1]}"
+          test "$(jq -r .version windows/src-tauri/tauri.conf.json)" = "$version"
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then echo 'Tag existiert bereits.'; exit 1; fi
+          run=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/windows-app.yml/runs?head_sha=$GITHUB_SHA&per_page=50" \
+            --jq '[.workflow_runs[] | select(.conclusion == "success" and .head_branch == "main")][0].id // empty')
+          if test -z "$run"; then echo 'Kein erfolgreicher Bau- und Abnahmelauf auf main für diesen Commit.'; exit 1; fi
+          echo "RUN=$run" >> "$GITHUB_ENV"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+      - name: Abgenommenen Installer holen und Prüfsumme prüfen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download "$RUN" --repo "$GITHUB_REPOSITORY" --name windows-installer --dir release-files
+          name="Workflow-PDF-Pro-Windows-$VERSION-Setup.exe"
+          (cd release-files && sha256sum -c "$name.sha256")
+          ls -l release-files
+      - name: Veröffentlichen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          name="Workflow-PDF-Pro-Windows-$VERSION-Setup.exe"
+          sum=$(cut -d' ' -f1 "release-files/$name.sha256")
+          size=$(stat -c %s "release-files/$name")
+          cat > notes.md <<NOTES
+          Workflow PDF Pro für Windows $VERSION (Windows 10 und 11, 64 Bit).
+
+          **Installation:** \`$name\` herunterladen und doppelt anklicken. Es sind keine Administratorrechte nötig.
+          Der Installer ist noch nicht signiert. Deshalb zeigt Windows „Der Computer wurde durch Windows geschützt“.
+          Dann „Weitere Informationen“ und danach „Trotzdem ausführen“ wählen.
+
+          - Gleicher Funktionsumfang wie Android $VERSION, mit unverändertem Kern, auch offline nutzbar.
+          - Der verschlüsselte Dokumenttresor kann in einem frei gewählten Ordner oder auf einem USB-Stick liegen.
+            Er ist mit dem Android-Tresor austauschbar.
+          - Im Menü „Öffnen mit“ für PDF und Bilder. Die Standard-App bleibt unverändert.
+          - Übersetzen mit Chrome (Variante A): Google Chrome muss installiert sein.
+
+          Prüfstand: gebaut und abgenommen auf einem GitHub-Windows-Rechner (Lauf $RUN).
+          Auf einem eigenen Windows-PC ist die App noch nicht gemessen.
+
+          SHA-256: \`$sum\` · Größe: $size Bytes
+          NOTES
+          sed -i 's/^          //' notes.md
+          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Workflow PDF Pro für Windows $VERSION" --notes-file notes.md --latest=false \
+            "release-files/$name" "release-files/$name.sha256"
+      - name: Unabhängig herunterladen und vergleichen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          name="Workflow-PDF-Pro-Windows-$VERSION-Setup.exe"
+          mkdir check
+          curl -fsSL -o "check/$name" "https://github.com/$GITHUB_REPOSITORY/releases/download/$RELEASE_TAG/$name"
+          test "$(sha256sum "check/$name" | cut -d' ' -f1)" = "$(cut -d' ' -f1 "release-files/$name.sha256")"
+          test "$(stat -c %s "check/$name")" = "$(stat -c %s "release-files/$name")"
+          echo "::notice title=Veröffentlicht::https://github.com/$GITHUB_REPOSITORY/releases/download/$RELEASE_TAG/$name"
