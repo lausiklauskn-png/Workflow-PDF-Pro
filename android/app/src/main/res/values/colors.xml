@@ -3,4 +3,5 @@
     <color name="colorPrimary">#E0231B</color>
     <color name="colorPrimaryDark">#A11914</color>
     <color name="colorAccent">#E0231B</color>
+    <color name="workflow_icon_background">#E0231B</color>
 </resources>

@@ -949,3 +949,26 @@ Sandbox-Prozess konnte Gradles lokalen Lock-Socket nicht öffnen; derselbe Bau
 mit genehmigtem Prozesszugriff bestand. Kein Produkttest wurde deshalb
 abgeschaltet oder als bestanden ersetzt. Vollständige Geräte-/Freigabeprüfung
 und signierte Aktualisierung folgen über den vorhandenen Actions-Weg.
+
+### Nachfolgend ausdrücklich gewählte Pro-Gestaltung
+
+Klaus ersetzte den Rahmenentwurf durch eine konkrete neue Vorgabe: vollflächig
+roter Hintergrund bis zum Rand, weißer weicher Verlauf hinter dem W-Floh ins
+Rot, größerer W-Floh mit kleinem Abstand zur Launcher-Kontur, auf dem gehaltenen
+Zettel „PDF Pro“ in roter Schrift. Diese gewählte Grafik liegt getrennt als
+`drawable-nodpi/workflow_pro_icon.png`; Originalgrafik und Quellbestand bleiben
+erhalten. Normales/rundes adaptives Icon nutzen den neuen Hintergrund und die
+Grafik mit 13% relativem Layer-Abstand. Da Android den mittleren 72dp-Ausschnitt
+der 108dp-Ebene zeigt, bleibt die Grafik dabei größer als der sichtbare
+Ausschnitt; Rot füllt die Launcher-Form bis außen. Das Motiv steht groß mit
+kleinem Sicherheitsabstand im Icon. Die obige 26%-Rahmenvariante wird damit
+nicht ausgeliefert. Auch die ältere Bitmap-Fallbackressource nutzt das Pro-Icon.
+Bildbearbeitung mit dem Bildwerkzeug; keine Änderung der ursprünglichen Grafik.
+
+Klaus bestätigte abschließend „genau so“. Der finale Maskenentwurf mit dem
+weiter vergrößerten Motiv wurde für Kreis, Squircle und Rundquadrat visuell
+kontrolliert: roter Hintergrund bis außen, weicher weißer Verlauf, rotes „PDF
+Pro“ auf dem Zettel, vollständige Fühler/Schuhe mit kleinem Abstand. Finaler
+lokaler Bau einschließlich Lint/JVM erfolgreich (151 Aufgaben; 16 ausgeführt,
+135 aktuell). Die Prüfung des zuvor gepushten Rahmenentwurfs ist kein
+Freigabenachweis dieser anschließend gewählten Pro-Grafik.
