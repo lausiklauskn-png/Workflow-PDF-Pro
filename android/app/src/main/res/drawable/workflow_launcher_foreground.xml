@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android displays a 72dp viewport of a 108dp adaptive layer. Keep the
+     complete rounded logo, including its red outline, in the central 52dp.
+     Its rounded corners fit within the guaranteed 66dp safe circle, so
+     launcher masks and their movement cannot crop the outline. Percentage
+     insets keep these proportions at every launcher size and display density. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:inset="26%">
+    <bitmap android:src="@drawable/workflow_icon" android:gravity="fill" />
+</inset>

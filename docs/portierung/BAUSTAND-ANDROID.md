@@ -924,3 +924,28 @@ Das Quellrepo und alle 191 Herkunftsdateien bleiben unverändert. Die physische
 Abnahme auf Galaxy Tab S6/S21, reale Chrome-Menüübersetzung sowie Windows und
 iOS sind nächste Arbeiten. Spätere Dokumentationscommits verändern die APK
 unter v1.0.0 nicht und sind keine neu ausgeführten Produktprüfungen.
+
+## Icon-Korrektur für Android 1.0.1 (21.10.2026)
+
+Klaus meldet nach erfolgreichem APK-Download einen an den Seiten abgeschnittenen,
+unregelmäßigen roten Icon-Rand. Ursache: Auch die Android-26-Ressourcen waren
+vollflächige Bitmaps; Launcher-Masken schnitten den vorhandenen Bildrand ab.
+Normales und rundes Launcher-Icon verwenden jetzt ein natives adaptives Icon
+mit weißem Hintergrund und identischem, unverändertem Originalmotiv. Relative
+26-Prozent-Abstände auf allen vier Seiten halten das vollständige abgerundete
+Motiv innerhalb des geschützten mittleren Bereichs, auch bei anderen
+Icon-Größen/Bildschirmdichten. Keine neue Grafik, keine Änderung am App-Kern,
+Quellrepo oder Signierschlüssel. Reguläre Updateversion 1.0.1, versionCode 2.
+
+Die lokale Vorschau mit Kreis-, Squircle- und Rundquadratmasken zeigt den roten
+Rand vollständig; dies ist eine simulierte Maskenvorschau, keine physische
+Samsung-Abnahme. Herkunft erneut geprüft: 191 Dateien bytegleich, null Fehler.
+Bau-/CI-/Release-Ergebnisse für diesen neuen Stand werden erst nach tatsächlicher
+Ausführung ergänzt. Die Nachweise zu 1.0.0 bleiben historische Nachweise.
+
+Tatsächlich lokal ausgeführt: `assembleRelease lintRelease testReleaseUnitTest`
+erfolgreich (151 Aufgaben; 74 ausgeführt, 77 aktuell). Die erste Ausführung im
+Sandbox-Prozess konnte Gradles lokalen Lock-Socket nicht öffnen; derselbe Bau
+mit genehmigtem Prozesszugriff bestand. Kein Produkttest wurde deshalb
+abgeschaltet oder als bestanden ersetzt. Vollständige Geräte-/Freigabeprüfung
+und signierte Aktualisierung folgen über den vorhandenen Actions-Weg.
