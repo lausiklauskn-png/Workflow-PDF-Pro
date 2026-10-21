@@ -739,3 +739,64 @@ Freigabe verlangt nun mindestens 45 tatsächliche native Fälle. Späte Aufrufe
 dürfen auch keinen neuen lokalen Modellclient für eine zerstörte Aktivität anlegen.
 Die Neuinstallationsprobe läuft unabhängig von fehlgeschlagenen Produktfällen
 weiter, bewahrt aber deren Fehlerstatus vollständig. Kein Gate wird umgangen.
+
+## Optionale lokale Google-Modelle: bewusster Start und Herstellerhinweise
+
+Die offiziellen [ML-Kit-Nutzungs-/Datenschutzhinweise](https://developers.google.com/ml-kit/terms)
+und [Übersetzungsrichtlinien](https://developers.google.com/ml-kit/language/translation/translation-terms)
+wurden am 21.10.2026 gelesen: Eingaben/Ergebnisse bleiben lokal; das SDK
+übermittelt technische Geräte-/App-/Nutzungs-/Leistungsdaten. Deshalb wird dessen
+automatischer InitProvider gemäß dokumentierter öffentlicher MlKit.initialize-API
+entfernt. Eine reine Verfügbarkeitsanzeige vor der Entscheidung initialisiert
+das SDK nicht. Erst die ausdrückliche erste Wahl nach DE/EN/RU/AR-Hinweis aktiviert
+Modelle. Ablehnen startet keinen Modellclient; die Freigabe bleibt gerätelokal
+und wird nicht in portable Tresorpräferenzen kopiert. Google Translate wird an
+Auswahl und angezeigtem Übersetzungsergebnis genannt; externe Informationslinks
+übertragen keine Dokumenttexte. Native HTML-Dialoge erhalten System-Zurück vor
+den darunterliegenden Originaldialogen.
+
+Lokale neue Gegenprobe: Ablehnung ohne Aktivierung oder Client, Bestätigung vor
+Modellstart und unveränderte Wiederholung/Satzzerlegung/Abbruch bestanden, ebenso
+die Datei-/Zurück-Gegenprobe. Android-Bau/Lint/JVM/Test-APK grün (32 s). Die neue
+Emulatorrunde prüft diesen bewusst gestarteten SDK-Weg erneut.
+
+Auf `ee72241` sind inzwischen alle 45 Produktfälle im Android-15-Telefonprofil
+durchgelaufen; der nachfolgende Neuinstallationstest scheiterte am falschen
+Debug-Activity-Klassennamen im Prüfskript. Der voll qualifizierte Namespace der
+MainActivity wird nun unabhängig vom App-ID-Suffix verwendet. Dieser Befund ist
+kein App-Startfehler einer regulär installierten APK; der Installationsnachweis
+bleibt trotzdem bis zur erfolgreichen erneuten Ausführung offen.
+
+## Vollständiger Telefonlauf und Android-12-Laufzeit
+
+`39600105556` auf `ee722417fba97e87879856f87e7fbe3c992e1587` ist vollständig
+grün: Originalkette, 33 native Browser-Einträge, Android-Bau/Lint, zehn JVM-Fälle
+und **45 Android-15-Produktfälle ohne Fehler/Skips, 176,673 s**. Rohbefund
+`nachweise/2026-10-21-native-full-phone-ci.json`. Dies umfasst echtes Blattmodell,
+OCR, Unicode-Ausgabe, Sicherungsrückweg, Kamera-/Dateiauswahl und Hintergrundfall.
+Der separate Freigabelauf ist damit noch nicht grün: Neuinstallationsskriptfehler
+und abweichende System-WebView im Android-12-SDK-Abbild bleiben zu korrigieren.
+
+Die gleiche unveränderte PDF-Engine scheiterte dort beim Workeraufbau; die
+Android-12-Gesamtabnahme wurde deshalb ausdrücklich nicht freigegeben. Der
+Prüfaufbau erfasst künftig die unveränderten WebView-/Trichrome-APKs aus dem
+offiziellen aktuellen API-35-SDK-Abbild samt SHA-256 und verwendet dieselbe
+aktuelle Systemkomponente im API-31-Test. Installation erfolgt regulär mit
+Androids Signaturprüfung, ohne Root-/Signatur-Umgehung oder fremde APK-Quelle.
+Provider und Version gehen in den Befund ein. Diese Laufzeitkomponente ist nur
+Prüfumgebung und wird nicht in die Produkt-APK kopiert.
+
+Die App fängt veraltete Systemkomponenten vor Laden des vollständigen Kerns
+verständlich ab, mit Aktualisieren-/Erneut-prüfen-Weg in DE/EN/RU/AR. Dokumente
+und Tresore werden nicht gelöscht. Mindest-Android ist nun 8/API26, System
+WebView ab 120; die Zielgeräte Tab S6/S21 liegen oberhalb der Android-Mindeststufe,
+ihre tatsächliche WebView-Version bleibt noch zu messen. Die Produktfunktion
+wird auf aktualisiertem Android 12 und 15 vollständig geprüft.
+
+Native Druckausgabe arbeitet jetzt außerhalb des UI-Threads, liefert weiterhin
+die Original-PDF-Bytes an Android und meldet Abbruch ohne Schreiberfolg. Neue
+echte Gegenprobe prüft Seitenzahl, Hintergrundarbeit, bytegleichen Druckstrom
+und Abbruch. Eine zusätzliche Android-Chooser-Gegenprobe prüft app-eigene
+Lesefreigaben für zwei Dateien und bestätigt auch bei Schließen keine Zustellung.
+Die Oberfläche stellt diese Zustellungsgrenze ausdrücklich klar. Die Freigabe
+verlangt deshalb mindestens 47 Produktfälle einschließlich NativeOutputTest.

@@ -23,6 +23,8 @@ public final class NativeTranslateTest {
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
             until(scenario,"Boolean(window.__wfpdf&&window.WFP&&window.Translator)",60);
             eval(scenario,"window.__localTranslation=null;(async()=>{try{const sample={de:'Guten Morgen. Dies ist ein einfacher Test.',en:'Good morning. This is a simple test.',ru:'Доброе утро. Это простой тест.'},out=[];for(const from of Object.keys(sample))for(const to of Object.keys(sample)){if(from===to)continue;const tr=await WFP.Uebersetzung.browserUebersetzer(from,to);try{const result=await tr([sample[from]]);out.push({from,to,text:result[0],state:await WFP.Uebersetzung.browserVerfuegbar(from,to)});}finally{tr.zu();}}window.__localTranslation={out};}catch(error){window.__localTranslation={error:String(error)};}})();true");
+            until(scenario,"window.__localTranslation!==null||Boolean(document.querySelector('.native-translate-consent'))",60);
+            eval(scenario,"document.querySelector('.native-translate-consent [data-accept]')?.click();true");
             until(scenario,"window.__localTranslation!==null",240);
             JSONObject result=new JSONObject((String)new JSONTokener(eval(scenario,"JSON.stringify(__localTranslation)")).nextValue());assertFalse(result.toString(),result.has("error"));JSONArray out=result.getJSONArray("out");assertEquals(6,out.length());
             for(int i=0;i<out.length();i++){

@@ -1,5 +1,15 @@
 # Arbeitsstand der nativen Übernahme
 
+Aktuelle Fortsetzung vom 21.10.2026: Der vollständige Android-Kern samt
+Datei-/Kamera-/Sprach-/Übersetzungs- und Haupttresoradaptern ist implementiert.
+Letzter kompletter Telefonbefund: `ee72241`, 45 Android-15-Fälle ohne Fehler.
+Die erweiterte Freigabe mit Android-12-Tablet, aktueller System-WebView und
+Neuinstallation wird noch ausgeführt; eine reguläre APK ist hiermit noch nicht
+behauptet. Neueste Änderungen und exakte Läufe stehen chronologisch am Ende
+von [BAUSTAND-ANDROID.md](BAUSTAND-ANDROID.md).
+
+Der nachstehende Herkunfts-/Prüfaufbau beschreibt den Beginn der Übernahme.
+
 Verbindlicher Auftrag: [Nachfolgebrief](../../BRIEF_NACHFOLGE_2026-10-20_NATIVE_APP.md).
 
 1. [Funktionsmatrix](FUNKTIONSMATRIX.md): 122 Bestandsfunktionen plus zwölf
@@ -21,7 +31,7 @@ Der ursprüngliche Bestand von Workflow-PDF-Pro blieb erhalten. Unter
 `upstream/workflow-pdf/` liegen sämtliche 191 Quelldateien bytegleich aus
 `7227c543d4a536cf8f3354a56fbba7574645703e`, einschließlich Lizenztexte,
 Bibliotheken, Modelle, Beispiele, Schutzmodule und Originaltests. Das ist der
-übernommene Ausgangskern, **noch kein natives Produkt und kein Installer**.
+übernommene Ausgangskern, der zu Beginn noch kein natives Produkt und kein Installer war.
 Dieser vollständige Herkunftsbestand ist nicht automatisch die Bundle-Eingabeliste:
 ein späteres App-Bundle darf ausschließlich ausgewählte öffentliche Laufzeitdateien
 enthalten, keine Tests/Entwicklungsdateien/Repository-Metadaten.

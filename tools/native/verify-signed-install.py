@@ -11,7 +11,9 @@ development='--development-probe' in sys.argv[2:]
 package='de.familyprojekt.workflowpdf.pro'+('.debug' if development else '')
 marker='Release-Installationspruefung'
 def adb(*args):
-    return subprocess.run(['adb',*map(str,args)],check=True,text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=45).stdout
+    result=subprocess.run(['adb',*map(str,args)],text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=45)
+    if result.returncode:raise RuntimeError('ADB '+str(args[:3])+': '+(result.stdout+result.stderr)[-3000:])
+    return result.stdout
 def hierarchy():
     adb('shell','uiautomator','dump','--compressed','/sdcard/workflow-release-probe.xml')
     return ET.fromstring(adb('exec-out','cat','/sdcard/workflow-release-probe.xml'))
@@ -29,7 +31,7 @@ def tap(node):
     bounds=list(map(int,re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',node['bounds']).groups()))
     adb('shell','input','tap',(bounds[0]+bounds[2])//2,(bounds[1]+bounds[3])//2)
 def launch():
-    result=adb('shell','am','start','-W','-n',package+'/.MainActivity')
+    result=adb('shell','am','start','-W','-n',package+'/de.familyprojekt.workflowpdf.pro.MainActivity')
     if 'Status: ok' not in result:raise RuntimeError('Regular application did not launch')
     if not adb('shell','pidof',package).strip():raise RuntimeError('Regular process is missing')
 

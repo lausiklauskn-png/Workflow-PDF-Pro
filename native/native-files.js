@@ -11,7 +11,8 @@
     back: ['Zurück', 'Back', 'Назад', 'رجوع'], print: ['Drucken', 'Print', 'Печать', 'طباعة'],
     save: ['Speichern unter …', 'Save as …', 'Сохранить как …', 'حفظ باسم …'],
     fail: ['Dateiaktion fehlgeschlagen. Es wurde kein Erfolg bestätigt.', 'File action failed. Success was not confirmed.', 'Ошибка операции с файлом. Успех не подтверждён.', 'فشلت عملية الملف. لم يتم تأكيد النجاح.'],
-    saved: ['Datei gespeichert und geprüft.', 'File saved and verified.', 'Файл сохранён и проверен.', 'تم حفظ الملف والتحقق منه.']
+    saved: ['Datei gespeichert und geprüft.', 'File saved and verified.', 'Файл сохранён и проверен.', 'تم حفظ الملف والتحقق منه.'],
+    shared: ['Teilen-Fenster geschlossen. Eine Zustellung an andere Apps wird nicht bestätigt.', 'Share window closed. Delivery to another app is not confirmed.', 'Окно отправки закрыто. Доставка в другое приложение не подтверждается.', 'أُغلقت نافذة المشاركة. لا يُؤكَّد التسليم إلى تطبيق آخر.']
   };
   const t = key => words[key][Math.max(0, ['de', 'en', 'ru', 'ar'].indexOf(document.documentElement.lang))];
   function notify(text) {
@@ -48,6 +49,7 @@
       for (const file of data.files || []) ids.push(await transfer(file, file.name));
       const result = await api.share({ ids, title: data.title || '', text: data.text || '', url: data.url || '' });
       opened = result.opened === true;
+      if(opened&&result.deliveryConfirmed===false)setTimeout(()=>notify(t('shared')),0);
     } finally {
       // A receiving app may read after the chooser returns. Keep shared tickets until cache cleanup.
       if (!opened) for (const id of ids) await api.abort({ id }).catch(() => {});
@@ -117,6 +119,8 @@
     return open(url, target, features);
   };
   window.WFPNativeNavigation = { back() {
+    const nativeDialog=[...document.querySelectorAll('dialog[open]')].at(-1);
+    if(nativeDialog){if(nativeDialog.dispatchEvent(new Event('cancel',{cancelable:true})))nativeDialog.close();return true;}
     if (viewer) { viewer.close(); return true; }
     const dialogs = [...document.querySelectorAll('#modals .dlg-grund')];
     if (dialogs.length) {

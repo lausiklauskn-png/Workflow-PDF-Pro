@@ -12,7 +12,9 @@ nach Logik und Nutzerfreundlichkeit treffen; vollständige Kernübernahme und
 Prüfgrenzen erhalten. Nicht erneut nach der Dienstentscheidung fragen.
 Aktuelle Speicheranbindung und Nachweise stehen am Ende von BAUSTAND-ANDROID.md.
 
-Aktueller Implementierungsnachweis dieser Fortsetzung: `2c16888`,
+Aktuell vollständig belegter Telefonstand: `ee72241`, [Actions 39600105556](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39600105556): vollständige Originalkette, 33 native Browserfälle, zehn JVM- und 45 Android-15-Fälle ohne Fehler/Skips. Produktive Tresoranbindung, dauerhafter Eingang, lokaler Chrome-Dienst/Transport, Android-Sprache und lokale Modelle sind implementiert. Die noch offene vollständige Freigabe verlangt zusätzlich Android 12 mit aktualisierter WebView und tatsächlichen Neuinstallations-/Datenerhaltbeleg. Aktuelle Nacharbeiten: optionale Google-SDK-Initialisierung nach Zustimmung, Laufzeitprüfung, Druck außerhalb des UI-Threads und die gemeinsame aktualisierte Emulator-Systemkomponente. Neueste Einzelheiten am Ende von BAUSTAND-ANDROID.md. Noch keine reguläre Veröffentlichung daraus ableiten.
+
+Historischer Empfangsabschnitt dieser Fortsetzung: `2c16888`,
 [Actions 39584646803](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39584646803)
 vollständig grün: Originalkette, 18 native Browser-Testeinträge,
 Speicher-/Release-Auftragsgegenproben und **27 Android-15-Emulatorfälle** ohne

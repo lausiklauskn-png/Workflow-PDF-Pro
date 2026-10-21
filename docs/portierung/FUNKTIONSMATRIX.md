@@ -2,8 +2,11 @@
 
 Stand 20.10.2026. Quelle `7227c543d4a536cf8f3354a56fbba7574645703e`.
 Diese Matrix beschreibt den vorhandenen Umfang, keine fertige native App.
-**Alle nativen Nachweise sind offen.** Testnamen bezeichnen vorhandene Prüfungen,
-keine hier behaupteten Erfolge. Aktuelle Ergebnisse stehen separat in PRUEFSTAND.md.
+Die Offen-Markierungen stammen aus der Erstanalyse vom 20.10.2026. Inzwischen
+sind native Adapter und echte Android-Produktfälle vorhanden. Verbindliche
+aktuelle Ergebnisse, verbleibende Geräteprüfungen und genaue Commit-/Laufnummern
+stehen in BAUSTAND-ANDROID.md; aus einer alten Tabellenzeile keinen aktuellen
+Bauerfolg oder dessen Fehlen ableiten.
 
 Quellstellen beziehen sich auf Workflow-PDF am genannten Commit. Native Anbindung
 ist ein Prüfbedarf/Vorschlag; komplexe Lösungen sind nicht vorentschieden.

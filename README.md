@@ -1,15 +1,32 @@
 # Workflow PDF Pro
 
-Vorbereiteter Auftrag für die vollständige native Übernahme von
-[Workflow PDF](https://github.com/lausiklauskn-png/Workflow-PDF).
+Native Android-Portierung des vollständigen
+[Workflow PDF](https://github.com/lausiklauskn-png/Workflow-PDF)-Kerns.
+Das Quellrepository und die übernommenen 191 Quelldateien bleiben unverändert.
 
-**Beginn der Nachfolgesitzung:**
-[Nachfolgebrief vom 20.10.2026](BRIEF_NACHFOLGE_2026-10-20_NATIVE_APP.md).
+Android enthält den lokalen PDF-/Formular-Editor, Scanner und OCR, Ausgabe und
+Drucken, Arbeitsstände und Sicherungen, Suche, Spracheingabe und die bestehenden
+Schutzmodule. Native Adapter verbinden Dateiauswahl, Kamera, Teilen, verschlüsselte
+Hauptablage und Übersetzungswege mit dem unveränderten Kern.
 
-Der Brief verlangt eine reguläre Pro-Version mit sämtlichen bestehenden
-Funktionen und Schutzfunktionen. Nötige Abweichungen oder komplexere Umstellungen
-sind vor ihrer Umsetzung mit Klaus zu besprechen, jeweils mit mehreren
-begründeten Möglichkeiten und einer nachvollziehbaren Empfehlung.
+Der verschlüsselte Tresor kann in einem selbst gewählten Ordner im Gerätespeicher
+oder auf einem verfügbaren Datenträger liegen. Eine SD-Karte ist optional. Ohne
+Ordnerwahl ist die interne Arbeitsablage nutzbar. Originale, Formularfelder und
+seitenweise Übersetzungsstände werden bei der Tresorübernahme mitgenommen.
 
-Dieses Repository enthält derzeit die Übergabe, noch keine native Anwendung
-und keinen Installer. Die bestehende Workflow-PDF-Web-App bleibt unverändert.
+Übersetzen ist lokal mit Android-Sprachmodellen, über Google Chrome mit lokalem
+geschütztem Hin-/Rücktransport oder freiwillig über bestehende KI-Anbieter mit
+eigenem Schlüssel möglich. Der Chrome-Weg verwendet die gewählte sichtbare
+Laufmeldung mit Abbruch; Reinigung und Bestätigung bleiben erhalten.
+
+Reguläre APKs werden nach vollständiger Freigabeprüfung, bestehender Signatur
+und erfolgreicher Installation unter [Releases](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases)
+bereitgestellt. Aktueller Stand und tatsächliche Nachweise:
+[Android-Baustand](docs/portierung/BAUSTAND-ANDROID.md). Die erste physische
+Geräteabnahme ist für Samsung Galaxy Tab S6 und S21 vorgesehen. Windows und iOS
+folgen nach Android.
+
+[Erstinstallation und Speicherwahl](docs/ANDROID-START.md) ·
+[Entwicklungsfortsetzung](docs/FOLGESITZUNG.md) ·
+[Ursprünglicher Auftrag](BRIEF_NACHFOLGE_2026-10-21_APP_FERTIGSTELLEN.md) ·
+[Gemeinsamer Signierweg](docs/SIGNIERUNG-UND-GITHUB.md)

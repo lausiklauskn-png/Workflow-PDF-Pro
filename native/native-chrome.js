@@ -5,6 +5,15 @@
   if (!window.Capacitor?.isNativePlatform?.() || !Capacitor.Plugins.WorkflowChrome || !window.WFP?.Uebersetzung) return;
   const api=Capacitor.Plugins.WorkflowChrome;
   let active;
+  const instructions=[
+    'Die bereinigten Texte werden in Google Chrome geöffnet. Dort ⋮ → Übersetzen und die Zielsprache wählen. Das Ergebnis wird in der App zum PDF. Der Text geht an Google; das Original bleibt erhalten. Die laufende Benachrichtigung bietet Abbrechen.',
+    'Cleaned text opens in Google Chrome. Select ⋮ → Translate and the target language. The app turns the result into a PDF. Text goes to Google; the original is retained. The ongoing notification offers Cancel.',
+    'Очищенный текст открывается в Google Chrome. Выберите ⋮ → Перевести и нужный язык. Приложение создаст PDF из результата. Текст передаётся Google; оригинал сохраняется. Отмена доступна в уведомлении.',
+    'يُفتح النص المنقّح في Google Chrome. اختر ⋮ ← ترجمة ولغة الهدف. ينشئ التطبيق ملف PDF من النتيجة. يُرسل النص إلى Google ويبقى الأصل محفوظاً. يتيح الإشعار المستمر الإلغاء.'
+  ];
+  new MutationObserver(()=>{for(const span of document.querySelectorAll('[data-weg="chrome"] > span')){
+    const text=instructions[Math.max(0,['de','en','ru','ar'].indexOf(document.documentElement.lang))];if(span.textContent!==text){span.dataset.keinUe='';span.textContent=text;}
+  }}).observe(document.body,{subtree:true,childList:true});
   const messages={
     CHROME_NOTIFICATION_REQUIRED:['Bitte Benachrichtigungen für Workflow PDF Pro erlauben, damit die Übersetzung sichtbar abgebrochen werden kann.','Allow Workflow PDF Pro notifications so the translation can be cancelled visibly.','Разрешите уведомления Workflow PDF Pro, чтобы можно было отменить перевод.','اسمح بإشعارات Workflow PDF Pro لتتمكن من إلغاء الترجمة.'],
     CHROME_NOT_INSTALLED:['Bitte Google Chrome installieren und die Übersetzung erneut starten.','Install Google Chrome and start the translation again.','Установите Google Chrome и запустите перевод снова.','ثبّت Google Chrome ثم أعد بدء الترجمة.'],
