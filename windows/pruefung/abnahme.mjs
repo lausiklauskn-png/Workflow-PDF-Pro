@@ -170,9 +170,12 @@ if (phase === 'erst') {
     await writeFile(file, await makePdf('Geöffnet mit'));
     const before = await docs();
     spawn(env('WFP_APP_EXE'), [file], { detached: true, stdio: 'ignore' }).unref();
-    await page.waitForSelector('#nativeIncoming button', { timeout: 60000 });
-    await page.locator('#nativeIncoming button', { hasText: 'Einlesen' }).click();
-    return { vorher: before, nachher: await waitDocs(before + 1) };
+    await page.waitForSelector('#nativeIncoming button', { state: 'attached', timeout: 60000 });
+    const button = page.locator('#nativeIncoming button', { hasText: 'Einlesen' });
+    const sichtbar = await button.isVisible();
+    const offen = await page.evaluate(() => [...document.querySelectorAll('dialog[open]')].map(d => d.textContent.slice(0, 80)));
+    await button.click({ timeout: 10000 }).catch(() => button.evaluate(b => b.click()));
+    return { vorher: before, nachher: await waitDocs(before + 1), sichtbar, offeneDialoge: offen };
   });
   await step('chromeAbbruch', async () => {
     const begin = await page.evaluate(() => Capacitor.Plugins.WorkflowChrome.begin({ von: 'de', nach: 'en', language: 'de' }));

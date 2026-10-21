@@ -11,11 +11,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::{Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
-// Tauri-Standard plus (nur im Prüfbau) der lokale Prüfzugang für Playwright.
-#[cfg(not(feature = "messprobe"))]
-const BROWSER_ARGS: &str = "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection";
-#[cfg(feature = "messprobe")]
-const BROWSER_ARGS: &str = "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port=9222";
 
 const BRIDGE: &str = include_str!("../../bridge/capacitor-tauri.js");
 
@@ -91,7 +86,7 @@ fn main() {
                 .use_https_scheme(true)
                 // Der Kern hat eigenes Ziehen und Ablegen von Dateien.
                 .disable_drag_drop_handler()
-                .additional_browser_args(BROWSER_ARGS)
+                .additional_browser_args(host::BROWSER_ARGS)
                 .initialization_script(BRIDGE)
                 // Eine fremde Seite darf die App nie ersetzen.
                 .on_navigation(|url| url.scheme() == "https" && url.host_str() == Some("tauri.localhost"))

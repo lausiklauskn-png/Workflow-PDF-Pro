@@ -20,6 +20,14 @@ use wfp_core::transfers::{copy_verified, Transfers};
 use wfp_core::vault::{DocumentVault, Place};
 use wfp_core::Error;
 
+// Tauri-Standard plus (nur im Prüfbau) der lokale Prüfzugang für Playwright.
+// WebView2 verlangt für alle Fenster einer App dieselben Startoptionen;
+// ein Fenster mit abweichenden Optionen lässt sich nicht erzeugen.
+#[cfg(not(feature = "messprobe"))]
+pub const BROWSER_ARGS: &str = "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection";
+#[cfg(feature = "messprobe")]
+pub const BROWSER_ARGS: &str = "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port=9222";
+
 pub type Reply = std::result::Result<Value, String>;
 
 pub enum DialogMessage {
@@ -495,6 +503,7 @@ impl Host {
             .center()
             .use_https_scheme(true)
             .disable_drag_drop_handler()
+            .additional_browser_args(BROWSER_ARGS)
             .on_navigation(|u| u.scheme() == "https" && u.host_str() == Some("tauri.localhost"));
         if let Some(main) = self.app.get_webview_window("main") {
             builder = builder.parent(&main).map_err(|_| "VAULT_UNAVAILABLE".to_string())?;
