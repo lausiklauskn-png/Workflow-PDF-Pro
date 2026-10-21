@@ -50,4 +50,24 @@ public final class NativeIncomingTest {
             scenario.onActivity(a->assertEquals(Intent.ACTION_MAIN,a.getIntent().getAction()));
         }
     }
+    @Test public void realViewIntentStreamsPdfIntoUnchangedCoreWithOriginalAndFormValue()throws Exception{
+        try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
+            until(scenario,"Boolean(window.WFPNativeIncoming && window.__wfpdf && window.PDFLib)");
+            eval(scenario,"window.__incomingPdf=null;(async()=>{const pdf=await PDFLib.PDFDocument.create();const page=pdf.addPage();const f=pdf.getForm().createTextField('Name');f.setText('Müller');f.addToPage(page,{x:30,y:600,width:150,height:25});const bytes=await pdf.save();let binary='';for(const byte of bytes)binary+=String.fromCharCode(byte);window.__incomingPdf=btoa(binary);})();true");
+            until(scenario,"typeof window.__incomingPdf==='string'");
+            String base64=(String)new org.json.JSONTokener(eval(scenario,"__incomingPdf")).nextValue();
+            java.io.File file=new java.io.File(context.getCacheDir(),"fixture-documents/sourceA/Received Мüller.pdf");
+            try(java.io.FileOutputStream out=new java.io.FileOutputStream(file)){out.write(android.util.Base64.decode(base64,android.util.Base64.NO_WRAP));}
+            String authority=context.getPackageName()+".fixture.documents";
+            Uri document=DocumentsContract.buildDocumentUri(authority,"sourceA/Received Мüller.pdf");
+            Intent view=new Intent(context,MainActivity.class).setAction(Intent.ACTION_VIEW).setDataAndType(document,"application/pdf").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            scenario.onActivity(a->a.startActivity(view));
+            until(scenario,"Boolean(document.querySelector('#nativeIncoming button'))");
+            eval(scenario,"document.querySelector('#nativeIncoming button').click();true");
+            until(scenario,"Boolean(__wfpdf.S.docs.find(d=>d.name==='Received Мüller'))");
+            eval(scenario,"window.__coreReceipt=null;(async()=>{const d=(await WFP.DB.all('docs')).find(d=>d.name==='Received Мüller');let binary='';for(const byte of await WFP.DB.getFile(d.id))binary+=String.fromCharCode(byte);window.__coreReceipt={original:btoa(binary)===__incomingPdf,value:d.fields[0].value,unexamined:!d.pruefung};})();true");
+            until(scenario,"Boolean(window.__coreReceipt)");
+            assertEquals("true",eval(scenario,"__coreReceipt.original && __coreReceipt.value==='Müller' && __coreReceipt.unexamined"));
+        }
+    }
 }

@@ -406,9 +406,13 @@ Neu lokal ausgeführt:
   im Wiederholungslauf erfolgreich: acht JVM-Fälle, Lint 0 Fehler / 9 Warnungen.
   Erster Lauf scheiterte an zwei neuen Testaufrufen (`setClipData` liefert void,
   direkter Aufruf der geschützten Basismethode); korrigiert. Die Warmstartprobe
-  startet nun tatsächlich Android-Aktivitäten. Fünf neue Instrumentierungsfälle
+  startet nun tatsächlich Android-Aktivitäten. Sechs neue Instrumentierungsfälle
   kompilieren; abschließender Lauf nach der letzten Intent-Absicherung ebenfalls
   erfolgreich (24 s). Lokal mangels `/dev/kvm`/Zielgerät nicht ausgeführt.
+  Die sechste Probe verbindet einen echten VIEW-Intent über den synthetischen
+  Android-Provider und die Java-Brücke mit dem unveränderten PDF-Importhandler,
+  Originalbytes, Formularwert und ungeprüftem Status. Ihre zusätzliche lokale
+  Test-APK-Kompilierung bestand (12 s); ein Emulatorlauf steht noch aus.
 - Bestehende eigene GitHub-Verbindung: Git-/API-/Actions-Lesen und Push-Dry-Run
   erfolgreich, Repo meldet Admin-/Pushrechte. Echter Workflow-Dispatch ausgeführt:
   Signieridentitäts-`check` auf main `a19d82d` im
