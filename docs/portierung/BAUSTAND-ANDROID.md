@@ -849,3 +849,10 @@ vor Eingabe ausdrücklich die Dialogüberschrift und das fokussierte Eingabefeld
 Er tippt erst bei über zwei UI-Abbilder stabilen Koordinaten und wiederholt nur
 das Öffnen des sichtbaren Dialogs bei noch umgebrochener Startkopfzeile. Eine
 fehlende Ordneranlage oder fehlender Datenerhalt bleibt ein harter Fehler.
+
+Als zusätzliche gewöhnliche Bedienroute kann derselbe UI-Prüfer den sichtbaren
+Ordnerknopf per Tab-Fokus und Enter öffnen, falls stabile Touchkoordinaten bei
+der Kombination alter WebView und Android-15-Fensterintegration nicht greifen.
+Auch dabei müssen Dialog, Texteingabe, gespeicherter Ordner und Datenerhalt nach
+APK-Neuinstallation sichtbar nachgewiesen werden. Es gibt keinen JS-/Debug- oder
+direkten Datenbankzugriff und keine Ersetzung eines fehlenden Produktresultats.

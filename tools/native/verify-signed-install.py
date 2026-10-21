@@ -68,7 +68,16 @@ for attempt in range(3):
         wait_node(lambda node:node.get('text') in ['Neuer Ordner','New folder'],5)
         break
     except RuntimeError:
-        if attempt==2:raise
+        if attempt==2:
+            # Exercise the ordinary keyboard path too. Some old WebView builds
+            # report stale touch bounds with Android 15 edge-to-edge windows.
+            # This uses visible focus and Enter, never JS/debug access or DB IO.
+            for key in range(40):
+                adb('shell','input','keyevent','KEYCODE_TAB')
+                if any(folder_button(n.attrib) and n.get('focused')=='true' for n in hierarchy().iter('node')):
+                    adb('shell','input','keyevent','KEYCODE_ENTER')
+                    break
+            wait_node(lambda node:node.get('text') in ['Neuer Ordner','New folder'],10)
 wait_node(lambda node:node.get('class')=='android.widget.EditText' and node.get('focused')=='true')
 adb('shell','input','text',marker)
 wait_node(lambda node:node.get('class')=='android.widget.EditText' and node.get('text')==marker)
