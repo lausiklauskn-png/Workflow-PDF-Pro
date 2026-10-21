@@ -1,7 +1,8 @@
 # Chrome-Transport — Erprobung der gewählten Variante A
 
 Klaus hat Variante A am 20.10.2026 zur Erprobung ausgewählt. Plattformfolge:
-Android/Samsung DeX → Windows → iOS. Geräte- und Chrome-Version sind unbekannt.
+Android/Samsung DeX → Windows → iOS. Klaus nennt inzwischen Galaxy Tab S6 und
+Galaxy S21 als Zielgeräte; genaue Android-/Chrome-/WebView-Versionen sind ungemessen.
 
 Neueste Nutzerweisung in der Fortsetzung vom 21.10.2026: Die zusätzliche
 Vordergrunddienstentscheidung ist wieder ausdrücklich offen. Das überstimmt die

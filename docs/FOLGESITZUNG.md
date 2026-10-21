@@ -20,6 +20,11 @@ Warteschlange ist weiterhin nicht gegen Prozessende gesichert. Tresor-/Migration
 und Chrome-Produktanbindung bleiben offen. Details, der zuvor fehlgeschlagene
 Lauf und dessen korrigierter Listenervertrag stehen am Ende des Baustands.
 
+Zielgeräte inzwischen vom Nutzer genannt: Samsung Galaxy Tab S6 und Galaxy S21,
+nach seiner Auskunft möglichst aktuell gehalten. Exakte Android-/One-UI-/Chrome-/
+WebView-Versionen noch nicht gemessen. Keine reale Installation oder Abnahme
+daraus ableiten. Tablet/DeX und Telefon in der Geräteabnahme berücksichtigen.
+
 Zuerst `AGENTS.md`, den vollständigen Nachfolgebrief und die aktuellen Dateien
 unter `docs/portierung/` lesen. Quellrepo und `upstream/workflow-pdf` unverändert
 lassen. Das Ziel bleibt die vollständige reguläre native App; ein gebauter Host

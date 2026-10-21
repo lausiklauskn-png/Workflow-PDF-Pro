@@ -6,6 +6,13 @@ Die unveränderte Quellübernahme und die Ausgangsprüfung sind davon unabhängi
 
 ## Zielsysteme
 
+Aktuelle Geräteangabe von Klaus in dieser Fortsetzung vom 21.10.2026:
+**Samsung Galaxy Tab S6 und Samsung Galaxy S21**. Er versucht beide jeweils
+aktuell zu halten. Exakte Modellvariante, Android-/One-UI-, Chrome- und Android-
+System-WebView-Version sind nicht gemessen; aus „neueste Version“ keine konkrete
+Versionsnummer ableiten. Tablet/DeX und Telefon als reale Abnahmeziele aufnehmen.
+Die bisherigen Android-15-Emulatorfälle sind weiterhin keine Geräteprüfung.
+
 Festgehaltene Reihenfolge aus Klaus’ Antwort vom 20.10.2026: **zuerst Android/Samsung DeX, danach Windows, anschließend iOS**. Die Formulierung der ersten Antwort wird im Kontext als Bestätigung von Android/DeX verstanden; genaue Geräte-, Android- und Chrome-Version sind weiterhin unbekannt. Native iOS-Auslieferung benötigt Apple-Werkzeuge,
 Signierung und Geräteprüfung; Windows/macOS/Linux eigene Plattformadapter und
 Installer. Linux-Browserprüfungen beweisen keine dieser nativen Ausgaben.
