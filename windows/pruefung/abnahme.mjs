@@ -41,14 +41,23 @@ for (let i = 0; i < 60 && !browser; i++) {
 }
 if (!browser) throw new Error('WebView2 nicht per CDP erreichbar');
 const pages = () => browser.contexts().flatMap(c => c.pages());
+// Rohliste aller WebView2-Ziele, unabhängig davon, was Playwright schon verbunden hat.
+const targets = () => fetch('http://127.0.0.1:9222/json').then(r => r.json()).then(list => list.map(t => t.type + ':' + t.url)).catch(e => ['CDP: ' + e.message]);
 async function findPage(test, ms = 60000) {
   const end = Date.now() + ms;
+  let reconnected = false;
   while (Date.now() < end) {
     const page = pages().find(p => test(p.url()));
     if (page) return page;
+    // Ein neues Fenster, das Playwright noch nicht kennt: neu verbinden.
+    if (!reconnected && (await targets()).some(t => test(t.replace(/^[a-z_]+:/, '')))) {
+      reconnected = true;
+      browser = await chromium.connectOverCDP('http://127.0.0.1:9222', { timeout: 10000 });
+      continue;
+    }
     await sleep(500);
   }
-  throw new Error('Fenster nicht gefunden; offen: ' + pages().map(p => p.url()).join(', '));
+  throw new Error('Fenster nicht gefunden; Playwright: ' + pages().map(p => p.url()).join(', ') + ' | WebView2: ' + (await targets()).join(', '));
 }
 const isMain = url => /^https:\/\/tauri\.localhost\/(index\.html)?(\?.*)?$/.test(url);
 let page = await findPage(isMain);
@@ -152,7 +161,11 @@ if (phase === 'erst') {
     const before = await docs();
     await page.evaluate(() => { void WFPNativeVault.manage(); });
     await clickText('Ordner wählen');
-    await password(PASSWORT);
+    try { await password(PASSWORT); }
+    catch (error) {
+      const info = await page.evaluate(async () => ({ state: await Capacitor.Plugins.WorkflowVault.state({}).catch(e => e.message), dialoge: [...document.querySelectorAll('dialog[open]')].map(d => d.textContent.slice(0, 160)) })).catch(e => e.message);
+      throw new Error(error.message + ' | Zustand: ' + JSON.stringify(info));
+    }
     await clickText('Übernahme starten');
     await sleep(3000);
     await ready();
@@ -171,7 +184,7 @@ if (phase === 'erst') {
     const before = await docs();
     spawn(env('WFP_APP_EXE'), [file], { detached: true, stdio: 'ignore' }).unref();
     await page.waitForSelector('#nativeIncoming button', { state: 'attached', timeout: 60000 });
-    const button = page.locator('#nativeIncoming button', { hasText: 'Einlesen' });
+    const button = page.locator('#nativeIncoming').getByRole('button', { name: 'Einlesen', exact: true });
     const sichtbar = await button.isVisible();
     const offen = await page.evaluate(() => [...document.querySelectorAll('dialog[open]')].map(d => d.textContent.slice(0, 80)));
     await button.click({ timeout: 10000 }).catch(() => button.evaluate(b => b.click()));
