@@ -1,6 +1,10 @@
 # Workflow PDF Pro
 
-**[Android-APK 1.0.0 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.0/Workflow-PDF-Pro-1.0.0.apk)** · [Erstinstallation](docs/ANDROID-START.md)
+**[Android-APK 1.0.1 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.1/Workflow-PDF-Pro-1.0.1.apk)** · [Erstinstallation](docs/ANDROID-START.md)
+
+Version 1.0.1 enthält das bestätigte Pro-Icon: roter Hintergrund bis außen,
+weicher weißer Verlauf, großer W-Floh und rotes „PDF Pro“ auf dem Zettel.
+Als Update über die vorhandene App installieren; vorher nicht deinstallieren.
 
 Native Android-App mit dem vollständigen
 [Workflow PDF](https://github.com/lausiklauskn-png/Workflow-PDF)-Kern.
@@ -21,8 +25,8 @@ geschütztem Hin-/Rücktransport oder freiwillig über bestehende KI-Anbieter mi
 eigenem Schlüssel möglich. Der Chrome-Weg verwendet die gewählte sichtbare
 Laufmeldung mit Abbruch; Reinigung und Bestätigung bleiben erhalten.
 
-Die reguläre APK 1.0.0 ist nach vollständiger Freigabeprüfung, bestehender Signatur
-und erfolgreicher Produktionsinstallation unter [Releases](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.0)
+Die reguläre APK 1.0.1 ist nach vollständiger Freigabeprüfung, bestehender Signatur
+und erfolgreicher Produktionsinstallation unter [Releases](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.1)
 verfügbar. Aktueller Stand und tatsächliche Nachweise:
 [Android-Baustand](docs/portierung/BAUSTAND-ANDROID.md). Die erste physische
 Geräteabnahme ist für Samsung Galaxy Tab S6 und S21 vorgesehen. Windows und iOS

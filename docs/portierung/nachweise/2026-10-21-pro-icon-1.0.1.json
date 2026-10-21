@@ -1,0 +1,151 @@
+{
+  "version": "1.0.1",
+  "versionCode": 2,
+  "commit": "46ee4ce18ccafd13f206be5b8ee9fca293d7443c",
+  "nativeAcceptance": {
+    "run": 39630794393,
+    "attempt": 2,
+    "gateJob": 119339858010,
+    "reports": [
+      {
+        "artifact": "native-acceptance-31-1",
+        "commit": "46ee4ce18ccafd13f206be5b8ee9fca293d7443c",
+        "api": 31,
+        "webview": {
+          "package": "com.google.android.webview",
+          "version": "124.0.6367.219"
+        },
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reinstallPreservesData": true,
+        "classes": [
+          "FolderImportTest",
+          "IncomingFilesTest",
+          "IncomingInboxTest",
+          "NativeChromeTest",
+          "NativeCoreProductTest",
+          "NativeDocumentVaultTest",
+          "NativeFoundationTest",
+          "NativeIncomingTest",
+          "NativeOutputTest",
+          "NativePickerProductTest",
+          "NativeSpeechTest",
+          "NativeTranslateTest",
+          "NativeVaultProductTest"
+        ],
+        "sourceCommit": "7227c543d4a536cf8f3354a56fbba7574645703e",
+        "kind": "actual Android instrumentation; camera/speech activity fixtures are synthetic; local ML translation, OCR and scanner model are real"
+      },
+      {
+        "artifact": "native-acceptance-35-2",
+        "commit": "46ee4ce18ccafd13f206be5b8ee9fca293d7443c",
+        "api": 35,
+        "webview": {
+          "package": "com.google.android.webview",
+          "version": "124.0.6367.219"
+        },
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reinstallPreservesData": true,
+        "classes": [
+          "FolderImportTest",
+          "IncomingFilesTest",
+          "IncomingInboxTest",
+          "NativeChromeTest",
+          "NativeCoreProductTest",
+          "NativeDocumentVaultTest",
+          "NativeFoundationTest",
+          "NativeIncomingTest",
+          "NativeOutputTest",
+          "NativePickerProductTest",
+          "NativeSpeechTest",
+          "NativeTranslateTest",
+          "NativeVaultProductTest"
+        ],
+        "sourceCommit": "7227c543d4a536cf8f3354a56fbba7574645703e",
+        "kind": "actual Android instrumentation; camera/speech activity fixtures are synthetic; local ML translation, OCR and scanner model are real"
+      }
+    ],
+    "retainedSuccessfulFirstAttempt": [
+      "source-and-product",
+      "webview-runtime",
+      "android-product (31, pixel_c)"
+    ]
+  },
+  "additionalFoundation": {
+    "run": 39630793961,
+    "attempt": 2,
+    "androidJob": 119334079030,
+    "tests": 47,
+    "result": "success",
+    "retainedSuccessfulFirstAttempt": [
+      "web-core",
+      "previous-failure-context"
+    ]
+  },
+  "firstAttemptFailures": [
+    {
+      "run": 39630793961,
+      "job": 119328866498,
+      "detail": "SocketException: Connection reset in Chrome negative-origin test; repeated unchanged and passed."
+    },
+    {
+      "run": 39630794393,
+      "job": 119329906747,
+      "detail": "47 product cases passed; UIAutomator dump then returned nonzero during reinstall UI check; repeated unchanged and passed."
+    },
+    {
+      "run": 39634219828,
+      "job": 119343921364,
+      "detail": "Signed APK created; first visible UI lookup returned no labels within its timeout. No release published in that attempt. Repeated unchanged and passed."
+    }
+  ],
+  "physicalSamsungAcceptance": false,
+  "chromeMenuGoogleTranslationMeasured": false,
+  "receipt": {
+    "applicationId": "de.familyprojekt.workflowpdf.pro",
+    "versionName": "1.0.1",
+    "versionCode": 2,
+    "commit": "46ee4ce18ccafd13f206be5b8ee9fca293d7443c",
+    "certificateSha256": "0da805c9ad11ded86227fa4398e9237766f9f2d12bec66d65cb20309cbea3837",
+    "apkSha256": "86f9f55bb519e446359a6c33bd42545870a3e7c712cd7552fe50a2dbe4c549a2",
+    "filename": "Workflow-PDF-Pro-1.0.1.apk"
+  },
+  "installation": {
+    "applicationId": "de.familyprojekt.workflowpdf.pro",
+    "apkSha256": "86f9f55bb519e446359a6c33bd42545870a3e7c712cd7552fe50a2dbe4c549a2",
+    "commit": "46ee4ce18ccafd13f206be5b8ee9fca293d7443c",
+    "versionCode": 2,
+    "api": 31,
+    "firstInstall": true,
+    "reinstallPreservesData": true,
+    "developmentProbe": false,
+    "probe": "visible WebView UI; folder retained across signed APK reinstall; no debug JS access"
+  },
+  "bytes": 83110198,
+  "independentSha256": "86f9f55bb519e446359a6c33bd42545870a3e7c712cd7552fe50a2dbe4c549a2",
+  "signatureVerified": true,
+  "updateIdentityAndVersionVerified": true,
+  "publishedAt": "2026-10-21T16:36:52Z",
+  "release": {
+    "run": 39634219828,
+    "attempt": 2,
+    "publishJob": 119345978713,
+    "buildReusedFromFirstAttempt": true,
+    "draft": false,
+    "prerelease": false,
+    "publicDownloadVerifiedByPublisher": true,
+    "url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.1"
+  },
+  "limits": [
+    "Launcher-mask preview is simulated; no physical Samsung mask measurement.",
+    "Camera/speech provider activities contain synthetic fixtures; native local model, OCR, PDF and vault tests are real.",
+    "Actual Chrome menu Google translation remains physical-device acceptance.",
+    "Debug-only installation receipt still has legacy hardcoded versionCode 1; production versionCode 2 is independently verified using aapt and the signed APK receipt.",
+    "Same-APK reinstall with retained data was executed. Old-to-new APK update compatibility was verified using unchanged certificate/application ID and increased version/build; no separate physical upgrade test is claimed."
+  ]
+}

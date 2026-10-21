@@ -977,3 +977,54 @@ Auch der native Startbildschirm verweist auf dasselbe adaptive Pro-Icon, damit
 beim Öffnen nicht noch das alte eingerahmte Symbol erscheint. Das alte
 Originalbild bleibt als unveränderte Datei erhalten. Hierdurch entsteht ein
 neuer exakter Prüfcommit; die Freigabe wird dafür vollständig neu ausgeführt.
+
+### Pro-Icon 1.0.1 tatsächlich veröffentlicht
+
+Regulärer Release **v1.0.1**, versionCode **2**, unveränderlicher App-/Tag-Commit
+`46ee4ce18ccafd13f206be5b8ee9fca293d7443c`.
+[APK direkt herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.1/Workflow-PDF-Pro-1.0.1.apk).
+83.110.198 Bytes, SHA-256
+`86f9f55bb519e446359a6c33bd42545870a3e7c712cd7552fe50a2dbe4c549a2`.
+
+Klaus hat die Pro-Gestaltung ausdrücklich bestätigt: roter Hintergrund bis an
+alle Außenkanten, weißer weicher Verlauf ins Rot hinter dem größeren W-Floh,
+rotes „PDF Pro“ auf dem Zettel. Der Floh steht mit kleinem Abstand innerhalb der
+Android-Maske. Originalmotivdatei und Quellrepo bleiben erhalten; die neue Grafik
+liegt getrennt in `drawable-nodpi/workflow_pro_icon.png`. Adaptives Icon und
+Startbildschirm verwenden denselben neuen Pro-Entwurf. Der zuerst versuchte
+inset-Rahmenentwurf wird nicht ausgeliefert. Keine weitere Gestaltungsfrage nötig.
+
+[Vollständige neue Freigabe 39630794393](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39630794393),
+Versuch 2, native-smoke `119339858010`: Originalkette, 33 Browserfälle, elf
+Chrome-Helferfälle, 49 Speicher-/Release-/Berichtsfälle und je **47 native Fälle
+auf API31/API35**, null Fehler/Skips sowie sichtbare Installation mit Datenerhalt.
+API31, Quelle und Laufzeit stammen aus dem erfolgreichen Erstversuch; Telefon
+wurde unverändert erneut ausgeführt. Zusätzlicher Grundlagenlauf `39630793961`
+ist nach unveränderter gezielter Wiederholung ebenfalls erfolgreich.
+
+[Regulärer Release 39634219828](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39634219828),
+Versuch 2, Publishjob `119345978713`, erfolgreich: vorhandene Signieridentität,
+echte signierte Produktionsinstallation auf API31 und Neuinstallation mit
+erhaltenem Ordner, `developmentProbe:false`, `versionCode:2`, öffentlicher
+Download bytegleich geprüft. Derselbe Download wurde lokal erneut gehasht und
+mit apksigner auf v2/v3 sowie den unveränderten öffentlichen Zertifikats-Pin
+geprüft. Der Build stammt aus dem erfolgreichen ersten Releaseversuch.
+
+Erste Fehler nicht verbergen: zusätzlicher Chrome-Negativtest mit Socket-Reset;
+Telefon: 47 Produktfälle erfolgreich, danach UIAutomator-Dump mit Fehlercode;
+erste signierte Produktionsprüfung: noch keine sichtbaren UI-Labels innerhalb
+der Abfragefrist. Diese Versuche waren keine Freigaben und erzeugten keinen
+Release. Die gezielten Wiederholungen desselben unveränderten Commits bestanden.
+Rohdaten und Grenzen: `docs/portierung/nachweise/2026-10-21-pro-icon-1.0.1.json`.
+
+Update direkt über die vorhandene App installieren, vorher nicht deinstallieren.
+Der tatsächliche Erhalt wurde bei Neuinstallation derselben APK geprüft;
+Kompatibilität zum vorigen Release durch Signatur/App-ID und höhere Version.
+Keine zusätzliche physische Alt-zu-Neu-Upgradeprüfung behaupten. Die simulierte
+Kreis-/Squircle-/Rundquadratvorschau ist keine physische Samsung-Messung.
+Geräteabnahmen, Windows und iOS bleiben wie unten beschrieben offen.
+
+Hinweis für spätere Testpflege: Der Debug-Installationshelfer trägt noch eine
+historisch fest kodierte Buildnummer 1 ein; daraus keine Versionsprüfung ableiten.
+Die Produktionsversion 2 ist durch aapt, Signaturreceipt und tatsächliche
+Produktionsinstallation unabhängig belegt. Keine App-/Signiergates absenken.
