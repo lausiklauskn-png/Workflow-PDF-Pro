@@ -235,3 +235,30 @@ anfordern. Die Signierfreigabe bleibt ausschließlich in Actions, dessen Release
 Workflow alle bisherigen Freigabeprüfungen behält. Noch keinen tatsächlichen
 Git-Brückenlauf oder eine Claude-Veröffentlichung daraus ableiten. Prüfverfahren
 und konkrete Schritte stehen in der Wiederanlaufanleitung.
+
+## Nachgemessen aus Claude Code (2026-10-20, nach der Einrichtung)
+
+Stand `main` `f403aa1`. Gemessen mit `gh api` und dem GitHub-MCP-Werkzeug dieser Sitzung.
+
+| Recht | Ergebnis Claude Code |
+|---|---|
+| Git lesen, Push-Probelauf | ja (`github-access.mjs --probe-write`) |
+| API lesen; Repo-Rechte der Verbindung | ja; `admin/maintain/push` gemeldet, Repo öffentlich |
+| Branches pushen, PRs anlegen | ja |
+| PR mergen | ja – PR #6 am 2026-10-21 auf Klaus' Wort gemergt (`a19d82d`) |
+| Workflow-Läufe und Schritte lesen | ja (Läufe 39472967095 `initialize` und 39473308583 `check` grün gelesen) |
+| Workflow starten (`workflow_dispatch`), **in diesem Repo** | **nein** – `check` per API und per MCP je 403 „Resource not accessible by integration“ |
+| Environments, Secrets, Actions-Einstellungen | **nein** – der Sitzungsproxy sperrt diese Pfade; ob das Secret da ist, belegt nur ein grüner `check`-Lauf |
+| Branch-Schutz lesen | nein (403); Rulesets: keine |
+| Releases | 0 vorhanden; Anlegen nicht versucht (keine App). Ausgeliefert wird ohnehin mit dem `GITHUB_TOKEN` des Workflows, nicht mit dem Token einer KI |
+
+Lokale Prüfungen auf `f403aa1`: `test-release-policy` 3/3, `test-identity` 7/7,
+`test-unlock-file` 3/3, `verify-upstream` 191/191 bytegleich. `test-apk` 0/6 –
+`aapt` fehlt, weil `dl.google.com` im Claude-Container gesperrt ist (ungeprüft, nicht rot im Code).
+
+Folge für den gemeinsamen Ablauf: Claude Code kann alles bis auf das **direkte
+Starten** eines Workflows. Codex kann es (Identitäts-`check` Lauf 39501737287, oben).
+Einen Release fordert Claude Code über die Git-Brücke an: `request-release.mjs`
+fällt nach dem 403 auf einen Push nach `release-requests/vX.Y.Z` zurück, sobald
+`release-request.yml` auf main steht. Ein `check` der Identität hat keine solche
+Brücke; den starten Klaus („Run workflow“) oder Codex.
