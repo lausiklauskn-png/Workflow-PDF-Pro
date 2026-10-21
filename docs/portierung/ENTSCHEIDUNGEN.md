@@ -27,6 +27,12 @@ Benötigte Angaben: erstes reales Zielgerät, OS-/Chrome-Version und weitere
 verbindliche Zielsysteme. Erst dann lassen sich die dort tatsächlich verfügbaren
 Sprachpaare, Berechtigungen und Geräteadapter messen.
 
+### Windows-Host gewählt am 21.10.2026
+
+Klaus wählt für die Windows-Ausgabe **Tauri 2** (gemeinsamer Webkern, eigene Windows-Geräteadapter, Installer) statt
+eines Neubaus als eigene Windows-App. Electron bleibt Rückfall, wenn WebView2 gemessen nicht trägt. Auftrag:
+`BRIEF_NACHFOLGE_2026-10-21_WINDOWS.md`.
+
 ## Google-/Chrome-Übersetzung
 
 **Neueste ausdrückliche Entscheidung vom 21.10.2026:** Nach der erneuten

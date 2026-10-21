@@ -26,13 +26,19 @@ kann keine PRs öffnen. Vorschauen und Ergebnisse bekommt er als **Link**.
   abgewandelt. Die Gerätefunktionen hängen in `native/*.js` an Capacitor-Plugins (Android).
 - Für Windows gibt es heute nur die PWA (`https://lausiklauskn-png.github.io/Workflow-PDF/`) in Chrome oder Edge.
 
+## Entschieden: Tauri (Klaus 2026-10-21)
+
+Klaus: *„Ok, dann machen wir Tauri.“* Kein Neubau als eigene Windows-App (C#/WinUI). Der Host ist **Tauri 2** mit
+WebView2. Electron nur noch als Rückfall, falls die Prüfung aus Abschnitt 3 zeigt, dass PDF-Verarbeitung,
+Texterkennung oder Übersetzung in WebView2 nicht tragen; das dann mit Messung an Klaus melden, nicht still wechseln.
+
 ## 3. Vor dem Bauen: kurzer Plan an Klaus, mit Empfehlung
 
 Plan-vor-Code gilt. Diese Punkte entscheidet Klaus. Jeweils eine Empfehlung geben, in einfachen Worten:
 
 | Frage | Möglichkeiten | Hinweis |
 |---|---|---|
-| Host | **Tauri 2** (WebView2 von Windows, kleine Datei) · Electron (eigenes Chromium, ~100 MB mehr) | Bei Tauri auch prüfen, ob WebView2 `Translator`/`window.print`/Dateiauswahl genauso kann wie die Android-WebView. Messen, nicht annehmen. |
+| Host | **entschieden: Tauri 2** (WebView2 von Windows, kleine Datei); Electron nur als Rückfall | Bei Tauri auch prüfen, ob WebView2 `Translator`/`window.print`/Dateiauswahl genauso kann wie die Android-WebView. Messen, nicht annehmen. |
 | Paket | MSI oder NSIS-Setup (`.exe`) · MSIX | Ohne Code-Signatur warnt Windows SmartScreen („Unbekannter Herausgeber“). |
 | Signatur | zunächst unsigniert mit klarem Hinweis · Zertifikat (OV/EV, kostet jährlich) · Azure Trusted Signing | Kosten und Konto liegen bei Klaus. Nie „von Microsoft geprüft“ schreiben. |
 | Speicherort | Arbeitsdatenbank in `%APPDATA%` + frei gewählter Rechnerordner/USB-Laufwerk als verschlüsselte Hauptablage | Wie unter Android (`SPEICHERORT-UND-TRESOR.md`): Ordnerwechsel ohne Datenverlust, keine stille leere Ersatzbibliothek. |
