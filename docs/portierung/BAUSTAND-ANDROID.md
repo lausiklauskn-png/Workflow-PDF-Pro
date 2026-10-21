@@ -972,3 +972,8 @@ Pro“ auf dem Zettel, vollständige Fühler/Schuhe mit kleinem Abstand. Finaler
 lokaler Bau einschließlich Lint/JVM erfolgreich (151 Aufgaben; 16 ausgeführt,
 135 aktuell). Die Prüfung des zuvor gepushten Rahmenentwurfs ist kein
 Freigabenachweis dieser anschließend gewählten Pro-Grafik.
+
+Auch der native Startbildschirm verweist auf dasselbe adaptive Pro-Icon, damit
+beim Öffnen nicht noch das alte eingerahmte Symbol erscheint. Das alte
+Originalbild bleibt als unveränderte Datei erhalten. Hierdurch entsteht ein
+neuer exakter Prüfcommit; die Freigabe wird dafür vollständig neu ausgeführt.
