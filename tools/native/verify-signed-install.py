@@ -41,6 +41,12 @@ if development:
     receipt={'apkSha256':digest,'applicationId':package,'commit':os.environ['GITHUB_SHA'],'versionCode':1}
 else:receipt=json.loads(Path(str(apk)+'.json').read_text())
 assert receipt['apkSha256']==digest and receipt['applicationId']==package
+existing=adb('shell','pm','list','packages',package).splitlines()
+if 'package:'+package in existing:
+    if not development:raise RuntimeError('First-install probe requires a clean dedicated emulator; existing production data is retained')
+    # Remove only this emulator's synthetic debug-suite data. Never remove a
+    # production installation, and retain all data for the following reinstall.
+    adb('uninstall',package)
 adb('install','-r',apk);launch()
 tap(wait_node(lambda node:node.get('text','').strip() in ['＋ Ordner','+ Ordner','＋ Folder','+ Folder']))
 tap(wait_node(lambda node:node.get('class')=='android.widget.EditText'))

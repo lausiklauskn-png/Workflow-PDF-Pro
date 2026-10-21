@@ -7,9 +7,15 @@ import hashlib,json,os,re,subprocess,sys,time
 from pathlib import Path
 
 def adb(*args):
-    result=subprocess.run(['adb',*args],text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=90)
-    if result.returncode:raise RuntimeError((result.stdout+result.stderr)[-3000:])
-    return result.stdout
+    for attempt in range(4):
+        result=subprocess.run(['adb',*args],text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=90)
+        if not result.returncode:return result.stdout
+        if attempt<3:
+            # The SDK image restarts adbd once after its first boot. Reconnect
+            # and repeat the same signature-checked operation, never skip it.
+            subprocess.run(['adb','wait-for-device'],timeout=45,check=True)
+            time.sleep(2)
+    raise RuntimeError((result.stdout+result.stderr)[-3000:])
 def provider():
     state=adb('shell','dumpsys','webviewupdate')
     match=re.search(r'Current WebView package \(name, version\): \(([^,]+), ([^)]+)\)',state)
