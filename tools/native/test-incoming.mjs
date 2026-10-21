@@ -100,5 +100,39 @@ test('native reception with real browser/core and a protocol fixture', async t =
       await page.waitForFunction(() => document.querySelector('#nativeIncoming')?.textContent.includes('تم استلام'));
       assert.equal(await page.evaluate(() => document.querySelector('#nativeIncoming').getBoundingClientRect().right <= innerWidth),true);await page.close();
     });
+    await t.test('working-state receipt retains field values and removal notes but distrusts foreign clean status', async () => {
+      const page=await pageFor();
+      await page.evaluate(async () => {
+        const [seed]=await __wfpdf.importDateien([new File([fixture.data.second],'seed.pdf',{type:'application/pdf'})],null,{still:true});
+        const doc=structuredClone(seed);doc.id='received-working-state';doc.name='Arbeitsstand Мüller';
+        doc.fields=[{id:'field',page:0,type:'text',label:'Name',value:'Мüller',x:10,y:10,w:30,h:5}];
+        doc.kiEntfernt=[{zeit:'2026-10-21',weg:'chrome',seite:1,text:'synthetic',grund:'hidden'}];
+        doc.pruefung={stand:'sauber'};
+        let pdf='';for(const byte of fixture.data.second)pdf+=String.fromCharCode(byte);
+        fixture.data.state=new TextEncoder().encode(JSON.stringify({format:'workfloh-pdf-arbeitsstand',version:1,doc,pdf:btoa(pdf)}));
+        fixture.queue[0].files=[{id:'state',name:'Мüller.workfloh.json',mime:'application/json'}];
+      });
+      await page.locator('#nativeIncoming button').first().click();
+      await page.waitForFunction(() => __wfpdf.S.docs.some(d=>d.id==='received-working-state'));
+      const result=await page.evaluate(async () => ({doc:await WFP.DB.get('docs','received-working-state'),bytes:Array.from(await WFP.DB.getFile('received-working-state')),expected:Array.from(fixture.data.second)}));
+      assert.equal(result.doc.fields[0].value,'Мüller');assert.equal(result.doc.kiEntfernt[0].text,'synthetic');assert.equal(result.doc.pruefung,undefined);assert.deepEqual(result.bytes,result.expected);await page.close();
+    });
+    await t.test('received image keeps exact unexamined original beside generated PDF', async () => {
+      const page=await pageFor();
+      await page.evaluate(async () => {
+        const canvas=document.createElement('canvas');canvas.width=160;canvas.height=220;
+        const ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,160,220);ctx.fillStyle='black';ctx.fillText('Synthetic photo',10,30);
+        const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+        fixture.data.photo=new Uint8Array(await blob.arrayBuffer());
+        fixture.queue[0].files=[{id:'photo',name:'Original Мüller.png',mime:'image/png'}];
+      });
+      await page.locator('#nativeIncoming button').first().click();
+      await page.waitForFunction(() => __wfpdf.S.docs.length===1);
+      const result=await page.evaluate(async () => {
+        const doc=__wfpdf.S.docs[0], original=await WFP.DB.get('files',doc.id+'~original');
+        return {source:doc.quelle,check:doc.pruefung||null,original:Array.from(original.bytes),expected:Array.from(fixture.data.photo),name:original.name,pdf:Array.from((await WFP.DB.getFile(doc.id)).slice(0,5))};
+      });
+      assert.equal(result.source,'foto');assert.equal(result.check,null);assert.deepEqual(result.original,result.expected);assert.equal(result.name,'Original Мüller.png');assert.deepEqual(result.pdf,[37,80,68,70,45]);await page.close();
+    });
   } finally { if(browser)await browser.close();await new Promise(resolve=>server.close(resolve)); }
 });

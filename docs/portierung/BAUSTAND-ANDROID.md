@@ -393,10 +393,12 @@ zweiten Import aus. Kaltstart wird nicht doppelt eingereiht; gleiche Warmstart-
 Aktionen haben unterschiedliche Empfangskennungen und verdrängen einander nicht.
 
 Neu lokal ausgeführt:
-- Gesamter `test:native-web`: 16 Testeinträge bestanden, 0 Fehler/ausgelassen,
-  einschließlich fünf neuer Empfangsgegenproben mit echtem Browser/PDF-/DB-Kern
-  und gestellter Android-Schnittstelle. Nach der letzten Empfangsbestätigungs-
-  und Ereigniskorrektur Empfangsprobe erneut 6/6 inklusive Sammeltest bestanden.
+- Gesamter abschließender `test:native-web`: 18 Testeinträge bestanden,
+  0 Fehler/ausgelassen, einschließlich sieben neuer Empfangsgegenproben mit
+  echtem Browser/PDF-/DB-Kern und gestellter Android-Schnittstelle. Darunter
+  Originalfoto bytegleich neben erzeugtem PDF sowie Arbeitsstand mit Feldwerten/
+  Entfernungsvermerk und verworfenem fremdem „sauber“-Befund. Zuvor kleinerer
+  Lauf mit 16 Einträgen und Wiederholungen der Empfangsprobe mit sechs Einträgen.
   Keine neue echte Android- oder Google-Prüfung daraus ableiten.
 - 35 Codec-/Transport-/Journal-/Startsperren-/Release-Auftragsgegenproben
   bestanden, 0 Fehler/ausgelassen; Schnittstellen dort weiterhin teilweise gestellt.
@@ -405,7 +407,8 @@ Neu lokal ausgeführt:
   Erster Lauf scheiterte an zwei neuen Testaufrufen (`setClipData` liefert void,
   direkter Aufruf der geschützten Basismethode); korrigiert. Die Warmstartprobe
   startet nun tatsächlich Android-Aktivitäten. Fünf neue Instrumentierungsfälle
-  kompilieren; lokal mangels `/dev/kvm`/Zielgerät nicht ausgeführt.
+  kompilieren; abschließender Lauf nach der letzten Intent-Absicherung ebenfalls
+  erfolgreich (24 s). Lokal mangels `/dev/kvm`/Zielgerät nicht ausgeführt.
 - Bestehende eigene GitHub-Verbindung: Git-/API-/Actions-Lesen und Push-Dry-Run
   erfolgreich, Repo meldet Admin-/Pushrechte. Echter Workflow-Dispatch ausgeführt:
   Signieridentitäts-`check` auf main `a19d82d` im

@@ -3,6 +3,11 @@
 Klaus hat Variante A am 20.10.2026 zur Erprobung ausgewählt. Plattformfolge:
 Android/Samsung DeX → Windows → iOS. Geräte- und Chrome-Version sind unbekannt.
 
+Neueste Nutzerweisung in der Fortsetzung vom 21.10.2026: Die zusätzliche
+Vordergrunddienstentscheidung ist wieder ausdrücklich offen. Das überstimmt die
+historische Zustimmung unter Punkt 2 unten. Erneute begründete Auswahl vorgelegt;
+bis zu einer Antwort keinen Dienst aktivieren. Variante A bleibt gewählt.
+
 ## Vorliegende Umsetzung
 
 - `transport.mjs`: ausführbarer **Node-Host für die Linux-Transporterprobung**.
