@@ -856,3 +856,31 @@ der Kombination alter WebView und Android-15-Fensterintegration nicht greifen.
 Auch dabei müssen Dialog, Texteingabe, gespeicherter Ordner und Datenerhalt nach
 APK-Neuinstallation sichtbar nachgewiesen werden. Es gibt keinen JS-/Debug- oder
 direkten Datenbankzugriff und keine Ersetzung eines fehlenden Produktresultats.
+
+## Tatsächliche vollständige Produktnachweise und Artefaktzuordnung
+
+Auf `83ece339fa7a043ee5c80f4e6d79ebdeb95602e8` bestanden im Lauf
+`39612801437` Android 12 und Android 15 jeweils 47 Produktfälle sowie sichtbare
+Erst-/Neuinstallation mit Datenerhalt. Der erste Telefonversuch wurde durch
+„Pixel Launcher isn't responding“ unterbrochen; der frische Telefonjob
+`119274114071` in Versuch 2 bestand alle Fälle und die sichtbare Installation.
+Die erfolgreichen Tablet-/Quellprüfungen wurden bei dieser Wiederholung
+wiederverwendet; sie wurden nicht als neu ausgeführte Versuchs-2-Prüfungen ausgegeben.
+
+Die Aggregation `119279243536` sperrte trotzdem korrekt: download-artifact
+lieferte das alte fehlgeschlagene Telefonpaket `12352470222` (14:09:57) statt
+des neuen erfolgreichen `12352438219` (14:24:48), beide mit demselben Namen.
+Der alte Befund hatte folgerichtig kein erfolgreiches native-35.json. Es wurde
+kein native-smoke-Erfolg behauptet und keine Signierung damit freigegeben.
+
+Berichtspakete tragen nun API und GitHub-Prüfversuch im eindeutigen Namen.
+Die unveränderten Freigabebedingungen (exakter Commit, beide APIs, jeweils
+mindestens 47 echte Fälle, null Fehler/Skips, Neuinstallations-Datenerhalt)
+verwenden ausschließlich den höchsten vorhandenen Versuch je API. Ein dort
+fehlender oder fehlgeschlagener Befund darf nicht durch einen alten Erfolg
+ersetzt werden. Alte Artefakte werden weder gelöscht noch überschrieben.
+Sieben neue echte Dateisystem-Gegenproben einschließlich alter Fehlerpakete,
+fehlendem neuestem Bericht, fremdem Commit und unvollständigem Ergebnis sind
+lokal bestanden; diese Logiknachweise ersetzen keine Android-Produkttests.
+Die App-Implementierung bleibt hierbei unverändert. Der neue CI-Commit muss
+seine vollständige gemeinsame Freigabe erneut tatsächlich bestehen.
