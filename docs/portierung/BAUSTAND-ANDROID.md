@@ -301,3 +301,22 @@ Neu tatsächlich ausgeführt:
 Rohprotokolle dieser Fortsetzung unter `nachweise/2026-10-21-journal*`.
 Keine erneute vollständige Originalkette oder Android-Bau-/Emulatorprüfung in
 diesen lokalen Angaben enthalten; der nächste CI-Lauf ist gesondert zu ergänzen.
+
+### Startsperre für die bevorstehende Produktanbindung
+
+`native/vault-gate.js` ergänzt die noch nicht aktivierte Speicherschicht.
+Bibliotheks- und Jobabfragen warten beim gesperrten Start auf erfolgreiche
+Entsperrung/Wiederaufnahme, statt `null` oder eine leere Liste vorzutäuschen.
+Vor Speicherwechseln wartet die Sperre laufende Datenbankaufrufe ab. Nach einem
+Fehler werden neue Schreibversuche abgewiesen; vor dem Fehler zurückgestellte
+Schreibversuche werden nach Wiederaufnahme verworfen und müssen vom aufrufenden
+Vorgang bewusst wiederholt werden. Das verhindert insbesondere, dass der Kern
+nach einem abgefangenen Job-Lesefehler später einen leeren Job nachschreibt.
+Eingabewerte werden bereits beim Aufruf kopiert, nicht erst nach dem Entsperren.
+
+`node tools/native/test-vault-gate.mjs`: **5/5 neu bestanden**, 0 Fehler/ausgelassen.
+Start mit gesperrtem Job, laufender Schreibvorgang beim Ordnerwechsel, Fehler
+mit anschließendem leeren Job, verspätete Wertänderung und eine bereits wartende
+Mutation nach fehlgeschlagenem Lesen sind getrennt geprüft. Das sind lokale
+Protokoll-/Nebenläufigkeitsprüfungen, keine native Passwortdialog-/Geräteabnahme.
+Die Sperre ist weiterhin eine Factory, keine schon injizierte Startoberfläche.

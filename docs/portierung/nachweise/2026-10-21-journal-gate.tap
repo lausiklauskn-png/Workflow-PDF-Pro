@@ -1,0 +1,13 @@
+✔ locked startup holds library and translation-job reads until a recovered target is ready (1.610866ms)
+✔ pause drains an active operation and prevents queued calls from using the old location (4.783393ms)
+✔ a failed read cannot be followed by overwriting a resumable job before recovery (5.266659ms)
+✔ arguments retain their invocation-time values across unlock and pause (0.428591ms)
+✔ a mutation queued during a pause is cancelled if an older operation fails before recovery (0.40091ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19.987338
