@@ -59,7 +59,7 @@ async function findPage(test, ms = 60000) {
   }
   throw new Error('Fenster nicht gefunden; Playwright: ' + pages().map(p => p.url()).join(', ') + ' | WebView2: ' + (await targets()).join(', '));
 }
-const isMain = url => /^https:\/\/tauri\.localhost\/(index\.html)?(\?.*)?$/.test(url);
+const isMain = url => /^https:\/\/tauri\.localhost\/(index\.html)?(\?[^#]*)?(#.*)?$/.test(url);
 let page = await findPage(isMain);
 const watch = p => p.on('pageerror', e => result.fehler.push(String(e.message)));
 watch(page);
