@@ -814,3 +814,14 @@ lokal erneut ausgeführt und bestanden (7,820 s); die neue CI-Runde bleibt bis z
 ihrem Abschluss offen. Der WebView-Prüfstand desselben Laufs wurde tatsächlich
 vollständig erfasst: Google System WebView 124.0.6367.219 aus dem API-35-SDK,
 unveränderte signaturgeprüfte Pakete und commitgebundene SHA-256-Liste.
+
+Die separate Baugrundlagenprüfung `39607829149` auf demselben `45fb062` ist
+inzwischen vollständig erfolgreich: Originalkette, 33 Browserfälle und **47
+Android-15-Produktfälle**, keine Fehler oder Skips, 167,721 s. Rohannotation:
+`nachweise/2026-10-21-native-output-phone-ci.json`. Die 47 Fälle enthalten die
+neuen Druck-/Chooser-Gegenproben. Der strengere Gesamtfreigabelauf bleibt wegen
+der beschriebenen zusätzlichen Browser-Abbruch-Gegenprobe noch rot; der
+Baugrundlagen-Erfolg ersetzt den vollständigen native-smoke nicht. Die
+Druck-Gegenprobe startet den Layout-Aufruf nun zusätzlich ausdrücklich auf dem
+UI-Thread und verlangt den Rückruf vom Hintergrundarbeiter; diese Verstärkung
+kompiliert lokal erfolgreich und wird in der nächsten Runde ausgeführt.

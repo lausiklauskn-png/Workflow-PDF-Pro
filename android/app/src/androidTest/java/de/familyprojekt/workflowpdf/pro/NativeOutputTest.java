@@ -25,10 +25,10 @@ public final class NativeOutputTest {
         try{
             PdfDocument pdf=new PdfDocument();for(int i=0;i<2;i++){PdfDocument.Page page=pdf.startPage(new PdfDocument.PageInfo.Builder(595,842,i+1).create());Paint paint=new Paint();paint.setTextSize(18);page.getCanvas().drawText("Synthetic print "+i,50,100,paint);pdf.finishPage(page);}try(FileOutputStream out=new FileOutputStream(source)){pdf.writeTo(out);}pdf.close();
             PdfPrintAdapter adapter=new PdfPrintAdapter(source,"Original.pdf");CountDownLatch layout=new CountDownLatch(1);AtomicInteger pages=new AtomicInteger();AtomicReference<String> error=new AtomicReference<>();AtomicBoolean background=new AtomicBoolean();
-            adapter.layoutAsync(new PrintAttributes.Builder().build(),new PrintAttributes.Builder().build(),new CancellationSignal(),new PdfPrintAdapter.LayoutResult(){
+            instrumentation.runOnMainSync(()->adapter.layoutAsync(new PrintAttributes.Builder().build(),new PrintAttributes.Builder().build(),new CancellationSignal(),new PdfPrintAdapter.LayoutResult(){
                 @Override public void finished(PrintDocumentInfo info,boolean changed){pages.set(info.getPageCount());background.set(Looper.myLooper()!=Looper.getMainLooper());layout.countDown();}
                 @Override public void failed(CharSequence message){error.set(message.toString());layout.countDown();}
-            public void cancelled(){error.set("cancelled");layout.countDown();}});assertTrue(layout.await(10,TimeUnit.SECONDS));assertNull(error.get());assertEquals(2,pages.get());assertTrue(background.get());
+            public void cancelled(){error.set("cancelled");layout.countDown();}}));assertTrue(layout.await(10,TimeUnit.SECONDS));assertNull(error.get());assertEquals(2,pages.get());assertTrue(background.get());
             CountDownLatch written=new CountDownLatch(1);AtomicInteger successes=new AtomicInteger();
             try(ParcelFileDescriptor destination=ParcelFileDescriptor.open(output,ParcelFileDescriptor.MODE_WRITE_ONLY|ParcelFileDescriptor.MODE_TRUNCATE)){
                 adapter.writeAsync(destination,new CancellationSignal(),new PdfPrintAdapter.WriteResult(){
