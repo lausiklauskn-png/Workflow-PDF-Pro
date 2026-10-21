@@ -12,15 +12,17 @@ public final class ProIncomingPlugin extends Plugin {
     private final ExecutorService worker=Executors.newSingleThreadExecutor();
     private final ArrayDeque<Batch> queue=new ArrayDeque<>();
     private static final String DELIVERY="de.familyprojekt.workflowpdf.pro.INCOMING_DELIVERY";
+    static final String ACKNOWLEDGED="de.familyprojekt.workflowpdf.pro.INCOMING_ACKNOWLEDGED";
     private static final class Batch {
         final String id;final Intent intent;IncomingFiles files;
         Batch(Intent intent){this.intent=new Intent(intent);id=intent.getStringExtra(DELIVERY);}
     }
     // BridgeActivity invokes onNewIntent for the launch intent after loading
     // plugins. Reading it in load as well would enqueue every cold start twice.
-    @Override protected void handleOnNewIntent(Intent intent){accept(intent);}
+    @Override protected void handleOnNewIntent(Intent intent){accept(((MainActivity)getActivity()).incomingForLaunch(intent));}
     private void accept(Intent intent){
         if(intent==null||!Arrays.asList(Intent.ACTION_SEND,Intent.ACTION_SEND_MULTIPLE,Intent.ACTION_VIEW).contains(intent.getAction()))return;
+        try{if(intent.getBooleanExtra(ACKNOWLEDGED,false))return;}catch(RuntimeException malformed){/* Sanitization below produces a visible error. */}
         Intent delivered;
         try{delivered=IncomingFiles.sanitize(intent);delivered.putExtra(DELIVERY,UUID.randomUUID().toString());}
         catch(Exception malformed){
@@ -28,7 +30,7 @@ public final class ProIncomingPlugin extends Plugin {
             // never crash the exported Activity while its plugins are loading.
             delivered=new Intent(intent.getAction()).putExtra(DELIVERY,UUID.randomUUID().toString());
         }
-        getActivity().setIntent(delivered);Batch batch=new Batch(delivered);
+        ((MainActivity)getActivity()).rememberIncoming(delivered);Batch batch=new Batch(delivered);
         worker.execute(()->{queue.add(batch);notifyListeners("available",new JSObject());});
     }
     @PluginMethod public void pending(PluginCall call){worker.execute(()->{
@@ -52,7 +54,8 @@ public final class ProIncomingPlugin extends Plugin {
         queue.remove();if(batch.files!=null)batch.files.close();
         // Avoid replaying the cold-start intent after an Activity recreation.
         getActivity().runOnUiThread(()->{
-            if(getActivity().getIntent()!=null&&batch.id.equals(getActivity().getIntent().getStringExtra(DELIVERY)))getActivity().setIntent(new Intent(getContext(),MainActivity.class).setAction(Intent.ACTION_MAIN));
+            Intent current=((MainActivity)getActivity()).currentIncoming();
+            if(current!=null&&batch.id.equals(current.getStringExtra(DELIVERY)))current.putExtra(ACKNOWLEDGED,true);
             call.resolve();
         });
     });}

@@ -38,16 +38,16 @@ public final class NativeIncomingTest {
     @Test public void warmStartsWithSameActionRemainDistinctAndKeepNewestLaunchIntent()throws Exception{
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
             until(scenario,"Boolean(window.WFPNativeIncoming && window.__wfpdf)");
-            eval(scenario,"window.__warmEvents=0;window.__listenerReady=false;Capacitor.Plugins.WorkflowIncoming.addListener('available',()=>window.__warmEvents++).then(()=>window.__listenerReady=true);true");
+            eval(scenario,"window.__warmEvents=0;window.__listenerReady=false;Promise.resolve(Capacitor.Plugins.WorkflowIncoming.addListener('available',()=>window.__warmEvents++)).then(()=>Capacitor.Plugins.WorkflowIncoming.pending()).then(()=>window.__listenerReady=true);true");
             until(scenario,"window.__listenerReady===true");
             scenario.onActivity(a->a.startActivity(send()));until(scenario,"window.__warmEvents===1");
             scenario.onActivity(a->a.startActivity(send()));until(scenario,"window.__warmEvents===2");
             until(scenario,"Boolean(document.querySelector('#nativeIncoming button'))");
             eval(scenario,"window.__warm=null;Capacitor.Plugins.WorkflowIncoming.pending().then(async a=>{await Capacitor.Plugins.WorkflowIncoming.acknowledge({id:a.id});const b=await Capacitor.Plugins.WorkflowIncoming.pending();window.__warm={a:a.id,b:b.id};});true");until(scenario,"Boolean(window.__warm)");
             assertEquals("true",eval(scenario,"typeof __warm.b==='string' && __warm.a!==__warm.b"));
-            scenario.onActivity(a->assertEquals(Intent.ACTION_SEND,a.getIntent().getAction()));
+            scenario.onActivity(a->assertFalse(a.currentIncoming().getBooleanExtra(ProIncomingPlugin.ACKNOWLEDGED,false)));
             eval(scenario,"window.__cleared=false;Capacitor.Plugins.WorkflowIncoming.acknowledge({id:__warm.b}).then(()=>window.__cleared=true);true");until(scenario,"window.__cleared===true");
-            scenario.onActivity(a->assertEquals(Intent.ACTION_MAIN,a.getIntent().getAction()));
+            scenario.onActivity(a->assertTrue(a.currentIncoming().getBooleanExtra(ProIncomingPlugin.ACKNOWLEDGED,false)));
         }
     }
     @Test public void realViewIntentStreamsPdfIntoUnchangedCoreWithOriginalAndFormValue()throws Exception{

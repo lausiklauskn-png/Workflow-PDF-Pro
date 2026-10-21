@@ -47,10 +47,16 @@ final class IncomingFiles implements AutoCloseable {
         // sender parcelables, text, nested intents or other private extras.
         try(IncomingFiles files=new IncomingFiles(null,intent)){
             ArrayList<Uri> selected=new ArrayList<>(files.uris.values());
-            Intent clean=new Intent(intent.getAction()).setType(intent.getType()).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Intent clean=new Intent(intent.getAction()).setComponent(intent.getComponent()).setPackage(intent.getPackage()).setType(intent.getType()).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            if(intent.getCategories()!=null)for(String category:intent.getCategories())clean.addCategory(category);
             if(Intent.ACTION_VIEW.equals(intent.getAction()))clean.setDataAndType(selected.get(0),intent.getType());
             else if(Intent.ACTION_SEND.equals(intent.getAction())&&selected.size()==1)clean.putExtra(Intent.EXTRA_STREAM,selected.get(0));
-            else { clean.setAction(Intent.ACTION_SEND_MULTIPLE);clean.putParcelableArrayListExtra(Intent.EXTRA_STREAM,selected); }
+            else if(Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction()))clean.putParcelableArrayListExtra(Intent.EXTRA_STREAM,selected);
+            else {
+                ClipData clips=ClipData.newRawUri("files",selected.get(0));
+                for(int i=1;i<selected.size();i++)clips.addItem(new ClipData.Item(selected.get(i)));
+                clean.setClipData(clips);
+            }
             return clean;
         }
     }

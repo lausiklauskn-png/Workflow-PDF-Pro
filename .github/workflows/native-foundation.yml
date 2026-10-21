@@ -107,7 +107,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
-          script: cd android && ./gradlew --no-daemon --max-workers=2 :app:connectedDebugAndroidTest
+          script: bash tools/native/run-connected.sh
       - name: Native XML-Befunde über GitHub-API lesbar halten
         if: always()
         shell: bash

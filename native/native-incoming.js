@@ -85,7 +85,9 @@
       retry.onclick = () => { panel.remove(); panel = null; show(); }; panel.append(retry); document.body.append(panel);
     }).finally(() => { busy = false; if (requested) { requested = false; show(); } });
   }
-  api.addListener('available', show).catch(() => {});
+  // Capacitor's injected legacy Plugins API returns a synchronous listener
+  // handle; registerPlugin proxies return a promise. Support both contracts.
+  Promise.resolve(api.addListener('available', show)).catch(() => {});
   window.addEventListener('load', show);
   window.WFPNativeIncoming = Object.freeze({ show });
 })();

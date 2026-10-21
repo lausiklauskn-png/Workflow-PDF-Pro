@@ -9,12 +9,14 @@ import androidx.activity.OnBackPressedCallback;
 
 public class MainActivity extends BridgeActivity {
     private static final String RECEIPT_STATE="workflow.incoming.intent";
+    private android.content.Intent incomingReceipt;
+    private boolean restoreIncoming;
     @Override public void onCreate(Bundle state) {
-        // Activity.setIntent alone is not the saved Android relaunch state.
-        // The plugin stores only sanitized routing data in the current intent.
+        // Keep sanitized receipt state independent of Android's launch intent;
+        // changing the latter disrupts Activity lifecycle/launch observers.
         if(state!=null&&state.containsKey(RECEIPT_STATE)){
-            android.content.Intent receipt=state.getParcelable(RECEIPT_STATE);
-            if(receipt!=null)setIntent(receipt);
+            incomingReceipt=state.getParcelable(RECEIPT_STATE);
+            restoreIncoming=incomingReceipt!=null;
         }
         registerPlugin(ProFilesPlugin.class);
         registerPlugin(ProImportPlugin.class);
@@ -46,11 +48,11 @@ public class MainActivity extends BridgeActivity {
     }
     @Override public void onSaveInstanceState(Bundle state){
         super.onSaveInstanceState(state);
-        android.content.Intent current=getIntent();
-        if(current==null)return;
-        if(android.content.Intent.ACTION_MAIN.equals(current.getAction()))
-            state.putParcelable(RECEIPT_STATE,new android.content.Intent(android.content.Intent.ACTION_MAIN));
-        else if(current.hasExtra("de.familyprojekt.workflowpdf.pro.INCOMING_DELIVERY"))
-            state.putParcelable(RECEIPT_STATE,current);
+        if(incomingReceipt!=null)state.putParcelable(RECEIPT_STATE,incomingReceipt);
     }
+    android.content.Intent incomingForLaunch(android.content.Intent delivered){
+        if(restoreIncoming){restoreIncoming=false;return incomingReceipt;}return delivered;
+    }
+    void rememberIncoming(android.content.Intent receipt){incomingReceipt=receipt;}
+    android.content.Intent currentIncoming(){return incomingReceipt;}
 }

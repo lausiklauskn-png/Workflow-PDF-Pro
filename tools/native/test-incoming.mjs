@@ -26,7 +26,9 @@ test('native reception with real browser/core and a protocol fixture', async t =
       await page.addInitScript(mode => {
         const f = window.fixture = { queue:[], data:{}, mode, events:[], acks:[], reads:[], changes:0 };
         window.Capacitor = { isNativePlatform:()=>true, Plugins:{ WorkflowIncoming:{
-          async addListener(name, cb) { f.events.push(cb); return { remove(){} }; },
+          // Match the actual injected Capacitor.Plugins contract, not the newer
+          // registerPlugin promise wrapper. This caught a real native startup gap.
+          addListener(name, cb) { f.events.push(cb); return { remove(){} }; },
           async pending() { return f.queue[0] || { empty:true }; },
           async read({ batch, id, offset }) {
             f.reads.push([batch,id,offset]);

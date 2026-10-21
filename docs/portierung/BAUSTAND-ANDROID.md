@@ -438,3 +438,31 @@ Der Tresor, Migration/Einstellungen, Chrome-Transport, übrige Geräteadapter un
 die gesamte Funktionsmatrix bleiben offen. Keine fertige/signierte APK, kein
 Releasegate verändert. Rohprotokolle dieser Maschine unter `work/`; CI-Nachweis
 für den neuen Commit ist gesondert zu ergänzen.
+
+### Erster neuer CI-Befund und Startkorrektur
+
+[Lauf 39582745003](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39582745003)
+auf `335bf47` bestand den vollständigen Web-Job einschließlich unveränderter
+Originalkette, Bundle/Empfang und Speicher-/Release-Gegenproben. Android-Bau,
+Lint und JVM bestanden; Emulator: **27 ausgeführt, 3 fehlgeschlagen, 0 ausgelassen**.
+Die 24 übrigen Fälle bestanden, einschließlich der vier neuen Empfangs-
+Komponentenfälle. Die drei neuen WebView-Lebenszyklusfälle scheiterten am Start;
+dieser Lauf ist keine bestandene native Gesamtabnahme.
+
+Belegter Fehler im Adapter: Capacitors injizierte `Plugins`-Schnittstelle liefert
+von `addListener` einen synchronen Handle (native-bridge.js:183), während die
+neuere registerPlugin-Schnittstelle ein Promise liefert. Der Adapter rief direkt
+`.catch` auf; die ursprüngliche Browserattrappe war durch `async addListener`
+zu großzügig. Jetzt beide Verträge über Promise.resolve unterstützt und die
+Attrappe auf den tatsächlichen synchronen Vertrag umgestellt. Empfangsprobe
+neu 8/8 bestanden. Kein Android-Erfolg daraus abgeleitet.
+
+Zusätzlich: AndroidX ActivityScenario 1.7.0 ordnet Lifecycle-Ereignisse anhand
+von Aktion, Daten, Typ und Komponente des Startintents zu (veröffentlichter
+Quelltext nachgelesen). Der bereinigte Empfangszustand wird jetzt separat im
+MainActivity-Instanzzustand gehalten, ohne Androids Startintent auszutauschen.
+Ein Bestätigungsmarker verhindert die erneute Kaltstartübergabe; spätere
+Warmstarts bleiben davon unberührt. Senderextras werden weiterhin verworfen,
+Routingdaten erhalten. Der noch nötige neue Emulatorlauf ist gesondert zu
+ergänzen. Die unzugängliche Actions-Logdownload-Domain wurde nicht umgangen;
+konkrete XML-Fehler wurden über die vorhandenen GitHub-Check-Annotationen gelesen.
