@@ -16,7 +16,9 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public final class NativeIncomingTest {
     private Context context;private Uri uri;
-    @Before public void setup(){context=InstrumentationRegistry.getInstrumentation().getTargetContext();String authority=context.getPackageName()+".fixture.documents";context.getContentResolver().call(Uri.parse("content://"+authority),"fixture-reset",null,null);uri=DocumentsContract.buildDocumentUri(authority,"sourceA/one.txt");}
+    private void clear(java.io.File file){java.io.File[] children=file.listFiles();if(children!=null)for(java.io.File child:children)clear(child);file.delete();}
+    @Before public void setup(){context=InstrumentationRegistry.getInstrumentation().getTargetContext();clear(new java.io.File(context.getNoBackupFilesDir(),"incoming-v1"));String authority=context.getPackageName()+".fixture.documents";context.getContentResolver().call(Uri.parse("content://"+authority),"fixture-reset",null,null);uri=DocumentsContract.buildDocumentUri(authority,"sourceA/one.txt");}
+    @After public void cleanup(){clear(new java.io.File(context.getNoBackupFilesDir(),"incoming-v1"));}
     private Intent send(){return new Intent(context,MainActivity.class).setAction(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM,uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_GRANT_READ_URI_PERMISSION);}
     private String eval(ActivityScenario<MainActivity> scenario,String js)throws Exception{
         CountDownLatch latch=new CountDownLatch(1);AtomicReference<String> value=new AtomicReference<>();

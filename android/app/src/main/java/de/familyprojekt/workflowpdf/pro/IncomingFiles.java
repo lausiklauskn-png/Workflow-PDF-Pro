@@ -73,6 +73,12 @@ final class IncomingFiles implements AutoCloseable {
         }
         return out;
     }
+    // Native-only snapshot for an interrupted intake. Never exposed to JS.
+    JSONArray sources()throws Exception {
+        JSONArray entries=describe();
+        for(int i=0;i<entries.length();i++){JSONObject entry=entries.getJSONObject(i);entry.put("uri",uris.get(entry.getString("id")).toString());}
+        return entries;
+    }
     void rewind()throws IOException { if(input!=null)input.close();input=null;reading=null;offset=0;done=false; }
     byte[] read(String ticket,long requested)throws Exception {
         Uri uri=uris.get(ticket);

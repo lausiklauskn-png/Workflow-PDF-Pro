@@ -24,7 +24,7 @@ test('native reception with real browser/core and a protocol fixture', async t =
     async function pageFor(mode = 'ok') {
       const page = await browser.newPage({ viewport:{ width:360, height:740 } });
       await page.addInitScript(mode => {
-        const f = window.fixture = { queue:[], data:{}, mode, events:[], acks:[], reads:[], changes:0 };
+        const f = window.fixture = { queue:[], archive:[], data:{}, mode, events:[], acks:[], reads:[], changes:0 };
         window.Capacitor = { isNativePlatform:()=>true, Plugins:{ WorkflowIncoming:{
           // Match the actual injected Capacitor.Plugins contract, not the newer
           // registerPlugin promise wrapper. This caught a real native startup gap.
@@ -38,11 +38,14 @@ test('native reception with real browser/core and a protocol fixture', async t =
             let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
             return { data:btoa(binary), done:offset+bytes.length>=f.data[id].length };
           },
-          async acknowledge({ id }) {
+          async acknowledge({ id,discard }) {
             if (f.mode === 'ackfail') throw Error('ack failure');
             if (f.queue[0].id !== id) throw Error('wrong batch');
-            f.acks.push(id);f.queue.shift();
-          }
+            f.acks.push(id);const batch=f.queue.shift();if(!discard)f.archive.push(batch);
+          },
+          async history(){return{receipts:f.archive};},
+          async restore({id}){const index=f.archive.findIndex(r=>r.id===id);f.queue.push(f.archive.splice(index,1)[0]);},
+          async discardArchived({id}){f.archive=f.archive.filter(r=>r.id!==id);}
         } } };
       }, mode);
       await page.goto('http://127.0.0.1:' + server.address().port + '/');
@@ -72,6 +75,13 @@ test('native reception with real browser/core and a protocol fixture', async t =
       assert.deepEqual(result.bytes,result.expected);assert.equal(result.check,null);
       assert.deepEqual(result.acks,['batch-1']);assert.equal(result.changes,1);assert.deepEqual(result.offsets,[0,262144,524288]);
       await page.close();
+    });
+    await t.test('acknowledged copies can be offered again explicitly; discarding them preserves imported documents',async()=>{
+      const page=await pageFor();await page.locator('#nativeIncoming button').first().click();await page.waitForFunction(()=>__wfpdf.S.docs.length===2&&!document.getElementById('nativeIncoming'));
+      await page.evaluate(()=>WFPNativeIncoming.history());await page.waitForSelector('dialog.native-vault-dialog section button');
+      await page.locator('dialog.native-vault-dialog section button').first().click();await page.waitForSelector('#nativeIncoming button');
+      assert.deepEqual(await page.evaluate(()=>[__wfpdf.S.docs.length,fixture.changes]),[2,1]);await page.locator('#nativeIncoming button').nth(1).click();
+      await page.waitForFunction(()=>!document.getElementById('nativeIncoming'));assert.deepEqual(await page.evaluate(()=>[__wfpdf.S.docs.length,fixture.changes,fixture.archive.length]),[2,1,0]);await page.close();
     });
     await t.test('later read failure submits nothing, keeps batch and can retry', async () => {
       const page=await pageFor('fail');await page.locator('#nativeIncoming button').first().click();

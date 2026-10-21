@@ -581,3 +581,32 @@ anschließend zwei gereinigte Seiten und PDF mit ursprünglichen Seitenmaßen;
 Benachrichtigungsabbruch verhindert weitere Übergaben. Android-Bau/Lint/JVM
 und Test-APK erfolgreich (28 s). Vier neue native HTTP-/Vordergrunddienstfälle
 sind kompiliert; ihre tatsächliche Emulatorausführung folgt im nächsten CI-Lauf.
+
+## Chrome-Dienstprüfung und dauerhafter Empfang / Spracheingabe
+
+CI `39591894099` auf `f554065afb4388d38d9547e340d0a983d27a8f9a` erfolgreich:
+Originalkette und sämtliche Web-/Speicherprüfungen, Android-Bau/Lint/JVM,
+**35 Android-15-Fälle, 0 Fehler/Skips, 80,834 s**. Enthalten sind die vier neuen
+Loopback-/Vordergrunddienstfälle einschließlich sichtbarer Benachrichtigung,
+Stopp einer wartenden Seite, Schutz gegen alten Abbruch und Systemzeitlimit.
+Rohbefund: `nachweise/2026-10-21-native-chrome-ci.json`. Keine echte Google-
+Übersetzung daraus ableiten.
+
+Neu im Bau: Android-Spracheingabe über die ausgewählte Systemerkennung,
+Mikrofonfreigabe, Zwischen-/Endergebnisse und Ende beim Verlassen der App.
+Der ursprüngliche WFSprechen-Balken und seine Duplikaterkennung bleiben gleich.
+Der native Knopf beschreibt korrekt den Android-Anbieter; kein Offlineversprechen
+und keine Audiodatei. Neue Browserprobe mit gestelltem Sprachdienst bestanden.
+
+Der Eingang erhält eine private, von der Bibliothek getrennte Wiederherstellung:
+komplette Dateien, atomarer Empfangsvermerk, SHA-256 vor Übergabe, mehrere
+Warteschlangeneinträge über Neuerstellung hinweg. Fehlgeschlagene spätere Datei
+wird nicht als vollständige Auswahl geliefert. Nach Importübergabe bleibt eine
+Empfangskopie erhalten, bis der Nutzer sie ausdrücklich verwirft; Wiederherstellen
+und Löschen in den Speichereinstellungen. Keine automatische Doppelübernahme.
+Dies ist eine zusätzliche interne Wiederherstellungskopie, kein Ersatz für den
+gewählten Haupttresor. Es werden ausschließlich app-eigene Empfangskopien gelöscht.
+
+Neue volle lokale Browserprüfung: 29 Einträge bestanden (vor zusätzlichem
+History-UI-Fall). Android-Bau/Lint/JVM/Test-APK erneut erfolgreich (21 s);
+drei neue native Empfangsspeicherfälle kompiliert. Emulatorausführung folgt.
