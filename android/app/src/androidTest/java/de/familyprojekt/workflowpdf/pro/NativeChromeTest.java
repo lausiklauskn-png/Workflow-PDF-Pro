@@ -81,20 +81,24 @@ public final class NativeChromeTest {
         long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(8);AtomicReference<Boolean> value=new AtomicReference<>(false);
         while(System.nanoTime()<end){main(()->value.set(ChromeRuntime.current==null));if(value.get())return;Thread.sleep(50);}fail("Service session still active");
     }
+    private Notification notice()throws Exception{
+        long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(8);
+        while(System.nanoTime()<end){for(android.service.notification.StatusBarNotification notice:context.getSystemService(NotificationManager.class).getActiveNotifications())if(notice.getId()==9301)return notice.getNotification();Thread.sleep(50);}
+        throw new AssertionError("Foreground notification not posted");
+    }
     @Test public void visibleForegroundNotificationCancelsPendingPageAndNeverRestartsAutomatically()throws Exception{
         grant();try(ActivityScenario<MainActivity> activity=ActivityScenario.launch(MainActivity.class)){
             ChromeRuntime.Item item=begin();CompletableFuture<JSONObject> pending=item.session.offer(new JSONArray().put("Test"));
-            android.service.notification.StatusBarNotification[] notifications=context.getSystemService(NotificationManager.class).getActiveNotifications();
-            Notification notice=Arrays.stream(notifications).filter(n->n.getId()==9301).findFirst().get().getNotification();assertTrue((notice.flags&Notification.FLAG_FOREGROUND_SERVICE)!=0);assertEquals("Übersetzung läuft",notice.extras.getString(Notification.EXTRA_TITLE));assertFalse(notice.extras.toString().contains("Test"));
+            Notification notice=notice();assertTrue((notice.flags&Notification.FLAG_FOREGROUND_SERVICE)!=0);assertEquals("Übersetzung läuft",notice.extras.getString(Notification.EXTRA_TITLE));assertFalse(notice.extras.toString().contains("Test"));
             notice.actions[0].actionIntent.send();stopped();assertTrue(pending.isCompletedExceptionally());
             Thread.sleep(300);assertEquals(0,context.getSystemService(NotificationManager.class).getActiveNotifications().length);
         }finally{main(()->{if(ChromeRuntime.current!=null)ChromeRuntime.stop(ChromeRuntime.current.session.id,"TEST_END");});}
     }
     @Test public void staleCancelCannotStopNewSessionAndSystemTimeoutRevokesCurrentTransport()throws Exception{
         grant();try(ActivityScenario<MainActivity> activity=ActivityScenario.launch(MainActivity.class)){
-            ChromeRuntime.Item first=begin();Notification old=context.getSystemService(NotificationManager.class).getActiveNotifications()[0].getNotification();
+            ChromeRuntime.Item first=begin();Notification old=notice();
             ChromeRuntime.Item second=begin();assertNotEquals(first.session.id,second.session.id);old.actions[0].actionIntent.send();
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync();assertFalse(second.session.closed());assertTrue(context.getSystemService(NotificationManager.class).getActiveNotifications().length>0);
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync();assertFalse(second.session.closed());assertNotNull(notice());
             main(()->second.service.onTimeout(second.startId,1));stopped();assertTrue(second.session.closed());
         }finally{main(()->{if(ChromeRuntime.current!=null)ChromeRuntime.stop(ChromeRuntime.current.session.id,"TEST_END");});}
     }

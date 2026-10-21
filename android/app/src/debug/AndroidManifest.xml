@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
+        <service android:name=".FixtureSpeechService" android:exported="true" android:permission="android.permission.BIND_SPEECH_RECOGNITION_SERVICE">
+            <intent-filter><action android:name="android.speech.RecognitionService" /></intent-filter>
+        </service>
         <provider android:name=".FixtureDocuments"
             android:authorities="${applicationId}.fixture.documents"
             android:exported="true" android:permission="android.permission.MANAGE_DOCUMENTS"

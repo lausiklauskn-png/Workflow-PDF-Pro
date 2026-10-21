@@ -79,6 +79,7 @@ final class ChromeRuntime {
         PendingIntent app=PendingIntent.getActivity(context,0,open,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         return new NotificationCompat.Builder(context,CHANNEL).setSmallIcon(de.familyprojekt.workflowpdf.pro.R.drawable.ic_translation)
             .setContentTitle(title).setContentText(text).setOngoing(true).setOnlyAlertOnce(true).setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .setContentIntent(app).addAction(0,cancel,cancelPending).build();
     }
     static void open(Activity activity,Item item)throws Exception{

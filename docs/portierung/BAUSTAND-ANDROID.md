@@ -610,3 +610,38 @@ gewählten Haupttresor. Es werden ausschließlich app-eigene Empfangskopien gel�
 Neue volle lokale Browserprüfung: 29 Einträge bestanden (vor zusätzlichem
 History-UI-Fall). Android-Bau/Lint/JVM/Test-APK erneut erfolgreich (21 s);
 drei neue native Empfangsspeicherfälle kompiliert. Emulatorausführung folgt.
+
+## Lokaler Android-Übersetzer und fortgesetzte native Abnahme
+
+CI `39593366955` auf `de7d1ad1041b68c6c181caa185fab7c6ae1020e8` grün:
+Originalkette und native Browserfälle, Bau/Lint/JVM sowie **38 echte Android-15-
+Fälle, 0 Fehler/Skips, 83,259 s**. Enthält drei neue Empfangsspeicherfälle
+(Wiederanlauf mit zwei Einträgen, beschädigte Kopie abweisen, Teilfehler/Retry).
+Rohbefund `nachweise/2026-10-21-native-recovery-ci.json`. Der parallele PR-Lauf
+der vorherigen Chrome-Revision hatte zwei instabile Befunde: Systembenachrichtigung
+noch nicht gepostet und ausstehender Speicherleser. Nicht als Vollerfolg verschwiegen.
+Die Meldung fordert nun ausdrücklich sofortige Sichtbarkeit; der Test wartet
+begrenzt auf das tatsächliche Posting. Die Startsperre bleibt bei notwendigem
+Präferenz-Neuladen geschlossen und verwendet den endgültigen Migrationszielort.
+Neue Browsergegenprobe zur Startsperre bestanden, genauere native Fehlerdiagnose
+ergänzt. Kein Test abgeschaltet und kein Gate umbenannt.
+
+Der vom Benutzer selbstständig zu vervollständigende lokale Weg erhält die
+Android-Fähigkeitsbrücke `WorkflowTranslate` mit festem `com.google.mlkit:translate:17.0.3`.
+Das ersetzt die im WebView fehlende Browser-Translator-Schnittstelle unterhalb
+der unveränderten Quellfunktionen: sechs DE/EN/RU-Paare, bestehende Wiederholung
+und Satzzerlegung, Gegenprobe und Feldrückweg. Modelle werden beim ersten
+Gebrauch vom SDK heruntergeladen, Dokumenttext wird auf dem Gerät verarbeitet.
+Die Ergebnisse müssen nicht wortgleich mit Chromes Browsermodellen sein.
+SDK-Lizenz und Modell-/Betriebsdaten: Google ML Kit / Google APIs Terms of Service
+(https://developers.google.com/ml-kit/terms). Keine neue kostenpflichtige API,
+kein API-Schlüssel und keine Weiterleitung von Dokumenttext an einen Ersatzdienst.
+Der native Dialog nennt den Weg korrekt „Übersetzer auf dem Gerät“.
+
+Lokaler Android-Gesamtbau/Lint/JVM/Test-APK grün (23 s); neue Browserprobe mit
+gestelltem Modelldienst prüft alle Paare, bestehende Satzzerlegung/Wiederholung
+und Abbruch spät eintreffender Antworten. Sie und die fünf Speicherproduktfälle
+plus Sammeltest bestanden, insgesamt sieben Einträge. Neue echte ML-Kit-
+Modell-/Sechspaarprüfung und Binder-Sprachprüfung mit ausschließlich im Debugbau
+enthaltenem synthetischem Android-Sprachdienst sind kompiliert. Ausführung folgt;
+keine echte Spracherkennung oder Modellübersetzung vorab behauptet.

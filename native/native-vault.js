@@ -82,17 +82,22 @@
   async function boot(){
     await gate.pause();active=null;needed=null;
     const state=await sourceState(), source=await attach(state);
+    let selected=state,bound=source;
     const migration=await api.migration();
     if(migration.location){
       const target=await usable(migration.location);
       await WFPVaultMigration.transfer({bridge:api,records,source,local:await localReady,location:target.location,vaultId:target.id,progress:()=>status('writing')});
-      gate.resume(await attach(target));
-    }else gate.resume(source);
-    if(state.configured&&!WFPVaultPreferences.keys.some(key=>localStorage.getItem(key)!==null)&&localStorage.getItem('wfp_native_preferences_loaded')!==state.id){
-      const info=await api.info({location:state.location,store:'settings',id:'workflow-preferences-v1'});
-      if(info.exists)WFPVaultPreferences.restore((await records.load(state.location,'settings','workflow-preferences-v1',info.hash)).record);
-      localStorage.setItem('wfp_native_preferences_loaded',state.id);await gate.pause();location.reload();return gate.db;
+      selected=target;bound=await attach(target);
     }
+    // Never release startup readers in the small interval before a required
+    // preferences reload. They would otherwise see a ready library that is
+    // immediately navigated away, losing in-flight reads or user actions.
+    if(selected.configured&&!WFPVaultPreferences.keys.some(key=>localStorage.getItem(key)!==null)&&localStorage.getItem('wfp_native_preferences_loaded')!==selected.id){
+      const info=await api.info({location:selected.location,store:'settings',id:'workflow-preferences-v1'});
+      if(info.exists)WFPVaultPreferences.restore((await records.load(selected.location,'settings','workflow-preferences-v1',info.hash)).record);
+      localStorage.setItem('wfp_native_preferences_loaded',selected.id);location.reload();return gate.db;
+    }
+    gate.resume(bound);
     panel?.close();panel?.remove();panel=null;
     return gate.db;
   }

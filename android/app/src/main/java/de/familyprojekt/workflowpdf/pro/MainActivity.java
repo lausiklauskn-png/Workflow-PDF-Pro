@@ -24,6 +24,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(ProVaultPlugin.class);
         registerPlugin(ProChromePlugin.class);
         registerPlugin(ProSpeechPlugin.class);
+        registerPlugin(ProTranslatePlugin.class);
         super.onCreate(state);
         bridge.setWebViewClient(new BridgeWebViewClient(bridge) {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
