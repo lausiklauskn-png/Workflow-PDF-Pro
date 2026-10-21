@@ -2,6 +2,12 @@
 
 **[Android-APK 1.0.1 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.1/Workflow-PDF-Pro-1.0.1.apk)** · [Erstinstallation](docs/ANDROID-START.md)
 
+**[Windows 1.0.1 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.1/Workflow-PDF-Pro-Windows-1.0.1-Setup.exe)** (Windows 10/11, 64 Bit) ·
+[Prüfsumme](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.1/Workflow-PDF-Pro-Windows-1.0.1-Setup.exe.sha256) ·
+[Windows-Baustand](docs/portierung/BAUSTAND-WINDOWS.md). Doppelt anklicken; keine Administratorrechte nötig.
+Noch unsigniert: Bei „Der Computer wurde durch Windows geschützt“ auf „Weitere Informationen“ und dann
+„Trotzdem ausführen“ klicken. Auf einem eigenen Windows-PC ist die App noch nicht gemessen.
+
 Version 1.0.1 enthält das bestätigte Pro-Icon: roter Hintergrund bis außen,
 weicher weißer Verlauf, großer W-Floh und rotes „PDF Pro“ auf dem Zettel.
 Als Update über die vorhandene App installieren; vorher nicht deinstallieren.
@@ -29,8 +35,8 @@ Die reguläre APK 1.0.1 ist nach vollständiger Freigabeprüfung, bestehender Si
 und erfolgreicher Produktionsinstallation unter [Releases](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.1)
 verfügbar. Aktueller Stand und tatsächliche Nachweise:
 [Android-Baustand](docs/portierung/BAUSTAND-ANDROID.md). Die erste physische
-Geräteabnahme ist für Samsung Galaxy Tab S6 und S21 vorgesehen. Windows und iOS
-folgen nach Android.
+Geräteabnahme ist für Samsung Galaxy Tab S6 und S21 vorgesehen. Windows (Tauri 2)
+ist als 1.0.1 veröffentlicht; iOS folgt.
 
 [Erstinstallation und Speicherwahl](docs/ANDROID-START.md) ·
 [Entwicklungsfortsetzung](docs/FOLGESITZUNG.md) ·
