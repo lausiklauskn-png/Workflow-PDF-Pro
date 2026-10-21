@@ -50,6 +50,7 @@ jobs:
             Copy-Item $f.FullName probe-out/
           }
       - name: Still installieren, starten, messen, neu starten, deinstallieren, neu installieren
+        timeout-minutes: 20
         env:
           WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: --remote-debugging-port=9222
         run: |
@@ -57,14 +58,21 @@ jobs:
           $setup = (Get-ChildItem probe-out -Filter *-setup.exe | Select-Object -First 1).FullName
           $appDir = Join-Path $env:LOCALAPPDATA 'Workflow PDF Pro'
           $exe = Join-Path $appDir 'workflow-pdf-pro.exe'
+          function Wait-Run($file, $arguments) {
+            $p = Start-Process -FilePath $file -ArgumentList $arguments -PassThru
+            if (!$p.WaitForExit(180000)) { $p | Stop-Process -Force; throw "Zeitgrenze: $file $arguments" }
+            "Fertig: $file $arguments -> $($p.ExitCode)" | Tee-Object -Append probe-out/ablauf.txt
+          }
           function Start-App { $p = Start-Process -FilePath $exe -PassThru; Start-Sleep 5; return $p }
           function Stop-App { Get-Process workflow-pdf-pro -ErrorAction SilentlyContinue | Stop-Process -Force; Get-Process msedgewebview2 -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; Start-Sleep 3 }
 
-          Start-Process -FilePath $setup -ArgumentList '/S' -Wait
+          Wait-Run $setup '/S'
           if (!(Test-Path $exe)) { Get-ChildItem $appDir -ErrorAction SilentlyContinue; throw "Installation fehlt: $exe" }
           "Installiert: $exe" | Tee-Object -Append probe-out/ablauf.txt
 
           Start-App | Out-Null
+          "App läuft: $((Get-Process workflow-pdf-pro -ErrorAction SilentlyContinue).Count) / WebView2: $((Get-Process msedgewebview2 -ErrorAction SilentlyContinue).Count)" | Tee-Object -Append probe-out/ablauf.txt
+          try { (Invoke-WebRequest http://127.0.0.1:9222/json -UseBasicParsing -TimeoutSec 10).Content | Tee-Object -Append probe-out/ablauf.txt } catch { "CDP: $_" | Tee-Object -Append probe-out/ablauf.txt }
           node windows/probe/probe.mjs erst probe-out/erst.json
           Stop-App
 
@@ -72,10 +80,10 @@ jobs:
           node windows/probe/probe.mjs neustart probe-out/neustart.json
           Stop-App
 
-          Start-Process -FilePath (Join-Path $appDir 'uninstall.exe') -ArgumentList '/S' -Wait
+          Wait-Run (Join-Path $appDir 'uninstall.exe') '/S'
           Start-Sleep 5
           "Nach Deinstallation vorhanden: $(Test-Path $exe)" | Tee-Object -Append probe-out/ablauf.txt
-          Start-Process -FilePath $setup -ArgumentList '/S' -Wait
+          Wait-Run $setup '/S'
           Start-App | Out-Null
           node windows/probe/probe.mjs neuinstallation probe-out/neuinstallation.json
           Stop-App

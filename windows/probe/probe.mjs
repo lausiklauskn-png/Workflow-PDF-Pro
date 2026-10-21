@@ -10,11 +10,17 @@ import { join } from 'node:path';
 
 const [phase = 'erst', out = 'probe-ergebnis.json'] = process.argv.slice(2);
 const result = { phase, zeit: new Date().toISOString(), checks: {}, fehler: [] };
-const ok = (name, value) => { result.checks[name] = value; console.log(name + ': ' + JSON.stringify(value)); };
+const ok = async (name, value) => { result.checks[name] = value; console.log(name + ': ' + JSON.stringify(value)); await writeFile(out, JSON.stringify(result, null, 2)); };
+const step = async (name, fn, ms = 120000) => {
+  console.log('-> ' + name);
+  try { await ok(name, await Promise.race([fn(), new Promise((_, rej) => setTimeout(() => rej(new Error('Zeitgrenze ' + ms + ' ms')), ms))])); }
+  catch (e) { await ok(name, { fehler: String(e?.message || e) }); }
+};
+console.log('Phase ' + phase);
 
 let browser;
 for (let i = 0; i < 60 && !browser; i++) {
-  try { browser = await chromium.connectOverCDP('http://127.0.0.1:9222'); }
+  try { browser = await chromium.connectOverCDP('http://127.0.0.1:9222', { timeout: 10000 }); }
   catch { await new Promise(r => setTimeout(r, 1000)); }
 }
 if (!browser) throw new Error('WebView2 nicht per CDP erreichbar');
@@ -25,9 +31,11 @@ for (let i = 0; i < 60 && !page; i++) {
 }
 if (!page) throw new Error('App-Seite nicht gefunden: ' + browser.contexts().flatMap(c => c.pages()).map(p => p.url()));
 page.on('pageerror', e => result.fehler.push(String(e.message)));
-await page.waitForFunction(() => window.__wfpdf && window.PDFLib && window.WFP?.DB, null, { timeout: 60000 });
+console.log('Seite: ' + page.url());
+await page.waitForFunction(() => window.__wfpdf && window.PDFLib && window.WFP?.DB, null, { timeout: 60000 })
+  .catch(async e => { await ok('kernGeladen', { fehler: e.message, fehlerSeite: result.fehler }); throw e; });
 
-ok('umgebung', await page.evaluate(async () => {
+await step('umgebung', () => page.evaluate(async () => {
   const sw = 'serviceWorker' in navigator ? await Promise.race([
     navigator.serviceWorker.ready.then(r => 'aktiv:' + (r.active?.scriptURL || '?')),
     new Promise(r => setTimeout(() => r('nicht-bereit-nach-15s'), 15000))]) : 'fehlt';
@@ -60,13 +68,15 @@ if (phase === 'erst') {
   const bytes = Buffer.from(await pdf.save());
   const dir = await mkdtemp(join(tmpdir(), 'wfp-')), file = join(dir, 'Formular.pdf');
   await writeFile(file, bytes);
-  await page.setInputFiles('#inDatei', file);
-  await page.waitForFunction(() => window.__wfpdf.S.doc?.fields?.length > 0, null, { timeout: 60000 });
-  ok('einlesen', await page.evaluate(async n => {
+  console.log('-> Datei setzen');
+  await page.setInputFiles('#inDatei', file, { timeout: 30000 });
+  await page.waitForFunction(() => window.__wfpdf.S.doc?.fields?.length > 0, null, { timeout: 60000 })
+    .catch(e => ok('einlesenWarten', { fehler: e.message }));
+  await step('einlesen', () => page.evaluate(async n => {
     const d = window.__wfpdf.S.doc, b = await WFP.DB.getFile(d.id);
     return { seiten: d.pages.length, feld: d.fields[0].value, originalGleich: b.length === n };
   }, bytes.length));
-  ok('ausgabe', await page.evaluate(async () => {
+  await step('ausgabe', () => page.evaluate(async () => {
     const w = window.__wfpdf, r = {};
     for (const m of ['ausfuellbar', 'fest', 'vorlage']) {
       const e = await WFP.Export.exportieren(w.S.doc, w.S.bytes, m);
@@ -75,7 +85,7 @@ if (phase === 'erst') {
     return r;
   }));
   // Texterkennung mit den lokal gebündelten Tesseract-Dateien (WASM + Worker).
-  ok('texterkennung', await page.evaluate(async () => {
+  await step('texterkennung', () => page.evaluate(async () => {
     const t0 = performance.now();
     if (!window.Tesseract) await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'vendor/tesseract/tesseract.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
     const abs = u => new URL(u, location.href).href;
@@ -86,20 +96,21 @@ if (phase === 'erst') {
     const r = await w.recognize(c); await w.terminate();
     return { text: r.data.text.trim(), ms: Math.round(performance.now() - t0) };
   }));
-  ok('pdfjsRender', await page.evaluate(async () => {
+  await step('pdfjsRender', () => page.evaluate(async () => {
     const d = window.__wfpdf.S.doc;
     return { seitenBilder: document.querySelectorAll('canvas').length, seiten: d.pages.length };
   }));
-  await page.screenshot({ path: out.replace(/\.json$/, '.png') });
+  await page.screenshot({ path: out.replace(/\.json$/, '.png'), timeout: 20000 }).catch(e => console.log('Bildschirmfoto: ' + e.message));
 }
 if (phase !== 'erst') {
   await page.waitForFunction(() => window.__wfpdf.S.docs.length > 0, null, { timeout: 30000 }).catch(() => {});
-  ok('datenerhalt', await page.evaluate(async () => {
+  await step('datenerhalt', () => page.evaluate(async () => {
     const docs = window.__wfpdf.S.docs;
     const d = docs[0]; const b = d && await WFP.DB.getFile(d.id);
     return { dokumente: docs.length, feld: d?.fields?.[0]?.value ?? null, originalBytes: b?.length ?? 0 };
   }));
 }
-ok('seitenfehler', result.fehler);
+await ok('seitenfehler', result.fehler);
 await writeFile(out, JSON.stringify(result, null, 2));
-await browser.close().catch(() => {});
+await Promise.race([browser.close().catch(() => {}), new Promise(r => setTimeout(r, 5000))]);
+process.exit(0);
