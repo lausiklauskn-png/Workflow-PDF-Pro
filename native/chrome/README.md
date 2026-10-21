@@ -93,8 +93,10 @@ weiterhin sechs `downloadable`-Paare in Chromium 154, keine geladenen Sprachpake
    ist eine ausführbare Protokollreferenz, keine native Implementierung.
 2. Android-Prozess-/WebView-Lebenszyklus prüfen: Die App darf beim Wechsel zu
    Chrome keine Seite verlieren. Hintergrund-Throttling, Suspendierung und
-   Prozessende sind hier nicht gemessen. Ein zusätzlicher Hintergrunddienst
-   mit Benachrichtigung wäre bei Bedarf gesondert begründet zu besprechen.
+   Prozessende sind hier nicht gemessen. Klaus hat am 21.10.2026 den konkret
+   vorgelegten Vordergrunddienst mit sichtbarer Benachrichtigung und Abbruch
+   ausdrücklich gewählt (ENTSCHEIDUNGEN.md). Noch nicht implementiert; die
+   Entscheidung nicht erneut als offen behandeln und nicht als Gerätenachweis werten.
 3. Auf dem Zielgerät prüfen, ob Chrome die lokale HTTP-Seite tatsächlich
    übersetzt. Nur lokales HTTP freigeben; keine allgemeine Freigabe unsicherer
    Netzwerkübertragungen und keine deaktivierte TLS-Prüfung.
