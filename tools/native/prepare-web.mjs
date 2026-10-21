@@ -9,7 +9,7 @@ export const runtimeRoots = ['assets/', 'vendor/', 'icons/', 'sbkim/', 'beispiel
 export const runtimeFiles = ['index.html', 'sw.js', 'manifest.webmanifest', 'impressum.html',
   'sicherheit.html', 'LICENSE', 'RECHTE.md', 'THIRD_PARTY.md'];
 export const vaultFiles=['vault-codec.js','vault-records.js','vault-journal.js','vault-db.js','vault-gate.js','vault-preferences.js','vault-migration.js','native-vault.js'];
-export const nativeFiles = ['native-bootstrap.js', 'native-files.js', 'native-import.js', 'native-incoming.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
+export const nativeFiles = ['native-bootstrap.js', 'native-files.js', 'native-import.js', 'native-incoming.js', 'native-chrome.js', 'chrome/helper.html', 'chrome/helper.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
 export const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 
 // This allowlist is deliberately independent of a recursive checkout copy.
@@ -58,7 +58,7 @@ export async function prepareWeb(out = join(root, 'www')) {
   // Classic deferred scripts preserve source execution order. The source worker stays intact:
   // model caches and share receipt must remain functional in the native host as well.
   html = replaceOnce(html, '<script defer src="assets/app.js?v=67"></script>',
-    ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js',...vaultFiles].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=67"></script>');
+    ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js',...vaultFiles].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=67"></script>');
   await rm(out, { recursive: true, force: true });
   await mkdir(out, { recursive: true });
   const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding and adapter tags'], files: [] };
@@ -69,7 +69,7 @@ export async function prepareWeb(out = join(root, 'www')) {
     receipt.files.push({ path: file.path, sha256: digest(bytes), sourceSha256: file.sha256 });
   }
   for (const [name, bytes] of adapters) {
-    await mkdir(join(out, 'native'), { recursive: true });
+    await mkdir(dirname(join(out, 'native', name)), { recursive: true });
     await writeFile(join(out, 'native', name), bytes);
   }
   await cp(join(root, 'node_modules/@capacitor/core/LICENSE'), join(out, 'CAPACITOR-LICENSE'));

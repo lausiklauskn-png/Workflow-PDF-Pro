@@ -6,8 +6,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openChromeTransport } from '../../native/chrome/transport.mjs';
 import { chromeTranslator } from '../../native/chrome/adapter.mjs';
-import { chromium } from '/workspace/setup/workflow-pdf-baseline/node_modules/playwright-core/index.mjs';
-import { PDFDocument, StandardFonts, rgb } from '/workspace/setup/workflow-pdf-baseline/node_modules/pdf-lib/cjs/index.js';
+import { chromium } from 'playwright-core';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 function client(session) {
   const url = new URL(session.browserURL), secret = url.hash.slice(1);

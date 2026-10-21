@@ -548,3 +548,36 @@ PDF/Formular/Foto/Job über Verschlüsselung bis zum internen Referenzindex und
 Activity-Neustart sind kompiliert. Deren CI-Ausführung ist gesondert zu ergänzen.
 Keine vollständige App-Abnahme: Chrome-Dienst/Transport, Sprache, weitere
 Gerätefunktionen und reguläre Freigabe bleiben im Bau. Releasegates unverändert.
+
+## Neue Speicherprüfung und native Chrome-Anbindung (21.10.2026)
+
+Der vollständige CI-Lauf `39590041226` auf `6291a479cec9a54b1721fa545ec2b007f4efd526`
+ist erfolgreich: Original-Testkette, Browser-/Speichergegenproben, Android-Bau,
+Lint und JVM sowie **31 Android-15-Instrumentierungsfälle, 0 Fehler/Skips,
+52,448 s**. Rohannotation: `nachweise/2026-10-21-native-storage-ci.json`.
+Dies ersetzt die zuvor noch ausstehende Ausführung der vier neuen Speicherfälle.
+
+Neu implementiert ist der gewählte native Vordergrunddienst mit sichtbarer,
+lokalisierter Laufmeldung und sitzungsgebundenem Abbruch. Er startet aus der
+sichtbaren App, verlangt sichtbare Benachrichtigungen, startet nach Prozessende
+nicht selbsttätig und beendet seinen Transport bei Abbruch/Systemzeitlimit.
+Die Datenverbindung öffnet erst beim ersten bereits bereinigten Absatzpaket:
+IPv4-Loopback, zufälliger Port und 256-Bit-Schlüssel nur im URL-Fragment,
+exakte Host-/Origin-Prüfung, keine CORS-Freigabe, keine Fremdressourcen.
+WebView-Cleartext bleibt abgeschaltet. Chrome wird ausdrücklich geöffnet;
+fehlt es, wird kein anderer Übersetzungsanbieter still gewählt.
+
+Der APK-Adapter ersetzt ausschließlich die Chrome-Transportfabrik. Quell-
+Reinigung, Einwilligung, seitenweise Jobs und PDF-Aufbau bleiben bytegleich.
+Der externe Helfer nutzt dieselbe unveränderte Chrome-DOM-Engine. 16 MiB sind
+der explizite technische Paketrahmen, keine Kürzung; eine Überschreitung wird
+als Fehler behandelt. Diese technische Grenze ist noch auf praxistaugliche
+Segmentierung zu prüfen. Kein tatsächlicher Google-Übersetzungslauf behauptet.
+
+Neu lokal bestanden: 15 Browser-/Transport-Testeinträge, davon drei native
+Produktfälle plus Sammeltest mit echter Quell-Reinigung/PDF-Kette und gestellter
+Android-Brücke. Vor Bestätigung kein Text; Abbruch ohne Entfernungsvermerk;
+anschließend zwei gereinigte Seiten und PDF mit ursprünglichen Seitenmaßen;
+Benachrichtigungsabbruch verhindert weitere Übergaben. Android-Bau/Lint/JVM
+und Test-APK erfolgreich (28 s). Vier neue native HTTP-/Vordergrunddienstfälle
+sind kompiliert; ihre tatsächliche Emulatorausführung folgt im nächsten CI-Lauf.

@@ -1,0 +1,44 @@
+{
+  "commit": "6291a479cec9a54b1721fa545ec2b007f4efd526",
+  "run": 39590041226,
+  "check": 119188419395,
+  "conclusion": "success",
+  "annotations": [
+    {
+      "path": ".github",
+      "blob_href": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/blob/6291a479cec9a54b1721fa545ec2b007f4efd526/.github",
+      "start_line": 3,
+      "start_column": null,
+      "end_line": 3,
+      "end_column": null,
+      "annotation_level": "warning",
+      "title": "",
+      "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+      "raw_details": ""
+    },
+    {
+      "path": ".github",
+      "blob_href": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/blob/6291a479cec9a54b1721fa545ec2b007f4efd526/.github",
+      "start_line": 26,
+      "start_column": null,
+      "end_line": 26,
+      "end_column": null,
+      "annotation_level": "notice",
+      "title": "Native Prüfergebnisse",
+      "message": "{'name': 'de.familyprojekt.workflowpdf.pro.FolderImportTest', 'tests': '31', 'failures': '0', 'errors': '0', 'skipped': '0', 'time': '52.448', 'timestamp': '2026-10-21T11:15:34', 'hostname': 'localhost'}",
+      "raw_details": ""
+    },
+    {
+      "path": ".github",
+      "blob_href": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/blob/6291a479cec9a54b1721fa545ec2b007f4efd526/.github",
+      "start_line": 25,
+      "start_column": null,
+      "end_line": 25,
+      "end_column": null,
+      "annotation_level": "notice",
+      "title": "Native Prüfergebnisse",
+      "message": "android/app/build/outputs/androidTest-results/connected/debug/TEST-emulator-5554 - 15-_app-.xml",
+      "raw_details": ""
+    }
+  ]
+}
