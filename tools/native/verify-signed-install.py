@@ -81,7 +81,9 @@ for attempt in range(3):
 wait_node(lambda node:node.get('class')=='android.widget.EditText' and node.get('focused')=='true')
 adb('shell','input','text',marker)
 wait_node(lambda node:node.get('class')=='android.widget.EditText' and node.get('text')==marker)
-stable_tap(lambda node:node.get('text')=='OK')
+# The original dialog implements Enter as its normal save action. Keep keyboard
+# focus in the verified field instead of relying on moving IME/touch bounds.
+adb('shell','input','keyevent','KEYCODE_ENTER')
 wait_node(lambda node:marker in node.get('text',''))
 adb('shell','am','force-stop',package)
 adb('install','-r',apk);launch()
