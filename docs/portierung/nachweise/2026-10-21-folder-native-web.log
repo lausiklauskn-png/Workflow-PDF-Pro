@@ -1,0 +1,39 @@
+
+> workflow-pdf-pro@1.0.0 test:native-web
+> npm run build:web && node --test --test-concurrency=1 tools/native/test-web-bundle.mjs tools/native/test-file-adapter.mjs tools/native/test-folder-import.mjs
+
+
+> workflow-pdf-pro@1.0.0 build:web
+> node tools/native/prepare-web.mjs
+
+Local native bundle: 86 public source files; source 7227c543d4a536cf8f3354a56fbba7574645703e
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+✔ native file adapter simulation: chunks, cancellation, faults, sharing and PDF return (2015.232898ms)
+▶ folder input adapter: unchanged core, nested Unicode paths, abort and inaccessible files
+  ✔ picker cancellation changes no library and dispatches no selection (11.984002ms)
+  ✔ failure in a later file never imports a silently truncated folder (6.759482ms)
+  ✔ abort during a read and an invalid empty chunk dispatch nothing (9.326281ms)
+  ✔ complete selection reaches original library with original PDF bytes and unchecked status (534.848537ms)
+  ✔ translation-folder input retains relative paths and multi-chunk bytes (120.093202ms)
+✔ folder input adapter: unchanged core, nested Unicode paths, abort and inaccessible files (1497.47936ms)
+Local native bundle: 86 public source files; source 7227c543d4a536cf8f3354a56fbba7574645703e
+✔ bundle contains the complete public runtime and unchanged protected files (81.966753ms)
+✔ bundle excludes development material, signing files and private data (2.224497ms)
+✔ generated bundle imports a real form, preserves its original and survives restart (1450.031033ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6236.098511
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice

@@ -144,3 +144,6 @@ Nachfolgend bestand auf `ce950ab` der tatsächliche Android-Emulatorlauf mit elf
 SAF-/Keystore-/Tresorkomponentenfällen und drei WebView-/Dateifällen, einschließlich
 internem Standard und Rückwechsel ohne Verlust der alten Ordnerverbindung.
 Exakte Laufnummer und Grenzen siehe [BAUSTAND-ANDROID.md](BAUSTAND-ANDROID.md).
+
+Statische Speicherzuordnung für die weitere Anbindung: [Speicherinventar](SPEICHERINVENTAR.md).
+Keine bereits ausgeführte Migration oder zusätzliche Speicherentscheidung.

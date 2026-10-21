@@ -197,3 +197,39 @@ bleibt offen. Keine Zustimmung aus Schweigen abgeleitet. Große Ordner müssen
 zusätzlich auf dem Zielgerät hinsichtlich Speicherverbrauch geprüft werden:
 der Webadapter baut die Dateiauswahl vollständig vor der Übergabe auf.
 Keine reguläre APK freigegeben und kein Releasegate abgeschaltet.
+
+### Bestätigter neuer Bau-/CI-Nachweis für `865b768`
+
+Lokaler erneuter Sync und
+`assembleRelease lintRelease testReleaseUnitTest :app:assembleDebugAndroidTest`
+bestanden vollständig. Lint: 0 Fehler, 9 Warnungen; acht JVM-Fälle bestanden,
+keine ausgelassen. Android-Test-APK kompiliert; lokal weiterhin kein ADB-/
+Emulatorlauf. Die Warnungen betreffen bestehende SharedPreferences-/Manifest-/
+Backup-/Ressourcen-/Speicherplatzstellen, keine neue FolderImport-Lintwarnung.
+
+[Actions-Lauf 39569568346](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39569568346)
+auf Implementierungscommit `865b768d70cd302b53dc12c6443c2c3683ee311b`
+ist vollständig erfolgreich: unveränderte Originalkette mit allen 28 Skripten,
+erweiterte Browser-/Dateiadapterfälle, sieben Codec-/Transportfälle und
+Release-Auftragsgegenprobe; Android-Bau, Lint, JVM und Emulator ebenfalls grün.
+Der zusätzliche PR-Lauf 39569577632 bestätigte den Android-Job neu; dessen
+API-lesbare XML-Annotation meldet **20 Tests, 0 Fehler, 0 ausgelassen**.
+Damit sind die vorherigen 14 Android-15-Emulatorfälle plus vier echte
+DocumentsProvider-Ordnerfälle und zwei WebView-/Java-Ordnerfälle bestätigt.
+Der System-Ordnerdialog wird in den zwei Brückenfällen per Instrumentation
+kontrolliert beantwortet; der Provider, Dateistream und WebView sind echt.
+Das ist keine Bedienprüfung eines echten SD-Kartenanbieters oder Zielgeräts.
+
+Die neue statische [Speicherinventur](SPEICHERINVENTAR.md) ordnet Dokumente,
+Originalfotos, `ue:*`-Jobs, Suchindex, Einstellungen, Geheimnisse sowie Modell-/
+Teilen-/Netzspeicher getrennt zu. Ein wichtiger noch zu schließender Fehlerpfad:
+`jobLesen` im Quellkern fängt Lesefehler als `null` ab. Der native Speicheradapter
+muss nicht erreichbare Freigaben vor dem Start eines Übersetzungsjobs sichtbar
+sperren; ein solcher Fehler darf keine Wiederaufnahme durch einen leeren Job
+ersetzen. Der Quellkern wurde nicht geändert.
+
+Die beiden konkret vorgelegten Entscheidungen (Wiederanlaufjournal und
+Chrome-Vordergrunddienst) sind beim Schreiben weiterhin unbeantwortet.
+Keine Migration, kein Vordergrunddienst und kein regulärer APK-Release daraus
+ableiten. Die Speicherarchitektur ist gewählt; deren Journal-/Index-Kopplung
+wird erst nach der konkreten Auswahl eingebaut. Das Releasegate bleibt erhalten.

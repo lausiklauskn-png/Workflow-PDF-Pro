@@ -1,0 +1,15 @@
+✔ vault record preserves binary originals, translation work, fields and shared views without base64 growth (10.429264ms)
+✔ vault record handles graphs, maps, dates, blobs, sparse arrays and prototype-like labels safely (2.119749ms)
+✔ truncation, trailing data, invalid references and unsupported executable values are rejected (1.996376ms)
+✔ multi-chunk records keep originals and resumable translation jobs in their own selected locations (111.915248ms)
+✔ a record replaced between info and its first chunk cannot return bytes of another version (1.14741ms)
+✔ failed chunk or unconfirmed commit aborts staging and keeps the previous complete original (1.705898ms)
+✔ stale versions are rejected before reading and an interrupted read cannot become a valid empty document (0.962937ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 194.73116
