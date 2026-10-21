@@ -4,6 +4,12 @@ Aktueller kopierbarer Nachfolgeauftrag:
 `BRIEF_NACHFOLGE_2026-10-21_APP_FERTIGSTELLEN.md`. Er ergänzt den weiterhin
 verbindlichen Originalbrief vom 20.10.2026.
 
+Neueste Weisung der Fortsetzung: Der Nutzer hat die zusätzliche Chrome-
+Vordergrunddienstentscheidung ausdrücklich als offen bezeichnet. Dies überstimmt
+die historischen Zustimmungsvermerke weiter unten; siehe ENTSCHEIDUNGEN.md.
+Native SEND/VIEW-Anbindung wurde danach unabhängig weitergebaut, aktuelle
+Prüfungen und verbleibende Lebenszyklusgrenzen am Ende von BAUSTAND-ANDROID.md.
+
 Zuerst `AGENTS.md`, den vollständigen Nachfolgebrief und die aktuellen Dateien
 unter `docs/portierung/` lesen. Quellrepo und `upstream/workflow-pdf` unverändert
 lassen. Das Ziel bleibt die vollständige reguläre native App; ein gebauter Host

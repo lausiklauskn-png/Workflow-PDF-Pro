@@ -362,4 +362,66 @@ Ein neuer/leerer Tresor, ein vorhandener eigener Tresor und fehlende Freigaben
 sind unterschiedliche Vorgänge. Fehler dürfen keine interne Ersatzbibliothek
 erzeugen; fremde/konfligierende Kennungen nicht überschreiben. Einstellungen
 explizit anhand SPEICHERINVENTAR.md zuordnen. Alle bereits gewählten Arbeiten
-sind weiterhin autorisiert; keine erneute Journal-/Dienstfreigabe erforderlich.
+sind weiterhin autorisiert. Zur Dienstfreigabe gilt inzwischen die neuere
+ausdrückliche Nutzerweisung der folgenden Fortsetzung.
+
+## Fortsetzung: nativer Dateieingang über SEND / SEND_MULTIPLE / VIEW
+
+Ausgangspunkt `f2fb08a`, main `a19d82d`; zunächst sauberer Arbeitsbaum und alle
+sieben Remotezweige gelesen. Die übrigen Branchspitzen enthalten historische
+Signier-/Rechtedokumentation bzw. sind im Bauzweig enthalten; main ist enthalten.
+Keine vorhandene Arbeit zurückgesetzt, kein Worktree, kein Force-Push. Der erste
+Tracking-Switch meldete wegen des auf main begrenzten Fetch-Refspecs einen Fehler;
+anschließend denselben bereits geprüften Stand mit `switch --no-track` übernommen.
+Arbeitsbaum danach sauber. Quell-main erneut `7227c54`, Herkunft 191/191 bytegleich.
+
+Die aktuelle Nutzerweisung bezeichnet die Chrome-Vordergrunddienstentscheidung
+als offen; sie überstimmt die historischen Zusagen oben. Konkrete Alternativen
+erneut vorgelegt, keine Antwort aus Schweigen abgeleitet und kein Dienst aktiviert.
+
+Neue unabhängige Anbindung: Manifest-Dateizuordnungen, `IncomingFiles`,
+`ProIncomingPlugin` und `native-incoming.js`. Android übergibt ausschließlich
+content-URIs aus SEND/SEND_MULTIPLE/VIEW; JavaScript erhält keine URI, sondern
+befristete Dateitickets. Einzel-/Mehrfachdateien und ClipData-Rückfall werden
+stückweise gelesen, Originalbytes und Namen erhalten. Eine sichtbare Empfangsleiste
+in DE/EN/RU/AR bietet Einlesen oder Verwerfen; der unveränderte `inDatei`-Handler
+übernimmt vollständig gelesene Auswahlen. Er behält die bestehenden Arbeitsstand-,
+PDF-/Bildimporte, Originalfotos und die manuelle Schutzprüfung bei. Kein Prüferpin,
+Quellcode oder Sicherungsformat geändert. Lesefehler geben keinen halben Satz
+Dateien weiter. Bestätigungsfehler nach Übergabe lösen keinen automatischen
+zweiten Import aus. Kaltstart wird nicht doppelt eingereiht; gleiche Warmstart-
+Aktionen haben unterschiedliche Empfangskennungen und verdrängen einander nicht.
+
+Neu lokal ausgeführt:
+- Gesamter `test:native-web`: 16 Testeinträge bestanden, 0 Fehler/ausgelassen,
+  einschließlich fünf neuer Empfangsgegenproben mit echtem Browser/PDF-/DB-Kern
+  und gestellter Android-Schnittstelle. Nach der letzten Empfangsbestätigungs-
+  und Ereigniskorrektur Empfangsprobe erneut 6/6 inklusive Sammeltest bestanden.
+  Keine neue echte Android- oder Google-Prüfung daraus ableiten.
+- 35 Codec-/Transport-/Journal-/Startsperren-/Release-Auftragsgegenproben
+  bestanden, 0 Fehler/ausgelassen; Schnittstellen dort weiterhin teilweise gestellt.
+- Gradle `assembleRelease lintRelease testReleaseUnitTest :app:assembleDebugAndroidTest`
+  im Wiederholungslauf erfolgreich: acht JVM-Fälle, Lint 0 Fehler / 9 Warnungen.
+  Erster Lauf scheiterte an zwei neuen Testaufrufen (`setClipData` liefert void,
+  direkter Aufruf der geschützten Basismethode); korrigiert. Die Warmstartprobe
+  startet nun tatsächlich Android-Aktivitäten. Fünf neue Instrumentierungsfälle
+  kompilieren; lokal mangels `/dev/kvm`/Zielgerät nicht ausgeführt.
+- Bestehende eigene GitHub-Verbindung: Git-/API-/Actions-Lesen und Push-Dry-Run
+  erfolgreich, Repo meldet Admin-/Pushrechte. Echter Workflow-Dispatch ausgeführt:
+  Signieridentitäts-`check` auf main `a19d82d` im
+  [Lauf 39580414181](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39580414181)
+  erfolgreich. Bestehende Identität, kein Secret gelesen/kopiert/neu erzeugt.
+  Echter Releases-Schreibvorgang weiterhin nicht ausgeführt.
+
+Offen: vollständige Geräte-/SD-/DeX-Prüfung, große Eingänge und Speicherverbrauch;
+die Auswahl wird vor Import vollständig im WebView zusammengesetzt. Die native
+Empfangswarteschlange ist noch im Arbeitsspeicher: ein unbestätigter Start-Intent
+kann wieder angeboten werden, mehrere wartende Warmstarts sind noch nicht gegen
+Prozessende gesichert. Nach Übergabe verwaltet der Quellkern seine eigenen
+Importfehler; die Empfangsbestätigung ist keine Zusage, dass alle Dateien als
+Dokumente gespeichert wurden. Keine sichere Exactly-once-Importtransaktion bei
+Prozessabbruch behaupten. Diese Grenzen vor vollständiger Freigabe schließen.
+Der Tresor, Migration/Einstellungen, Chrome-Transport, übrige Geräteadapter und
+die gesamte Funktionsmatrix bleiben offen. Keine fertige/signierte APK, kein
+Releasegate verändert. Rohprotokolle dieser Maschine unter `work/`; CI-Nachweis
+für den neuen Commit ist gesondert zu ergänzen.

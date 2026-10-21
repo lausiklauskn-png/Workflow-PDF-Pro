@@ -22,6 +22,13 @@ Sprachpaare, Berechtigungen und Geräteadapter messen.
 
 ## Google-/Chrome-Übersetzung
 
+**Aktuelle Weisung dieser Fortsetzung vom 21.10.2026:** Klaus bezeichnet die
+zusätzliche Vordergrunddienstentscheidung ausdrücklich wieder als offen. Diese
+neuere Weisung hat Vorrang vor den unten dokumentierten historischen Zusagen.
+Vordergrunddienst und manuelle Rückkehr wurden erneut mit Vor-/Nachteilen und
+Empfehlung vorgelegt; bis zu einer neuen Antwort keine Dienstaktivierung.
+Chrome-Variante A und die bereits gewählte Journalarchitektur bleiben bestehen.
+
 ### Belegtes Problem
 
 `assets/app.js:chromeTabAdresse`, `inChromeOeffnen` und `chromeTabRueckweg`
