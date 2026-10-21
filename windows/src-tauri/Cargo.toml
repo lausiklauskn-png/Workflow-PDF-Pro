@@ -18,3 +18,7 @@ lto = true
 opt-level = "s"
 panic = "abort"
 strip = true
+
+[features]
+# Nur für den GitHub-Prüfbau: öffnet den lokalen Prüfzugang (CDP) für Playwright.
+messprobe = []

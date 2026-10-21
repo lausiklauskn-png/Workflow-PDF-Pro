@@ -39,7 +39,7 @@ jobs:
           cargo --version
       - name: Tauri-App und Installer bauen
         working-directory: windows
-        run: npx tauri build
+        run: npx tauri build --features messprobe
       - name: Installer beschreiben
         run: |
           $files = Get-ChildItem windows/src-tauri/target/release/bundle -Recurse -Include *.exe,*.msi
