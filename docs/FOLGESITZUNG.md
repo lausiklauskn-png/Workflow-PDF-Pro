@@ -108,6 +108,9 @@ Auf dem letzten Implementierungsstand `ce950ab` bestanden im Actions-Lauf
 39513680351 die vollständige Originalkette und der Android-Job mit 14
 Emulatorfällen; das ist keine vollständige native App-Abnahme. Ergebnisse und Grenzen stehen
 in `docs/portierung/BAUSTAND-ANDROID.md`; diesen Stand vor weiteren Aussagen lesen.
-Die zusätzliche Frage zum Vordergrunddienst beim Chrome-Wechsel ist noch offen
-(siehe `docs/portierung/ENTSCHEIDUNGEN.md`), keine Zustimmung aus Schweigen ableiten.
+Die Entscheidungen wurden am 21.10.2026 ausdrücklich beantwortet: verschlüsseltes
+Wiederanlaufjournal und Chrome-Vordergrunddienst mit sichtbarer Benachrichtigung
+und Abbruch sind gewählt (siehe `docs/portierung/ENTSCHEIDUNGEN.md`). Nicht erneut
+als offen behandeln. Die Umsetzung und tatsächliche Geräteabnahme bleiben davon
+getrennt; der neue Journal-/DB-Baustein ist noch nicht im Produkt aktiviert.
 Abhängigkeiten nicht mit `npm ci` während eines Gradle-/Lint-Laufs neu erzeugen.

@@ -1,0 +1,22 @@
+▶ restart replays every interrupted durable write boundary before allowing reads
+  ✔ boundary 1 (7.6638ms)
+  ✔ boundary 2 (1.53985ms)
+  ✔ boundary 3 (1.607712ms)
+  ✔ boundary 4 (1.334525ms)
+  ✔ boundary 5 (1.382925ms)
+  ✔ boundary 6 (0.976911ms)
+✔ restart replays every interrupted durable write boundary before allowing reads (16.33605ms)
+✔ an index quota failure retains the encrypted redo payload and never reports saved (1.098992ms)
+✔ file replacement/deletion invalidates every vector block and preserves the original lifecycle and translation jobs (5.539408ms)
+✔ unreachable/locked storage blocks even translation-job reads and cannot become a missing job or empty library (1.177581ms)
+✔ damaged or foreign journals fail closed without modifying local records (1.139553ms)
+✔ callers cannot mutate queued values; writes and reads retain call order (1.031685ms)
+✔ stale file references are rejected rather than returning a different document version (0.604001ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 33.9029

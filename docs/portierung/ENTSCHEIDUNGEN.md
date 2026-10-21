@@ -64,7 +64,7 @@ wurden für keinen neuen Anbieter behauptet; Arbeitszeiten sind nicht geschätzt
 
 **Entscheidung getroffen:** A — Chrome erhalten, lokalen Hin-/Rücktransport zuerst erproben. Das erlaubt keine heimliche Umstellung auf B/C und ersetzt keine Geräteprüfung. Android/DeX zuerst, Windows danach, iOS anschließend.
 
-### Noch unbeantwortet: Verarbeitung beim Wechsel zu Chrome
+### Gewählt am 21.10.2026: Verarbeitung beim Wechsel zu Chrome
 
 Für lange native Übersetzungen wurde gesondert nachgefragt: empfohlener nativer
 Vordergrunddienst mit sichtbarer Benachrichtigung „Übersetzung läuft“ und Abbruch,
@@ -72,8 +72,28 @@ oder abschnittsweise manuelle Rückkehr zur App. Der Vordergrunddienst benötigt
 Android-Dienstberechtigungen und muss Laufzeit-/Energiespargrenzen einhalten;
 die manuelle Variante verändert den gewohnten Ablauf und benötigt viele Wechsel.
 Chrome-Variante A allein ist keine Zustimmung zu dieser zusätzlichen Umstellung.
-Solange Klaus dazu nicht geantwortet hat, keinen solchen Dienst als gewählt
-behandeln und nicht ungefragt einbauen. Unabhängiger Bau kann weitergehen.
+Klaus hat in der Fortsetzung am 21.10.2026 ausdrücklich den Vordergrunddienst
+mit sichtbarer Benachrichtigung und Abbruch gewählt. Die zuvor offene Zustimmung
+liegt damit vor. Das ist noch kein implementierter Dienst und kein echter
+Chrome-/Gerätenachweis; Laufzeit-, Energie- und Berechtigungsgrenzen bleiben zu prüfen.
+
+### Gewählt am 21.10.2026: verschlüsseltes Wiederanlaufjournal
+
+Klaus wählte ausdrücklich das verschlüsselte Wiederanlaufjournal für die Kopplung
+zwischen hauptsächlichem Dokumenttresor und interner Arbeitsdatenbank. Vorgelegte
+Alternative war ein vollständiger Indexneuaufbau nach einem unterbrochenen
+Schreibvorgang. Das Journal hält eine Operation lokal verschlüsselt im Tresor
+fest, bestätigt dessen Datensätze und stellt danach den internen Index in einer
+Transaktion um. Offene Operationen werden vor weiteren Zugriffen wiederholt;
+Fehler dürfen weder als leere Bibliothek noch als fehlender Übersetzungsjob gelten.
+Zusätzlicher Implementierungs-/Prüfaufwand und zeitweiser Speicher für offene
+Operationen wurden genannt. Offline, ohne neuen Dienst oder Dienstkosten.
+
+Diese Wahl erlaubt die konkrete Journal-/Index-Kopplung. Keine pauschale Freigabe
+für Änderungen am PDF-Kern, Übertragung von API-/Netzschlüsseln oder Änderungen
+am bisherigen Sicherungsformat. Implementierungsstand und Prüfgrenzen stehen in
+BAUSTAND-ANDROID.md. Migration und Speicherwechsel benötigen weiterhin einen
+expliziten Vorgang in der App; die Architekturentscheidung migriert keine Daten.
 
 ## Weitere Grenzen vor einer Änderung
 

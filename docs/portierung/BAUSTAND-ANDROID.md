@@ -233,3 +233,71 @@ Chrome-Vordergrunddienst) sind beim Schreiben weiterhin unbeantwortet.
 Keine Migration, kein Vordergrunddienst und kein regulärer APK-Release daraus
 ableiten. Die Speicherarchitektur ist gewählt; deren Journal-/Index-Kopplung
 wird erst nach der konkreten Auswahl eingebaut. Das Releasegate bleibt erhalten.
+
+## Fortsetzung: gewähltes Wiederanlaufjournal, 21.10.2026
+
+Ausgangspunkt dieser Fortsetzung: sauberer lokaler Checkout `f403aa1`; Remote-
+Zweige vollständig gelesen. Bauzweig inzwischen `2c63afc`, main `a19d82d`;
+main ist im Bauzweig enthalten. Alle sieben Remotezweige wurden verglichen,
+kein Reset, Force-Push oder Worktree. Quell-main erneut unverändert `7227c54`.
+
+Klaus hat in dieser Sitzung ausdrücklich gewählt: **verschlüsseltes
+Wiederanlaufjournal** und **Chrome-Vordergrunddienst mit sichtbarer Benachrichtigung
+und Abbruch**. Die historischen offenen Fragen oben sind damit beantwortet;
+die Funktionen sind durch die Entscheidung allein noch nicht fertig gebaut.
+
+Neue getrennte Bausteine:
+- `native/vault-journal.js`: serielles Redo-Protokoll über den vorhandenen
+  binären Records-/Android-Verschlüsselungsweg. Erst bestätigtes Journal,
+  dann bestätigte Tresoränderungen, dann eine interne Indextransaktion,
+  anschließend ein Abschlussmarker ohne Nutzdaten. Wiederholung ist idempotent;
+  nach einem Fehler bleiben weitere Operationen bis zur Wiederaufnahme gesperrt.
+- `native/vault-db.js`: Factory für den bestehenden asynchronen WFP.DB-Vertrag.
+  PDF-/Original-/Jobdatensätze werden vollständig transportiert; `files` enthält
+  intern nur Versionsreferenzen. Text-/Vektorkopf-/Blockinvalidierung und Löschen
+  des Originalfotos bleiben erhalten. Metadaten behalten Felder, Verknüpfungen
+  und Entfernungsvermerke. Keine localStorage-/API-/SBKIM-Schlüsselübernahme.
+- Die interne Transaktion verwendet unverändert `WorkflohPDF1`, Version 3 und
+  dessen fünf Stores. Das ursprüngliche DB-Objekt wird nicht ersetzt oder geändert.
+
+**Noch nicht produktiv aktiviert:** Factory und Journal sind weder in den
+Bundle-Skripttags noch in MainActivity registriert. Einstellungen, explizite
+Migration/Ordnerwechsel, Übernahme auf ein zweites Gerät, sichere Startsperre
+und Fehleranzeige sowie zugeordnete Einstellungen fehlen noch. Die Library darf
+erst nach deren Einbau auf den neuen Adapter umgeschaltet werden. Ein bloßes
+Factory-/Protokollergebnis ist keine vollständige Tresoranbindung. Der bisherige
+Dateieingang SEND/SEND_MULTIPLE/VIEW ist ebenfalls weiterhin offen; nach Klaus'
+Antwort wurde die Journalschicht vorgezogen. Der Chrome-Dienst ist gewählt,
+noch nicht implementiert. Keine reguläre APK und kein geändertes Releasegate.
+
+Neu tatsächlich ausgeführt:
+- `node tools/native/test-vault-journal.mjs`: **13 Testeinträge bestanden**, 0
+  Fehler/ausgelassen, einschließlich sechs Unterfällen mit Abbruch nach einem
+  dauerhaften Protokollschritt. Fehler nach PDF-Schreiben, Index-Quota, verlorene
+  Bestätigung, gesperrter Speicher, beschädigtes/fremdes Journal, veraltete
+  Dateireferenz, unveränderte Original-/Übersetzungszustände und Aufrufreihenfolge.
+  Der native Transport ist in diesen Protokollfällen gestellt; keine neuen
+  Android-Verschlüsselungs-/Emulatorfälle daraus ableiten.
+- Erweiterte echte Chromium-Bundleprüfung: **3/3 bestanden**, einschließlich
+  realer IndexedDB-Rücknahme bei ungültigem Datensatz und Journalwiederaufnahme
+  nach tatsächlich abgeschlossenem Indexschreiben mit verlorener Bestätigung.
+  PDF-Bytes, Versionreferenz ohne interne PDF-Kopie und Löschung geprüft; die
+  Remote-Schnittstelle ist dabei gestellt. Kein Produktadapter aktiviert.
+- Gesamter vorhandener `test:native-web`-Lauf: **10 Testeinträge bestanden**,
+  0 Fehler/ausgelassen; danach die zuletzt erweiterte Bundleprüfung separat
+  erneut 3/3 bestanden. Die erste Ausführung ohne Sandbox-Netzfreigabe konnte
+  keinen lokalen Testserver öffnen (`listen EPERM`); mit der vorgesehenen
+  Netzfreigabe bestanden, keine Browserrichtlinie umgangen.
+- Herkunftsprüfung erneut **191/191 unverändert**. Syntax und `git diff --check`
+  ohne Befund. Codec-/Record-Transportdateien ebenfalls neu erfolgreich gestartet;
+  deren ursprüngliche Geräteprüfungen bleiben historische Nachweise.
+- Eigene Verbindung: API lesen und Admin-/Pushrechte von GitHub gemeldet,
+  Git lesen und Push-Dry-Run erfolgreich. **Direkter Workflow-Dispatch neu
+  ausgeführt**, vorhandene Identität im
+  [Lauf 39575347257](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39575347257)
+  auf main `a19d82d` erfolgreich geprüft. Keine Schlüsselwerte gelesen oder neu
+  erzeugt. Releases-Schreibvorgang weiterhin nicht ausgeführt.
+
+Rohprotokolle dieser Fortsetzung unter `nachweise/2026-10-21-journal*`.
+Keine erneute vollständige Originalkette oder Android-Bau-/Emulatorprüfung in
+diesen lokalen Angaben enthalten; der nächste CI-Lauf ist gesondert zu ergänzen.

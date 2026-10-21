@@ -112,6 +112,12 @@ sind beauftragt; damit ist keine beliebige Änderung des PDF-Kerns freigegeben.
 API-Schlüssel nicht automatisch in eine Sicherung oder den neuen Dokumenttresor
 übertragen. Ein geänderter Umgang damit benötigt eine eigene konkrete Abstimmung.
 
+Diese konkrete Auswahl liegt seit der Fortsetzung am 21.10.2026 vor: Klaus
+beauftragte das verschlüsselte Wiederanlaufjournal statt eines vollständigen
+Indexneuaufbaus nach Abbruch. Entscheidung und Grenzen stehen in
+`ENTSCHEIDUNGEN.md`; der Protokoll-/DB-Baustein ist begonnen, aber noch nicht
+mit laufender Bibliothek, Einstellungen und Migration verbunden.
+
 Workflow PDF Pro erhält eigene Ordner-/Tresorkennungen und neue eigene
 Datenschlüssel. Keine Private-Brain-Passwörter, Keystore-Aliasse, Konten,
 Mailadapter, Importgrößen oder Polnisch statt Arabisch übernehmen. Der Dokumenttresor

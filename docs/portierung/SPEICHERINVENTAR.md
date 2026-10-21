@@ -5,7 +5,10 @@
 Implementierungsgrundlage, keine bereits ausgeführte Migration oder Freigabe.
 Die gewählte Kombination bleibt interne Arbeitsdatenbank plus verschlüsselter
 Ordner als hauptsächliche dauerhafte Ablage. Die konkrete Wiederanlaufkopplung
-wurde zur Entscheidung vorgelegt; noch nicht eingebaut.
+wurde am 21.10.2026 als verschlüsseltes Wiederanlaufjournal ausdrücklich gewählt;
+noch nicht an die laufende App angebunden. Protokoll-/DB-Bausteine liegen unter
+`native/vault-journal.js` und `native/vault-db.js`; aktuelle Prüfgrenzen siehe
+`BAUSTAND-ANDROID.md`.
 
 | Bestand | Quellstelle | Erhaltung / Grenze der künftigen Anbindung |
 |---|---|---|

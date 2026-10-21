@@ -1,0 +1,12 @@
+Local native bundle: 86 public source files; source 7227c543d4a536cf8f3354a56fbba7574645703e
+✔ bundle contains the complete public runtime and unchanged protected files (94.198007ms)
+✔ bundle excludes development material, signing files and private data (1.792795ms)
+✔ generated bundle imports a real form, preserves its original and survives restart (2988.396089ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3090.261643

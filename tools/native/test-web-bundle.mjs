@@ -77,6 +77,64 @@ test('generated bundle imports a real form, preserves its original and survives 
     await page.reload();
     await page.waitForFunction(() => window.__wfpdf?.S.docs.length === 1);
     assert.deepEqual(await page.evaluate(async id => Array.from(await WFP.DB.getFile(id)), state.id), [...bytes]);
+    // New storage-index boundary with the real, unchanged IndexedDB schema.
+    // This does not activate a vault or simulate a successful Android write.
+    await page.addScriptTag({ path: join(root, 'native/vault-db.js') });
+    const indexResult = await page.evaluate(async () => {
+      const local = await WFPVaultDB.localIndex(WFP.DB);
+      await WFP.DB.put('texte', { id: 'atomic-index', text: 'keep until committed' });
+      let rejected = false;
+      try {
+        await local.commit([
+          { kind: 'delete', store: 'texte', id: 'atomic-index' },
+          { kind: 'put', store: 'docs', record: { /* missing key: abort the entire transaction */ } }
+        ]);
+      } catch { rejected = true; }
+      const preserved = (await WFP.DB.get('texte', 'atomic-index'))?.text;
+      await local.commit([
+        { kind: 'delete', store: 'texte', id: 'atomic-index' },
+        { kind: 'put', store: 'files', record: { id: 'atomic-reference', __wfpVault: { hash: 'synthetic-reference' } } }
+      ]);
+      const removed = await WFP.DB.get('texte', 'atomic-index');
+      const ref = await WFP.DB.get('files', 'atomic-reference');
+      await WFP.DB.del('files', 'atomic-reference'); local.close();
+      return { rejected, preserved, removed: removed === undefined, ref: ref.__wfpVault.hash };
+    });
+    assert.deepEqual(indexResult, { rejected: true, preserved: 'keep until committed', removed: true, ref: 'synthetic-reference' });
+    await page.addScriptTag({ path: join(root, 'native/vault-journal.js') });
+    const replayResult = await page.evaluate(async () => {
+      const local = await WFPVaultDB.localIndex(WFP.DB), values = new Map();
+      // Only the remote protocol is a fixture; local transactions and the DB
+      // wrapper are real. Native encryption has separate Android coverage.
+      const key = (store, id) => JSON.stringify([store, id]);
+      const records = {
+        async save(location, store, record) {
+          values.set(key(store, record.id), structuredClone(record));
+          return { saved: true, hash: 'a'.repeat(64) };
+        },
+        async load(location, store, id) { return { record: structuredClone(values.get(key(store, id))) }; }
+      };
+      const bridge = {
+        async state() { return { location: 'fixture', id: 'fixture-vault', unlocked: true, reachable: true }; },
+        async info({ store, id }) { return { exists: values.has(key(store, id)), hash: 'a'.repeat(64) }; },
+        async remove({ store, id }) { values.delete(key(store, id)); return { saved: true }; }
+      };
+      let loseAck = true;
+      const first = new WFPVaultJournal({ bridge, records, location: 'fixture', vaultId: 'fixture-vault',
+        local: { ...local, async commit(changes) { await local.commit(changes); if (loseAck) { loseAck = false; throw Error('LOST_INDEX_ACK'); } } } });
+      await first.recover();
+      const db = WFPVaultDB.create({ journal: first, local, records });
+      let blocked = false;
+      try { await db.putFile('journal-browser', new Uint8Array([7, 8, 9])); } catch { blocked = first.blocked; }
+      const second = new WFPVaultJournal({ bridge, records, local, location: 'fixture', vaultId: 'fixture-vault' });
+      await second.recover();
+      const restored = WFPVaultDB.create({ journal: second, local, records });
+      const bytes = Array.from(await restored.getFile('journal-browser'));
+      const stored = await WFP.DB.get('files', 'journal-browser');
+      await restored.del('files', 'journal-browser'); local.close();
+      return { blocked, bytes, noInternalBytes: !Object.hasOwn(stored, 'bytes'), reference: stored.__wfpVault.location };
+    });
+    assert.deepEqual(replayResult, { blocked: true, bytes: [7, 8, 9], noInternalBytes: true, reference: 'fixture' });
     assert.deepEqual(errors, []);
     for (const file of ['vendor/scanic/ort-wasm-simd-threaded.mjs', 'vendor/tesseract/lang/rus.traineddata']) {
       const response = await page.request.get('http://127.0.0.1:' + server.address().port + '/' + file);
