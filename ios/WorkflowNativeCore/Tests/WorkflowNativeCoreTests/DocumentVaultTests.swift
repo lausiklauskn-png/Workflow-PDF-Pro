@@ -2,6 +2,36 @@ import XCTest
 @testable import WorkflowNativeCore
 
 final class DocumentVaultTests: XCTestCase {
+    func testRetentionKeepsThreeGenerationsAndDamageStopsCleanup() throws {
+        let local = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: local, withIntermediateDirectories: false)
+        defer { try? FileManager.default.removeItem(at: local) }
+        let root = local.appendingPathComponent("vault")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+        let grant = VaultFolderGrant(metadata: local.appendingPathComponent("grant"))
+        try grant.select(root)
+        let vault = try DocumentVault(folder: VaultFolder(grant: grant), scratch: local.appendingPathComponent("scratch"), checkpoint: local.appendingPathComponent("checkpoint"))
+        try vault.initialize(password: "Test password 123")
+        for value in UInt8(1)...5 {
+            let ticket = try vault.begin(store: "files", id: "file")
+            try vault.append(ticket: ticket, offset: 0, bytes: Data([value]))
+            try vault.finish(ticket: ticket, size: 1)
+        }
+        try vault.prune()
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: root.path).filter { $0.hasPrefix("commit-") }.count, 3)
+        XCTAssertEqual(try vault.read(store: "files", id: "file", offset: 0), Data([5]))
+        for value in UInt8(6)...7 {
+            let ticket = try vault.begin(store: "files", id: "file")
+            try vault.append(ticket: ticket, offset: 0, bytes: Data([value]))
+            try vault.finish(ticket: ticket, size: 1)
+        }
+        let before = Set(try FileManager.default.contentsOfDirectory(atPath: root.path))
+        let oldest = before.filter { $0.hasPrefix("commit-") }.sorted().first!
+        try Data("broken".utf8).write(to: root.appendingPathComponent(oldest))
+        XCTAssertThrowsError(try vault.prune())
+        XCTAssertEqual(Set(try FileManager.default.contentsOfDirectory(atPath: root.path)), before)
+        XCTAssertEqual(try vault.read(store: "files", id: "file", offset: 0), Data([7]))
+    }
     func testWholeVaultRestartBatchFailureAndDamagedNewestGeneration() throws {
         let local = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: local, withIntermediateDirectories: false)
