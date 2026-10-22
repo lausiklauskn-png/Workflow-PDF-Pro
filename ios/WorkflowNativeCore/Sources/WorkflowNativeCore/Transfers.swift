@@ -1,5 +1,7 @@
 import Foundation
 import Darwin
+import CryptoKit
+import UniformTypeIdentifiers
 
 public enum WorkflowError: String, Error {
     case invalidTransfer = "FILE_INVALID_TRANSFER"
@@ -136,6 +138,13 @@ public final class IncomingStore {
     private func path(_ batch: String, _ file: String) -> URL {
         root.appendingPathComponent(batch, isDirectory: true).appendingPathComponent(file)
     }
+    private func digest(_ file: URL) throws -> SHA256.Digest {
+        let handle = try FileHandle(forReadingFrom: file)
+        defer { try? handle.close() }
+        var hash = SHA256()
+        while let bytes = try handle.read(upToCount: Transfers.chunk), !bytes.isEmpty { hash.update(data: bytes) }
+        return hash.finalize()
+    }
     @discardableResult public func receive(_ urls: [URL]) throws -> IncomingBatch {
         guard !urls.isEmpty, urls.count <= 256 else { throw WorkflowError.invalidTransfer }
         var state = try load()
@@ -148,6 +157,7 @@ public final class IncomingStore {
             for url in urls {
                 let values = try url.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey])
                 guard values.isRegularFile == true, values.isSymbolicLink != true else { throw WorkflowError.unavailable }
+                let expected = try digest(url)
                 let id = UUID().uuidString
                 let destination = path(batchID, id)
                 try FileManager.default.copyItem(at: url, to: destination)
@@ -155,9 +165,9 @@ public final class IncomingStore {
                 do { try copied.synchronize(); try copied.close() }
                 catch { try? copied.close(); throw error }
                 let size = try destination.resourceValues(forKeys: [.fileSizeKey]).fileSize!
-                guard size == values.fileSize else { throw WorkflowError.unavailable }
+                guard size == values.fileSize, try digest(destination) == expected else { throw WorkflowError.unavailable }
                 let ext = url.pathExtension.lowercased()
-                let mime = ["pdf": "application/pdf", "json": "application/json", "jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png", "heic": "image/heic"][ext] ?? "application/octet-stream"
+                let mime = UTType(filenameExtension: ext)?.preferredMIMEType ?? "application/octet-stream"
                 files.append(IncomingFile(id: id, name: Transfers.filename(url.lastPathComponent), mime: mime, size: UInt64(size)))
             }
             let batch = IncomingBatch(id: batchID, files: files)
