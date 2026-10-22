@@ -12,7 +12,7 @@ const host = await readFile(new URL('../host.js', import.meta.url), 'utf8');
 await mkdir(new URL('ios/', base), { recursive: true });
 await writeFile(new URL('ios/host.js', base), host);
 html = html.replace(anchor[0], `<script defer src="ios/host.js?v=${hash(host)}"></script>\n${anchor[0]}`);
-const csp = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data: blob:; connect-src 'self' https: wss:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'";
+const csp = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2 https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data: blob:; connect-src 'self' https: wss:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'";
 html = html.replace('<head>', `<head>\n<meta http-equiv="Content-Security-Policy" content="${csp}">`);
 await writeFile(new URL('index.html', base), html);
 receipt.host = 'ios-capacitor';

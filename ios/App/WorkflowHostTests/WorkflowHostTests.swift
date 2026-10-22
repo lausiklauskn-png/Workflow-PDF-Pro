@@ -344,6 +344,16 @@ import Speech
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+    func testOptionalModelRuntimeModuleLoadsFromThePinnedSource() async throws {
+        try await ready()
+        let result = try await js("""
+            const runtime=await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
+            return {pipeline:typeof runtime.pipeline,cache:runtime.env.useBrowserCache,wasm:typeof runtime.env.backends.onnx.wasm};
+            """, seconds: 60) as? [String: Any]
+        XCTAssertEqual(result?["pipeline"] as? String, "function")
+        XCTAssertEqual(result?["cache"] as? Bool, true)
+        XCTAssertEqual(result?["wasm"] as? String, "object")
+    }
     func testSpeechBridgeAvailabilityAndInvalidSessionDoNotStartRecording() async throws {
         try await ready()
         let result = try await js("""
