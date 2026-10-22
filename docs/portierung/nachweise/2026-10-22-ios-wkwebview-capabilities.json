@@ -1,0 +1,12 @@
+{
+  "speech": "function",
+  "indexedDB": true,
+  "modelBytes": 3861738,
+  "worker": "function",
+  "wasm": "object",
+  "translator": "undefined",
+  "origin": "capacitor://localhost",
+  "serviceWorker": false,
+  "caches": "object",
+  "secure": true
+}

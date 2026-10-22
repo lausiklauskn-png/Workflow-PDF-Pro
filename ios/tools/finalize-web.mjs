@@ -1,0 +1,23 @@
+// Run after `cap sync ios`: decorate only the generated Apple bundle.
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+const base = new URL('../App/App/public/', import.meta.url);
+const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+let html = await readFile(new URL('index.html', base), 'utf8');
+const receipt = JSON.parse(await readFile(new URL('native-bundle.json', base), 'utf8'));
+if (receipt.host) throw new Error('Expected an undecorated shared bundle; run cap sync ios first.');
+const anchor = html.match(/<script defer src="assets\/app\.js\?v=\d+"><\/script>/g);
+if (anchor?.length !== 1) throw new Error('Apple injection anchor changed');
+const host = await readFile(new URL('../host.js', import.meta.url), 'utf8');
+await mkdir(new URL('ios/', base), { recursive: true });
+await writeFile(new URL('ios/host.js', base), host);
+html = html.replace(anchor[0], `<script defer src="ios/host.js?v=${hash(host)}"></script>\n${anchor[0]}`);
+const csp = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2 https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data: blob:; connect-src 'self' https: wss:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'";
+html = html.replace('<head>', `<head>\n<meta http-equiv="Content-Security-Policy" content="${csp}">`);
+await writeFile(new URL('index.html', base), html);
+receipt.host = 'ios-capacitor';
+receipt.files.find(file => file.path === 'index.html').sha256 = hash(html);
+receipt.coreByteIdenticalExcept.push('index.html: Apple CSP and host adapter tag');
+receipt.iosFiles = [{ path: 'ios/host.js', sha256: hash(host) }];
+await writeFile(new URL('native-bundle.json', base), JSON.stringify(receipt, null, 2) + '\n');
+console.log(`Apple bundle: shared source ${receipt.sourceCommit}, ${receipt.files.length} runtime files`);

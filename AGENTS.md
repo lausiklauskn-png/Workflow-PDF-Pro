@@ -1,5 +1,17 @@
 # Workflow PDF Pro — gemeinsame Arbeitsgrundlage
 
+- Aktueller Auftrag von Klaus (22.10.2026, nach den Apple-Prüfungen):
+  **iOS ist als Vorbereitung für eine spätere Veröffentlichung zurückgestellt.**
+  Klaus hat kein Apple-Gerät und möchte derzeit keine jährliche Apple-Mitgliedschaft
+  bezahlen. Keine Geräteabnahme, Signierung oder Veröffentlichung als nächsten Schritt
+  verlangen und iOS nicht als fertig ausgeben. Code und Nachweise bleiben auf
+  `codex/ios-native-host`, Entwurf-PR #17, gesichert. Maßgebliche Notiz:
+  `docs/portierung/IOS-ZURUECKGESTELLT-2026-10-22.md`.
+  Jetzt die vorhandenen Workflow-Varianten (Windows, PWA, Android) sowie die bereits
+  vorhandenen Private-Brain-Varianten auf Fehler und Mängel prüfen und beheben.
+  Private Brain Pro hat nach aktuellem Repository-Stand keinen Windows-Host.
+  Den Private-Brain-iOS-Nachfolgebrief erst nach vollständigem iOS-Abschluss erstellen.
+
 - Wiederaufnahme, tatsächliche Zugriffsprüfung und Bauumgebung: `docs/FOLGESITZUNG.md`.
   **Neueste Übergabe (22.10.2026, abends):** `BRIEF_ABSCHLUSS_2026-10-22_VERSION-UND-VIDEO.md`
   (Android 1.0.3 und Windows 1.0.3 veröffentlicht, Web 1.1.0, Video mit Prüfteil) und

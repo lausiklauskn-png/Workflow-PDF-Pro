@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-22",
+  "product": "Workflow PDF Pro",
+  "state": "incomplete-ios-implementation",
+  "baseMain": "4bf83efcac603d654abba1e0a87d816987a75667",
+  "sharedSource": "db3830e23b1207498efa083d00678f2de31379f7",
+  "branch": "codex/ios-native-host",
+  "draftPR": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/pull/17",
+  "localChecks": {
+    "upstream": {
+      "checked": 193,
+      "failed": 0
+    },
+    "sharedNativeBrowser": {
+      "tests": 33,
+      "pass": 33,
+      "fail": 0,
+      "skipped": 0
+    },
+    "vaultComponents": {
+      "tests": 41,
+      "pass": 41,
+      "fail": 0,
+      "skipped": 0
+    },
+    "appleBundle": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "appleRuns": [
+    {
+      "id": 39810507308,
+      "commit": "8cb815fcd30c567c542c370e3ed854445d36349e",
+      "swiftFileTests": {
+        "tests": 6,
+        "pass": 6,
+        "fail": 0
+      },
+      "simulator": "failed-before-tests",
+      "diagnosis": "Xcode test target had no dependency on the App target; no such module App"
+    },
+    {
+      "id": 39811790747,
+      "commit": "bdd93213d3eff1db037369e0f97800a58b52168c",
+      "swiftFileTests": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0
+      },
+      "simulator": "app-compiled-and-launched-but-tests-not-loaded",
+      "runConclusion": "cancelled-when-superseded",
+      "diagnosis": "Test bundle failed to load /usr/lib/swift/libswiftWebKit.dylib; no functional WKWebView test results"
+    },
+    {
+      "id": 39813164051,
+      "commit": "ff20b56806524e61af1809b8faefc1293bc60e05",
+      "state": "functional-test-step-failed",
+      "correction": "Use Objective-C WebKit callback APIs with bounded Promise observation and embed Swift runtime",
+      "swiftFileTests": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0
+      },
+      "hostTests": {
+        "tests": 4,
+        "pass": 3,
+        "fail": 1,
+        "skipped": 0
+      },
+      "failure": "PDF/form/original/database-reload probe timed out; exact async stage not identified by the first probe helper",
+      "passedHostCases": [
+        "actual WKWebView capabilities and local language-file request",
+        "real native file-transfer protocol and app version",
+        "trusted-origin URL policy"
+      ],
+      "deviceReleaseBuild": "not-run-after-test-failure"
+    },
+    {
+      "id": 39815186968,
+      "commit": "1b60246fc33d5cded9378ed7c18fad1aad9a24b2",
+      "state": "queued-at-recording",
+      "correction": "Wait for a genuinely new document after reload before probing persisted bytes; retain all PDF assertions; allow independent unsigned Release build even if host tests fail"
+    }
+  ],
+  "observedTools": {
+    "xcode": "16.4",
+    "xcodeBuild": "16F6",
+    "swift": "6.1.2",
+    "simulatorSDK": "18.5"
+  },
+  "unverified": [
+    "encrypted primary vault and Keychain",
+    "3-of-5 recovery interoperability",
+    "iOS speech and translation",
+    "share extension",
+    "full function matrix and iPad coverage",
+    "physical device and Apple team/signing",
+    "App Store/TestFlight distribution"
+  ],
+  "recordedReflogStartUTC": "2026-10-22T15:54:01Z",
+  "ciWebCore": {
+    "job": 119945319456,
+    "commit": "ff20b56806524e61af1809b8faefc1293bc60e05",
+    "outcome": "success",
+    "checks": [
+      "complete unchanged upstream test chain",
+      "shared native browser tests",
+      "release-request counterprobes",
+      "vault-record and journal tests"
+    ]
+  },
+  "wkwebviewCapabilities": {
+    "speech": "function",
+    "indexedDB": true,
+    "modelBytes": 3861738,
+    "worker": "function",
+    "wasm": "object",
+    "translator": "undefined",
+    "origin": "capacitor://localhost",
+    "serviceWorker": false,
+    "caches": "object",
+    "secure": true
+  },
+  "implementationNotFinished": true
+}

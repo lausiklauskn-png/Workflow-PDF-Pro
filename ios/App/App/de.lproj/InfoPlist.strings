@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Dokumente fotografieren und auf diesem Gerät bearbeiten.";
+"NSMicrophoneUsageDescription" = "Gesprochene Eingaben für die Dokumentensuche und Bearbeitung aufnehmen.";
+"NSSpeechRecognitionUsageDescription" = "Gesprochene Eingaben in Text umwandeln. Je nach Gerät und Sprache kann Apple die Aufnahme auf seinen Servern verarbeiten.";

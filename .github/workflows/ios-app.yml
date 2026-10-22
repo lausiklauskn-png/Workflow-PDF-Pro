@@ -1,0 +1,135 @@
+name: iOS-App – Bau und WKWebView-Prüfung
+on:
+  push:
+    branches: ['main']
+    paths: ['ios/**', 'native/**', 'upstream/**', 'tools/native/**', 'package*.json', 'capacitor.config.json', '.github/workflows/ios-app.yml']
+  pull_request:
+    paths: ['ios/**', 'native/**', 'upstream/**', 'tools/native/**', 'package*.json', 'capacitor.config.json', '.github/workflows/ios-app.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ios-app-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  simulator:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Tatsächliche Apple-Werkzeuge
+        run: |
+          xcodebuild -version
+          swift --version
+          xcrun simctl list devices available
+      - run: npm ci
+      - run: npm run verify:upstream
+      - run: npm run sync:ios
+        id: apple_sync
+      - run: node --test ios/tools/test-bundle.mjs
+      - name: Native Datei- und Empfangsverträge
+        run: |
+          set -euo pipefail
+          mkdir -p ios/results
+          swift test --package-path ios/WorkflowNativeCore 2>&1 | tee ios/results/swift-core.log
+      - name: Tresorformat und Ersatzschlüssel Apple ↔ Android ↔ Windows
+        run: |
+          set -euo pipefail
+          node ios/tools/test-vault-interop.mjs 2>&1 | tee ios/results/vault-interop.log
+      - name: Unsigned simulator build and real WKWebView tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          destination=$(python3 - <<'PY'
+          import json, subprocess
+          groups = json.loads(subprocess.check_output(['xcrun','simctl','list','devices','available','--json']))['devices']
+          phones = [d for runtime, devices in groups.items() if 'iOS' in runtime for d in devices if d['name'].startswith('iPhone')]
+          if not phones: raise SystemExit('No available iPhone simulator')
+          print(phones[0]['udid'])
+          PY
+          )
+          mkdir -p ios/results
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -destination "platform=iOS Simulator,id=$destination" -parallel-testing-enabled NO \
+            -test-timeouts-enabled YES -default-test-execution-time-allowance 90 -maximum-test-execution-time-allowance 120 \
+            -derivedDataPath ios/DerivedData -resultBundlePath ios/results/Workflow.xcresult \
+            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test 2>&1 | tee ios/results/xcodebuild.log
+      - name: Produktionsbau ohne Signierung
+        if: ${{ !cancelled() && steps.apple_sync.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -derivedDataPath ios/DerivedData-device \
+            CODE_SIGNING_ALLOWED=NO build 2>&1 | tee ios/results/release-build.log
+      - name: Baufehler über die Checks-API lesbar halten
+        if: failure()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for path in Path('ios/results').glob('*.log'):
+              selected = [line for line in path.read_text(errors='replace').splitlines() if any(word in line for word in ['error:', 'failed', 'FAILED', 'Failing tests:'])]
+              for line in selected[-30:]:
+                  safe = line[:3000].replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+                  print('::error title=iOS build evidence::' + safe)
+          PY
+      - name: Prüfergebnisse bewahren
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ios-build-and-wkwebview-results
+          path: ios/results/
+          if-no-files-found: warn
+          retention-days: 14
+  ipad:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run sync:ios
+      - name: Echte WKWebView-Proben im iPad-Simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          destination=$(python3 - <<'PY'
+          import json, subprocess
+          groups = json.loads(subprocess.check_output(['xcrun','simctl','list','devices','available','--json']))['devices']
+          tablets = [d for runtime, devices in groups.items() if 'iOS' in runtime for d in devices if d['name'].startswith('iPad')]
+          if not tablets: raise SystemExit('No available iPad simulator')
+          print(tablets[0]['udid'])
+          PY
+          )
+          mkdir -p ios/results
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -destination "platform=iOS Simulator,id=$destination" -parallel-testing-enabled NO \
+            -test-timeouts-enabled YES -default-test-execution-time-allowance 90 -maximum-test-execution-time-allowance 120 \
+            -derivedDataPath ios/DerivedData -resultBundlePath ios/results/Workflow-iPad.xcresult \
+            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test 2>&1 | tee ios/results/ipad-host.log
+      - name: iPad-Baufehler lesbar halten
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for path in Path('ios/results').glob('*.log'):
+              selected = [line for line in path.read_text(errors='replace').splitlines() if any(word in line for word in ['error:', 'failed', 'FAILED'])]
+              for line in selected[-25:]:
+                  safe = line[:3000].replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+                  print('::error title=iPad build evidence::' + safe)
+          PY
+      - name: iPad-Prüfergebnisse bewahren
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ios-ipad-host-results
+          path: ios/results/
+          if-no-files-found: warn
+          retention-days: 14
