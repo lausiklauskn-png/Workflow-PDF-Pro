@@ -6,6 +6,11 @@ public enum VaultKeychainFailure: String, Error {
     case unavailable = "VAULT_UNAVAILABLE"
     case locked = "VAULT_LOCKED"
 }
+public struct VaultKeychainStatusError: Error, CustomStringConvertible {
+    public let operation: String
+    public let status: OSStatus
+    public var description: String { "Keychain " + operation + " failed with OSStatus " + String(status) }
+}
 
 /// Optional device-only remembered data keys, never passwords. This class is not
 /// registered as a Capacitor plugin. The portable vault uses password wrapping.
@@ -29,8 +34,9 @@ public final class VaultKeychain {
         let updated = SecItemUpdate(base as CFDictionary, attributes as CFDictionary)
         if updated == errSecItemNotFound {
             var add = base; attributes.forEach { add[$0.key] = $0.value }
-            guard SecItemAdd(add as CFDictionary, nil) == errSecSuccess else { throw VaultKeychainFailure.unavailable }
-        } else if updated != errSecSuccess { throw VaultKeychainFailure.unavailable }
+            let added = SecItemAdd(add as CFDictionary, nil)
+            guard added == errSecSuccess else { throw VaultKeychainStatusError(operation: "add", status: added) }
+        } else if updated != errSecSuccess { throw VaultKeychainStatusError(operation: "update", status: updated) }
     }
     public func recalled(vaultID: String) throws -> SymmetricKey {
         var request = try query(vaultID)
@@ -45,6 +51,6 @@ public final class VaultKeychain {
     }
     public func forget(vaultID: String) throws {
         let status = SecItemDelete(try query(vaultID) as CFDictionary)
-        guard status == errSecSuccess || status == errSecItemNotFound else { throw VaultKeychainFailure.unavailable }
+        guard status == errSecSuccess || status == errSecItemNotFound else { throw VaultKeychainStatusError(operation: "delete", status: status) }
     }
 }
