@@ -208,6 +208,12 @@ final class DocumentVault {
         Place p = new Place(); p.tree = Uri.parse(prefs.getString("tree", "")); p.root = prefs.getString("root", ""); p.label = prefs.getString("label", FOLDER);
         open(p, password, remember);
     }
+    /** Gespeicherten Tresor mit Ersatzschlüsseln öffnen (Passwort vergessen). */
+    void recoverStored(List<String> texts, CharSequence newPassword, boolean remember) throws Exception {
+        if (!configured()) throw failure("VAULT_NOT_CONFIGURED");
+        Place p = new Place(); p.tree = Uri.parse(prefs.getString("tree", "")); p.root = prefs.getString("root", ""); p.label = prefs.getString("label", FOLDER);
+        recover(p, texts, newPassword, remember);
+    }
     static final String RECOVERY_PREFIX = "workflow-pdf-pro.ersatz-", SLOT_PREFIX = "workflow-pdf-pro.kennwort-";
     private JSONObject readHeader(Place candidate) throws Exception {
         Entry header = child(candidate, candidate.root, HEADER);

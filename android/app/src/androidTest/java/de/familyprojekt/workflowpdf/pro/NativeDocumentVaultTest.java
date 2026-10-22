@@ -53,6 +53,29 @@ public final class NativeDocumentVaultTest {
         String header=new String(fileBytes(new File(folder(),DocumentVault.HEADER)),StandardCharsets.UTF_8);
         assertFalse(header.contains(PASSWORD));assertFalse(header.contains("Документ"));
     }
+    @Test public void recoveryKeysReplaceAForgottenPasswordOnAnotherDevice() throws Exception {
+        reset();DocumentVault a=fresh("ra");a.initialize(a.inspect(tree()),PASSWORD,false);
+        write(a,"doc",new byte[]{4,5,6});
+        assertFalse(a.recoveryInfo().getBoolean("exists"));
+        List<String> old=a.createRecovery(5,3),keys=a.createRecovery(5,3);
+        assertEquals(5,keys.size());assertNotEquals(old,keys);assertEquals(3,a.recoveryInfo().getInt("k"));
+        int sets=0;for(File f:Objects.requireNonNull(folder().listFiles()))if(f.getName().startsWith(DocumentVault.RECOVERY_PREFIX))sets++;
+        assertEquals("Older set must be removed",1,sets);a.closeWorking();
+        DocumentVault b=fresh("rb");
+        try{b.recover(b.inspect(tree()),keys.subList(0,2),"Neues Passwort 2026",false);fail("Two keys accepted");}
+        catch(IOException expected){assertEquals("VAULT_RECOVERY_INCOMPLETE",expected.getMessage());}
+        try{b.recover(b.inspect(tree()),old.subList(0,3),"Neues Passwort 2026",false);fail("Outdated keys accepted");}
+        catch(IOException expected){assertEquals("VAULT_RECOVERY_UNKNOWN",expected.getMessage());}
+        assertFalse(b.configured());
+        b.recover(b.inspect(tree()),Arrays.asList(keys.get(4),keys.get(0),keys.get(2)),"Neues Passwort 2026",false);
+        assertArrayEquals(new byte[]{4,5,6},read(b,"doc"));b.closeWorking();
+        for(String pw:new String[]{"Neues Passwort 2026",PASSWORD}){DocumentVault c=fresh("rc");c.open(c.inspect(tree()),pw,false);assertArrayEquals(new byte[]{4,5,6},read(c,"doc"));c.closeWorking();}
+        DocumentVault d=fresh("rd");
+        try{d.open(d.inspect(tree()),"wrong password 99",false);fail("Wrong password accepted");}
+        catch(IOException expected){assertEquals("VAULT_PASSWORD",expected.getMessage());}
+        String slot=null;for(File f:Objects.requireNonNull(folder().listFiles()))if(f.getName().startsWith(DocumentVault.SLOT_PREFIX))slot=new String(fileBytes(f),StandardCharsets.UTF_8);
+        assertNotNull(slot);assertFalse(slot.contains("Neues Passwort"));
+    }
     @Test public void copiedEncryptedFolderWorksWithDifferentProviderDocumentIds() throws Exception {
         reset();DocumentVault a=fresh("a");a.initialize(a.inspect(tree()),PASSWORD,false);write(a,"move",new byte[]{7,8,9});a.closeWorking();
         File copy=new File(context().getCacheDir(),"fixture-documents/libraryB/Workflow PDF Pro");assertTrue(copy.mkdir());

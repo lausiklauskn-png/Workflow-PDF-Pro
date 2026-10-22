@@ -34,7 +34,7 @@
     WorkflowIncoming: plugin('WorkflowIncoming', ['pending', 'read', 'acknowledge', 'history', 'restore', 'discardArchived']),
     WorkflowVault: plugin('WorkflowVault', ['state', 'locations', 'migration', 'prepareMigration', 'completeMigration', 'cancelMigration',
       'beginBatch', 'commitBatch', 'abortBatch', 'setPrimary', 'volumes', 'choose', 'unlock', 'lock', 'begin', 'append', 'finish', 'abort',
-      'info', 'read', 'list', 'remove']),
+      'info', 'read', 'list', 'remove', 'recoveryInfo', 'createRecovery']),
     WorkflowChrome: plugin('WorkflowChrome', ['begin', 'translate', 'close'])
   });
   window.Capacitor = Object.freeze({

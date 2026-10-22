@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src ipc: http://ipc.localhost https://ipc.localhost">
+<title>Workflow PDF Pro</title>
+<link rel="stylesheet" href="dialog.css">
+<script defer src="ersatz.js"></script>
+</head>
+<body>
+<main>
+<h1 id="titel"></h1>
+<p id="hilfe"></p>
+<ol id="teile" class="teile"></ol>
+<label><input id="bestaetigt" type="checkbox"><span id="bestaetigtText"></span></label>
+<p id="status" role="status"></p>
+<div class="zeile"><button id="speichern"></button><button id="drucken"></button><button id="fertig" class="haupt" disabled></button></div>
+</main>
+</body>
+</html>

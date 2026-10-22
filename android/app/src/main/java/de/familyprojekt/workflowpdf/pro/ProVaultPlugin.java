@@ -109,9 +109,11 @@ public final class ProVaultPlugin extends Plugin {
         CheckBox notice=new CheckBox(getContext());notice.setText(t.apply(4));if(mode==0)box.addView(notice);
         CheckBox remember=new CheckBox(getContext());remember.setText(t.apply(5));remember.setChecked(true);box.addView(remember);
         TextView status=new TextView(getContext());box.addView(status);ScrollView scroll=new ScrollView(getContext());scroll.addView(box);
-        AlertDialog dialog=new AlertDialog.Builder(getActivity()).setTitle(t.apply(mode==0?0:1)).setView(scroll)
+        AlertDialog.Builder builder=new AlertDialog.Builder(getActivity()).setTitle(t.apply(mode==0?0:1)).setView(scroll)
             .setNegativeButton(t.apply(6),(d,w)->{choosing.set(false);first.getText().clear();second.getText().clear();call.resolve(new JSObject().put("cancelled",true));})
-            .setPositiveButton(t.apply(7),null).create();
+            .setPositiveButton(t.apply(7),null);
+        if(mode!=0)builder.setNeutralButton(R_WORDS[0][lang],(d,w)->{first.getText().clear();second.getText().clear();recoveryDialog(call,vault,place,mode,lang);});
+        AlertDialog dialog=builder.create();
         dialog.setOnCancelListener(d->{choosing.set(false);first.getText().clear();second.getText().clear();call.resolve(new JSObject().put("cancelled",true));});
         dialog.setOnShowListener(d->dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
             String p=java.text.Normalizer.normalize(first.getText(),java.text.Normalizer.Form.NFC);
@@ -127,6 +129,127 @@ public final class ProVaultPlugin extends Plugin {
                 }catch(Exception error){getActivity().runOnUiThread(()->{first.getText().clear();second.getText().clear();status.setText(t.apply(9));dialog.setCancelable(true);dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);});}
             });
         }));dialog.show();first.requestFocus();
+    }
+    private static final String[][] R_WORDS={
+        {"Passwort vergessen?","Forgot password?","Забыли пароль?","نسيت كلمة المرور؟"},
+        {"Mit Ersatzschlüsseln öffnen","Open with recovery keys","Открыть ключами восстановления","الفتح بمفاتيح الاسترداد"},
+        {"Drei verschiedene Ersatzschlüssel eingeben und ein neues Passwort festlegen.","Enter three different recovery keys and choose a new password.","Введите три разных ключа восстановления и задайте новый пароль.","أدخل ثلاثة مفاتيح استرداد مختلفة واختر كلمة مرور جديدة."},
+        {"Ersatzschlüssel","Recovery key","Ключ восстановления","مفتاح الاسترداد"},
+        {"Neues Passwort","New password","Новый пароль","كلمة مرور جديدة"},
+        {"Neues Passwort wiederholen","Repeat new password","Повторите новый пароль","أعد كتابة كلمة المرور الجديدة"},
+        {"Wiederherstellen","Recover","Восстановить","استرداد"},
+        {"Ein Ersatzschlüssel ist falsch abgetippt. Bitte Zeichen für Zeichen prüfen.","A recovery key contains a typo. Please check it character by character.","Ключ восстановления введён с ошибкой. Проверьте его посимвольно.","يحتوي أحد مفاتيح الاسترداد على خطأ. يرجى التحقق منه حرفاً حرفاً."},
+        {"Bitte drei verschiedene Ersatzschlüssel desselben Satzes eingeben.","Enter three different recovery keys from the same set.","Введите три разных ключа из одного набора.","أدخل ثلاثة مفاتيح مختلفة من المجموعة نفسها."},
+        {"Diese Ersatzschlüssel gehören nicht zu diesem Tresor oder sind veraltet.","These recovery keys do not belong to this vault or are outdated.","Эти ключи не относятся к этому хранилищу или устарели.","مفاتيح الاسترداد هذه لا تخص هذه الخزنة أو أنها قديمة."},
+        {"Neues Passwort: mindestens 10 Zeichen, beide gleich.","New password: at least 10 characters, both identical.","Новый пароль: не менее 10 символов, оба одинаковые.","كلمة المرور الجديدة: 10 أحرف على الأقل ومتطابقة."},
+        {"Wiederherstellung nicht möglich. Keine Daten wurden verändert.","Recovery not possible. No data was changed.","Восстановление невозможно. Данные не изменены.","تعذر الاسترداد. لم تتغير أي بيانات."},
+        {"Ersatzschlüssel (3 von 5)","Recovery keys (3 of 5)","Ключи восстановления (3 из 5)","مفاتيح الاسترداد (3 من 5)"},
+        {"Diese fünf Ersatzschlüssel getrennt aufbewahren, zum Beispiel ausgedruckt an verschiedenen Orten. Drei beliebige genügen, um ein vergessenes Passwort zu ersetzen. Wer drei Teile hat, kann den Tresor öffnen. Ältere Ersatzschlüssel gelten ab jetzt nicht mehr.","Keep these five recovery keys separately, e.g. printed in different places. Any three replace a forgotten password. Anyone holding three keys can open the vault. Older recovery keys are no longer valid.","Храните пять ключей раздельно, например распечатанными в разных местах. Любые три заменяют забытый пароль. Владелец трёх ключей может открыть хранилище. Прежние ключи больше не действуют.","احتفظ بمفاتيح الاسترداد الخمسة بشكل منفصل، مثلاً مطبوعة في أماكن مختلفة. أي ثلاثة منها تستبدل كلمة مرور منسية. من يملك ثلاثة مفاتيح يمكنه فتح الخزنة. المفاتيح القديمة لم تعد صالحة."},
+        {"Als Datei speichern …","Save as file …","Сохранить в файл …","حفظ كملف …"},
+        {"Ich habe alle fünf Ersatzschlüssel gespeichert oder aufgeschrieben.","I have saved or written down all five recovery keys.","Я сохранил или записал все пять ключей.","لقد حفظت أو دونت مفاتيح الاسترداد الخمسة."},
+        {"Fertig","Done","Готово","تم"},
+        {"Datei gespeichert und geprüft. Teile trotzdem getrennt aufbewahren.","File saved and verified. Still keep the keys separately.","Файл сохранён и проверен. Храните ключи раздельно.","تم حفظ الملف والتحقق منه. احتفظ بالمفاتيح منفصلة."},
+        {"Datei konnte nicht gespeichert werden.","The file could not be saved.","Не удалось сохранить файл.","تعذر حفظ الملف."},
+        {"Teil","Key","Ключ","المفتاح"}
+    };
+    private static String recoveryMessage(String code,int lang){
+        int n="VAULT_RECOVERY_TYPO".equals(code)?7:"VAULT_RECOVERY_INCOMPLETE".equals(code)||"VAULT_RECOVERY_MIXED".equals(code)||"VAULT_RECOVERY_DUPLICATE".equals(code)?8:"VAULT_RECOVERY_UNKNOWN".equals(code)||"VAULT_RECOVERY_INVALID".equals(code)?9:"VAULT_PASSWORD_SHORT".equals(code)?10:11;
+        return R_WORDS[n][lang];
+    }
+    /** Drei Ersatzschlüssel und ein neues Passwort; nur im nativen Dialog. */
+    private void recoveryDialog(PluginCall call,DocumentVault vault,DocumentVault.Place place,int mode,int lang){
+        if(worker.closed()||getActivity().isFinishing()||getActivity().isDestroyed()){choosing.set(false);call.reject("NATIVE_ACTIVITY_CLOSED");return;}
+        LinearLayout box=new LinearLayout(getContext());box.setOrientation(LinearLayout.VERTICAL);int pad=(int)(20*getContext().getResources().getDisplayMetrics().density);box.setPadding(pad,pad,pad,pad);
+        if(lang==3)box.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView help=new TextView(getContext());help.setText(R_WORDS[2][lang]);box.addView(help);
+        EditText[] keys=new EditText[3];
+        for(int i=0;i<3;i++){keys[i]=new EditText(getContext());keys[i].setHint(R_WORDS[3][lang]+" "+(i+1));keys[i].setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS|InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS|InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);keys[i].setTypeface(android.graphics.Typeface.MONOSPACE);if(Build.VERSION.SDK_INT>=26)keys[i].setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);box.addView(keys[i]);}
+        EditText first=new EditText(getContext()),second=new EditText(getContext());
+        for(EditText field:new EditText[]{first,second}){field.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);if(Build.VERSION.SDK_INT>=26)field.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);}
+        first.setHint(R_WORDS[4][lang]);second.setHint(R_WORDS[5][lang]);box.addView(first);box.addView(second);
+        CheckBox remember=new CheckBox(getContext());remember.setText(WORDS[5][lang]);remember.setChecked(true);box.addView(remember);
+        TextView status=new TextView(getContext());box.addView(status);ScrollView scroll=new ScrollView(getContext());scroll.addView(box);
+        Runnable clear=()->{for(EditText k:keys)k.getText().clear();first.getText().clear();second.getText().clear();};
+        AlertDialog dialog=new AlertDialog.Builder(getActivity()).setTitle(R_WORDS[1][lang]).setView(scroll)
+            .setNegativeButton(WORDS[6][lang],(d,w)->{clear.run();choosing.set(false);call.resolve(new JSObject().put("cancelled",true));})
+            .setPositiveButton(R_WORDS[6][lang],null).create();
+        dialog.setOnCancelListener(d->{clear.run();choosing.set(false);call.resolve(new JSObject().put("cancelled",true));});
+        dialog.setOnShowListener(d->dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
+            String p=java.text.Normalizer.normalize(first.getText(),java.text.Normalizer.Form.NFC);
+            if(p.codePointCount(0,p.length())<10||!p.equals(java.text.Normalizer.normalize(second.getText(),java.text.Normalizer.Form.NFC))){status.setText(R_WORDS[10][lang]);return;}
+            ArrayList<String> texts=new ArrayList<>();for(EditText k:keys)texts.add(k.getText().toString());
+            boolean keep=remember.isChecked();dialog.setCancelable(false);dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
+            worker.submit(call,()->{
+                try{
+                    if(mode==1)vault.recover(place,texts,p,keep);else vault.recoverStored(texts,p,keep);
+                    texts.clear();
+                    String expected=call.getString("expectedVaultId");
+                    if(expected!=null&&!expected.equals(vault.identity())){vault.lock();throw new java.io.IOException("VAULT_WRONG_FOLDER");}
+                    String location=mode==2?vault.locationId():locations.adopt(vault);
+                    JSONObject state=locations.state(location);getActivity().runOnUiThread(()->{clear.run();dialog.dismiss();choosing.set(false);call.resolve(new JSObject().put("location",location).put("state",state).put("created",false).put("opened",mode==1).put("unlocked",true).put("recovered",true));});
+                }catch(Exception error){texts.clear();String code=error.getMessage();getActivity().runOnUiThread(()->{first.getText().clear();second.getText().clear();status.setText(recoveryMessage(code,lang));dialog.setCancelable(true);dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);});}
+            });
+        }));dialog.show();keys[0].requestFocus();
+    }
+    @PluginMethod public void recoveryInfo(PluginCall call){work(call,()->vault(call).recoveryInfo());}
+    private List<String> shownShares;private AlertDialog sharesDialog;private TextView sharesStatus;private int sharesLang;
+    /** Neue Ersatzschlüssel nur im nativen Dialog anzeigen; sie gelangen nie in die Webseite. */
+    @PluginMethod public void createRecovery(PluginCall call){
+        if(!choosing.compareAndSet(false,true)){call.reject("VAULT_BUSY","VAULT_BUSY");return;}
+        String language=call.getString("language","de");int index=Arrays.asList("de","en","ru","ar").indexOf(language);final int lang=index<0?0:index;
+        worker.submit(call,()->{
+            try{
+                DocumentVault v=vault(call);List<String> shares=v.createRecovery(VaultRecovery.DEFAULT_N,VaultRecovery.DEFAULT_K);JSONObject info=v.recoveryInfo();
+                getActivity().runOnUiThread(()->showShares(call,shares,info,lang));
+            }catch(Exception error){choosing.set(false);String code=code(error);call.reject(code,code);}
+        });
+    }
+    private String sharesText(int lang){
+        StringBuilder out=new StringBuilder("Workflow PDF Pro – ").append(R_WORDS[12][lang]).append("\n\n").append(R_WORDS[13][lang]).append("\n\n");
+        for(int i=0;i<shownShares.size();i++)out.append(R_WORDS[19][lang]).append(' ').append(i+1).append("/").append(shownShares.size()).append(":  ").append(shownShares.get(i)).append("\n\n");
+        return out.toString();
+    }
+    private void showShares(PluginCall call,List<String> shares,JSONObject info,int lang){
+        if(worker.closed()||getActivity().isFinishing()||getActivity().isDestroyed()){choosing.set(false);call.reject("NATIVE_ACTIVITY_CLOSED");return;}
+        shownShares=new ArrayList<>(shares);sharesLang=lang;
+        LinearLayout box=new LinearLayout(getContext());box.setOrientation(LinearLayout.VERTICAL);int pad=(int)(20*getContext().getResources().getDisplayMetrics().density);box.setPadding(pad,pad,pad,pad);
+        if(lang==3)box.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView help=new TextView(getContext());help.setText(R_WORDS[13][lang]);box.addView(help);
+        for(int i=0;i<shares.size();i++){TextView line=new TextView(getContext());line.setText(R_WORDS[19][lang]+" "+(i+1)+":\n"+shares.get(i));line.setTypeface(android.graphics.Typeface.MONOSPACE);line.setTextIsSelectable(false);line.setPadding(0,pad/2,0,0);line.setContentDescription(R_WORDS[19][lang]+" "+(i+1));line.setTag("wfp-recovery-share");box.addView(line);}
+        CheckBox confirm=new CheckBox(getContext());confirm.setText(R_WORDS[15][lang]);box.addView(confirm);
+        sharesStatus=new TextView(getContext());box.addView(sharesStatus);ScrollView scroll=new ScrollView(getContext());scroll.addView(box);
+        AlertDialog dialog=new AlertDialog.Builder(getActivity()).setTitle(R_WORDS[12][lang]).setView(scroll).setCancelable(false)
+            .setNeutralButton(R_WORDS[14][lang],null).setPositiveButton(R_WORDS[16][lang],null).create();
+        sharesDialog=dialog;
+        dialog.setOnShowListener(d->{
+            android.widget.Button done=dialog.getButton(AlertDialog.BUTTON_POSITIVE);done.setEnabled(false);
+            confirm.setOnCheckedChangeListener((b,checked)->done.setEnabled(checked));
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v->{
+                Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("text/plain").putExtra(Intent.EXTRA_TITLE,"Workflow-PDF-Pro-Ersatzschluessel.txt");
+                try{startActivityForResult(call,intent,"sharesSaved");}catch(Exception error){sharesStatus.setText(R_WORDS[18][lang]);}
+            });
+            done.setOnClickListener(v->{
+                shownShares=null;sharesDialog=null;dialog.dismiss();choosing.set(false);
+                call.resolve(new JSObject().put("created",true).put("set",info.optString("set")).put("n",info.optInt("n")).put("k",info.optInt("k")).put("createdAt",info.optLong("created")));
+            });
+        });
+        dialog.show();
+    }
+    @ActivityCallback private void sharesSaved(PluginCall call,ActivityResult result){
+        if(shownShares==null||sharesStatus==null)return;
+        Intent data=result.getData();int lang=sharesLang;
+        if(result.getResultCode()!=Activity.RESULT_OK||data==null||data.getData()==null)return;
+        Uri uri=data.getData();byte[] text=sharesText(lang).getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        worker.execute(()->{
+            boolean ok=false;
+            try{
+                if(!"content".equals(uri.getScheme()))throw new SecurityException();
+                try(java.io.OutputStream out=getContext().getContentResolver().openOutputStream(uri,"wt")){if(out==null)throw new java.io.IOException();out.write(text);}
+                try(java.io.InputStream in=getContext().getContentResolver().openInputStream(uri)){java.io.ByteArrayOutputStream back=new java.io.ByteArrayOutputStream();byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1)back.write(b,0,n);ok=Arrays.equals(back.toByteArray(),text);}
+            }catch(Exception error){ok=false;}
+            Arrays.fill(text,(byte)0);boolean saved=ok;
+            getActivity().runOnUiThread(()->{if(sharesStatus!=null)sharesStatus.setText(R_WORDS[saved?17:18][lang]);});
+        });
     }
     @PluginMethod public void lock(PluginCall call){work(call,()->{locations.lock();return locations.state(null);});}
     @PluginMethod public void begin(PluginCall call){work(call,()->new JSONObject().put("ticket",vault(call).begin(call.getString("store"),call.getString("id"),call.getData().optJSONObject("reference"))));}

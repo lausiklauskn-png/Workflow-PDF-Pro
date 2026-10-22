@@ -485,6 +485,15 @@ impl DocumentVault {
         Ok(json!({"exists": false}))
     }
 
+    /// Gespeicherten Tresor mit Ersatzschlüsseln öffnen (Passwort vergessen).
+    pub fn recover_stored(&mut self, texts: &[String], new_password: &str, remember: bool) -> Result<()> {
+        if !self.configured() {
+            return Err(fail("VAULT_NOT_CONFIGURED"));
+        }
+        let candidate = self.stored_place();
+        self.recover(candidate, texts, new_password, remember)
+    }
+
     /// Mit genug Ersatzschlüsseln öffnen und ein neues Passwort setzen. Der bisherige
     /// Tresorkopf bleibt unverändert; das neue Passwort liegt in einem eigenen Passwortfach.
     pub fn recover(&mut self, mut candidate: Place, texts: &[String], new_password: &str, remember: bool) -> Result<()> {

@@ -16,6 +16,7 @@ import { createHash } from 'node:crypto';
 const [phase = 'erst', out = 'abnahme.json'] = process.argv.slice(2);
 const env = name => { const v = process.env[name]; if (!v) throw new Error('Umgebung fehlt: ' + name); return v; };
 const PASSWORT = 'Prüf-Passwort für Windows 2026';
+const NEUES_PASSWORT = 'Neues Prüf-Passwort nach Ersatzschlüsseln';
 const result = { phase, zeit: new Date().toISOString(), checks: {}, fehler: [], rot: [] };
 const save = () => writeFile(out, JSON.stringify(result, null, 2));
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -220,6 +221,34 @@ if (phase === 'erst') {
     for (const name of names.filter(n => n.endsWith('.wpv'))) expect(!(await readFile(join(root, name))).includes(Buffer.from('%PDF-')), 'Klartext im Tresor');
     return { dokumente: before, datensaetze: state.records, dateien: names.length };
   });
+  await step('ersatzschluesselErzeugen', async () => {
+    await page.evaluate(() => { void WFPNativeVault.manage(); });
+    await page.waitForFunction(() => /Noch keine Ersatzschlüssel/.test(document.getElementById('nativeVaultRecovery')?.textContent || ''), null, { timeout: 30000 });
+    await clickText('Ersatzschlüssel erzeugen');
+    const win = await findPage(url => url.includes('/windows/ersatz.html'), 60000);
+    watch(win);
+    await win.waitForFunction(() => document.querySelectorAll('#teile li').length === 5, null, { timeout: 60000 });
+    const shares = await win.evaluate(() => [...document.querySelectorAll('#teile li')].map(li => li.textContent));
+    expect(shares.every(s => /^WFP1(-[0-9A-Z]{1,5})+$/.test(s)) && new Set(shares).size === 5, 'Teile ungültig: ' + shares.join(' '));
+    // Das Hauptfenster darf die Teile nicht abrufen.
+    const mainDenied = await page.evaluate(() => window.__TAURI_INTERNALS__.invoke('wfp_dialog', { action: 'anzeigen' }).then(() => false, e => String(e) === 'NOT_ALLOWED'));
+    expect(mainDenied, 'Hauptfenster konnte Ersatzschlüssel lesen');
+    expect(await win.isDisabled('#fertig'), 'Fertig ohne Bestätigung möglich');
+    await win.click('#speichern');
+    await win.waitForFunction(() => /gespeichert/.test(document.getElementById('status').textContent), null, { timeout: 30000 });
+    const file = await readFile(join(env('WFP_PRUEF_SPEICHERN'), 'Workflow-PDF-Pro-Ersatzschluessel.txt'), 'utf8');
+    expect(shares.every(s => file.includes(s)), 'Datei enthält nicht alle Teile');
+    await win.check('#bestaetigt');
+    await win.click('#fertig');
+    const end = Date.now() + 30000;
+    while (pages().some(p => p.url().includes('/windows/ersatz.html'))) { if (Date.now() > end) throw new Error('Ersatzschlüsselfenster blieb offen'); await sleep(300); }
+    await page.waitForFunction(() => /Ersatzschlüssel vorhanden/.test(document.getElementById('nativeVaultRecovery')?.textContent || ''), null, { timeout: 30000 });
+    await clickText('Schließen');
+    const names = await readdir(join(env('WFP_PRUEF_TRESOR'), 'Workflow PDF Pro'));
+    expect(names.filter(n => n.startsWith('workflow-pdf-pro.ersatz-')).length === 1, 'Ersatzschlüsseldatei fehlt');
+    await writeFile(join(env('WFP_PRUEF_ARBEIT'), 'ersatz.json'), JSON.stringify(shares));
+    return { teile: shares.length, datei: true, hauptfensterGesperrt: mainDenied };
+  });
   await step('oeffnenMit', async () => {
     const file = join(env('WFP_PRUEF_ARBEIT'), 'Geteilt.pdf');
     await writeFile(file, await makePdf('Geöffnet mit'));
@@ -269,6 +298,53 @@ if (phase === 'neustart') {
     await ready();
     await waitDocs(4, 90000);
     return { gesperrt: locked.problem, falschesPasswort: wrong, danach: (await vaultState()).unlocked };
+  });
+}
+
+if (phase === 'neustart') {
+  await step('passwortVergessen', async () => {
+    const shares = JSON.parse(await readFile(join(env('WFP_PRUEF_ARBEIT'), 'ersatz.json'), 'utf8'));
+    await page.evaluate(() => { void WFPNativeVault.manage(); });
+    await clickText('Tresor sperren');
+    await page.waitForFunction(() => 'wfpVaultLocked' in document.documentElement.dataset, null, { timeout: 60000 });
+    await clickText('Entsperren');
+    const dialog = await findPage(url => url.includes('/windows/kennwort.html'));
+    watch(dialog);
+    await dialog.click('#vergessen');
+    await dialog.waitForSelector('#teil1');
+    // Tippfehler in einem Teil wird erkannt; nichts wird verändert.
+    const typo = shares[0].slice(0, 12) + (shares[0][12] === 'A' ? 'B' : 'A') + shares[0].slice(13);
+    await dialog.fill('#teil1', typo); await dialog.fill('#teil2', shares[1]); await dialog.fill('#teil3', shares[3]);
+    await dialog.fill('#neu1', NEUES_PASSWORT); await dialog.fill('#neu2', NEUES_PASSWORT);
+    await dialog.click('#weiter');
+    await dialog.waitForFunction(() => /falsch abgetippt/.test(document.getElementById('status').textContent), null, { timeout: 60000 });
+    const typoText = await dialog.textContent('#status');
+    // Nur zwei Teile reichen nicht.
+    await dialog.fill('#teil1', ''); await dialog.fill('#neu1', NEUES_PASSWORT); await dialog.fill('#neu2', NEUES_PASSWORT);
+    await dialog.click('#weiter');
+    await dialog.waitForFunction(() => /drei verschiedene/.test(document.getElementById('status').textContent), null, { timeout: 60000 });
+    // Drei richtige Teile (lowercase, ohne Bindestriche) und ein neues Passwort.
+    await dialog.fill('#teil1', shares[4].toLowerCase().replace(/-/g, ' '));
+    await dialog.fill('#neu1', NEUES_PASSWORT); await dialog.fill('#neu2', NEUES_PASSWORT);
+    await dialog.check('#merken');
+    await dialog.click('#weiter');
+    const end = Date.now() + 120000;
+    while (pages().some(p => p.url().includes('/windows/kennwort.html'))) { if (Date.now() > end) throw new Error('Wiederherstellung hängt: ' + await dialog.textContent('#status').catch(() => '?')); await sleep(300); }
+    await sleep(2000);
+    await ready();
+    await waitDocs(4, 90000);
+    const names = await readdir(join(env('WFP_PRUEF_TRESOR'), 'Workflow PDF Pro'));
+    expect(names.filter(n => n.startsWith('workflow-pdf-pro.kennwort-')).length === 1, 'Passwortfach fehlt');
+    // Danach öffnet auch das neue Passwort.
+    await page.evaluate(() => { void WFPNativeVault.manage(); });
+    await clickText('Tresor sperren');
+    await page.waitForFunction(() => 'wfpVaultLocked' in document.documentElement.dataset, null, { timeout: 60000 });
+    await clickText('Entsperren');
+    await password(NEUES_PASSWORT);
+    await sleep(2000);
+    await ready();
+    await waitDocs(4, 90000);
+    return { tippfehler: typoText, entsperrt: (await vaultState()).unlocked, dokumente: 4 };
   });
 }
 

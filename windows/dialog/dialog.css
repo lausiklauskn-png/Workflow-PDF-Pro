@@ -11,3 +11,10 @@ button { font: inherit; padding: 8px 16px; border-radius: 6px; border: 1px solid
 button.haupt { background: var(--akzent); border-color: var(--akzent); color: #fff; }
 button:disabled { opacity: .5; cursor: default; }
 #status { min-height: 1.4em; color: var(--akzent); margin: 0; }
+section { display: flex; flex-direction: column; gap: 10px; }
+.teil, .teile li { font-family: Consolas, "Cascadia Mono", monospace; letter-spacing: .02em; }
+.teil { font-size: 14px; padding: 8px; border: 1px solid var(--rand); border-radius: 6px; background: transparent; color: inherit; }
+button.link { border: none; padding: 0; color: var(--akzent); text-decoration: underline; background: none; }
+.teile { margin: 0; padding-inline-start: 1.4em; display: flex; flex-direction: column; gap: 8px; }
+.teile li { font-size: 14px; word-break: break-all; }
+@media print { .zeile, label, #status { display: none !important; } html, body { background: #fff; color: #000; } }
