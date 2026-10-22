@@ -4,7 +4,7 @@ name: Windows-App (Tauri) – Bau und Abnahme
 # installierten App aus. Der GitHub-Rechner ist nicht Klaus' PC.
 on:
   push:
-    branches: ['claude/windows-**', 'main']
+    branches: ['claude/windows-**', 'codex/windows-**', 'main']
     paths: ['windows/**', 'native/**', 'upstream/**', 'tools/native/**', '.github/workflows/windows-app.yml']
   pull_request:
     paths: ['windows/**', 'native/**', 'upstream/**', 'tools/native/**', '.github/workflows/windows-app.yml']
@@ -20,6 +20,13 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Manipulierte Updates und Speichern vor Neustart
+        run: |
+          node windows/tools/test-update-feed.mjs
+          node windows/tools/test-update-ui.mjs
       - name: Tresor, Empfang, Übergaben und Chrome-Sitzung (Rust)
         working-directory: windows/core
         run: cargo test --release
@@ -46,8 +53,34 @@ jobs:
       - name: Werkzeuge
         working-directory: windows
         run: npm ci
+      - name: Rust-Abhängigkeiten zwischenspeichern
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0
+        with:
+          workspaces: windows/src-tauri -> target
+          cache-on-failure: true
+      - name: Lokalen Webinhalt vor Rust-Tests erzeugen
+        working-directory: windows
+        run: node tools/build-web.mjs
+      - name: Signier- und Veröffentlichungsskripte auf Syntax prüfen
+        run: |
+          Get-ChildItem windows/tools -Filter *.ps1 | ForEach-Object {
+            $tokens = $null; $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count) { throw ($errors | Out-String) }
+          }
+      - name: Echte Tauri-Updatesignaturen gegenprüfen
+        run: |
+          node windows/tools/test-tauri-signatures.mjs
+          if ($LASTEXITCODE -ne 0) { throw 'Signature interoperability failed.' }
+      - name: Native Update- und Herkunftsregeln prüfen
+        working-directory: windows/src-tauri
+        run: |
+          cargo test --locked --release
+          if ($LASTEXITCODE -ne 0) { throw 'Native updater tests failed.' }
       - name: Prüfbau (mit lokalem Prüfzugang) bauen
         working-directory: windows
+        env:
+          WFP_WINDOWS_PROBE: '1'
         run: |
           npx tauri build --features messprobe
           New-Item -ItemType Directory -Force ../pruef-out | Out-Null
@@ -56,6 +89,7 @@ jobs:
         working-directory: windows
         run: |
           npx tauri build
+          if (Test-Path dist/windows/csp-probe.js) { throw 'CSP probe must not ship in the production bundle.' }
           New-Item -ItemType Directory -Force ../auslieferung | Out-Null
           $version = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
           $name = "Workflow-PDF-Pro-Windows-$version-Setup.exe"
@@ -146,3 +180,4 @@ jobs:
           name: windows-installer
           path: auslieferung/
           retention-days: 14
+

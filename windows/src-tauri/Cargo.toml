@@ -1,6 +1,6 @@
 [package]
 name = "workflow-pdf-pro"
-version = "1.0.1"
+version = "1.0.2"
 description = "Workflow PDF Pro für Windows"
 edition = "2021"
 publish = false
@@ -13,6 +13,7 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 tauri-plugin-dialog = "2"
 tauri-plugin-single-instance = "2"
+tauri-plugin-updater = "=2.14.0"
 wfp-core = { path = "../core" }
 serde_json = { version = "1", features = ["preserve_order"] }
 base64 = "0.22"
@@ -44,3 +45,4 @@ strip = true
 [features]
 # Nur für den GitHub-Prüfbau: öffnet den lokalen Prüfzugang (CDP) für Playwright.
 messprobe = []
+
