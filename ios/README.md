@@ -3,8 +3,9 @@
 Dieser Host verwendet denselben `tools/native/prepare-web.mjs` wie Windows und Android.
 `upstream/workflow-pdf` bleibt unverändert. Der Apple-Host ist noch keine vollständige
 oder veröffentlichte App. Portabler Tresor, Ordnerfreigaben, Keychain und die
-Bibliotheksanbindung sind implementiert und im Simulator geprüft. Übersetzungswege,
-Share Extension und vollständige Geräteabnahme fehlen noch.
+Bibliotheksanbindung sind implementiert und im Simulator geprüft. Share Extension
+und native Spracheingabe sind ergänzt; ihre aktuelle Prüfung steht im Baustand.
+Übersetzungswege und vollständige Geräteabnahme fehlen noch.
 
 ## Reproduzierbarer Bau
 
@@ -55,10 +56,18 @@ keine Apple-Vertriebsidentität.
   Leseaufrufe. Bei einem Fehler wird kein Teilordner an den Webkern übergeben.
 - Öffnen von Dateien aus anderen Apps mit dauerhafter, explizit zu bestätigender
   Warteschlange, Empfangsarchiv und Wiederherstellung. Fehlende/beschädigte Metadaten
-  dürfen keine leere Erfolgsansicht erzeugen. Eine Share Extension fehlt noch.
+  dürfen keine leere Erfolgsansicht erzeugen. Die eingebettete Share Extension
+  kopiert alle bereitgestellten Dateien vor Veröffentlichung einer Empfangsgruppe;
+  Abbruch davor veröffentlicht keine Teilgruppe. Der vorherige interne Eingang
+  bleibt parallel lesbar, neue Dateien liegen im koordinierten App-Group-Eingang.
 - Vor Capacitors Plugin-Dispatch prüft eine native Nachrichtensperre Hauptframe
   **und** Hauptseiten-URL. Externe Seiten und eingebettete Frames erhalten keinen Zugriff.
 - Kein entfernter Prüfzugang; WebView-Inspektion bleibt deaktiviert.
+- Native Spracheingabe nutzt Apples Speech-API nach expliziter Mikrofon-/Speech-
+  Freigabe, bevorzugt Erkennung auf dem Gerät und beendet die Aufnahme bei Abbruch,
+  Unterbrechung, Navigation und Hintergrundwechsel. Je nach Gerät/Sprache kann
+  Apple Audio auf Servern verarbeiten; Apple-Hinweis ersetzt nur im iOS-Host die
+  Android-spezifische Erklärung des unveränderten gemeinsamen Adapters.
 
 Der unvollständige Host darf noch nicht als reguläre Pro-Ausgabe verteilt werden.
 Dateieingang/temporäre Dateien sind durch die iOS-Sandbox und System-Dateischutz
@@ -98,3 +107,22 @@ Fehlende/widerrufene Freigaben führen zu Fehlern. Es gibt keinen Ersatzordner.
 neuesten mit ihren gemeinsam verwendeten Datensätzen. Beschädigung stoppt das
 Aufräumen. Der lokale Revisions-/Indexprüfpunkt schützt auch Dokumentmetadaten
 vor Rücksetzung beim erneuten Auswählen eines älteren Tresorordners.
+Neue Ersatzschlüssel werden nativ angezeigt und optional verifiziert exportiert.
+Die bisherigen Teile bleiben bis zur bestätigten Aufbewahrung des neuen Satzes
+gültig; vor ihrer Entfernung wird die neue Hülle mit den neuen Teilen geprüft.
+
+## App Group und Nachweise
+
+App und Share Extension verwenden `group.de.familyprojekt.workflowpdf.pro`.
+Diese logische Zuordnung ist im Simulator prüfbar; Bundle-IDs, App Group und
+Provisioning müssen vor einem signierten Gerät zum vorhandenen Apple-Team passen.
+Es wurde keine Apple-Registrierung angelegt. Ein erfolgreich gebautes Extension-
+Bundle und Provider-Gegenproben ersetzen keinen Durchlauf des Teilen-Menüs einer
+echten Fremd-App auf einem physischen Gerät.
+
+Die CI enthält einen iPhone-Lauf mit Swift-/Drei-Plattform-Gegenproben und einen
+eigenen iPad-Hostlauf. Zusätzliche Hostproben prüfen verschlüsselte Sicherung und
+Rückimport mit Originalen, vier UI-Sprachen/RTL bei mehreren WKWebView-Größen,
+OCR mit gesperrten HTTP-/HTTPS-Ressourcen und den tatsächlichen Import der
+gepinnten optionalen Modellbibliothek. Bibliotheksimport allein ist noch kein
+heruntergeladenes Modell, kein Embedding und kein Offline-Modellnachweis.

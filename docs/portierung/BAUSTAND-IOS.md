@@ -32,6 +32,8 @@ Native Komponenten:
 - `WorkflowIncomingPlugin` und Scene-Anbindung: Dateieingang über „Öffnen mit“,
   dauerhafte explizite Warteschlange, Empfangsarchiv und erneutes Anbieten.
 - `WorkflowNativeCore`: vom UI unabhängige Swift-Verträge mit echten Dateiproben.
+- In der Fortsetzung: `WorkflowVaultPlugin`, `WorkflowSpeechPlugin` und
+  `WorkflowShare.appex`; aktuelle Implementierungs-/Prüfgrenzen am Ende dieser Datei.
 
 Framework-Untergrenze laut Paket: iOS 15.0. Das ist noch keine vollständige
 Abnahme auf iOS 15; notwendige neue APIs dürfen nicht unbemerkt die endgültige
@@ -81,8 +83,9 @@ Mindestversion verändern. Apple-Team und Bundle-ID-Verfügbarkeit sind ungeprü
   `nachweise/2026-10-22-ios-wkwebview-capabilities.json`. Noch kein signierter Bau,
   keine physische Geräteprüfung und kein App-Store-/TestFlight-Release.
 
-Die URL-Herkunftsregeln wurden als native Policy-Gegenprobe geprüft; ein vollständiger
-Angriffstest aus fremden Frames steht noch aus.
+Die URL-Herkunftsregeln wurden zuerst als native Policy-Gegenprobe geprüft.
+Der aktuelle Eintrag unten enthält zusätzlich einen echten Same-Origin-Subframe-
+Angriff über WebKits Nachrichtenhandler.
 
 ## Noch erforderlich, bevor die Pro-App vollständig ist
 
@@ -204,3 +207,53 @@ Share Extension, iPad-/Mindestversionsabnahme, physische Geräte und echte
 Dateianbieter-/Unterbrechungsproben sowie spätere Signierung und Verteilung.
 Die oben stehende historische Aufgabenliste ist anhand dieses Eintrags zu lesen;
 ein bestandener Simulatorlauf ist keine vollständige Produktabnahme.
+
+### Sicherheitsprüfung und Erweiterungen nach diesem Lauf
+
+Commit `9ea382cce15b9ebffb5f5bf6ca5dc2c5c7141229`, Apple-Lauf
+[39851891286](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39851891286),
+Job `120079973405`: vollständig grün. **19/19** Swift-Tests und **9/9**
+WKWebView-Hosttests, Drei-Plattform-Gegenproben und unsignierter Gerätebau bestanden.
+Die neuen Gegenproben belegen:
+
+- Nur an PDF-Dateien zu vergleichen genügt nicht: lokale Revisions-/Indexprüfstände
+  weisen ältere Ordnerkopien und abweichende Dokumentmetadaten derselben Revision
+  beim Wiederanbinden zurück. Der bisherige Hauptort bleibt erhalten. Eine aktuelle
+  identische Kopie lässt sich auch bei entzogenem altem Ordner wieder anbinden.
+- Ein laufender Tresor weist ersetzte Commit-Markierungen ab; nach Neustart wird
+  auch der authentifizierte Indexinhalt gegen den lokalen Prüfstand verglichen.
+- Ein echter eingebetteter Same-Origin-Frame erreicht den WebKit-Handler, bekommt
+  aber keinen nativen Aufruf ausgeführt; die Hauptframe-Kontrollanfrage funktioniert.
+- Ein veröffentlichter Standortkatalog wird bei nachfolgend fehlgeschlagener
+  Synchronisation nicht durch Zurückverschieben seiner Dateien ungültig gemacht.
+
+Auf `e8ab661` wurde die Share Extension tatsächlich eingebettet und kompiliert,
+auch der unsignierte Gerätebau bestand. Lauf
+[39852974761](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39852974761)
+bestätigt **20/20** Swift-Tests einschließlich kurzlebiger NSItemProvider-Dateien,
+ganzer Empfangsgruppen, Abbruch und unabhängiger koordinierter Clients. Im Host
+bestanden **9/10** Fälle. Der neue native→Web→Archiv→Wiederherstellungsfall scheiterte
+mit `INCOMING_DAMAGED`: Foundation-JSON wurde als Capacitor-`JSObject` gecastet.
+Die Brücke konstruiert nun ausdrücklich typisierte Werte; Datenassertionen bleiben
+erhalten und Aufrufe erhalten zur Diagnose ihren Methodennamen. Dieser Lauf ist
+wegen des Fehlers ausdrücklich **nicht vollständig grün**.
+
+Weitere neue Implementierung, Nachprüfung des aktuellen Commits erforderlich:
+
+- Native Spracheingabe mit Freigaben, begrenztem Stoppen und Aufräumen bei
+  Unterbrechung/Hintergrund/Navigation; gemeinsame JS-Ereignisform bleibt erhalten.
+  Kein erfolgreicher Sprachlauf aus der bloßen Verfügbarkeitsprobe ableiten.
+- Neue Ersatzschlüsselsätze lassen bisherige Teile bis zur nativen Bestätigung
+  ihrer Aufbewahrung gültig. Neustart davor soll keine bisherigen Teile entwerten;
+  neue Teile werden vor dem Entfernen der alten Manifestdateien erneut geprüft.
+- Unterbrochene private Import-/Empfangs-/Schlüsselexport-Kopien werden beim Start
+  aufgeräumt. Geteilte Exportkopien erhalten für mögliche Nachleser 24 Stunden.
+- Eigener iPad-Hostlauf, verschlüsselte Sicherungs-/Original-/Rückimportprobe,
+  vier UI-Sprachen und RTL bei drei WKWebView-Größen, Offline-OCR-Ressourcensperre
+  und Import der gepinnten optionalen Modellbibliothek. Die Apple-CSP erlaubt nun
+  auch deren exakte Basis-URL, die der unveränderte Kern tatsächlich importiert.
+  Das sind noch keine physischen Drehungs-/Tastatur-/Modellabnahmen.
+
+`ios/README.md` beschreibt App Group und aktuellen Bau. Die App-Group-/Bundle-
+Zuordnung ist vor signierten Geräten mit dem vorhandenen Team zu bestätigen.
+Keine Kosten, Konten oder signierten Veröffentlichungen wurden ausgelöst.
