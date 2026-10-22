@@ -96,10 +96,17 @@ public final class DocumentVault {
         }
     }
     private func temporary() -> URL { scratch.appendingPathComponent(UUID().uuidString.lowercased()) }
+    private func encode<T: Encodable>(_ value: T) throws -> Data {
+        let encoder = JSONEncoder()
+        // Match the canonical unescaped Base64 strings emitted by Android and
+        // Windows, including their existing pure-Java compatibility reader.
+        encoder.outputFormatting = [.withoutEscapingSlashes]
+        return try encoder.encode(value)
+    }
     private func publish<T: Encodable>(_ value: T, name: String) throws {
         let local = temporary()
         defer { try? FileManager.default.removeItem(at: local) }
-        try JSONEncoder().encode(value).write(to: local, options: .atomic)
+        try encode(value).write(to: local, options: .atomic)
         try folder.createVerified(name, from: local)
         if setupFiles != nil { setupFiles?.append(name) }
     }
@@ -272,7 +279,7 @@ public final class DocumentVault {
     }
     private func checkpointRevision() throws {
         try FileManager.default.createDirectory(at: checkpoint.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try JSONEncoder().encode(Checkpoint(id: identity, revision: revision)).write(to: checkpoint, options: .atomic)
+        try encode(Checkpoint(id: identity, revision: revision)).write(to: checkpoint, options: .atomic)
     }
     /// Validate all generations before deleting anything. Keep the same three
     /// committed generations as Windows; unknown/uncommitted objects are retained.
@@ -319,7 +326,7 @@ public final class DocumentVault {
         guard revision < UInt64(Int64.max) else { throw DocumentVaultFailure.damaged }
         let updated = revision + 1, source = temporary()
         defer { try? FileManager.default.removeItem(at: source) }
-        try JSONEncoder().encode(Envelope(app: Self.format, v: 1, revision: updated, records: next)).write(to: source, options: .atomic)
+        try encode(Envelope(app: Self.format, v: 1, revision: updated, records: next)).write(to: source, options: .atomic)
         let (file, _, _) = try encrypted(source, kind: "index")
         let marker = Marker(index: file, revision: updated)
         try publish(marker, name: String(format: "commit-%020llu-", updated) + UUID().uuidString.lowercased() + ".json")
