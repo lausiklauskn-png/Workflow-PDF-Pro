@@ -36,6 +36,12 @@ final class TransfersTests: XCTestCase {
         XCTAssertEqual(Transfers.filename(".."), "Dokument")
         XCTAssertFalse(Transfers.filename("path/unsafe\0name.pdf").contains("/"))
         XCTAssertEqual(Transfers.filename("Mu\u{0308}ller.pdf"), "Müller.pdf")
+        let unicode = try store.begin(name: String(repeating: "😀", count: 90) + ".pdf", mime: "application/pdf")
+        try store.finish(id: unicode, size: 0)
+        let filename = try store.file(id: unicode).lastPathComponent
+        XCTAssertTrue(filename.hasSuffix(".pdf"))
+        XCTAssertLessThanOrEqual(filename.utf8.count, 240)
+        try store.abort(id: unicode)
     }
     func testInboxRestartConsentArchiveRestoreAndChunkIdentity() throws {
         let root = try temporary()

@@ -28,8 +28,16 @@ public final class Transfers {
     public static func filename(_ name: String) -> String {
         let value = name.precomposedStringWithCanonicalMapping
             .components(separatedBy: CharacterSet(charactersIn: "/\\:\0").union(.controlCharacters)).joined(separator: "_")
-        let trimmed = String(value.prefix(180)).trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty || trimmed == "." || trimmed == ".." ? "Dokument" : trimmed
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        let ext = (trimmed as NSString).pathExtension
+        let suffix = !ext.isEmpty && ext.count <= 16 && ext.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber) }) ? "." + ext : ""
+        let stem = suffix.isEmpty ? trimmed : String(trimmed.dropLast(suffix.count))
+        var shortened = String(stem.prefix(180 - suffix.count))
+        // File providers constrain bytes as well as visible characters. Preserve
+        // the type extension when a Unicode document title needs shortening.
+        while shortened.utf8.count + suffix.utf8.count > 240 { shortened.removeLast() }
+        let result = shortened + suffix
+        return result.isEmpty || result == "." || result == ".." ? "Dokument" : result
     }
     public func begin(name: String, mime: String) throws -> String {
         guard tickets.count < 128 else { throw WorkflowError.unavailable }
