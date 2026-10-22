@@ -1,6 +1,6 @@
 # Workflow PDF Pro auf Android
 
-**[Workflow PDF Pro 1.0.2 als APK herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.2/Workflow-PDF-Pro-1.0.2.apk)**
+**[Workflow PDF Pro 1.0.3 als APK herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.3/Workflow-PDF-Pro-1.0.3.apk)**
 
 Die reguläre APK ist veröffentlicht. Signatur, öffentliche Downloadbytes und
 tatsächliche Produktionsinstallation mit erhaltenen Daten nach erneuter
@@ -9,7 +9,8 @@ Signatur-/Installationsnachweise; der Android-Baustand nennt die genauen Läufe.
 
 ## Update einer vorhandenen Installation
 
-Die APK 1.0.1 direkt über die vorhandene App installieren. **Nicht vorher
+Die APK 1.0.3 direkt über die vorhandene App installieren. Die installierte Version steht
+unten unter „Impressum & Datenschutz“ und ganz unten in den Einstellungen. **Nicht vorher
 deinstallieren.** App-Kennung und Signieridentität bleiben gleich; die
 Versions-/Buildnummer steigt. Ein neuer Tresor muss dafür nicht angelegt werden.
 Das bestätigte Pro-Icon ersetzt den früheren eingerahmten Launcher-Entwurf.

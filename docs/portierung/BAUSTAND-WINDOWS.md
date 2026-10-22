@@ -216,3 +216,13 @@ Der Lauf startet nur, wenn ein Commit Dateien unter `windows/`, `native/`,
 Doku-Commit auf main fehlt dieser Lauf; dann bricht die Veröffentlichung ab.
 
 Einzelheiten: [Windows-Signierung und Updates](../../windows/SIGNIERUNG-UND-UPDATES.md).
+
+## Veröffentlichung 1.0.3 (22.10.2026)
+
+Erster Lauf des neuen unsignierten Ablaufs: `windows-release.yml` Lauf 39802111266 auf main
+`4bf83ef`, Installer aus dem grünen `windows-app`-Lauf 39800194808 desselben Commits (dort
+auch die Abnahme mit „Version 1.0.3“ im Fuß). Release
+[windows-v1.0.3](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.3):
+`Workflow-PDF-Pro-Windows-1.0.3-Setup.exe`, 15.854.566 Bytes, SHA-256
+`4795946f26aac4f1d6e9d37df9c59279b8f66733feccf4f6e8144a181f19ea68`, unabhängig geladen und
+verglichen. Unsigniert, ohne automatische Updates. Auf Klaus' Windows-PC nicht gemessen.
