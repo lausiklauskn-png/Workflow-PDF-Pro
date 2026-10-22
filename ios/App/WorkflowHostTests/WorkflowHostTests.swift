@@ -209,6 +209,66 @@ import Speech
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+    func testEncryptedBackupRoundTripPreservesOriginalAndNeverOverwritesExistingDocument() async throws {
+        try await ready()
+        let result = try await js("""
+            const DB=WFP.DB,SI=WFP.Sicherung,id='ios-backup-'+crypto.randomUUID(),folder=id+'-folder';
+            const pdf=await PDFLib.PDFDocument.create();pdf.addPage([595,842]);const bytes=await pdf.save();
+            const original=new Uint8Array([255,216,1,2,3,255,217]),password='Synthetic backup password 123';
+            try {
+              await DB.put('folders',{id:folder,name:'Папка العربية'});
+              await DB.putFile(id,bytes);
+              await DB.put('docs',{id,name:'Erfundene Sicherungsprobe',folderId:folder,pages:[{w:595,h:842}],fields:[{id:'f',value:'Müller Москва العربية'}],pruefung:{status:'sauber'}});
+              await DB.put('files',{id:id+'~original',name:'Фото.jpg',bytes:original});
+              const saved=await SI.verschliessen(password,DB),serialized=JSON.stringify(saved.datei);
+              await DB.del('docs',id);await DB.del('files',id);await DB.del('files',id+'~original');await DB.del('folders',folder);
+              let wrongRejected=false;try{await SI.oeffnen('Wrong synthetic password 456',saved.datei);}catch(error){wrongRejected=error.message==='passwort';}
+              if(await DB.get('docs',id))throw Error('Wrong password changed the database');
+              const content=await SI.oeffnen(password,saved.datei),merged=await SI.zusammenfuehren(DB,content);
+              const restored=await DB.get('docs',id),file=await DB.getFile(id),photo=await DB.get('files',id+'~original');
+              await DB.put('docs',{...restored,name:'Keep my newer name'});
+              await SI.zusammenfuehren(DB,content);
+              return {wrongRejected,encrypted:!serialized.includes('Erfundene Sicherungsprobe')&&!serialized.includes('Müller'),added:merged.neu.some(row=>row.doc.id===id),
+                bytes:JSON.stringify(Array.from(file))===JSON.stringify(Array.from(bytes)),original:JSON.stringify(Array.from(photo.bytes))===JSON.stringify(Array.from(original)),
+                originalNotice:photo.name.includes(SI.ORIGINAL_VERMERK),unicode:restored.fields[0].value,untrustedFindingRemoved:!('pruefung'in restored),
+                unchanged:(await DB.get('docs',id)).name==='Keep my newer name'};
+            } finally {await DB.del('docs',id);await DB.del('files',id);await DB.del('files',id+'~original');await DB.del('folders',folder);}
+            """, seconds: 60) as? [String: Any]
+        for key in ["wrongRejected", "encrypted", "added", "bytes", "original", "originalNotice", "untrustedFindingRemoved", "unchanged"] {
+            XCTAssertEqual(result?[key] as? Bool, true, key)
+        }
+        XCTAssertEqual(result?["unicode"] as? String, "Müller Москва العربية")
+    }
+    func testFourUILanguagesAndArabicDirectionAtPhoneAndTabletViewportSizes() async throws {
+        try await ready()
+        let view = try webView(), previousFrame = view.frame
+        defer { view.frame = previousFrame }
+        let initialLanguage = try await js("return WFP.Sprache.lang;") as? String ?? "de"
+        let quoted = String(data: try JSONSerialization.data(withJSONObject: [initialLanguage]), encoding: .utf8)!
+        do {
+            var measurements: [[String: Any]] = []
+            for size in [CGSize(width: 375, height: 700), CGSize(width: 1024, height: 768), CGSize(width: 768, height: 1024)] {
+                view.frame = CGRect(origin: previousFrame.origin, size: size)
+                for language in ["de", "en", "ru", "ar"] {
+                    let result = try await js("""
+                        WFP.Sprache.setzen('\(language)');await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+                        return {language:document.documentElement.lang,direction:document.documentElement.dir,width:innerWidth,height:innerHeight,
+                          editor:typeof __wfpdf==='object',bodyDirection:getComputedStyle(document.body).direction};
+                        """) as? [String: Any] ?? [:]
+                    XCTAssertEqual(result["language"] as? String, language)
+                    XCTAssertEqual(result["direction"] as? String, language == "ar" ? "rtl" : "ltr")
+                    XCTAssertEqual(result["bodyDirection"] as? String, language == "ar" ? "rtl" : "ltr")
+                    XCTAssertGreaterThan(result["width"] as? Int ?? 0, 0)
+                    XCTAssertEqual(result["editor"] as? Bool, true)
+                    measurements.append(result)
+                }
+            }
+            let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: measurements, options: .prettyPrinted), uniformTypeIdentifier: "public.json")
+            attachment.name = "Actual WKWebView language and viewport measurements; no hardware keyboard or rotation proof"
+            attachment.lifetime = .keepAlways; add(attachment)
+        } catch { _ = try? await js("WFP.Sprache.setzen(\(quoted)[0]);return true;"); throw error }
+        _ = try await js("WFP.Sprache.setzen(\(quoted)[0]);return true;")
+    }
     func testLocalOCRWorkerAndWASMRecognizeThreeLanguages() async throws {
         try await ready()
         let result = try await js("""
@@ -266,6 +326,27 @@ import Speech
         attachment.name = "Native language API availability only; no translation or speech recognition proof"
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+    func testSpeechBridgeAvailabilityAndInvalidSessionDoNotStartRecording() async throws {
+        try await ready()
+        let result = try await js("""
+            const api=Capacitor.Plugins.WorkflowSpeech;
+            const availability=await api.available({language:'de-DE'});
+            let rejected=false;
+            try {await api.start({id:'invalid',language:'de-DE'});}catch(error){rejected=error.code==='SPEECH_INVALID_SESSION';}
+            await api.stop({id:crypto.randomUUID(),abort:true});
+            const parent=document.createElement('div'),button=document.createElement('button');parent.append(button);document.body.append(parent);
+            try {
+              WFSprechen.anhaengen({knopf:button,nach:parent});
+              return {rejected,availableType:typeof availability.available,onDeviceType:typeof availability.supportsOnDevice,notice:button.title,recognizer:typeof window.SpeechRecognition};
+            } finally {parent.nextElementSibling?.remove();parent.remove();}
+            """) as? [String: Any]
+        XCTAssertEqual(result?["rejected"] as? Bool, true)
+        XCTAssertEqual(result?["availableType"] as? String, "boolean")
+        XCTAssertEqual(result?["onDeviceType"] as? String, "boolean")
+        XCTAssertEqual(result?["recognizer"] as? String, "function")
+        XCTAssertTrue((result?["notice"] as? String)?.contains("Apple") == true)
+        XCTAssertFalse((result?["notice"] as? String)?.contains("Android") == true)
     }
     func testVaultMigrationUsesRealNativeStorageAndMissingFolderBlocksJobs() async throws {
         try await ready()

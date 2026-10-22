@@ -27,6 +27,7 @@
 		46816066277445C58ED7C060 /* WorkflowShare.appex in Copy Files */ = {isa = PBXBuildFile; fileRef = F7AB11F2896B487BA4DB0C5D /* WorkflowShare.appex */; };
 		BC8A5BA5A74F4010B37B4A49 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4478490402EA4F75A34E85F0 /* ShareViewController.swift */; };
 		A19EC7A255CE47659D4B0806 /* WorkflowNativeCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000002 /* WorkflowNativeCore */; };
+		B30000000000000000000001 /* WorkflowSpeechPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000000000000000000002 /* WorkflowSpeechPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,7 @@
 		B20000000000000000000002 /* WorkflowVaultPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowVaultPlugin.swift; sourceTree = "<group>"; };
 		F7AB11F2896B487BA4DB0C5D /* WorkflowShare.appex */ = {isa = PBXFileReference; name = "WorkflowShare.appex"; path = WorkflowShare.appex; sourceTree = BUILT_PRODUCTS_DIR; fileEncoding = undefined; lastKnownFileType = undefined; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; };
 		4478490402EA4F75A34E85F0 /* ShareViewController.swift */ = {isa = PBXFileReference; name = "ShareViewController.swift"; path = ShareViewController.swift; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		B30000000000000000000002 /* WorkflowSpeechPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowSpeechPlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 				09059FBCE3195F04D70500FC /* WorkflowImportPlugin.swift */,
 				DEBFE8029F15A5ED740F9364 /* WorkflowFilesPlugin.swift */,
 				B20000000000000000000002 /* WorkflowVaultPlugin.swift */,
+				B30000000000000000000002 /* WorkflowSpeechPlugin.swift */,
 				0C35F01C9DE114014E60A613 /* WorkflowBridgeViewController.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
@@ -266,6 +269,7 @@
 				AEF3E796727E71F9010A6655 /* WorkflowImportPlugin.swift in Sources */,
 				F5A42A4AB151C0D44B46C4B4 /* WorkflowFilesPlugin.swift in Sources */,
 				B20000000000000000000001 /* WorkflowVaultPlugin.swift in Sources */,
+				B30000000000000000000001 /* WorkflowSpeechPlugin.swift in Sources */,
 				555F03B1F2009DDD10E84D15 /* WorkflowBridgeViewController.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 			);

@@ -95,6 +95,6 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Gesprochene Eingaben für die Dokumentensuche und Bearbeitung aufnehmen.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Gesprochene Eingaben in Text umwandeln. Die Verfügbarkeit hängt vom Gerät und der Sprache ab.</string>
+	<string>Gesprochene Eingaben in Text umwandeln. Je nach Gerät und Sprache kann Apple die Aufnahme auf seinen Servern verarbeiten.</string>
 </dict>
 </plist>

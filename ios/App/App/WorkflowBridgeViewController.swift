@@ -31,6 +31,7 @@ final class WorkflowBridgeViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(WorkflowImportPlugin())
         bridge?.registerPluginInstance(WorkflowIncomingPlugin())
         bridge?.registerPluginInstance(WorkflowVaultPlugin())
+        bridge?.registerPluginInstance(WorkflowSpeechPlugin())
         if #available(iOS 16.4, *) { webView.isInspectable = false }
     }
 }

@@ -8,7 +8,7 @@ const receipt = JSON.parse(await readFile(new URL('native-bundle.json', base), '
 if (receipt.host) throw new Error('Expected an undecorated shared bundle; run cap sync ios first.');
 const anchor = html.match(/<script defer src="assets\/app\.js\?v=\d+"><\/script>/g);
 if (anchor?.length !== 1) throw new Error('Apple injection anchor changed');
-const host = "'use strict';\ndocument.documentElement.dataset.wfpNative = 'ios';\n";
+const host = await readFile(new URL('../host.js', import.meta.url), 'utf8');
 await mkdir(new URL('ios/', base), { recursive: true });
 await writeFile(new URL('ios/host.js', base), host);
 html = html.replace(anchor[0], `<script defer src="ios/host.js?v=${hash(host)}"></script>\n${anchor[0]}`);

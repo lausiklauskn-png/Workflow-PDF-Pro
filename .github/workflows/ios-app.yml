@@ -85,3 +85,51 @@ jobs:
           path: ios/results/
           if-no-files-found: warn
           retention-days: 14
+  ipad:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run sync:ios
+      - name: Echte WKWebView-Proben im iPad-Simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          destination=$(python3 - <<'PY'
+          import json, subprocess
+          groups = json.loads(subprocess.check_output(['xcrun','simctl','list','devices','available','--json']))['devices']
+          tablets = [d for runtime, devices in groups.items() if 'iOS' in runtime for d in devices if d['name'].startswith('iPad')]
+          if not tablets: raise SystemExit('No available iPad simulator')
+          print(tablets[0]['udid'])
+          PY
+          )
+          mkdir -p ios/results
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -destination "platform=iOS Simulator,id=$destination" -parallel-testing-enabled NO \
+            -test-timeouts-enabled YES -default-test-execution-time-allowance 90 -maximum-test-execution-time-allowance 120 \
+            -derivedDataPath ios/DerivedData -resultBundlePath ios/results/Workflow-iPad.xcresult \
+            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test 2>&1 | tee ios/results/ipad-host.log
+      - name: iPad-Baufehler lesbar halten
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for path in Path('ios/results').glob('*.log'):
+              selected = [line for line in path.read_text(errors='replace').splitlines() if any(word in line for word in ['error:', 'failed', 'FAILED'])]
+              for line in selected[-25:]:
+                  safe = line[:3000].replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+                  print('::error title=iPad build evidence::' + safe)
+          PY
+      - name: iPad-Prüfergebnisse bewahren
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ios-ipad-host-results
+          path: ios/results/
+          if-no-files-found: warn
+          retention-days: 14
