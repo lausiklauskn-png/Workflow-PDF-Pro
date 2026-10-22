@@ -2,6 +2,11 @@
 
 - Wiederaufnahme, tatsächliche Zugriffsprüfung und Bauumgebung: `docs/FOLGESITZUNG.md`.
   Eigene bestehende GitHub-Verbindung nutzen; Signierfreigabe bleibt in Actions.
+  Neueste Übergabe vom 22.10.2026: `BRIEF_ABSCHLUSS_2026-10-22_WINDOWS.md` und
+  `BRIEF_NACHFOLGE_2026-10-22_IOS.md`. Windows vorerst beendet; iOS ist die nächste Sitzung.
+  Windows bleibt vorerst bei manuellen unsignierten Installern ohne Update-Schlüssel;
+  der vorbereitete Releaseablauf verlangt technisch noch Signierung und ist vor
+  einer späteren Windows-Veröffentlichung entsprechend zu korrigieren.
   Aktueller Zusatzbrief: `BRIEF_NACHFOLGE_2026-10-21_ANDROID_APK_AUSGELIEFERT.md`.
   Windows (Tauri 2, Claude Code): `BRIEF_NACHFOLGE_2026-10-21_WINDOWS.md`, Stand in
   `docs/portierung/BAUSTAND-WINDOWS.md`. Windows-Teile liegen nur unter `windows/` und in

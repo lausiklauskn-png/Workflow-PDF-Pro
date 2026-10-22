@@ -163,6 +163,21 @@ Neuinstallation bestanden. Auslieferungsbau läuft ohne CDP-Prüfzugang und ohne
 CSP-Prüfskript. 191/191 Quelldateien unverändert.
 
 Das ist keine ausgeführte Authenticode-Signierung oder echte Update-Installation
-und keine physische Windows-10-/11-Abnahme. Einrichtung und anschließende
-Neuveröffentlichung bleiben wegen fehlendem Signierkonto und Update-Schlüssel offen.
+und keine physische Windows-10-/11-Abnahme. Eine neue Veröffentlichung ist noch nicht erfolgt. Die spätere abschließende Wahl
+unten ersetzt die zuvor angenommene Pflicht zur Einrichtung eines Signierkontos.
 
+
+## Abschlussentscheidung vom 22.10.2026
+
+Klaus beendet Windows vorerst und bereitet als nächste Sitzung iOS vor.
+[Windows-Abschluss](../../BRIEF_ABSCHLUSS_2026-10-22_WINDOWS.md) und
+[iOS-Nachfolgebrief](../../BRIEF_NACHFOLGE_2026-10-22_IOS.md) sind die aktuelle Übergabe.
+
+Vorerst manuelle Updates per unsignierter Setup.exe; kein kostenpflichtiges
+Windows-Signierkonto, kein selbstsigniertes Herausgeberzertifikat und kein
+Update-Schlüssel. Automatische Updates bleiben deaktiviert. Der existierende
+Releaseworkflow erzwingt noch Signierung und passt damit noch nicht zur letzten
+Wahl. Dies vor einer späteren Windows-Veröffentlichung korrigieren; jetzt kein
+Konto anlegen, keinen Schlüssel erzeugen und keine neue Version veröffentlichen.
+Der aktuelle öffentliche Installer bleibt 1.0.1. Diese Abschlussfortsetzung
+ändert Dokumentation, weder Anwendungscode noch den Releaseablauf.

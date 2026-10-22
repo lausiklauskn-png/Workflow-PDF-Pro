@@ -1,5 +1,23 @@
 # Selbstständig weiterarbeiten: Codex und Claude Code
 
+## Übergabe vom 22.10.2026
+
+Windows ist auf Klaus' Wunsch vorerst abgeschlossen. Maßgeblich sind der
+[Windows-Abschluss](../BRIEF_ABSCHLUSS_2026-10-22_WINDOWS.md) und der vorbereitete
+[iOS-Nachfolgeauftrag](../BRIEF_NACHFOLGE_2026-10-22_IOS.md). iOS beginnt in der
+nächsten Sitzung. Die folgenden älteren Fortsetzungsnotizen sind historisch;
+deren offene Android-/Windows-Aufgaben nicht ungeprüft erneut beginnen.
+
+Veröffentlicht bleibt Windows 1.0.1, unsigniert und ohne automatische Updates.
+Windows-Quellstand 1.0.2 enthält geprüfte Sicherheitsverbesserungen und einen
+wegen leerem Schlüssel deaktivierten Updater, ist aber nicht veröffentlicht.
+Klaus wählt vorerst manuelle Setup.exe-Updates ohne kostenpflichtige Signierung,
+ohne selbstsigniertes Herausgeberzertifikat und ohne Update-Schlüssel. Der aktuelle
+Windows-Releaseablauf erzwingt noch Signierung; vor dem nächsten Windows-Release
+an diese Wahl anpassen. Jetzt weder Konto einrichten noch Release starten.
+
+## Bisherige Android Fortsetzung
+
 Aktueller kopierbarer Nachfolgeauftrag:
 `BRIEF_NACHFOLGE_2026-10-21_ANDROID_APK_AUSGELIEFERT.md`. Er ergänzt die historischen
 Baufortsetzungen und den weiterhin
