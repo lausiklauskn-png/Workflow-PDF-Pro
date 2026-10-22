@@ -54,6 +54,18 @@ jobs:
           xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
             -destination 'generic/platform=iOS' -derivedDataPath ios/DerivedData-device \
             CODE_SIGNING_ALLOWED=NO build 2>&1 | tee ios/results/release-build.log
+      - name: Baufehler über die Checks-API lesbar halten
+        if: failure()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for path in Path('ios/results').glob('*.log'):
+              selected = [line for line in path.read_text(errors='replace').splitlines() if any(word in line for word in ['error:', 'failed', 'FAILED', 'Failing tests:'])]
+              for line in selected[-30:]:
+                  safe = line[:3000].replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+                  print('::error title=iOS build evidence::' + safe)
+          PY
       - name: Prüfergebnisse bewahren
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

@@ -95,7 +95,10 @@ public final class IncomingStore {
         self.root = root
         index = root.appendingPathComponent("inbox.json")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        if !FileManager.default.fileExists(atPath: index.path) { try save(State()) }
+        if !FileManager.default.fileExists(atPath: index.path) {
+            guard try FileManager.default.contentsOfDirectory(atPath: root.path).isEmpty else { throw WorkflowError.damagedInbox }
+            try save(State())
+        }
         _ = try load()
     }
     private func load() throws -> State {

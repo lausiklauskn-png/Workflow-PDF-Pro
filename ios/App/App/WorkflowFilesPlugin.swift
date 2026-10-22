@@ -57,7 +57,7 @@ final class WorkflowFilesPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
         perform(call) { [self] in ["id": try store().begin(name: text(call, "name"), mime: call.getString("mime") ?? "application/octet-stream")] }
     }
     @objc func append(_ call: CAPPluginCall) {
-        perform(call) { [self] in ["size": try store().append(id: text(call, "id"), offset: number(call, "offset"), base64: text(call, "data"))] }
+        perform(call) { [self] in ["size": NSNumber(value: try store().append(id: text(call, "id"), offset: number(call, "offset"), base64: text(call, "data")))] }
     }
     @objc func finish(_ call: CAPPluginCall) {
         perform(call) { [self] in try store().finish(id: text(call, "id"), size: number(call, "size")); return ["ok": true] }

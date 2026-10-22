@@ -88,6 +88,16 @@ final class TransfersTests: XCTestCase {
         try Data("corrupt".utf8).write(to: inboxURL.appendingPathComponent("inbox.json"))
         XCTAssertThrowsError(try IncomingStore(root: inboxURL))
     }
+    func testMissingIndexDoesNotResetExistingIntake() throws {
+        let root = try temporary()
+        let source = root.appendingPathComponent("source.pdf")
+        try Data([1, 2, 3]).write(to: source)
+        let inboxURL = root.appendingPathComponent("inbox")
+        let inbox = try IncomingStore(root: inboxURL)
+        _ = try inbox.receive([source])
+        try FileManager.default.removeItem(at: inboxURL.appendingPathComponent("inbox.json"))
+        XCTAssertThrowsError(try IncomingStore(root: inboxURL))
+    }
     func testSymlinkAndTraversalMetadataAreRejected() throws {
         let root = try temporary()
         let file = root.appendingPathComponent("document.pdf")
