@@ -41,7 +41,7 @@
 		DEBFE8029F15A5ED740F9364 /* WorkflowFilesPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowFilesPlugin.swift; sourceTree = "<group>"; };
 		09059FBCE3195F04D70500FC /* WorkflowImportPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowImportPlugin.swift; sourceTree = "<group>"; };
 		6C0270720B5F363347EA630C /* WorkflowIncomingPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowIncomingPlugin.swift; sourceTree = "<group>"; };
-		9D7DEEB38C98450CBF3F7872 /* WorkflowHostTests.mdimporter */ = {isa = PBXFileReference; name = "WorkflowHostTests.mdimporter"; path = "WorkflowHostTests.mdimporter"; sourceTree = BUILT_PRODUCTS_DIR; fileEncoding = undefined; lastKnownFileType = undefined; explicitFileType = "wrapper.cfbundle"; includeInIndex = 0; };
+		9D7DEEB38C98450CBF3F7872 /* WorkflowHostTests.mdimporter */ = {isa = PBXFileReference; name = "WorkflowHostTests.xctest"; path = "WorkflowHostTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; explicitFileType = "wrapper.cfbundle"; includeInIndex = 0; };
 		C034FEA6B58A4F8785ACDD19 /* WorkflowHostTests.swift */ = {isa = PBXFileReference; name = "WorkflowHostTests.swift"; path = "WorkflowHostTests/WorkflowHostTests.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
@@ -413,6 +413,7 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/App.app/App";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = xctest;
 			};
 		};
 		882E4F979D5748BAA982885F /* Release */ = {
@@ -429,6 +430,7 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/App.app/App";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = xctest;
 			};
 		};
 /* End XCBuildConfiguration section */
