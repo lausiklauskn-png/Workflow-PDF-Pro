@@ -8,9 +8,30 @@ import UIKit
         let controllers = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows).compactMap { $0.rootViewController as? WorkflowBridgeViewController }
         return try XCTUnwrap(controllers.first?.webView)
     }
+    // Use the Objective-C completion API: the Swift async WebKit overlay is
+    // not shipped by every supported simulator runtime.
+    private func evaluate(_ code: String) async throws -> Any? {
+        let view = try webView()
+        return try await withCheckedThrowingContinuation { continuation in
+            view.evaluateJavaScript(code) { value, error in
+                if let error = error { continuation.resume(throwing: error) }
+                else { continuation.resume(returning: value) }
+            }
+        }
+    }
     private func js(_ code: String) async throws -> Any? {
-        let bounded = "return await Promise.race([(async()=>{\(code)})(),new Promise((_,reject)=>setTimeout(()=>reject(Error('iOS probe timeout')),15000))]);"
-        return try await webView().callAsyncJavaScript(bounded, arguments: [:], in: nil, contentWorld: .page)
+        let key = "__iosProbe_" + UUID().uuidString.replacingOccurrences(of: "-", with: "")
+        _ = try await evaluate("window['\(key)']=null;(async()=>{\(code)})().then(value=>window['\(key)']={done:true,value:value??null},error=>window['\(key)']={done:true,error:String(error)});null;")
+        for _ in 0..<150 {
+            if let result = try await evaluate("window['\(key)']") as? [String: Any], result["done"] as? Bool == true {
+                _ = try await evaluate("delete window['\(key)'];null;")
+                if let error = result["error"] as? String { throw NSError(domain: "WorkflowProbe", code: 1, userInfo: [NSLocalizedDescriptionKey: error]) }
+                return result["value"]
+            }
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        _ = try? await evaluate("delete window['\(key)'];null;")
+        throw NSError(domain: "WorkflowProbe", code: 2, userInfo: [NSLocalizedDescriptionKey: "iOS probe timeout"])
     }
     private func ready() async throws {
         for _ in 0..<150 {
