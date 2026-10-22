@@ -24,9 +24,9 @@ use wfp_core::Error;
 // WebView2 verlangt für alle Fenster einer App dieselben Startoptionen;
 // ein Fenster mit abweichenden Optionen lässt sich nicht erzeugen.
 #[cfg(not(feature = "messprobe"))]
-pub const BROWSER_ARGS: &str = "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection";
+pub const BROWSER_ARGS: &str = "--disable-features=msWebOOUI,msPdfOOUI";
 #[cfg(feature = "messprobe")]
-pub const BROWSER_ARGS: &str = "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port=9222";
+pub const BROWSER_ARGS: &str = "--disable-features=msWebOOUI,msPdfOOUI --remote-debugging-port=9222";
 
 pub type Reply = std::result::Result<Value, String>;
 
@@ -496,6 +496,7 @@ impl Host {
             .title("Workflow PDF Pro")
             .inner_size(width, height)
             .resizable(false)
+            .devtools(cfg!(feature="messprobe"))
             .minimizable(false)
             .maximizable(false)
             .always_on_top(true)
@@ -608,3 +609,4 @@ pub enum Target {
     Candidate(DocumentVault, Place),
     Existing(Option<String>),
 }
+
