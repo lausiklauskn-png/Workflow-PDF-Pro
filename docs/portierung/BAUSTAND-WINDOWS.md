@@ -181,3 +181,12 @@ Wahl. Dies vor einer späteren Windows-Veröffentlichung korrigieren; jetzt kein
 Konto anlegen, keinen Schlüssel erzeugen und keine neue Version veröffentlichen.
 Der aktuelle öffentliche Installer bleibt 1.0.1. Diese Abschlussfortsetzung
 ändert Dokumentation, weder Anwendungscode noch den Releaseablauf.
+
+## Ersatzschlüssel 3 von 5 (Quellstand, nicht veröffentlicht)
+
+PR #14 ergänzt den Windows-Quellstand um Ersatzschlüssel für den Ordnertresor:
+eigenes Fenster `windows/ersatz.html` (Anzeigen, Speichern, Drucken, Bestätigen) und
+„Passwort vergessen?“ im Passwortfenster. Die Windows-Abnahme prüft Erzeugen, Sperre für
+das Hauptfenster, Tippfehlererkennung, Ablehnung von nur zwei Teilen und das Öffnen mit
+neuem Passwort nach Neustart. Laut Klaus' Entscheidung vom 22.10.2026 wird jetzt kein
+neuer Windows-Installer veröffentlicht; veröffentlicht bleibt 1.0.1 ohne Ersatzschlüssel.
