@@ -177,6 +177,14 @@ public final class ProFilesPlugin extends Plugin {
         // Android's chooser does not reliably report delivery/cancellation. Do not claim delivery.
         if (call != null) call.resolve(new JSObject().put("opened", true).put("deliveryConfirmed", false));
     }
+    /** App-Version für die Anzeige im Fuß und in den Einstellungen (Klaus 2026-10-22). */
+    @PluginMethod public void appInfo(PluginCall call) {
+        try {
+            android.content.pm.PackageInfo info = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
+            long code = android.os.Build.VERSION.SDK_INT >= 28 ? info.getLongVersionCode() : info.versionCode;
+            call.resolve(new JSObject().put("version", info.versionName).put("build", code));
+        } catch (Exception error) { call.reject("APP_INFO_UNAVAILABLE"); }
+    }
     @PluginMethod public void openLink(PluginCall call) {
         String url = call.getString("url", ""); Uri uri = Uri.parse(url);
         if (!Arrays.asList("https", "http", "mailto", "tel").contains(uri.getScheme())) { call.reject("LINK_NOT_ALLOWED"); return; }

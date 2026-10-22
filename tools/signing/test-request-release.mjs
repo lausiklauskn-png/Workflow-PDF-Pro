@@ -19,6 +19,7 @@ if(cmd==='gh')process.exit(mode==='direct'?0:1);
 if(args[0]==='ls-remote') { if(args.at(-1)==='refs/heads/main') console.log(sha+'\\trefs/heads/main'); else if(mode==='already')console.log(sha+'\\t'+args.at(-1)); }
 else if(args[0]==='rev-parse')console.log(mode==='changed'?'b'.repeat(40):sha);
 else if(args[0]==='cat-file'&&mode==='missing')process.exit(1);
+else if(args[0]==='grep')process.exit(mode==='nowindows'?1:0);
 else if(!['fetch','cat-file','push'].includes(args[0]))process.exit(99);
 `;
     for (const name of ['git', 'gh']) { const file = join(folder, name); await writeFile(file, mock); await chmod(file, 0o700); }
@@ -42,5 +43,13 @@ else if(!['fetch','cat-file','push'].includes(args[0]))process.exit(99);
     const already = await run('already');
     assert.equal(already.status, 0); assert.match(already.stdout, /bereits vorhanden/); assert.ok(!already.calls.some(c => c.args[0] === 'push'));
     const preview = await run('preview', 'v1.0.0-preview'); assert.equal(preview.status, 1); assert.equal(preview.calls.length, 0);
+    const windowsDirect = await run('direct', 'windows-v1.0.3');
+    assert.equal(windowsDirect.status, 0); assert.equal(windowsDirect.calls.find(c => c.cmd === 'gh').args[2], 'windows-release.yml');
+    assert.equal(direct.calls.find(c => c.cmd === 'gh').args[2], 'workflow-pdf-release.yml');
+    const windowsFallback = await run('fallback', 'windows-v1.0.3');
+    assert.equal(windowsFallback.status, 0);
+    assert.equal(windowsFallback.calls.find(c => c.args[0] === 'push').args[2], 'a'.repeat(40) + ':refs/heads/release-requests/windows-v1.0.3');
+    const noBridge = await run('nowindows', 'windows-v1.0.3'); assert.equal(noBridge.status, 1); assert.ok(!noBridge.calls.some(c => c.args[0] === 'push'));
+    for (const bad of ['windows-1.0.3', 'win-v1.0.3', 'windows-v1.0']) { const r = await run('bad', bad); assert.equal(r.status, 1); assert.equal(r.calls.length, 0); }
   } finally { await rm(folder, { recursive: true, force: true }); }
 });

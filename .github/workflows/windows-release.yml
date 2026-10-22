@@ -1,15 +1,18 @@
-name: Workflow PDF Pro für Windows signieren und veröffentlichen
-# Authenticode signs the accepted installer; minisign then binds its final bytes
-# to the release version. No unsigned release fallback and no new app build.
+name: Workflow PDF Pro für Windows veröffentlichen (unsigniert)
+# Klaus' Wahl vom 22.10.2026: manueller, unsignierter Setup.exe-Installer.
+# Kein Signierkonto, kein Herausgeberzertifikat, kein Update-Schlüssel, kein Updater.
+# Veröffentlicht wird genau der Installer, den "Windows-App (Tauri)" für diesen
+# main-Commit gebaut und abgenommen hat. Kein Neubau; so wurde auch 1.0.1 veröffentlicht.
+# Anstoß: "Run workflow" oder Git-Brücke release-requests/windows-vX.Y.Z (release-request.yml).
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Windows-Tag, z. B. windows-v1.0.2
+        description: Windows-Tag, z. B. windows-v1.0.3 (muss zur Version in tauri.conf.json passen)
         required: true
         type: string
       commit:
-        description: Vollständiger, zuvor geprüfter main-Commit
+        description: Vollständiger, zuvor geprüfter main-Commit (aktueller main-Stand)
         required: true
         type: string
 permissions:
@@ -19,127 +22,183 @@ concurrency:
   group: workflow-pdf-pro-windows-release
   cancel-in-progress: false
 jobs:
-  release:
+  pruefen:
     if: github.ref == 'refs/heads/main'
-    runs-on: windows-latest
-    timeout-minutes: 30
-    environment: windows-production
-    permissions:
-      contents: write
-      actions: read
-      id-token: write
-    defaults:
-      run:
-        shell: pwsh
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      run: ${{ steps.gates.outputs.run }}
+      version: ${{ steps.gates.outputs.version }}
+      installer: ${{ steps.gates.outputs.installer }}
+      sha256: ${{ steps.gates.outputs.sha256 }}
+      size: ${{ steps.gates.outputs.size }}
     steps:
-      - name: Bytegleiche Dateien auschecken
-        run: git config --global core.autocrlf false
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: '24'
-      - name: Identität, Schlüssel und Abnahmelauf verlangen
+      - name: Version, main-Stand, Abnahme und unsignierten Bau verlangen
+        id: gates
         env:
           GH_TOKEN: ${{ github.token }}
           EXPECTED_COMMIT: ${{ inputs.commit }}
           RELEASE_TAG: ${{ inputs.tag }}
-          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-          SIGNING_ENDPOINT: ${{ vars.WF_PDF_SIGNING_ENDPOINT }}
-          SIGNING_ACCOUNT: ${{ vars.WF_PDF_SIGNING_ACCOUNT }}
-          SIGNING_PROFILE: ${{ vars.WF_PDF_SIGNING_CERTIFICATE_PROFILE }}
-          PUBLISHER: ${{ vars.WF_PDF_WINDOWS_PUBLISHER_SUBJECT }}
-          UPDATE_KEY: ${{ secrets.WF_PDF_UPDATER_PRIVATE_KEY }}
+        shell: bash
         run: |
-          $ErrorActionPreference = 'Stop'
-          if ($env:GITHUB_REPOSITORY -ne 'lausiklauskn-png/Workflow-PDF-Pro') { throw 'Wrong repository.' }
-          if ($env:EXPECTED_COMMIT -cnotmatch '^[a-f0-9]{40}$' -or $env:EXPECTED_COMMIT -cne $env:GITHUB_SHA) { throw 'Exact accepted main commit required.' }
-          $version = (Get-Content windows/src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
-          if ($env:RELEASE_TAG -cne "windows-v$version") { throw 'Tag/version mismatch.' }
-          foreach ($name in @('AZURE_CLIENT_ID','AZURE_TENANT_ID','AZURE_SUBSCRIPTION_ID','SIGNING_ENDPOINT','SIGNING_ACCOUNT','SIGNING_PROFILE','PUBLISHER','UPDATE_KEY')) {
-            if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) { throw "Missing protected signing configuration: $name" }
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          [[ "$GITHUB_REPOSITORY" == 'lausiklauskn-png/Workflow-PDF-Pro' ]] || fail 'Falsches Repository.'
+          [[ "$EXPECTED_COMMIT" =~ ^[a-f0-9]{40}$ && "$EXPECTED_COMMIT" == "$GITHUB_SHA" ]] || fail 'Commit passt nicht zum gestarteten main-Stand.'
+          head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
+          [[ "$head" == "$GITHUB_SHA" ]] || fail 'main wurde geändert. Nur den aktuellen main-Commit veröffentlichen.'
+          semver='(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)'
+          [[ "$RELEASE_TAG" =~ ^windows-v(${semver})$ ]] || fail 'Tag muss windows-vX.Y.Z lauten.'
+          version="${BASH_REMATCH[1]}"
+          test "$(jq -r .version windows/src-tauri/tauri.conf.json)" = "$version" || fail 'Tag passt nicht zu tauri.conf.json.'
+          test "$(jq -r .version windows/package.json)" = "$version" || fail 'Tag passt nicht zu windows/package.json.'
+          grep -qx "version = \"$version\"" windows/src-tauri/Cargo.toml || fail 'Tag passt nicht zu Cargo.toml.'
+
+          # Ehrliche Beschriftung: nur Ausgaben ohne Update-Schlüssel und ohne Updater-Dateien.
+          if grep -q '[^[:space:]]' windows/signing/updater.pub; then
+            fail 'updater.pub ist gesetzt. Dieser Ablauf ist nur für Ausgaben ohne automatische Updates.'
+          fi
+          test "$(jq -r '.bundle.createUpdaterArtifacts // false' windows/src-tauri/tauri.conf.json)" = 'false' \
+            || fail 'createUpdaterArtifacts ist aktiv. Dieser Ablauf baut keine Update-Dateien.'
+
+          # Nie ersetzen; Version muss über allen bisherigen Windows-Ausgaben liegen.
+          newer() {
+            local a1 a2 a3 b1 b2 b3
+            IFS=. read -r a1 a2 a3 <<<"$1"; IFS=. read -r b1 b2 b3 <<<"$2"
+            (( a1 > b1 || (a1 == b1 && (a2 > b2 || (a2 == b2 && a3 > b3))) ))
           }
-          if ([string]::IsNullOrWhiteSpace((Get-Content windows/signing/updater.pub -Raw))) { throw 'Commit the public update key before building an accepted installer.' }
-          $existing = gh release list --repo $env:GITHUB_REPOSITORY --limit 100 --json tagName | ConvertFrom-Json
-          if ($LASTEXITCODE -ne 0) { throw 'Cannot verify existing releases.' }
-          foreach ($release in $existing) {
-            if ($release.tagName -ceq $env:RELEASE_TAG) { throw 'Version exists; it must never be replaced.' }
-            if ($release.tagName -cmatch '^windows-v(.+)$') {
-              node --input-type=module -e "import {assertNewer} from './windows/tools/update-feed.mjs'; assertNewer(process.argv[1],process.argv[2]);" $version $Matches[1]
-              if ($LASTEXITCODE -ne 0) { throw 'Windows version must increase.' }
-            }
-          }
-          $runs = gh api "repos/$env:GITHUB_REPOSITORY/actions/workflows/windows-app.yml/runs?head_sha=$env:GITHUB_SHA&per_page=50" | ConvertFrom-Json
-          if ($LASTEXITCODE -ne 0) { throw 'Cannot verify acceptance.' }
-          $run = $runs.workflow_runs | Where-Object { $_.conclusion -eq 'success' -and $_.head_branch -eq 'main' } | Select-Object -First 1
-          if (!$run) { throw 'No accepted Windows build on main for this commit.' }
-          "RUN=$($run.id)" >> $env:GITHUB_ENV
-          "VERSION=$version" >> $env:GITHUB_ENV
-          "INSTALLER=Workflow-PDF-Pro-Windows-$version-Setup.exe" >> $env:GITHUB_ENV
-      - name: Genau den abgenommenen Installer holen
+          tags=$( { git ls-remote --tags --refs "https://github.com/$GITHUB_REPOSITORY.git" 'refs/tags/windows-v*' | sed 's#.*refs/tags/##'
+                    gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[].tag_name'; } | sort -u )
+          while IFS= read -r old; do
+            [[ -n "$old" ]] || continue
+            [[ "$old" == "$RELEASE_TAG" ]] && fail 'Diese Windows-Version existiert bereits. Sie wird nie ersetzt.'
+            if [[ "$old" =~ ^windows-v(${semver})$ ]]; then
+              newer "$version" "${BASH_REMATCH[1]}" || fail "Version muss über $old liegen."
+            fi
+          done <<<"$tags"
+
+          # Bau- und Abnahmelauf "Windows-App (Tauri)" auf genau diesem main-Commit.
+          run=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/windows-app.yml/runs?head_sha=$GITHUB_SHA&per_page=100" \
+            --jq '[.workflow_runs[] | select(.head_sha == env.GITHUB_SHA and .head_branch == "main" and .conclusion == "success" and (.event == "push" or .event == "workflow_dispatch"))] | sort_by(.run_started_at) | last | .id // empty')
+          [[ -n "$run" ]] || fail 'Kein erfolgreicher Windows-Bau- und Abnahmelauf auf main für diesen Commit.'
+
+          installer="Workflow-PDF-Pro-Windows-$version-Setup.exe"
+          gh run download "$run" --repo "$GITHUB_REPOSITORY" --name windows-installer --dir release-files \
+            || fail "Abgenommener Installer aus Lauf $run fehlt oder ist abgelaufen. windows-app.yml auf main erneut laufen lassen."
+          (cd release-files && sha256sum -c "$installer.sha256") || fail 'Prüfsumme des abgenommenen Installers stimmt nicht.'
+          sum=$(cut -d' ' -f1 "release-files/$installer.sha256")
+          size=$(stat -c %s "release-files/$installer")
+          {
+            echo "run=$run"; echo "version=$version"; echo "installer=$installer"
+            echo "sha256=$sum"; echo "size=$size"
+          } >> "$GITHUB_OUTPUT"
+          echo "::notice title=Abgenommen::Lauf $run, $installer, $size Bytes, SHA-256 $sum"
+
+  installieren:
+    needs: pruefen
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Genau diesen Installer unsigniert installieren, starten und entfernen
         env:
           GH_TOKEN: ${{ github.token }}
+          RUN: ${{ needs.pruefen.outputs.run }}
+          INSTALLER: ${{ needs.pruefen.outputs.installer }}
+          SHA256: ${{ needs.pruefen.outputs.sha256 }}
         run: |
+          $ErrorActionPreference = 'Stop'
           gh run download $env:RUN --repo $env:GITHUB_REPOSITORY --name windows-installer --dir release-files
-          if ($LASTEXITCODE -ne 0) { throw 'Accepted artifact is missing.' }
-          $expected = ((Get-Content "release-files/$env:INSTALLER.sha256" -Raw) -split '\s+')[0]
-          if ((Get-FileHash "release-files/$env:INSTALLER" -Algorithm SHA256).Hash.ToLower() -cne $expected) { throw 'Accepted installer hash mismatch.' }
-      - name: Azure per kurzlebiger GitHub-Identität anmelden
-        uses: azure/login@8216e11d8cd9b42fe925c852af8e76311ff067ac
-        with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      - name: Windows-Herausgebersignatur mit Zeitstempel hinzufügen
-        uses: azure/artifact-signing-action@29de24bf030cfee71b1ad0207ab4d69e74514a42
-        with:
-          endpoint: ${{ vars.WF_PDF_SIGNING_ENDPOINT }}
-          signing-account-name: ${{ vars.WF_PDF_SIGNING_ACCOUNT }}
-          certificate-profile-name: ${{ vars.WF_PDF_SIGNING_CERTIFICATE_PROFILE }}
-          files-folder: ${{ github.workspace }}\release-files
-          files-folder-filter: exe
-          file-digest: SHA256
-          timestamp-digest: SHA256
-          description: Workflow PDF Pro
-          description-url: https://github.com/lausiklauskn-png/Workflow-PDF-Pro
-          exclude-environment-credential: true
-          exclude-managed-identity-credential: true
-      - name: Herausgeber prüfen
-        env:
-          PUBLISHER: ${{ vars.WF_PDF_WINDOWS_PUBLISHER_SUBJECT }}
-        run: windows/tools/verify-windows-signature.ps1 -File "release-files/$env:INSTALLER" -ExpectedSubject $env:PUBLISHER
-      - name: Werkzeuge ohne Signierfreigabe installieren
-        working-directory: windows
-        run: |
-          npm ci
-          if ($LASTEXITCODE -ne 0) { throw 'Signing tool installation failed.' }
-      - name: Update-Signatur an diese Version binden
-        working-directory: windows
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.WF_PDF_UPDATER_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.WF_PDF_UPDATER_PRIVATE_KEY_PASSWORD }}
-        run: |
-          npx --no-install tauri signer sign --app-version $env:VERSION "../release-files/$env:INSTALLER"
-          if ($LASTEXITCODE -ne 0) { throw 'Update signing failed.' }
-      - name: Signatur unabhängig prüfen und Metadaten erstellen
-        run: |
-          node windows/tools/update-feed.mjs release-files $env:VERSION windows/signing/updater.pub
-          if ($LASTEXITCODE -ne 0) { throw 'Update verification failed.' }
-      - name: Signierten Installer installieren und starten
-        run: |
-          $p = Start-Process -FilePath "release-files/$env:INSTALLER" -ArgumentList '/S' -PassThru
-          if (!$p.WaitForExit(180000) -or $p.ExitCode -ne 0) { throw 'Signed installer failed.' }
+          if ($LASTEXITCODE -ne 0) { throw 'Abgenommener Installer fehlt.' }
+          $file = "release-files/$env:INSTALLER"
+          if ((Get-FileHash $file -Algorithm SHA256).Hash.ToLower() -cne $env:SHA256) { throw 'Prüfsumme weicht ab.' }
+          # Die Hinweise sagen "unsigniert". Das muss stimmen.
+          $sig = Get-AuthenticodeSignature -LiteralPath $file
+          if ($sig.Status -ne 'NotSigned') { throw "Erwartet unsigniert, gefunden: $($sig.Status)" }
+          $p = Start-Process -FilePath $file -ArgumentList '/S' -PassThru
+          if (!$p.WaitForExit(180000) -or $p.ExitCode -ne 0) { throw 'Installation fehlgeschlagen.' }
           $dir = Join-Path $env:LOCALAPPDATA 'Workflow PDF Pro'
           $app = Start-Process (Join-Path $dir 'workflow-pdf-pro.exe') -PassThru
           Start-Sleep 8
-          if ($app.HasExited) { throw 'Installed application did not stay running.' }
-          $app | Stop-Process
+          if ($app.HasExited) { throw 'Installierte App läuft nicht.' }
+          $app | Stop-Process -Force
+          Start-Sleep 3
           $p = Start-Process (Join-Path $dir 'uninstall.exe') -ArgumentList '/S' -PassThru
-          if (!$p.WaitForExit(180000) -or $p.ExitCode -ne 0) { throw 'Uninstall failed.' }
-      - name: Veröffentlichen und Update-Adresse freigeben
+          if (!$p.WaitForExit(180000) -or $p.ExitCode -ne 0) { throw 'Deinstallation fehlgeschlagen.' }
+          Write-Output 'Unsignierter Installer: Installation, Start und Deinstallation in Ordnung.'
+
+  veroeffentlichen:
+    needs: [pruefen, installieren]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Veröffentlichen, anonym herunterladen und vergleichen
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag }}
-          PUBLISHER: ${{ vars.WF_PDF_WINDOWS_PUBLISHER_SUBJECT }}
-        run: windows/tools/publish-signed-release.ps1
+          RUN: ${{ needs.pruefen.outputs.run }}
+          VERSION: ${{ needs.pruefen.outputs.version }}
+          INSTALLER: ${{ needs.pruefen.outputs.installer }}
+          SHA256: ${{ needs.pruefen.outputs.sha256 }}
+          SIZE: ${{ needs.pruefen.outputs.size }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
+          [[ "$head" == "$GITHUB_SHA" ]] || fail 'main wurde inzwischen geändert. Nichts veröffentlicht.'
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then fail 'Release existiert bereits.'; fi
+          [[ -z "$(git ls-remote --tags "https://github.com/$GITHUB_REPOSITORY.git" "refs/tags/$RELEASE_TAG")" ]] || fail 'Tag existiert bereits.'
+
+          gh run download "$RUN" --repo "$GITHUB_REPOSITORY" --name windows-installer --dir release-files
+          test "$(sha256sum "release-files/$INSTALLER" | cut -d' ' -f1)" = "$SHA256" || fail 'Prüfsumme weicht ab.'
+          test "$(stat -c %s "release-files/$INSTALLER")" = "$SIZE" || fail 'Größe weicht ab.'
+
+          cat > notes.md <<NOTES
+          Workflow PDF Pro für Windows $VERSION (Windows 10 und 11, 64 Bit).
+
+          **Installation:** \`$INSTALLER\` herunterladen und doppelt anklicken. Es sind keine Administratorrechte nötig.
+
+          **Unsigniert:** Der Installer hat keine Herausgebersignatur. Deshalb warnt Windows SmartScreen mit „Der Computer wurde durch Windows geschützt“.
+          Dann „Weitere Informationen“ und danach „Trotzdem ausführen“ wählen.
+          Auf verwalteten Rechnern oder mit strengeren Sicherheitseinstellungen kann Windows die Ausführung verhindern.
+
+          **Keine automatischen Updates:** Die App sucht nicht selbst nach neuen Versionen.
+          Eine neue Version wird von Hand heruntergeladen und bei geschlossener App über die vorhandene installiert.
+          Vorher nicht deinstallieren. Einstellungen, Bibliothek und Tresor bleiben erhalten. Eine Sicherung ersetzt das nicht.
+
+          Prüfstand: gebaut und abgenommen auf einem GitHub-Windows-Rechner (Lauf $RUN), Quellstand $GITHUB_SHA.
+          Auf einem eigenen Windows-PC ist diese Version noch nicht gemessen.
+
+          SHA-256: \`$SHA256\` · Größe: $SIZE Bytes
+          NOTES
+
+          created=0
+          rollback() {
+            if [[ "$created" == 1 ]]; then
+              gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=true \
+                || echo '::error::Rücknahme als Entwurf nicht bestätigt. Release von Hand prüfen.'
+            fi
+          }
+          trap 'rollback' ERR
+
+          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --draft --latest=false \
+            --title "Workflow PDF Pro für Windows $VERSION" --notes-file notes.md \
+            "release-files/$INSTALLER" "release-files/$INSTALLER.sha256"
+          created=1
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest=false
+
+          # Ohne Anmeldung herunterladen, wie ein Nutzer es tut.
+          mkdir check
+          url="https://github.com/$GITHUB_REPOSITORY/releases/download/$RELEASE_TAG/$INSTALLER"
+          curl --fail --location --retry 5 --retry-all-errors --retry-delay 5 --proto '=https' --proto-redir '=https' \
+            -o "check/$INSTALLER" "$url"
+          test "$(sha256sum "check/$INSTALLER" | cut -d' ' -f1)" = "$SHA256"
+          test "$(stat -c %s "check/$INSTALLER")" = "$SIZE"
+          echo "::notice title=Veröffentlicht (unsigniert)::$url"

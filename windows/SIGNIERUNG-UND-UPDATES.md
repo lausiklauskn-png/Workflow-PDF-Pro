@@ -12,12 +12,53 @@ Konto und kein selbstsigniertes Herausgeberzertifikat einrichten. Automatische U
 sind derzeit nicht aktiviert. Ein eigener kostenloser Update-Schlüssel kommt erst
 bei einer späteren Aktivierung infrage und ersetzt keine Windows-Herausgebersignatur.
 
-Der vorhandene Releaseablauf verlangt technisch noch Microsoft Artifact Signing
-und einen Update-Schlüssel. Vor einer späteren manuellen Windows-Veröffentlichung
-ist diese Pflicht zu entfernen; sie ist keine aktuelle Nutzeranforderung. Die folgenden
-Abschnitte beschreiben die zuvor vorbereitete optionale Signier-/Updatearchitektur,
-keinen jetzt auszuführenden Einrichtungsauftrag. Vollständiger Stand im
+Die folgenden Abschnitte ab „Zwei getrennte Identitäten“ beschreiben die zuvor
+vorbereitete optionale Signier-/Updatearchitektur, keinen jetzt auszuführenden
+Einrichtungsauftrag. Vollständiger Stand im
 [Windows-Abschluss](../BRIEF_ABSCHLUSS_2026-10-22_WINDOWS.md).
+
+## Neuer Releaseablauf: unsigniert, ohne Updater (22.10.2026)
+
+`.github/workflows/windows-release.yml` ist umgebaut. Er braucht **kein** Secret,
+kein Signierkonto, kein Zertifikat und keinen Update-Schlüssel. Er wurde noch
+**nicht** ausgeführt; das ist noch keine Veröffentlichung.
+
+Ablauf:
+
+1. **Anstoß.** „Run workflow“ auf main mit `tag` und `commit`, oder Git-Brücke:
+   Push des aktuellen main-Commits auf `release-requests/windows-vX.Y.Z`.
+   `release-request.yml` startet dann `windows-release.yml` auf main.
+   Claude Code: `node tools/signing/request-release.mjs windows-vX.Y.Z`.
+2. **Prüfen** (Linux): richtiges Repo; Commit = gestarteter Stand = aktueller main.
+   Tag `windows-vX.Y.Z` passt zu `tauri.conf.json`, `windows/package.json` und
+   `Cargo.toml`. Tag und Release gibt es noch nicht. Version liegt über allen
+   bisherigen `windows-v*`. `updater.pub` ist leer und `createUpdaterArtifacts`
+   ist aus; sonst Abbruch, weil die Hinweise dann nicht stimmen würden.
+   Ein Lauf „Windows-App (Tauri)“ auf genau diesem main-Commit ist grün.
+3. **Datei.** Kein Neubau. Veröffentlicht wird der Auslieferungsbau aus diesem
+   Abnahmelauf (`npm ci`, `verify:upstream`, `build-web`, `npx tauri build` ohne
+   `messprobe`). Prüfsumme aus der `.sha256`-Datei wird verglichen. So wurde
+   auch 1.0.1 veröffentlicht. Das Artefakt bleibt jetzt 90 Tage erhalten.
+4. **Installieren** (Windows): Prüfsumme gleich; Authenticode-Status muss
+   `NotSigned` sein; still installieren, starten, deinstallieren.
+5. **Veröffentlichen** (Linux): main noch einmal prüfen. Release erst als Entwurf
+   mit Installer und `.sha256`, dann öffentlich, nicht als „latest“.
+   Danach ohne Anmeldung herunterladen und SHA-256 und Größe vergleichen.
+   Bei Abweichung wird das Release wieder zum Entwurf und der Lauf scheitert.
+
+Die Hinweise im Release sagen klar: unsigniert; SmartScreen warnt
+(„Weitere Informationen“ → „Trotzdem ausführen“); keine automatischen Updates;
+neue Version von Hand über die alte installieren; Daten bleiben erhalten.
+
+Der Bau braucht keinen `TAURI_SIGNING_PRIVATE_KEY`: `createUpdaterArtifacts` ist
+nicht gesetzt (Standard: aus). Der Updater ist eingebaut, bleibt aber mit leerem
+`updater.pub` abgeschaltet (`configured:false`, keine Abfragen).
+
+Nicht mehr verwendet: `windows/tools/publish-signed-release.ps1`,
+`windows/tools/verify-windows-signature.ps1`, das Environment `windows-production`
+und der Update-Zeiger `windows-updates/latest.json`. Die Skripte sind als
+„NICHT IN GEBRAUCH“ markiert und bleiben nur als Vorlage. `update-feed.mjs` und
+seine Tests bleiben, weil der Updater-Code in der App noch geprüft wird.
 
 ## Zwei getrennte Identitäten
 
@@ -102,13 +143,14 @@ werden nicht ersetzt; die Windows-Feed-Veröffentlichung wird nicht als GitHub-�
 
 ## Release und Sicherheit
 
-`windows-release.yml` verlangt einen erfolgreichen `windows-app.yml`-Lauf auf
+Früherer Stand, ersetzt am 22.10.2026 (siehe oben):
+`windows-release.yml` verlangte einen erfolgreichen `windows-app.yml`-Lauf auf
 dem exakt aktuellen main-Commit. Danach: abgenommenen Installer hashen,
 Authenticode signieren und prüfen, endgültige Bytes mit versionsgebundener
 Update-Signatur versehen, Signatur unabhängig mit Node-Kryptografie prüfen,
 signierten Installer installieren/starten, veröffentlichen, anonym herunterladen
-und erneut vergleichen. Erst danach wird der Update-Zeiger freigegeben.
-Fehlende Signierkonfiguration führt vor der Veröffentlichung zum Abbruch.
+und erneut vergleichen. Erst danach wurde der Update-Zeiger freigegeben.
+Fehlende Signierkonfiguration führte vor der Veröffentlichung zum Abbruch.
 
 WebView2-SmartScreen wird nicht mehr abgeschaltet. Die CSP erlaubt lokale Skripte,
 die bereits verwendete, fest versionierte Transformers-Bibliothek von jsDelivr,

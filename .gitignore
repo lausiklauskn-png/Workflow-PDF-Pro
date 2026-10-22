@@ -27,3 +27,6 @@ android/capacitor-cordova-android-plugins/
 
 # Lokale Arbeitsprotokolle und temporäre Einrichtung.
 /work/
+
+# Python-Zwischenstände
+__pycache__/

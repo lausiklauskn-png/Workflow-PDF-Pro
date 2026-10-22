@@ -179,5 +179,6 @@ jobs:
         with:
           name: windows-installer
           path: auslieferung/
-          retention-days: 14
+          # windows-release.yml veröffentlicht genau diese Datei; länger aufbewahren.
+          retention-days: 90
 
