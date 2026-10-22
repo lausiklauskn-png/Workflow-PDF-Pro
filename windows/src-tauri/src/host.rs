@@ -198,6 +198,8 @@ impl Host {
                 }
                 Ok(json!({"opened": true, "printed": false}))
             }
+            // App-Version für Fuß und Einstellungen (Klaus 2026-10-22), aus tauri.conf.json
+            "appInfo" => Ok(json!({"version": self.app.package_info().version.to_string()})),
             "openLink" => {
                 let url = s(o, "url").unwrap_or("");
                 let scheme = url.split(':').next().unwrap_or("").to_ascii_lowercase();

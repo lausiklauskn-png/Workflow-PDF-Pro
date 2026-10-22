@@ -29,7 +29,7 @@
     return Object.freeze(api);
   }
   const Plugins = Object.freeze({
-    WorkflowFiles: plugin('WorkflowFiles', ['begin', 'append', 'finish', 'abort', 'save', 'share', 'print', 'openLink']),
+    WorkflowFiles: plugin('WorkflowFiles', ['begin', 'append', 'finish', 'abort', 'save', 'share', 'print', 'openLink', 'appInfo']),
     WorkflowImport: plugin('WorkflowImport', ['chooseFolder', 'read', 'release']),
     WorkflowIncoming: plugin('WorkflowIncoming', ['pending', 'read', 'acknowledge', 'history', 'restore', 'discardArchived']),
     WorkflowVault: plugin('WorkflowVault', ['state', 'locations', 'migration', 'prepareMigration', 'completeMigration', 'cancelMigration',

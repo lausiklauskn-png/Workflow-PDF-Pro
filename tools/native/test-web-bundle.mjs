@@ -21,6 +21,8 @@ test('bundle contains the complete public runtime and unchanged protected files'
   assert.ok(receipt.files.some(f => f.path === 'vendor/tesseract/lang/rus.traineddata'));
   const html = await readFile(join(root, 'www/index.html'), 'utf8');
   assert.match(html, /<title>Workflow PDF Pro/);
+  // Versionsnummer: in der App nie die Nummer der Webversion, bis die App ihre eigene setzt
+  assert.equal((html.match(/<meta name="wfp-version" content=""/g) || []).length, 1);
   assert.ok(html.indexOf('native/native-bootstrap.js') < html.indexOf('assets/app.js'));
   for (const name of ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js',...vaultFiles,'native.css']) {
     assert.ok(html.includes('native/' + name + '?v=' + digest(await readFile(join(root,'www/native',name)))));

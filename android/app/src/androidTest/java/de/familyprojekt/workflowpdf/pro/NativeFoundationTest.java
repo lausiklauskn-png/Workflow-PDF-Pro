@@ -28,6 +28,12 @@ public final class NativeFoundationTest {
             assertEquals("\"https://localhost\"", evaluate(scenario, "location.origin"));
             assertEquals("\"Workflow PDF Pro\"", evaluate(scenario, "document.querySelector('.marke-name').textContent"));
             assertEquals("true", evaluate(scenario, "document.querySelector('#btnInstall').getBoundingClientRect().width === 0"));
+            // Versionsnummer (Klaus 2026-10-22): die App-Nummer aus dem Paket, nie die der Webversion
+            android.content.Context target = InstrumentationRegistry.getInstrumentation().getTargetContext();
+            String version = target.getPackageManager().getPackageInfo(target.getPackageName(), 0).versionName.replaceAll("^(\\d+\\.\\d+\\.\\d+).*$", "$1");
+            assertTrue("versionName " + version, version.matches("\\d+\\.\\d+\\.\\d+"));
+            await(scenario, "document.getElementById('versionFuss') && document.getElementById('versionFuss').textContent === 'Version " + version + "'");
+            assertEquals("true", evaluate(scenario, "document.getElementById('versionFuss').checkVisibility()"));
             evaluate(scenario, "WFPNativeFiles.transfer(new Blob(['Native boundary'],{type:'text/plain'}),'Мüller.txt').then(id=>Capacitor.Plugins.WorkflowFiles.abort({id})).then(()=>window.__transferOK=true).catch(e=>window.__transferError=String(e));true");
             await(scenario, "window.__transferOK === true || Boolean(window.__transferError)");
             assertEquals("Native transfer error: " + evaluate(scenario, "window.__transferError"), "true", evaluate(scenario, "window.__transferOK === true"));

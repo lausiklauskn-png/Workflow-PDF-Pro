@@ -768,6 +768,16 @@ auftauchen … Überall, wo ich Teilen machen kann."
   Browser, launchQueue gestellt) · `node tests/gegenprobe_teilen_empfang.mjs` (13 Fälle; `NUR_ANKER=1`). Cache v73 (v74 nach dem Nachziehen des Prüfkerns),
   `app.js?v=56`, `sprache-texte.js?v=34`.
 
+## 📲 Teilen: „405 Not Allowed" (Klaus 2026-10-21)
+
+Klaus: Teilen → Workfloh PDF zeigte „405 Not Allowed", aus Private Brain Pro (native) und aus der PWA. 405 ist die Antwort
+von GitHub Pages auf den POST an `./teilen-empfang` — er kam also beim Server an statt beim Worker. Der Worker wurde erst am
+Ende von `app.js` angemeldet (nach allen Skripten mit `defer`), und ⟳ meldet ihn ab. Jetzt meldet ihn ein kurzes Skript
+**im Kopf von index.html** an, vor allen anderen Skripten — derselbe Weg wie Mein-WorkFloh #253 und Kim-sync #17.
+`tests/teilen-empfang.mjs` prüft die Stelle (Gegenprobe von Hand mit der alten index.html: genau diese Zeile rot).
+Cache v104, `app.js?v=68`. ⚠ Ob das am Tablet den 405 behebt, ist nicht gemessen: wer die App schon installiert hat, öffnet
+sie nach dem Update einmal, bevor er teilt.
+
 ## 🕸 SBKIM-Knoten mit Netz-Einstellung (2026-10-13)
 
 Workflow PDF ist ein eigener SBKIM-Knoten, nach dem Muster des Sende-Prüfers. Er hat eine feste Leiste in der Kopfzeile
@@ -871,6 +881,29 @@ möchte … Und so auch bei älteren Dateien, die schon importiert wurden."
   nur das eine Dokument, Löschen nimmt das Original mit) · Gegenprobe `NUR_FALL="MANUELL:"` (6 Fälle). Gefahren in einer Kopie: erst **1 aus falschem Grund** (die Probe las den Editor, bevor „wird geprüft" stand — seitdem zeigt die App es schon beim Tipp, und die Probe wartet auf die Bedingung), danach **6 gefangen · 1 durchgerutscht**. Der durchgerutschte Fall („der Knopf an der Karte öffnet das Dokument mit") ist als benannte Grenze ersetzt: die Marke liegt außerhalb jedes Öffnen-Bereichs, `stopPropagation` ist dort am Bestand nicht messbar. `npm test` Rückgabe 0.
 - Cache v86, `app.js?v=63`, `db.js?v=6`, `sicherung.js?v=2`, `style.css?v=41`, `sprache-texte.js?v=43`.
 - ⚠ Am Tablet nicht gemessen; ein Buch mit 400 Seiten auch nicht.
+
+## ▶ „Alle prüfen“ und die Versionsnummer (Klaus 2026-10-22)
+
+„Dafür sollte es noch einen Knopf geben: alle Dokumente prüfen. Bisher muss man unten einzeln anklicken."
+- **▶ Alle prüfen** steht über den Karten (`#pruefAlle`, `[data-pruef-alle]`), nur wenn es ungeprüfte Dokumente
+  gibt, mit „N noch nicht geprüft". Ein Tipp prüft ALLE ungeprüften der Bibliothek (`offenePruefungen()` =
+  `S.docs.filter(pruefbar)`) **nacheinander** über denselben Weg wie der Knopf an der Karte (`pruefungNachholen`,
+  dann `await PRUEF.kette`), mit 30 ms Atempause dazwischen. Die Leiste zeigt „Prüfe Dokument X von N …", einen
+  Balken und **■ Abbrechen** (hält nach dem laufenden Dokument an). Am Ende „✓ Fertig: N geprüft.", dazu
+  „⚠ Mit Fund: N. Die Karte zeigt ihn." und bei Abbruch „Abgebrochen. Noch offen: N.". Während des Laufs öffnet
+  ein Fund **kein** Fenster (`!ALLE.an`), die Karte trägt die Marke. `markeErneuern` zeichnet die Leiste mit.
+- **Versionsnummer** unter „Impressum & Datenschutz" (`#versionFuss`) und ganz unten in den Einstellungen
+  (`[data-einst-version]`). **Eine Quelle:** `<meta name="wfp-version" content="1.1.0" data-cache="…">` in
+  `index.html`. `tests/version.mjs` verlangt: gleich `package.json`, und `data-cache` gleich `CACHE_VERSION`.
+  ⚠ **Wer `CACHE_VERSION` erhöht, erhöht auch die Version** (Meta + package.json), sonst ist die Probe rot —
+  so steigt die Nummer mit jeder Auslieferung (Klaus: „ob es sich um eine ältere oder jüngere Version handelt").
+  Klaus' Wahl: die Webversion hat eine **eigene** Nummer, die Pro-App ihre App-Nummer. Die Pro setzt dazu das
+  Meta auf ihre Nummer und sendet `document.dispatchEvent(new Event('wfp-version'))`; Fuß und Einstellungen folgen.
+  Eine falsch geformte Nummer wird nicht angezeigt.
+- Proben: `tests/eingang.mjs` § 11 (ALLE, Abbruch, nie zwei zugleich) · `tests/version.mjs` (in `npm test`) ·
+  Gegenproben `NUR_FALL="ALLE:" node tests/gegenprobe_eingang.mjs` und `node tests/gegenprobe_version.mjs` (7 Fälle).
+- Cache v105, `app.js?v=69`, `style.css?v=43`, `sprache-texte.js?v=46`, Version 1.1.0.
+- ⚠ Am Tablet nicht gemessen; ein Buch mit 400 Seiten in „Alle prüfen" auch nicht.
 
 ## 🧽 Reinigung vor der KI · Originale in der Sicherung (Klaus 2026-10-14)
 

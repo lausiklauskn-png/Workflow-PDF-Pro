@@ -21,6 +21,8 @@ const result = { phase, zeit: new Date().toISOString(), checks: {}, fehler: [], 
 const save = () => writeFile(out, JSON.stringify(result, null, 2));
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// App-Version aus derselben Quelle wie der Bau (tauri.conf.json), nicht fest im Test
+const APP_VERSION = JSON.parse(await readFile(new URL('../src-tauri/tauri.conf.json', import.meta.url), 'utf8')).version;
 
 async function step(name, fn, ms = 180000) {
   console.log('-> ' + name);
@@ -122,8 +124,15 @@ if (phase === 'erst') {
         updateAdapter: typeof window.WFPWindowsUpdates?.check === 'function',
         status: await window.__TAURI_INTERNALS__.invoke('wfp_update', {operation: 'status'})};
     });
-    expect(policy.evalBlocked && policy.inlineBlocked && policy.updateAdapter && policy.status.current === '1.0.2', 'CSP/update adapter: ' + JSON.stringify(policy));
+    expect(policy.evalBlocked && policy.inlineBlocked && policy.updateAdapter && policy.status.current === APP_VERSION, 'CSP/update adapter: ' + JSON.stringify(policy));
     return policy;
+  });
+  // Versionsnummer (Klaus 2026-10-22): im Fuß die App-Nummer aus Tauri, nie die der Webversion
+  await step('versionsnummer', async () => {
+    await page.waitForFunction(v => document.getElementById('versionFuss')?.textContent === 'Version ' + v, APP_VERSION, { timeout: 15000 }).catch(() => {});
+    const v = await page.evaluate(() => ({ fuss: document.getElementById('versionFuss')?.textContent || '', sichtbar: !!document.getElementById('versionFuss')?.checkVisibility() }));
+    expect(v.fuss === 'Version ' + APP_VERSION && v.sichtbar, 'Versionsnummer im Fuß: ' + JSON.stringify(v));
+    return v;
   });
   await step('eingebetteteSicherheitshilfe', () => page.evaluate(async () => {
     // The existing Mycel wizard embeds this local help page.

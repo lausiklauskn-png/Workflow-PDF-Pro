@@ -57,11 +57,16 @@ export async function prepareWeb(out = join(root, 'www')) {
   html = replaceOnce(html, '</head>', '<link rel="stylesheet" href="' + adapterUrl('native.css') + '">\n</head>');
   // Classic deferred scripts preserve source execution order. The source worker stays intact:
   // model caches and share receipt must remain functional in the native host as well.
-  html = replaceOnce(html, '<script defer src="assets/app.js?v=67"></script>',
-    ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=67"></script>');
+  // Versionsnummer (Klaus 2026-10-22): die Webversion trägt ihre eigene Nummer im Meta. In der App steht
+  // dort zuerst nichts; native-bootstrap.js setzt die App-Nummer (Android-Paket bzw. Tauri) ein.
+  const versionMeta = html.match(/<meta name="wfp-version" content="[^"]*"/g) || [];
+  if (versionMeta.length !== 1) throw new Error('Native injection anchor changed: wfp-version');
+  html = html.replace(versionMeta[0], '<meta name="wfp-version" content=""');
+  html = replaceOnce(html, '<script defer src="assets/app.js?v=69"></script>',
+    ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=69"></script>');
   await rm(out, { recursive: true, force: true });
   await mkdir(out, { recursive: true });
-  const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding and adapter tags'], files: [] };
+  const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding, adapter tags and empty wfp-version (filled by the app)'], files: [] };
   for (const file of selected) {
     await mkdir(dirname(join(out, file.path)), { recursive: true });
     const bytes = file.path === 'index.html' ? Buffer.from(html) : contents.get(file.path);
