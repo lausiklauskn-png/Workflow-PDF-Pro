@@ -112,6 +112,19 @@ await step('umgebung', () => page.evaluate(async () => ({
 })).then(v => { expect(v.plattform === 'windows' && v.host === 'windows' && !v.adapter.length, 'Brücke/Adapter fehlen'); return v; }));
 
 if (phase === 'erst') {
+  await step('sicherheitUndUpdates', async () => {
+    const policy = await page.evaluate(async () => {
+      let evalBlocked = false;
+      try { (0, eval)('window.__wfpUnsafeEval=1'); } catch {evalBlocked = true;}
+      const script = document.createElement('script'); script.textContent = 'window.__wfpUnsafeInline=1'; document.body.append(script);
+      await new Promise(resolve => setTimeout(resolve, 100)); script.remove();
+      return {evalBlocked, inlineBlocked: !window.__wfpUnsafeInline,
+        updateAdapter: typeof window.WFPWindowsUpdates?.check === 'function',
+        status: await window.__TAURI_INTERNALS__.invoke('wfp_update', {operation: 'status'})};
+    });
+    expect(policy.evalBlocked && policy.inlineBlocked && policy.updateAdapter && policy.status.current === '1.0.2', 'CSP/update adapter did not enforce the intended rules');
+    return policy;
+  });
   const form = await makePdf('Workflow PDF Pro Windows', true);
   const dir = env('WFP_PRUEF_ARBEIT');
   await mkdir(dir, { recursive: true });
@@ -254,3 +267,4 @@ await save();
 console.log(result.rot.length ? 'ROT: ' + result.rot.join(', ') : 'GRÜN: ' + phase);
 await Promise.race([browser.close().catch(() => {}), sleep(5000)]);
 process.exit(result.rot.length ? 1 : 0);
+

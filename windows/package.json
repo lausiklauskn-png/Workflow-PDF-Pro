@@ -1,6 +1,6 @@
 {
   "name": "workflow-pdf-pro-windows",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "type": "module",
   "description": "Windows-Host (Tauri 2, WebView2) für den unveränderten Workflow-PDF-Kern",
@@ -13,3 +13,4 @@
     "playwright-core": "1.56.1"
   }
 }
+

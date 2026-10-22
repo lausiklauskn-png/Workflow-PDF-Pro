@@ -4,7 +4,7 @@ name: Windows-App (Tauri) – Bau und Abnahme
 # installierten App aus. Der GitHub-Rechner ist nicht Klaus' PC.
 on:
   push:
-    branches: ['claude/windows-**', 'main']
+    branches: ['claude/windows-**', 'codex/windows-**', 'main']
     paths: ['windows/**', 'native/**', 'upstream/**', 'tools/native/**', '.github/workflows/windows-app.yml']
   pull_request:
     paths: ['windows/**', 'native/**', 'upstream/**', 'tools/native/**', '.github/workflows/windows-app.yml']
@@ -20,6 +20,13 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Manipulierte Updates und Speichern vor Neustart
+        run: |
+          node windows/tools/test-update-feed.mjs
+          node windows/tools/test-update-ui.mjs
       - name: Tresor, Empfang, Übergaben und Chrome-Sitzung (Rust)
         working-directory: windows/core
         run: cargo test --release
@@ -46,6 +53,20 @@ jobs:
       - name: Werkzeuge
         working-directory: windows
         run: npm ci
+      - name: Echte Tauri-Updatesignaturen gegenprüfen
+        run: |
+          node windows/tools/test-tauri-signatures.mjs
+          if ($LASTEXITCODE -ne 0) { throw 'Signature interoperability failed.' }
+      - name: Native Update- und Herkunftsregeln prüfen
+        working-directory: windows/src-tauri
+        run: |
+          cargo test --release
+          if ($LASTEXITCODE -ne 0) { throw 'Native updater tests failed.' }
+      - name: Aufgelöste Host-Abhängigkeiten für die Prüfung sichern
+        if: always()
+        run: |
+          $text = [Convert]::ToBase64String([IO.File]::ReadAllBytes('windows/src-tauri/Cargo.lock'))
+          Write-Output "HOST_LOCKFILE_BASE64=$text"
       - name: Prüfbau (mit lokalem Prüfzugang) bauen
         working-directory: windows
         run: |
@@ -146,3 +167,4 @@ jobs:
           name: windows-installer
           path: auslieferung/
           retention-days: 14
+

@@ -1,0 +1,3 @@
+#windowsUpdates{position:fixed;z-index:19000;bottom:1rem;inset-inline:1rem;max-width:38rem;padding:.8rem;background:var(--papier,#fff);color:var(--text,#17202a);border:1px solid currentColor;border-radius:.5rem;box-shadow:0 2px 12px #0003}
+#windowsUpdates[hidden]{display:none}#windowsUpdates p{margin:0 0 .5rem}#windowsUpdates button{margin-inline-end:.5rem;margin-block:.25rem}
+#stWindowsUpdates+label{display:block;margin-block:.5rem}

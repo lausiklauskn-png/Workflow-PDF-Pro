@@ -4,6 +4,7 @@
 
 mod host;
 mod win;
+mod updates;
 
 use host::{DialogMessage, Host};
 use serde_json::{json, Value};
@@ -14,10 +15,18 @@ use tauri::{Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 const BRIDGE: &str = include_str!("../../bridge/capacitor-tauri.js");
 
+#[tauri::command]
+async fn wfp_update(window: WebviewWindow, app: tauri::AppHandle, updates: tauri::State<'_, updates::Updates>, operation: String, version: Option<String>, language: Option<String>) -> Result<Value, String> {
+    let url=window.url().map_err(|_| "NOT_ALLOWED")?;
+    if window.label()!="main" || url.scheme()!="https" || url.host_str()!=Some("tauri.localhost") || !["/","/index.html"].contains(&url.path()) {return Err("NOT_ALLOWED".into());}
+    updates.call(app,&operation,version.as_deref(),language.as_deref()).await
+}
+
 /// Aufrufe der Geräteadapter. Nur das Hauptfenster darf sie verwenden.
 #[tauri::command]
 async fn wfp_call(window: WebviewWindow, host: tauri::State<'_, Arc<Host>>, plugin: String, method: String, options: Value) -> Result<Value, String> {
-    if window.label() != "main" {
+    let url=window.url().map_err(|_| "NOT_ALLOWED")?;
+    if window.label() != "main" || url.scheme()!="https" || url.host_str()!=Some("tauri.localhost") || !["/","/index.html"].contains(&url.path()) {
         return Err("NOT_ALLOWED".into());
     }
     let host = host.inner().clone();
@@ -27,6 +36,9 @@ async fn wfp_call(window: WebviewWindow, host: tauri::State<'_, Arc<Host>>, plug
 /// Eingaben aus den eigenen Dialogfenstern (Passwort, Übersetzung abbrechen).
 #[tauri::command]
 async fn wfp_dialog(window: WebviewWindow, host: tauri::State<'_, Arc<Host>>, action: String, fields: Option<Value>) -> Result<Value, String> {
+    let url=window.url().map_err(|_| "NOT_ALLOWED")?;
+    let expected=match window.label(){"kennwort"=>"/windows/kennwort.html","uebersetzung"=>"/windows/uebersetzung.html",_=>return Err("NOT_ALLOWED".into())};
+    if url.scheme()!="https" || url.host_str()!=Some("tauri.localhost") || url.path()!=expected {return Err("NOT_ALLOWED".into());}
     let host = host.inner().clone();
     match (window.label(), action.as_str()) {
         ("kennwort", "senden") => {
@@ -75,7 +87,9 @@ fn main() {
             }
         }))
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![wfp_call, wfp_dialog])
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .manage(updates::Updates::default())
+        .invoke_handler(tauri::generate_handler![wfp_call, wfp_dialog, wfp_update])
         .setup(|app| {
             let host = Arc::new(Host::new(app.handle().clone()));
             app.manage(host.clone());
@@ -83,6 +97,7 @@ fn main() {
                 .title("Workflow PDF Pro")
                 .inner_size(1280.0, 900.0)
                 .min_inner_size(360.0, 480.0)
+                .devtools(cfg!(feature="messprobe"))
                 .use_https_scheme(true)
                 // Der Kern hat eigenes Ziehen und Ablegen von Dateien.
                 .disable_drag_drop_handler()
@@ -117,3 +132,4 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("Workflow PDF Pro konnte nicht starten");
 }
+
