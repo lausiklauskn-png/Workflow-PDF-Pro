@@ -26,7 +26,11 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
         let manager = FileManager.default
         let app = try manager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         let cache = try manager.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        let value = try VaultLocations(root: app.appendingPathComponent("WorkflowVault"), cache: cache.appendingPathComponent("WorkflowVaultStaging"))
+        let staging = cache.appendingPathComponent("WorkflowVaultStaging")
+        // Only this app-private staging namespace is disposable. A crashed
+        // transfer never leaves a permanent internal copy of an external PDF.
+        if manager.fileExists(atPath: staging.path) { try manager.removeItem(at: staging) }
+        let value = try VaultLocations(root: app.appendingPathComponent("WorkflowVault"), cache: staging)
         storage = value; return value
     }
     private func work(_ call: CAPPluginCall, _ task: @escaping (VaultLocations) throws -> [String: Any]) {
@@ -49,7 +53,7 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
     @objc func completeMigration(_ call: CAPPluginCall) { work(call) { try $0.completeMigration(self.text(call, "location")); return try $0.state() } }
     @objc func cancelMigration(_ call: CAPPluginCall) { work(call) { try $0.cancelMigration(); return ["saved": true] } }
     @objc func beginBatch(_ call: CAPPluginCall) { work(call) { try self.vault(call, $0).beginBatch(); return ["started": true] } }
-    @objc func commitBatch(_ call: CAPPluginCall) { work(call) { try self.vault(call, $0).commitBatch(); return ["saved": true] } }
+    @objc func commitBatch(_ call: CAPPluginCall) { work(call) { let vault = try self.vault(call, $0); try vault.commitBatch(); try? vault.prune(); return ["saved": true] } }
     @objc func abortBatch(_ call: CAPPluginCall) { work(call) { try self.vault(call, $0).abortBatch(); return ["aborted": true] } }
     @objc func setPrimary(_ call: CAPPluginCall) { work(call) { try $0.select(call.getString("location")); return try $0.state() } }
     @objc func lock(_ call: CAPPluginCall) { work(call) { try $0.lock(); return try $0.state() } }
@@ -69,7 +73,9 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
     }
     @objc func finish(_ call: CAPPluginCall) {
         work(call) { locations in
-            let record = try self.vault(call, locations).finish(ticket: self.text(call, "ticket"), size: self.number(call, "size"))
+            let vault = try self.vault(call, locations)
+            let record = try vault.finish(ticket: self.text(call, "ticket"), size: self.number(call, "size"))
+            try? vault.prune()
             var result = try self.recordInfo(record); result["saved"] = true; return result
         }
     }
@@ -77,7 +83,7 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
     @objc func info(_ call: CAPPluginCall) { work(call) { try self.recordInfo(self.vault(call, $0).info(store: self.text(call, "store"), id: self.text(call, "id"))) } }
     @objc func read(_ call: CAPPluginCall) { work(call) { ["data": try self.vault(call, $0).read(store: self.text(call, "store"), id: self.text(call, "id"), offset: self.number(call, "offset"), hash: call.getString("hash")).base64EncodedString()] } }
     @objc func list(_ call: CAPPluginCall) { work(call) { ["ids": try self.vault(call, $0).list(store: self.text(call, "store"))] } }
-    @objc func remove(_ call: CAPPluginCall) { work(call) { try self.vault(call, $0).remove(store: self.text(call, "store"), id: self.text(call, "id"), prefix: call.getBool("prefix") ?? false); return ["saved": true] } }
+    @objc func remove(_ call: CAPPluginCall) { work(call) { let vault = try self.vault(call, $0); try vault.remove(store: self.text(call, "store"), id: self.text(call, "id"), prefix: call.getBool("prefix") ?? false); try? vault.prune(); return ["saved": true] } }
     @objc func recoveryInfo(_ call: CAPPluginCall) {
         work(call) { locations in
             guard let info = try self.vault(call, locations).recoveryInfo() else { return ["exists": false] }
