@@ -23,6 +23,7 @@
 		A10000000000000000000001 /* WorkflowNativeCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000002; };
 		83942C7CC974451CA481F750 /* WorkflowHostTests.mdimporter in Copy Files */ = {isa = PBXBuildFile; fileRef = 9D7DEEB38C98450CBF3F7872 /* WorkflowHostTests.mdimporter */; };
 		AF16763C91494404A2FF562D /* WorkflowHostTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C034FEA6B58A4F8785ACDD19 /* WorkflowHostTests.swift */; };
+		B20000000000000000000001 /* WorkflowVaultPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000002 /* WorkflowVaultPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 		6C0270720B5F363347EA630C /* WorkflowIncomingPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowIncomingPlugin.swift; sourceTree = "<group>"; };
 		9D7DEEB38C98450CBF3F7872 /* WorkflowHostTests.mdimporter */ = {isa = PBXFileReference; name = "WorkflowHostTests.xctest"; path = "WorkflowHostTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; explicitFileType = "wrapper.cfbundle"; includeInIndex = 0; };
 		C034FEA6B58A4F8785ACDD19 /* WorkflowHostTests.swift */ = {isa = PBXFileReference; name = "WorkflowHostTests.swift"; path = "WorkflowHostTests/WorkflowHostTests.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		B20000000000000000000002 /* WorkflowVaultPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowVaultPlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +94,7 @@
 				6C0270720B5F363347EA630C /* WorkflowIncomingPlugin.swift */,
 				09059FBCE3195F04D70500FC /* WorkflowImportPlugin.swift */,
 				DEBFE8029F15A5ED740F9364 /* WorkflowFilesPlugin.swift */,
+				B20000000000000000000002 /* WorkflowVaultPlugin.swift */,
 				0C35F01C9DE114014E60A613 /* WorkflowBridgeViewController.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
@@ -208,6 +211,7 @@
 				1CB655E5A69C5C902C96E9D3 /* WorkflowIncomingPlugin.swift in Sources */,
 				AEF3E796727E71F9010A6655 /* WorkflowImportPlugin.swift in Sources */,
 				F5A42A4AB151C0D44B46C4B4 /* WorkflowFilesPlugin.swift in Sources */,
+				B20000000000000000000001 /* WorkflowVaultPlugin.swift in Sources */,
 				555F03B1F2009DDD10E84D15 /* WorkflowBridgeViewController.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 			);

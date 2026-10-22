@@ -211,4 +211,79 @@ import Speech
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+    func testVaultMigrationUsesRealNativeStorageAndMissingFolderBlocksJobs() async throws {
+        try await ready()
+        let controllers = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows).compactMap { $0.rootViewController as? WorkflowBridgeViewController }
+        let plugin = try XCTUnwrap(controllers.first?.bridge?.plugin(withName: "WorkflowVault") as? WorkflowVaultPlugin)
+        let originalStorage = WorkflowPlugin.io.sync { plugin.storage }
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("wfp-vault-acceptance-" + UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+        let selected = root.appendingPathComponent("Workflow PDF Pro")
+        try FileManager.default.createDirectory(at: selected, withIntermediateDirectories: false)
+        let locations = try VaultLocations(root: root.appendingPathComponent("metadata"), cache: root.appendingPathComponent("cache"))
+        let id: String = try WorkflowPlugin.io.sync {
+            let candidate = try locations.candidate(folder: selected)
+            try candidate.vault.initialize(password: "Synthetic test password 123")
+            let id = try locations.adopt(candidate)
+            plugin.storage = locations
+            return id
+        }
+        func restore() async {
+            _ = try? await js("""
+                if(window.__iosVaultBackup){
+                  const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('WorkflohPDF1');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
+                  const names=['folders','docs','files','texte','vektoren'];
+                  await new Promise((resolve,reject)=>{const tx=db.transaction(names,'readwrite');for(const name of names){const store=tx.objectStore(name);store.clear();for(const row of __iosVaultBackup[name])store.put(row);}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});
+                  db.close();delete window.__iosVaultBackup;
+                }
+                return true;
+                """)
+            WorkflowPlugin.io.sync { locations.closeWorking(); plugin.storage = originalStorage }
+            _ = try? await js("await WFPNativeVault.boot();return true;")
+            try? FileManager.default.removeItem(at: root)
+        }
+        do {
+            let idJSON = String(data: try JSONSerialization.data(withJSONObject: [id]), encoding: .utf8)!
+            _ = try await js("""
+                await WFP.DB.keys('files');
+                const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('WorkflohPDF1');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
+                window.__iosVaultBackup={};
+                for(const name of ['folders','docs','files','texte','vektoren']) __iosVaultBackup[name]=await new Promise((resolve,reject)=>{const r=db.transaction(name).objectStore(name).getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
+                db.close();
+                await WFP.DB.putFile('ios-vault-document',new Uint8Array([7,8,9]));
+                const state=await Capacitor.Plugins.WorkflowVault.state({location:\(idJSON)[0]});
+                await WFPNativeVault.selectLocation(state);
+                const buttons=document.querySelectorAll('.native-vault-dialog button');buttons[buttons.length-1].click();
+                return true;
+                """)
+            var migrated = false
+            for _ in 0..<150 {
+                if (try? await js("const state=await Capacitor.Plugins.WorkflowVault.state();return state.location===\(idJSON)[0]&&!WFPNativeVault.gate.blocked;")) as? Bool == true { migrated = true; break }
+                try await Task.sleep(nanoseconds: 200_000_000)
+            }
+            XCTAssertTrue(migrated, "Explicit migration must finish its native commit and local transaction")
+            guard migrated else { throw NSError(domain: "WorkflowVaultAcceptance", code: 1) }
+            let result = try await js("""
+                const bytes=Array.from(await WFP.DB.getFile('ios-vault-document'));
+                await WFP.DB.put('files',{id:'ue:ios-vault-document:de-ru',job:{page:2,complete:false}});
+                const db=await new Promise(resolve=>{const r=indexedDB.open('WorkflohPDF1');r.onsuccess=()=>resolve(r.result);});
+                const raw=await new Promise(resolve=>{const r=db.transaction('files').objectStore('files').get('ios-vault-document');r.onsuccess=()=>resolve(r.result);});db.close();
+                return {bytes,reference:!!raw.__wfpVault,internalBytes:Object.hasOwn(raw,'bytes'),page:(await WFP.DB.get('files','ue:ios-vault-document:de-ru')).job.page};
+                """) as? [String: Any]
+            XCTAssertEqual(result?["bytes"] as? [Int], [7,8,9])
+            XCTAssertEqual(result?["reference"] as? Bool, true)
+            XCTAssertEqual(result?["internalBytes"] as? Bool, false)
+            XCTAssertEqual(result?["page"] as? Int, 2)
+            try FileManager.default.removeItem(at: selected)
+            let blocked = try await js("""
+                let readBlocked=false,writeBlocked=false;
+                try{await WFP.DB.get('files','ue:ios-vault-document:de-ru');}catch{readBlocked=true;}
+                try{await WFP.DB.put('files',{id:'ue:ios-vault-document:de-ru',job:{page:0}});}catch{writeBlocked=true;}
+                return {readBlocked,writeBlocked};
+                """) as? [String: Any]
+            XCTAssertEqual(blocked?["readBlocked"] as? Bool, true)
+            XCTAssertEqual(blocked?["writeBlocked"] as? Bool, true)
+        } catch { await restore(); throw error }
+        await restore()
+    }
 }
