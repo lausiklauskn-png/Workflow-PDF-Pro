@@ -1,5 +1,7 @@
 name: Vollständige native Android-Freigabeprüfung
 on:
+  pull_request:
+    paths: ['native/**', 'android/**', 'upstream/**', 'tools/native/**', '.github/workflows/native-acceptance.yml']
   workflow_dispatch:
   push:
     branches: [main, codex/native-android-build]
