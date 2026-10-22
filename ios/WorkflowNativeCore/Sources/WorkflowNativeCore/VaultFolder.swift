@@ -131,6 +131,10 @@ public final class VaultFolder {
             let values = try file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
             guard values.isRegularFile == true, values.isSymbolicLink != true else { throw VaultFolderFailure.damaged }
             try FileManager.default.removeItem(at: file)
+            let descriptor = Darwin.open(folder.path, O_RDONLY)
+            guard descriptor >= 0 else { throw VaultFolderFailure.unavailable }
+            defer { Darwin.close(descriptor) }
+            guard fsync(descriptor) == 0 else { throw VaultFolderFailure.unavailable }
         }
     }
 }
