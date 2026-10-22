@@ -123,6 +123,7 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
             guard !uiBusy, let controller = bridge?.viewController, controller.presentedViewController == nil else { call.reject("VAULT_BUSY", "VAULT_BUSY"); return }
             uiBusy = true; folderCall = call
             let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder], asCopy: false)
+            picker.directoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
             picker.delegate = self; controller.present(picker, animated: true)
         }
     }
