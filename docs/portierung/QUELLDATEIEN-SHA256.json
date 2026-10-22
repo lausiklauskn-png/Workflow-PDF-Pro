@@ -1,5 +1,5 @@
 {
-  "commit": "faebdc5dbe841cb7ec8528ddacc1308bac734f5e",
+  "commit": "73e02b802557635846f76063d7bd6ff879630ace",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
@@ -448,8 +448,8 @@
     },
     {
       "path": "sw.js",
-      "bytes": 4994,
-      "sha256": "5a9e71af814daa89706436e9e0b9682da776dc62853f3fb044c26baff0acd41e"
+      "bytes": 5004,
+      "sha256": "4a2000f15a80fa0ea3d497fce9639b628fdc9b208f6dbdd97a727a25f4d38060"
     },
     {
       "path": "tests/bedeutung.mjs",
