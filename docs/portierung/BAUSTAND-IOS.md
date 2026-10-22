@@ -136,3 +136,37 @@ zusätzliche Daten und Überschreibschutz. Neue Apple-Nachweise stehen noch aus.
 Diese Bausteine sind noch nicht als produktiver `WorkflowVault`-Adapter aktiviert.
 Ordnerrechte, Keychain, Index/Journal, Migration und native Passwort-/Recovery-UI
 bleiben anzubinden. Keine vollständige Tresor- oder Geräteabnahme daraus ableiten.
+
+### Weitere Implementierung derselben Fortsetzung
+
+- `VaultFolderGrant` speichert Apple-Ordner-Bookmarks getrennt vom portablen Tresor.
+  `VaultFolder` koordiniert Anbieterzugriffe, bestätigt neue Dateien nach Rücklesen
+  und Dateisystem-Synchronisation und verweigert Überschreiben/Links/Traversal.
+  Fehlender Ordner oder beschädigtes Bookmark erzeugen keinen leeren Ersatz.
+- `VaultKeychain` speichert optional nur den Datenschlüssel, gerätegebunden und
+  nur bei entsperrtem Gerät; keine Passwortübertragung an JavaScript.
+- Auf `6e52bb9` bestätigte Job `120057140897` **13/13** Swift-Tests einschließlich
+  Bookmark-Neustart und Fehlerszenarien. Der Gesamtlauf wurde bei Ablösung des
+  Commits abgebrochen; daraus folgt keine vollständige Simulatorabnahme.
+- Auf `0b6d441` bestand die neue echte Drei-Plattform-Probe für 54 Dateicodec-
+  Richtungen, drei NFC-Passwortableitungen und 90 Ersatzschlüsselkombinationen
+  (Job `120055579284`). Der spätere Hosttest wurde durch Ablösung abgebrochen.
+- Neu hinzugefügt: `DocumentVault` für vollständige portable Ordner, verschlüsselte
+  Indexgenerationen und Commit-Markierungen, blockweises Schreiben/Lesen,
+  Schreibchargen, Neustartprüfung, Ersatzschlüssel-Hülle und zusätzliche
+  Passwortfächer. Neuste beschädigte Generation wird nicht übersprungen;
+  verschobene Generationen und doppelte Revisionsmarkierungen sperren den Zugriff.
+  Apple↔Android↔Windows-Ordnerproben und deren Swift-Tests stehen noch aus.
+- Alte verschlüsselte Generationen werden vorerst erhalten. Aufräumregel,
+  `VaultLocations`, Plugin-/Passwort-UI, native Recovery-Anzeige und produktive
+  Bibliotheks-/Journal-/Migrationsanbindung fehlen weiterhin.
+- Neue Hostproben führen echte DE/EN/RU-OCR mit lokalem Worker/WASM aus und
+  messen native Übersetzungs-Sprachpaare/Spracheingabe-Verfügbarkeit. Für deren
+  Ergebnis den aktuellen Apple-Lauf prüfen; eine Verfügbarkeitsabfrage ist kein
+  ausgeführter Übersetzungs- oder Sprachlauf.
+- Neue lokale Regressionen: **193/193** Herkunftsdateien unverändert, **33/33**
+  gemeinsame Browserfälle und **41/41** Tresorkomponenten bestanden, keine Skips.
+  Es wurden keine Änderungen an Android, Windows oder dem gemeinsamen Kern gemacht.
+
+Workflow PDF Pro für iOS ist weiterhin nicht vollständig abgeschlossen. Es wurde
+kein Nachfolgebrief für Private Brain Pro erstellt.

@@ -2,8 +2,9 @@
 
 Dieser Host verwendet denselben `tools/native/prepare-web.mjs` wie Windows und Android.
 `upstream/workflow-pdf` bleibt unverändert. Der Apple-Host ist noch keine vollständige
-oder veröffentlichte App. Insbesondere Tresor, Schlüsselverwaltung, Ersatzschlüssel,
-Übersetzungswege und vollständige Geräteabnahme fehlen noch.
+oder veröffentlichte App. Der portable Tresorbaustein, Ordnerfreigaben und Keychain sind begonnen; ihre
+produktive Bibliotheksanbindung, Übersetzungswege und vollständige Geräteabnahme
+fehlen noch.
 
 ## Reproduzierbarer Bau
 
@@ -62,3 +63,32 @@ Dateieingang/temporäre Dateien sind durch die iOS-Sandbox und System-Dateischut
 abgesichert; daraus folgt kein bereits implementierter portabler Dokumenttresor.
 
 Aktuelle Messergebnisse und offene Aufgaben: `docs/portierung/BAUSTAND-IOS.md`.
+
+## Tresorbausteine und Gegenproben
+
+`WorkflowNativeCore` enthält den PBV1-Dateicodec, NFC/PBKDF2, WFP1-Ersatzschlüssel,
+dauerhafte Ordner-Bookmarks, koordinierte Dateianbieterzugriffe, gerätegebundene
+Keychain-Ablage und `DocumentVault` mit verschlüsseltem Index, Generationen,
+Schreibchargen und Passwortfächern nach Ersatzschlüssel-Wiederherstellung.
+Diese Komponenten sind **noch nicht** als `WorkflowVault`-Plugin registriert.
+Die laufende Bibliothek verwendet damit noch keinen Apple-Haupttresor.
+
+Auf macOS prüfen:
+
+```sh
+swift test --package-path ios/WorkflowNativeCore
+node ios/tools/test-vault-interop.mjs
+```
+
+Die zweite Probe benötigt JDK und Rust/Cargo. Sie verwendet die unveränderten
+Android- und Windows-Implementierungen, synthetische öffentliche Schlüssel und
+zufällige temporäre Verzeichnisse. Sie prüft 54 Dateicodec-Richtungen, drei
+Passwortableitungen, 90 Ersatzschlüsselkombinationen und neun vollständige
+Tresorordner-Richtungen. Ein erfolgreicher Dateicodec-Lauf allein ist kein
+vollständiger Ordner- oder Produktnachweis.
+
+`VaultFolder` bestätigt synchronisiertes Schreiben und Rücklesen beim Dateianbieter;
+das bestätigt keine abgeschlossene Synchronisation mit einem iCloud-Server.
+Fehlende/widerrufene Freigaben führen zu Fehlern. Es gibt keinen Ersatzordner.
+`DocumentVault` behält alte verschlüsselte Generationen vorerst vollständig;
+eine generationenbewusste Aufräumregel und die produktive Migration fehlen noch.
