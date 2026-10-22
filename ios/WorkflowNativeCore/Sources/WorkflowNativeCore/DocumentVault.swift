@@ -57,6 +57,7 @@ public final class DocumentVault {
     public private(set) var revision: UInt64 = 0
     private var records: [String: Record] = [:]
     private var batch: [String: Record]?
+    private var batchFiles = Set<String>()
     private var pending: [String: Pending] = [:]
     private var setupFiles: [String]?
     public var unlocked: Bool { key != nil }
@@ -238,6 +239,7 @@ public final class DocumentVault {
         } catch { lock(); throw error }
     }
     public func lock() {
+        abortBatch()
         for item in pending.values { try? FileManager.default.removeItem(at: item.file) }
         pending = [:]; batch = nil; records = [:]; key = nil; revision = 0
     }
@@ -272,6 +274,33 @@ public final class DocumentVault {
         try FileManager.default.createDirectory(at: checkpoint.deletingLastPathComponent(), withIntermediateDirectories: true)
         try JSONEncoder().encode(Checkpoint(id: identity, revision: revision)).write(to: checkpoint, options: .atomic)
     }
+    /// Validate all generations before deleting anything. Keep the same three
+    /// committed generations as Windows; unknown/uncommitted objects are retained.
+    public func prune() throws {
+        _ = try require()
+        guard !busy, setupFiles == nil else { return }
+        let names = Array(commitNames(try folder.names()).reversed())
+        guard names.count > 3 else { return }
+        var retained = Set<String>(), expired = Set<String>()
+        for (position, name) in names.enumerated() {
+            let marker = try small(name, as: Marker.self)
+            guard marker.revision > 0, name.hasPrefix(String(format: "commit-%020llu-", marker.revision)) else { throw DocumentVaultFailure.damaged }
+            try fileName(marker.index)
+            let key = try require()
+            let envelope: Envelope = try folder.read(marker.index) { url in
+                let reader = try VaultCrypto.Reader(url: url, key: key, name: logical("index"))
+                var bytes = Data()
+                for index in 0..<max(1, (reader.size + UInt64(VaultCrypto.chunk) - 1) / UInt64(VaultCrypto.chunk)) { bytes.append(try reader.block(index)) }
+                return try JSONDecoder().decode(Envelope.self, from: bytes)
+            }
+            guard envelope.app == Self.format, envelope.v == 1, envelope.revision == marker.revision else { throw DocumentVaultFailure.damaged }
+            var owned = Set([marker.index])
+            for record in envelope.records.values { try fileName(record.file); owned.insert(record.file) }
+            if position < 3 { retained.formUnion(owned) } else { expired.formUnion(owned) }
+        }
+        for name in expired.subtracting(retained) { try folder.remove(name) }
+        for name in names.dropFirst(3) { try folder.remove(name) }
+    }
     private func encrypted(_ source: URL, kind: String) throws -> (String, UInt64, String) {
         let key = try require(), local = temporary(), name = UUID().uuidString.lowercased() + ".wpv"
         defer { try? FileManager.default.removeItem(at: local) }
@@ -301,6 +330,7 @@ public final class DocumentVault {
     }
     public func begin(store: String, id: String, reference: Reference? = nil) throws -> String {
         _ = try require(); _ = try recordName(store, id)
+        guard pending.count < 128 else { throw DocumentVaultFailure.busy }
         if let reference = reference {
             guard store == "files", reference.id == id, UUID(uuidString: reference.vaultId) != nil,
                   reference.hash.range(of: "^[0-9a-f]{64}$", options: .regularExpression) != nil else { throw DocumentVaultFailure.invalid }
@@ -333,7 +363,7 @@ public final class DocumentVault {
         let (file, checkedSize, hash) = try encrypted(item.file, kind: kind)
         let record = Record(store: item.store, id: item.id, file: file, size: checkedSize, hash: hash, reference: item.reference)
         var next = batch ?? records; next[kind] = record
-        if batch != nil { batch = next } else { try commit(next) }
+        if batch != nil { batch = next; batchFiles.insert(file) } else { try commit(next) }
         return record
     }
     public func info(store: String, id: String) throws -> Record? { _ = try require(); return (batch ?? records)[try recordName(store, id)] }
@@ -361,11 +391,12 @@ public final class DocumentVault {
     }
     public func commitBatch() throws {
         _ = try require(); guard let next = batch, pending.isEmpty else { throw DocumentVaultFailure.busy }
-        try commit(next); batch = nil
+        try commit(next); batch = nil; batchFiles = []
     }
     public func abortBatch() {
         for ticket in Array(pending.keys) { abort(ticket: ticket) }; batch = nil
-        // Unreferenced encrypted candidates are safe orphans. Never delete old
-        // committed objects before generation-aware retention is implemented.
+        let committed = Set(records.values.map(\.file))
+        for name in batchFiles.subtracting(committed) { try? folder.remove(name) }
+        batchFiles = []
     }
 }
