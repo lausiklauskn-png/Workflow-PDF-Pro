@@ -27,6 +27,16 @@ bleibt zurück. Ziel: keine Lücken und keine Frage, welche Fassung was schon ha
   steht, welche Fassung noch fehlt und warum (zum Beispiel iOS: nur vorbereitet, nicht veröffentlicht).
 - Nach jeder Veröffentlichung die Übersicht oben aktualisieren.
 
+## Gesammelt für die nächste gemeinsame Version
+
+Kleine Korrekturen werden gesammelt und dann zusammen in alle Fassungen gebracht (Klaus, 22.10.2026).
+
+1. Handy-Editorleiste: Der Zurück-Pfeil „←“ steht hinter ✂️ 💾 📤 an vierter Stelle statt ganz links,
+   in allen Sprachen. Ursache: `#edZuschneiden`, `#edSpeichern`, `#edTeilen` haben im Kern
+   (`assets/style.css`, Regel unter 640 px) keine `order`, alle anderen schon.
+   Der Fehler aus der Videoaufnahme (russisch, „← Библиотека“ außerhalb) ließ sich in der
+   Web-App nicht nachstellen.
+
 ## Entscheidung zu iOS (Klaus, 22.10.2026)
 
 - Die iOS-Version von Workflow PDF Pro wird **fertig vorbereitet**, aber **nicht veröffentlicht**.
