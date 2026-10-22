@@ -56,6 +56,26 @@ import Speech
             XCTAssertFalse(WorkflowMessageGate.trusted(URL(string: value)))
         }
     }
+    func testActualSameOriginFrameCannotDispatchNativeCalls() async throws {
+        try await ready()
+        let result = try await js("""
+            const original=Capacitor.fromNative,seen=new Set();
+            Capacitor.fromNative=result=>{if(result.callbackId?.startsWith('ios-frame-probe-'))seen.add(result.callbackId);return original(result);};
+            const frame=document.createElement('iframe');frame.hidden=true;
+            try {
+              window.webkit.messageHandlers.bridge.postMessage({type:'message',pluginId:'WorkflowFiles',methodName:'appInfo',callbackId:'ios-frame-probe-control',options:{}});
+              for(let i=0;i<100&&!seen.has('ios-frame-probe-control');i++)await new Promise(r=>setTimeout(r,10));
+              await new Promise((resolve,reject)=>{frame.onload=resolve;frame.onerror=reject;frame.src=location.href;document.body.append(frame);});
+              const exposed=Boolean(frame.contentWindow.webkit?.messageHandlers?.bridge);
+              if(exposed)frame.contentWindow.eval("window.webkit.messageHandlers.bridge.postMessage({type:'message',pluginId:'WorkflowFiles',methodName:'appInfo',callbackId:'ios-frame-probe-attack',options:{}})");
+              await new Promise(r=>setTimeout(r,500));
+              return {control:seen.has('ios-frame-probe-control'),exposed,attackReturned:seen.has('ios-frame-probe-attack')};
+            } finally {frame.remove();Capacitor.fromNative=original;}
+            """) as? [String: Any]
+        XCTAssertEqual(result?["control"] as? Bool, true)
+        XCTAssertEqual(result?["exposed"] as? Bool, true, "Probe must actually reach the subframe message handler")
+        XCTAssertEqual(result?["attackReturned"] as? Bool, false)
+    }
     func testDeviceKeychainRememberRecallForgetAndIsolation() throws {
         let service = "de.familyprojekt.workflowpdf.pro.tests." + UUID().uuidString
         let keychain = VaultKeychain(service: service), id = UUID().uuidString
