@@ -32,6 +32,22 @@ Aktualisieren-Weg, bevor die Dokumentfunktionen starten.
    Übernahme nimmt Dokumente, Originale, Felder und Übersetzungsstände mit.
    Frühere Ordner und Sicherungen bleiben erhalten.
 
+## Ersatzschlüssel (3 von 5)
+
+Für ein vergessenes Tresor-Passwort: Einstellungen ⚙️ → **Speicher und Dokumenttresor**
+→ **Ersatzschlüssel erzeugen (3 von 5)**. Die App zeigt fünf Schlüssel (`WFP1-…`)
+in einem eigenen Fenster. Über **Als Datei speichern …** lassen sie sich sichern.
+**Fertig** ist erst möglich, wenn bestätigt ist, dass alle fünf gespeichert oder
+aufgeschrieben sind. Die Teile getrennt aufbewahren: Drei beliebige genügen, und wer
+drei hat, kann den Tresor öffnen. Ein neuer Satz macht den vorigen ungültig.
+
+Passwort vergessen: Im Passwortfenster **Passwort vergessen?** wählen, drei
+verschiedene Ersatzschlüssel eintippen und ein neues Passwort festlegen. Groß- und
+Kleinschreibung, Leerzeichen und Bindestriche sind egal. Tippfehler erkennt die App
+an der eingebauten Prüfsumme. Das neue Passwort öffnet den Tresor danach auch auf
+anderen Geräten mit Version 1.0.2. Ältere Versionen kennen nur das ursprüngliche
+Passwort. Der Tresor auf SD-Karte oder im Ordner ist unter Android und Windows derselbe.
+
 ## Übersetzen
 
 - **Mit Google auf dem Gerät übersetzen:** Die benötigten Android-Sprachmodelle werden beim
