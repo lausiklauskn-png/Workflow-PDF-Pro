@@ -1,5 +1,5 @@
 {
-  "commit": "d6d090b407cffddb75782df6b2fd3c120767e6e0",
+  "commit": "faebdc5dbe841cb7ec8528ddacc1308bac734f5e",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
@@ -369,7 +369,7 @@
     {
       "path": "index.html",
       "bytes": 12282,
-      "sha256": "f0d30d161a30965e92d7577c5f741700b761ec801fec3c74c4e04cc5e3eebe50"
+      "sha256": "a571bf36bd97f50874d2f4a7805657a76955555abb141fae43dbd64a7fa8b92e"
     },
     {
       "path": "manifest.webmanifest",
