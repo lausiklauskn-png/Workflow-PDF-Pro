@@ -1,8 +1,23 @@
 # Windows: Herausgebersignatur, Updates und Freigabe
 
 Stand 22.10.2026. Die veröffentlichte Windows-Version 1.0.1 bleibt unverändert.
-Die Änderungen für 1.0.2 sind erst nach bestandener Windows-Abnahme und vollständig
-eingerichteter Signierung freizugeben. Android-Version und Android-Schlüssel bleiben erhalten.
+Die Windows-Abnahme für den Quellstand 1.0.2 ist bestanden; ein neuer Download ist
+noch nicht veröffentlicht. Android-Version und Android-Schlüssel bleiben erhalten.
+
+## Abschließende Wahl vom 22.10.2026
+
+Klaus bleibt vorerst bei **manuellen unsignierten Setup.exe-Updates**. Dafür sind
+weder ein Windows-Signierkonto noch ein Update-Schlüssel nötig. Kein kostenpflichtiges
+Konto und kein selbstsigniertes Herausgeberzertifikat einrichten. Automatische Updates
+sind derzeit nicht aktiviert. Ein eigener kostenloser Update-Schlüssel kommt erst
+bei einer späteren Aktivierung infrage und ersetzt keine Windows-Herausgebersignatur.
+
+Der vorhandene Releaseablauf verlangt technisch noch Microsoft Artifact Signing
+und einen Update-Schlüssel. Vor einer späteren manuellen Windows-Veröffentlichung
+ist diese Pflicht zu entfernen; sie ist keine aktuelle Nutzeranforderung. Die folgenden
+Abschnitte beschreiben die zuvor vorbereitete optionale Signier-/Updatearchitektur,
+keinen jetzt auszuführenden Einrichtungsauftrag. Vollständiger Stand im
+[Windows-Abschluss](../BRIEF_ABSCHLUSS_2026-10-22_WINDOWS.md).
 
 ## Zwei getrennte Identitäten
 
