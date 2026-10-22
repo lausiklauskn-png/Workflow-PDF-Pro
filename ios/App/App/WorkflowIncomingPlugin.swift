@@ -88,15 +88,18 @@ final class WorkflowIncomingPlugin: WorkflowPlugin, CAPBridgedPlugin {
     }
     deinit { NotificationCenter.default.removeObserver(self) }
     @objc private func changed() { notifyListeners("available", data: [:], retainUntilConsumed: true) }
-    private func object(_ batch: IncomingBatch) throws -> JSObject {
-        let bytes = try JSONEncoder().encode(batch)
-        guard let value = try JSONSerialization.jsonObject(with: bytes) as? JSObject else { throw WorkflowError.damagedInbox }
-        return value
+    private func object(_ batch: IncomingBatch) -> JSObject {
+        // Foundation's untyped JSON objects do not reliably conform to
+        // Capacitor's Swift JSValue protocol. Build the bridge value explicitly.
+        let files: [JSObject] = batch.files.map { file in
+            ["id": file.id, "name": file.name, "mime": file.mime, "size": NSNumber(value: file.size)]
+        }
+        return ["id": batch.id, "files": files]
     }
     @objc func pending(_ call: CAPPluginCall) {
         perform(call) { [self] in
             guard let batch = try WorkflowIntake.shared.pending() else { return ["empty": true] }
-            return try object(batch)
+            return object(batch)
         }
     }
     @objc func read(_ call: CAPPluginCall) {
@@ -109,7 +112,7 @@ final class WorkflowIncomingPlugin: WorkflowPlugin, CAPBridgedPlugin {
         perform(call) { [self] in try WorkflowIntake.shared.acknowledge(id: text(call, "id"), discard: call.getBool("discard") ?? false); return [:] }
     }
     @objc func history(_ call: CAPPluginCall) {
-        perform(call) { [self] in ["receipts": try WorkflowIntake.shared.history().map { try object($0) }] }
+        perform(call) { [self] in ["receipts": try WorkflowIntake.shared.history().map { object($0) }] }
     }
     @objc func restore(_ call: CAPPluginCall) {
         perform(call) { [self] in try WorkflowIntake.shared.restore(id: text(call, "id")); return [:] }

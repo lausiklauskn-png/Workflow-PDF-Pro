@@ -110,14 +110,15 @@ import Speech
         let quoted = String(data: try JSONSerialization.data(withJSONObject: [batch.id, batch.files[0].id]), encoding: .utf8)!
         let result = try await js("""
             const [id,file]=\(quoted),api=Capacitor.Plugins.WorkflowIncoming;
-            const pending=await api.pending();
+            const invoke=async(method,options)=>{try{return await api[method](options);}catch(error){throw Error(method+': '+error.message);}};
+            const pending=await invoke('pending');
             if(pending.id!==id)throw Error('Shared batch missing');
-            const bytes=await api.read({batch:id,id:file,offset:0});
-            await api.acknowledge({id,discard:false});
-            const archived=(await api.history()).receipts.some(row=>row.id===id);
-            await api.restore({id});
-            const restored=(await api.pending()).id===id;
-            await api.acknowledge({id,discard:true});
+            const bytes=await invoke('read',{batch:id,id:file,offset:0});
+            await invoke('acknowledge',{id,discard:false});
+            const archived=(await invoke('history')).receipts.some(row=>row.id===id);
+            await invoke('restore',{id});
+            const restored=(await invoke('pending')).id===id;
+            await invoke('acknowledge',{id,discard:true});
             return {data:bytes.data,done:bytes.done,archived,restored};
             """) as? [String: Any]
         XCTAssertEqual(result?["data"] as? String, expected.base64EncodedString())
