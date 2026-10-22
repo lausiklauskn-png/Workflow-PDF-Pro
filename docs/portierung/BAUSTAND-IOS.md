@@ -257,3 +257,26 @@ Weitere neue Implementierung, Nachprüfung des aktuellen Commits erforderlich:
 `ios/README.md` beschreibt App Group und aktuellen Bau. Die App-Group-/Bundle-
 Zuordnung ist vor signierten Geräten mit dem vorhandenen Team zu bestätigen.
 Keine Kosten, Konten oder signierten Veröffentlichungen wurden ausgelöst.
+
+Apple bestätigt in [Meet the Translation API](https://developer.apple.com/videos/play/wwdc2024/10117/),
+dass diese APIs im Simulator nicht funktionieren. Die gemessenen nicht unterstützten
+Paare sind daher kein Nachweis fehlender Übersetzung auf einem echten iPhone.
+Die physische Probe bleibt erforderlich. Neuere APIs für längere Hintergrundaufträge
+und direkte Übersetzungssitzungen sind an konkrete Betriebssystem-/SDK-Versionen
+gebunden; aus dem älteren gemessenen SDK keinen universellen iOS-Ausschluss ableiten.
+
+Erster neuer iPad-Nachweis auf `35a0475ee503fd8bdf12198b71c18083939ad2bb`:
+Lauf [39855024240](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39855024240),
+Job `120091222612`, iPad Pro 11-inch (M4), iPadOS-Simulator 18.5: **14/14**
+Hosttests bestanden. Korrigierter gemeinsamer Eingang bis Archiv/Wiederherstellung,
+verschlüsselte Sicherung mit Original und Überschreibschutz, OCR mit blockierten
+HTTP-/HTTPS-Ressourcen, vier UI-Sprachen/RTL, nativer Speech-Vertrag ohne Aufnahme
+und Import der echten gepinnten Modellbibliothek bestätigt. Der Bibliotheksimport
+bestätigt weder Modelldownload noch Embedding/Offline-Modellrechnung.
+
+Der Folgeentwurf ergänzt eine sichtbare Latin-/Kyrillisch-Schriftprobe aus dem
+unveränderten Upstream-Test, genaue Kontrolle der angeforderten WKWebView-Breite,
+SHA-256-Rücklesen eingegangener Dateien, Apple-MIME-Typen, Unicode-Dateinamen mit
+erhaltener Endung und lokalisierte native Kamer-/Mikrofon-/Speech-Freigabehinweise.
+Diese Ergänzungen benötigen ihren eigenen Apple-Lauf. Reguläre Hardware-Drehung,
+externe Tastatur und Dateianbieter bleiben davon getrennte Geräteproben.

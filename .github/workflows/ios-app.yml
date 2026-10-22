@@ -1,7 +1,7 @@
 name: iOS-App – Bau und WKWebView-Prüfung
 on:
   push:
-    branches: ['codex/ios-**', 'main']
+    branches: ['main']
     paths: ['ios/**', 'native/**', 'upstream/**', 'tools/native/**', 'package*.json', 'capacitor.config.json', '.github/workflows/ios-app.yml']
   pull_request:
     paths: ['ios/**', 'native/**', 'upstream/**', 'tools/native/**', 'package*.json', 'capacitor.config.json', '.github/workflows/ios-app.yml']

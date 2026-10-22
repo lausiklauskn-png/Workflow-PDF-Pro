@@ -126,3 +126,6 @@ Rückimport mit Originalen, vier UI-Sprachen/RTL bei mehreren WKWebView-Größen
 OCR mit gesperrten HTTP-/HTTPS-Ressourcen und den tatsächlichen Import der
 gepinnten optionalen Modellbibliothek. Bibliotheksimport allein ist noch kein
 heruntergeladenes Modell, kein Embedding und kein Offline-Modellnachweis.
+PR-Änderungen starten diese Prüfungen einmal über `pull_request`; der zusätzliche
+Push-Lauf ist auf `main` begrenzt. So laufen auf dem offenen Arbeitsbranch nicht
+zwei identische macOS-Prüfketten pro Änderung.
