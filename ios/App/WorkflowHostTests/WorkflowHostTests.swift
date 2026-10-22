@@ -1,6 +1,8 @@
 import XCTest
 import WebKit
 import UIKit
+import CryptoKit
+import WorkflowNativeCore
 @testable import App
 
 @MainActor final class WorkflowHostTests: XCTestCase {
@@ -51,6 +53,20 @@ import UIKit
         for value in ["https://localhost/", "capacitor://evil/", "capacitor://localhost/help.html", "capacitor://localhost:123/", "capacitor://user@localhost/"] {
             XCTAssertFalse(WorkflowMessageGate.trusted(URL(string: value)))
         }
+    }
+    func testDeviceKeychainRememberRecallForgetAndIsolation() throws {
+        let service = "de.familyprojekt.workflowpdf.pro.tests." + UUID().uuidString
+        let keychain = VaultKeychain(service: service), id = UUID().uuidString
+        defer { try? keychain.forget(vaultID: id) }
+        let key = SymmetricKey(size: .bits256)
+        XCTAssertThrowsError(try keychain.recalled(vaultID: id))
+        try keychain.remember(key, vaultID: id)
+        let reopened = VaultKeychain(service: service)
+        XCTAssertEqual(try reopened.recalled(vaultID: id).withUnsafeBytes { Data($0) }, key.withUnsafeBytes { Data($0) })
+        XCTAssertThrowsError(try reopened.recalled(vaultID: UUID().uuidString))
+        try reopened.forget(vaultID: id)
+        XCTAssertThrowsError(try reopened.recalled(vaultID: id))
+        try reopened.forget(vaultID: id)
     }
     func testRealNativeTransferAndVersion() async throws {
         try await ready()
