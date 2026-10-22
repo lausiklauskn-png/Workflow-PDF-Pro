@@ -124,4 +124,13 @@ public final class VaultFolder {
             }
         }
     }
+    public func remove(_ name: String) throws {
+        try valid(name)
+        try coordinate(write: true) { folder in
+            let file = folder.appendingPathComponent(name)
+            let values = try file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
+            guard values.isRegularFile == true, values.isSymbolicLink != true else { throw VaultFolderFailure.damaged }
+            try FileManager.default.removeItem(at: file)
+        }
+    }
 }
