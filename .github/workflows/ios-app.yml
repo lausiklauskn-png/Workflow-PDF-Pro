@@ -32,9 +32,14 @@ jobs:
         id: apple_sync
       - run: node --test ios/tools/test-bundle.mjs
       - name: Native Datei- und Empfangsverträge
-        run: swift test --package-path ios/WorkflowNativeCore
+        run: |
+          set -euo pipefail
+          mkdir -p ios/results
+          swift test --package-path ios/WorkflowNativeCore 2>&1 | tee ios/results/swift-core.log
       - name: Tresorformat und Ersatzschlüssel Apple ↔ Android ↔ Windows
-        run: node ios/tools/test-vault-interop.mjs
+        run: |
+          set -euo pipefail
+          node ios/tools/test-vault-interop.mjs 2>&1 | tee ios/results/vault-interop.log
       - name: Unsigned simulator build and real WKWebView tests
         shell: bash
         run: |
