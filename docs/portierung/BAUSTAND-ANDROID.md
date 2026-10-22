@@ -1046,3 +1046,20 @@ ab; die einmalige Wiederholung lief durch. APK 83.126.582 Bytes, SHA-256
 `405e49f56a6d9b0315e8ec2843f6050fec842a7e849c5bfef8232d95c07b5ba7`. Der Download wurde
 unabhängig geladen und verglichen.
 [APK direkt herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.2/Workflow-PDF-Pro-1.0.2.apk).
+
+## 1.0.3: Versionsnummer, „Alle prüfen“, Webkern 1.1.0 (22.10.2026)
+
+versionCode 4 / versionName 1.0.3. Webkern bytegleich aus Workflow-PDF `db3830e` (#130):
+„▶ Alle prüfen“ und die Versionsnummer im Fuß und in den Einstellungen. Die App zeigt ihre
+eigene Nummer (`WorkflowFiles.appInfo` liefert `versionName`; `prepare-web` leert das Meta der
+Webversion). `NativeFoundationTest` prüft auf dem Emulator „Version “ + versionName im Fuß.
+
+Veröffentlicht als [v1.0.3](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.3)
+von `4bf83efcac603d654abba1e0a87d816987a75667` (Release-Lauf 39807912821). Freigabeprüfung
+39800194664: erster Versuch auf Android 12 abgebrochen (`NativeIncomingTest.warmStartsWithSameAction…`
+rot, danach verschwand der Emulator, Zeitgrenze 35 min); auch der vorige main-Lauf 39791369443 war
+auf Android 12 rot (leere UI im Installationsnachweis). Die einmalige Wiederholung lief grün.
+Ursache des wackligen Android-12-Emulators nicht behoben. APK 83.130.678 Bytes, SHA-256
+`d90860d83d08a98891a7ac3bcf02aaf4cc40472a167804e2ec97fc48c8da1975`, Zertifikat wie bisher
+(`0da805c9…3837`). Download unabhängig geladen und verglichen. Nicht auf Klaus' Geräten gemessen.
+[APK direkt herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.3/Workflow-PDF-Pro-1.0.3.apk).

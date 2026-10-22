@@ -7,10 +7,11 @@
   sind durch das ausdrückliche Go aufgehoben. Unvollständigen Host nicht veröffentlichen.
 
 - Wiederaufnahme, tatsächliche Zugriffsprüfung und Bauumgebung: `docs/FOLGESITZUNG.md`.
-  **Nächster Auftrag (Klaus 22.10.2026):** `BRIEF_NACHFOLGE_2026-10-22_VERSION-UND-VIDEO.md`
-  (Versionsnummer sichtbar, „Alle prüfen“, Erklärvideo mit Prüfteil, Musik ohne Lücken).
-  Abschluss davor: `BRIEF_ABSCHLUSS_2026-10-22_ERSATZSCHLUESSEL.md` (Android 1.0.2 mit
-  Ersatzschlüsseln 3 von 5 veröffentlicht).
+  **Neueste Übergabe (22.10.2026, abends):** `BRIEF_ABSCHLUSS_2026-10-22_VERSION-UND-VIDEO.md`
+  (Android 1.0.3 und Windows 1.0.3 veröffentlicht, Web 1.1.0, Video mit Prüfteil) und
+  `BRIEF_NACHFOLGE_2026-10-22_NACH-VERSION-UND-VIDEO.md` (nächster Schritt iOS).
+  Windows-Releases jetzt unsigniert ohne Schlüssel über `request-release.mjs windows-vX.Y.Z`.
+  Davor: `BRIEF_ABSCHLUSS_2026-10-22_ERSATZSCHLUESSEL.md` (Android 1.0.2).
   Eigene bestehende GitHub-Verbindung nutzen; Signierfreigabe bleibt in Actions.
   Neueste Übergabe vom 22.10.2026: `BRIEF_ABSCHLUSS_2026-10-22_WINDOWS.md` und
   `BRIEF_NACHFOLGE_2026-10-22_IOS.md`. Windows vorerst beendet; iOS ist die nächste Sitzung.
