@@ -28,6 +28,7 @@
 		BC8A5BA5A74F4010B37B4A49 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4478490402EA4F75A34E85F0 /* ShareViewController.swift */; };
 		A19EC7A255CE47659D4B0806 /* WorkflowNativeCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000002 /* WorkflowNativeCore */; };
 		B30000000000000000000001 /* WorkflowSpeechPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30000000000000000000002 /* WorkflowSpeechPlugin.swift */; };
+		B40000000000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B40000000000000000000002 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +53,10 @@
 		F7AB11F2896B487BA4DB0C5D /* WorkflowShare.appex */ = {isa = PBXFileReference; name = "WorkflowShare.appex"; path = WorkflowShare.appex; sourceTree = BUILT_PRODUCTS_DIR; fileEncoding = undefined; lastKnownFileType = undefined; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; };
 		4478490402EA4F75A34E85F0 /* ShareViewController.swift */ = {isa = PBXFileReference; name = "ShareViewController.swift"; path = ShareViewController.swift; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 		B30000000000000000000002 /* WorkflowSpeechPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowSpeechPlugin.swift; sourceTree = "<group>"; };
+		B40000000000000000000003 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		B40000000000000000000004 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		B40000000000000000000005 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		B40000000000000000000006 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +123,7 @@
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
+				B40000000000000000000002 /* InfoPlist.strings */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
 			);
@@ -217,6 +223,9 @@
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				de,
+				ru,
+				ar,
 				en,
 				Base,
 			);
@@ -247,6 +256,7 @@
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
+				B40000000000000000000001 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,6 +318,17 @@
 				504EC3111FED79650016851F /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		B40000000000000000000002 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B40000000000000000000003 /* de */,
+				B40000000000000000000004 /* en */,
+				B40000000000000000000005 /* ru */,
+				B40000000000000000000006 /* ar */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

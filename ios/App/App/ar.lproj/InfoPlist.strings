@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "تصوير المستندات وتحريرها على هذا الجهاز.";
+"NSMicrophoneUsageDescription" = "تسجيل الإدخال الصوتي للبحث في المستندات وتحريرها.";
+"NSSpeechRecognitionUsageDescription" = "تحويل الكلام إلى نص. قد تعالج Apple التسجيل على خوادمها بحسب الجهاز واللغة.";
