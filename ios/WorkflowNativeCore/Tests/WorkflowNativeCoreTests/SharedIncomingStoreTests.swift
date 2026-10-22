@@ -16,6 +16,12 @@ final class SharedIncomingStoreTests: XCTestCase {
         try second.access { try $0.acknowledge(id: a.id, discard: false) }
         XCTAssertEqual(try first.access { try $0.pending()?.id }, b.id)
         XCTAssertEqual(try first.access { try $0.history().first?.id }, a.id)
+        let payload = root.appendingPathComponent(b.id).appendingPathComponent(b.files[0].id)
+        try FileManager.default.removeItem(at: payload)
+        try FileManager.default.createSymbolicLink(at: payload, withDestinationURL: source)
+        XCTAssertThrowsError(try second.access { try $0.pending() })
+        try FileManager.default.removeItem(at: payload)
+        try FileManager.default.copyItem(at: source, to: payload)
         try Data([0]).write(to: root.appendingPathComponent("inbox.json"))
         XCTAssertThrowsError(try second.access { try $0.pending() })
     }

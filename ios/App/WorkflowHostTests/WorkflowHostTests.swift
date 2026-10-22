@@ -90,6 +90,42 @@ import Speech
         XCTAssertThrowsError(try reopened.recalled(vaultID: id))
         try reopened.forget(vaultID: id)
     }
+    func testSharedIncomingContainerRoundTripAcrossNativeAndWebBridge() async throws {
+        try await ready()
+        let extensionURL = try XCTUnwrap(Bundle.main.builtInPlugInsURL?.appendingPathComponent("WorkflowShare.appex"))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: extensionURL.path), "The Share Extension must actually be embedded")
+        let store = try SharedIncomingStore.live()
+        XCTAssertNil(try WorkflowIntake.shared.pending(), "Synthetic CI inbox must start empty")
+        let source = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".pdf")
+        let expected = Data("%PDF synthetic shared intake".utf8)
+        try expected.write(to: source)
+        defer { try? FileManager.default.removeItem(at: source) }
+        let batch = try store.access { try $0.receive([source]) }
+        defer {
+            try? store.access { inbox in
+                if try inbox.pending()?.id == batch.id { try inbox.acknowledge(id: batch.id, discard: true) }
+                else if try inbox.history().contains(where: { $0.id == batch.id }) { try inbox.discardArchived(id: batch.id) }
+            }
+        }
+        let quoted = String(data: try JSONSerialization.data(withJSONObject: [batch.id, batch.files[0].id]), encoding: .utf8)!
+        let result = try await js("""
+            const [id,file]=\(quoted),api=Capacitor.Plugins.WorkflowIncoming;
+            const pending=await api.pending();
+            if(pending.id!==id)throw Error('Shared batch missing');
+            const bytes=await api.read({batch:id,id:file,offset:0});
+            await api.acknowledge({id,discard:false});
+            const archived=(await api.history()).receipts.some(row=>row.id===id);
+            await api.restore({id});
+            const restored=(await api.pending()).id===id;
+            await api.acknowledge({id,discard:true});
+            return {data:bytes.data,done:bytes.done,archived,restored};
+            """) as? [String: Any]
+        XCTAssertEqual(result?["data"] as? String, expected.base64EncodedString())
+        XCTAssertEqual(result?["done"] as? Bool, true)
+        XCTAssertEqual(result?["archived"] as? Bool, true)
+        XCTAssertEqual(result?["restored"] as? Bool, true)
+        XCTAssertNil(try store.access { try $0.pending() })
+    }
     func testRealNativeTransferAndVersion() async throws {
         try await ready()
         let result = try await js("""

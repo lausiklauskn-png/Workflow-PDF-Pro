@@ -24,6 +24,9 @@
 		83942C7CC974451CA481F750 /* WorkflowHostTests.mdimporter in Copy Files */ = {isa = PBXBuildFile; fileRef = 9D7DEEB38C98450CBF3F7872 /* WorkflowHostTests.mdimporter */; };
 		AF16763C91494404A2FF562D /* WorkflowHostTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C034FEA6B58A4F8785ACDD19 /* WorkflowHostTests.swift */; };
 		B20000000000000000000001 /* WorkflowVaultPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000002 /* WorkflowVaultPlugin.swift */; };
+		46816066277445C58ED7C060 /* WorkflowShare.appex in Copy Files */ = {isa = PBXBuildFile; fileRef = F7AB11F2896B487BA4DB0C5D /* WorkflowShare.appex */; };
+		BC8A5BA5A74F4010B37B4A49 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4478490402EA4F75A34E85F0 /* ShareViewController.swift */; };
+		A19EC7A255CE47659D4B0806 /* WorkflowNativeCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000002 /* WorkflowNativeCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +48,8 @@
 		9D7DEEB38C98450CBF3F7872 /* WorkflowHostTests.mdimporter */ = {isa = PBXFileReference; name = "WorkflowHostTests.xctest"; path = "WorkflowHostTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; explicitFileType = "wrapper.cfbundle"; includeInIndex = 0; };
 		C034FEA6B58A4F8785ACDD19 /* WorkflowHostTests.swift */ = {isa = PBXFileReference; name = "WorkflowHostTests.swift"; path = "WorkflowHostTests/WorkflowHostTests.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 		B20000000000000000000002 /* WorkflowVaultPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowVaultPlugin.swift; sourceTree = "<group>"; };
+		F7AB11F2896B487BA4DB0C5D /* WorkflowShare.appex */ = {isa = PBXFileReference; name = "WorkflowShare.appex"; path = WorkflowShare.appex; sourceTree = BUILT_PRODUCTS_DIR; fileEncoding = undefined; lastKnownFileType = undefined; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; };
+		4478490402EA4F75A34E85F0 /* ShareViewController.swift */ = {isa = PBXFileReference; name = "ShareViewController.swift"; path = ShareViewController.swift; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +69,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		223F675A3D5F440198A11CC2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A19EC7A255CE47659D4B0806 /* WorkflowNativeCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -73,6 +86,7 @@
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
 				504EC3051FED79650016851F /* Products */,
+				3550B341675D4D06B9299564 /* WorkflowShare */,
 			);
 			sourceTree = "<group>";
 		};
@@ -81,6 +95,7 @@
 			children = (
 				504EC3041FED79650016851F /* App.app */,
 				9D7DEEB38C98450CBF3F7872 /* WorkflowHostTests.mdimporter */,
+				F7AB11F2896B487BA4DB0C5D /* WorkflowShare.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -106,6 +121,15 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		3550B341675D4D06B9299564 /* WorkflowShare */ = {
+			isa = PBXGroup;
+			children = (
+				4478490402EA4F75A34E85F0 /* ShareViewController.swift */,
+			);
+			name = WorkflowShare;
+			path = WorkflowShare;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -116,10 +140,12 @@
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
+				1D371719BE3944669E8A0B87 /* Copy Files */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1D15A453A0CC4A44A50B842E /* PBXTargetDependency */,
 			);
 			name = App;
 			packageProductDependencies = (
@@ -145,6 +171,26 @@
 			);
 			dependencies = (
 				44BF1DC4375A46DF9D3EAA2E /* PBXTargetDependency */,
+			);
+		};
+		77E68B06E61C430185181686 /* "WorkflowShare" */ = {
+			isa = PBXNativeTarget;
+			name = "WorkflowShare";
+			productName = "WorkflowShare";
+			productReference = F7AB11F2896B487BA4DB0C5D;
+			productType = "com.apple.product-type.app-extension";
+			buildConfigurationList = C1CF0AA76EB54229A7AA9E1E;
+			buildPhases = (
+				36D6CB6F0092455FB3B6FDF2 /* Sources */,
+				223F675A3D5F440198A11CC2 /* Frameworks */,
+				8569956742BC458A967B977E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			packageProductDependencies = (
+				A10000000000000000000002 /* WorkflowNativeCore */,
 			);
 		};
 /* End PBXNativeTarget section */
@@ -182,6 +228,7 @@
 			targets = (
 				504EC3031FED79650016851F /* App */,
 				DCF803624ABE4598BE9C581E /* "WorkflowHostTests" */,
+				77E68B06E61C430185181686 /* "WorkflowShare" */,
 			);
 		};
 /* End PBXProject section */
@@ -197,6 +244,13 @@
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8569956742BC458A967B977E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +276,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF16763C91494404A2FF562D /* WorkflowHostTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36D6CB6F0092455FB3B6FDF2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC8A5BA5A74F4010B37B4A49 /* ShareViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,6 +440,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_ENTITLEMENTS = Shared.entitlements;
 			};
 			name = Debug;
 		};
@@ -401,6 +464,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_ENTITLEMENTS = Shared.entitlements;
 			};
 			name = Release;
 		};
@@ -444,6 +508,50 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 			};
 		};
+		AEA78FB3604F43B4A6424910 /* Debug */ = {
+			name = Debug;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = WorkflowShare/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "WorkflowShare";
+				SKIP_INSTALL = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "de.familyprojekt.workflowpdf.pro.share";
+				SWIFT_VERSION = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0.3;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = appex;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = Shared.entitlements;
+			};
+		};
+		E2487A22EAFA41028B9C6534 /* Release */ = {
+			name = Release;
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = WorkflowShare/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "WorkflowShare";
+				SKIP_INSTALL = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "de.familyprojekt.workflowpdf.pro.share";
+				SWIFT_VERSION = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0.3;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = appex;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = Shared.entitlements;
+			};
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -470,6 +578,15 @@
 			buildConfigurations = (
 				20A99195F3F64935A69724E0 /* Debug */,
 				882E4F979D5748BAA982885F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C1CF0AA76EB54229A7AA9E1E /* Build configuration list for PBXNativeTarget "WorkflowShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AEA78FB3604F43B4A6424910 /* Debug */,
+				E2487A22EAFA41028B9C6534 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -506,6 +623,11 @@
 			target = 504EC3031FED79650016851F /* App */;
 			targetProxy = FB8C2D932C4B4DF0ACB73377 /* PBXContainerItemProxy */;
 		};
+		1D15A453A0CC4A44A50B842E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 77E68B06E61C430185181686 /* "WorkflowShare" */;
+			targetProxy = 5B770945151A481590B93FA4 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXContainerItemProxy section */
@@ -516,7 +638,28 @@
 			remoteGlobalIDString = 504EC3031FED79650016851F;
 			remoteInfo = App;
 		};
+		5B770945151A481590B93FA4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 77E68B06E61C430185181686;
+			remoteInfo = "WorkflowShare";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1D371719BE3944669E8A0B87 /* Copy Files */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				46816066277445C58ED7C060 /* WorkflowShare.appex in Copy Files */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			name = "Copy Files";
+			dstPath = "";
+			dstSubfolderSpec = 13;
+		};
+/* End PBXCopyFilesBuildPhase section */
 	};
 	rootObject = 504EC2FC1FED79650016851F /* Project object */;
 }

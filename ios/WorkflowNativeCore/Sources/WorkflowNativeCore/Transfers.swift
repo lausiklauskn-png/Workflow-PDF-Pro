@@ -110,9 +110,13 @@ public final class IncomingStore {
             for batch in batches {
                 guard UUID(uuidString: batch.id) != nil, !batch.files.isEmpty,
                       Set(batch.files.map(\.id)).count == batch.files.count else { throw WorkflowError.damagedInbox }
+                let directory = try root.appendingPathComponent(batch.id).resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
+                guard directory.isDirectory == true, directory.isSymbolicLink != true else { throw WorkflowError.damagedInbox }
                 for file in batch.files {
-                    guard UUID(uuidString: file.id) != nil,
-                          let size = try path(batch.id, file.id).resourceValues(forKeys: [.fileSizeKey]).fileSize,
+                    guard UUID(uuidString: file.id) != nil else { throw WorkflowError.damagedInbox }
+                    let values = try path(batch.id, file.id).resourceValues(forKeys: [.fileSizeKey, .isRegularFileKey, .isSymbolicLinkKey])
+                    guard values.isRegularFile == true, values.isSymbolicLink != true,
+                          let size = values.fileSize,
                           UInt64(size) == file.size else { throw WorkflowError.damagedInbox }
                 }
             }

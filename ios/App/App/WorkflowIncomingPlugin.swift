@@ -5,7 +5,7 @@ import WorkflowNativeCore
 final class WorkflowIntake {
     static let shared = WorkflowIntake()
     private var store: IncomingStore?
-    func inbox() throws -> IncomingStore {
+    private func legacyInbox() throws -> IncomingStore {
         if let store = store { return store }
         let support = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         let root = support.appendingPathComponent("WorkflowIncoming", isDirectory: true)
@@ -13,6 +13,31 @@ final class WorkflowIntake {
         try FileManager.default.setAttributes([.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication], ofItemAtPath: root.path)
         store = value
         return value
+    }
+    // Keep the pre-extension inbox readable. Never silently move or abandon
+    // existing receipts while switching new intake to the shared container.
+    func access<T>(_ operation: (IncomingStore, IncomingStore) throws -> T) throws -> T {
+        try SharedIncomingStore.live().access { shared in try operation(legacyInbox(), shared) }
+    }
+    func pending() throws -> IncomingBatch? { try access { try $0.pending() ?? $1.pending() } }
+    func read(batch: String, id: String, offset: UInt64) throws -> (Data, Bool) {
+        try access { legacy, shared in
+            let source = try legacy.pending()?.id == batch ? legacy : shared
+            return try source.read(batch: batch, id: id, offset: offset)
+        }
+    }
+    func acknowledge(id: String, discard: Bool) throws {
+        try access { legacy, shared in
+            let source = try legacy.pending()?.id == id ? legacy : shared
+            try source.acknowledge(id: id, discard: discard)
+        }
+    }
+    func history() throws -> [IncomingBatch] { try access { try $0.history() + $1.history() } }
+    func restore(id: String, discard: Bool = false) throws {
+        try access { legacy, shared in
+            let source = try legacy.history().contains(where: { $0.id == id }) ? legacy : shared
+            if discard { try source.discardArchived(id: id) } else { try source.restore(id: id) }
+        }
     }
     func receive(_ urls: [URL], controller: UIViewController?) {
         guard !urls.isEmpty else { return }
@@ -39,7 +64,7 @@ final class WorkflowIntake {
                     if let failure = error ?? copyingError as NSError? { throw failure }
                     coordinated.append(target)
                 }
-                try inbox().receive(coordinated)
+                _ = try access { _, shared in try shared.receive(coordinated) }
                 DispatchQueue.main.async { NotificationCenter.default.post(name: .workflowIncomingChanged, object: nil) }
             } catch {
                 DispatchQueue.main.async {
@@ -70,26 +95,26 @@ final class WorkflowIncomingPlugin: WorkflowPlugin, CAPBridgedPlugin {
     }
     @objc func pending(_ call: CAPPluginCall) {
         perform(call) { [self] in
-            guard let batch = try WorkflowIntake.shared.inbox().pending() else { return ["empty": true] }
+            guard let batch = try WorkflowIntake.shared.pending() else { return ["empty": true] }
             return try object(batch)
         }
     }
     @objc func read(_ call: CAPPluginCall) {
         perform(call) { [self] in
-            let (data, done) = try WorkflowIntake.shared.inbox().read(batch: text(call, "batch"), id: text(call, "id"), offset: number(call, "offset"))
+            let (data, done) = try WorkflowIntake.shared.read(batch: text(call, "batch"), id: text(call, "id"), offset: number(call, "offset"))
             return ["data": data.base64EncodedString(), "done": done]
         }
     }
     @objc func acknowledge(_ call: CAPPluginCall) {
-        perform(call) { [self] in try WorkflowIntake.shared.inbox().acknowledge(id: text(call, "id"), discard: call.getBool("discard") ?? false); return [:] }
+        perform(call) { [self] in try WorkflowIntake.shared.acknowledge(id: text(call, "id"), discard: call.getBool("discard") ?? false); return [:] }
     }
     @objc func history(_ call: CAPPluginCall) {
-        perform(call) { [self] in ["receipts": try WorkflowIntake.shared.inbox().history().map { try object($0) }] }
+        perform(call) { [self] in ["receipts": try WorkflowIntake.shared.history().map { try object($0) }] }
     }
     @objc func restore(_ call: CAPPluginCall) {
-        perform(call) { [self] in try WorkflowIntake.shared.inbox().restore(id: text(call, "id")); return [:] }
+        perform(call) { [self] in try WorkflowIntake.shared.restore(id: text(call, "id")); return [:] }
     }
     @objc func discardArchived(_ call: CAPPluginCall) {
-        perform(call) { [self] in try WorkflowIntake.shared.inbox().discardArchived(id: text(call, "id")); return [:] }
+        perform(call) { [self] in try WorkflowIntake.shared.restore(id: text(call, "id"), discard: true); return [:] }
     }
 }
