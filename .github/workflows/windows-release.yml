@@ -109,15 +109,18 @@ jobs:
         env:
           PUBLISHER: ${{ vars.WF_PDF_WINDOWS_PUBLISHER_SUBJECT }}
         run: windows/tools/verify-windows-signature.ps1 -File "release-files/$env:INSTALLER" -ExpectedSubject $env:PUBLISHER
+      - name: Werkzeuge ohne Signierfreigabe installieren
+        working-directory: windows
+        run: |
+          npm ci
+          if ($LASTEXITCODE -ne 0) { throw 'Signing tool installation failed.' }
       - name: Update-Signatur an diese Version binden
         working-directory: windows
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.WF_PDF_UPDATER_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.WF_PDF_UPDATER_PRIVATE_KEY_PASSWORD }}
         run: |
-          npm ci
-          if ($LASTEXITCODE -ne 0) { throw 'Signing tool installation failed.' }
-          npx tauri signer sign --app-version $env:VERSION "../release-files/$env:INSTALLER"
+          npx --no-install tauri signer sign --app-version $env:VERSION "../release-files/$env:INSTALLER"
           if ($LASTEXITCODE -ne 0) { throw 'Update signing failed.' }
       - name: Signatur unabhängig prüfen und Metadaten erstellen
         run: |

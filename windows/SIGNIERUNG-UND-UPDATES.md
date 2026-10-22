@@ -74,8 +74,8 @@ API-Schlüssel. Der Server sieht die technisch nötigen Verbindungsdaten.
 
 Ein Update wird sichtbar angeboten. Download und Installation beginnen erst nach
 Auswahl; die Installation benötigt außerdem eine native Bestätigung. Der aktuelle
-Dokumentstand wird vor dem Schließen gespeichert und die Datenbank geleert beziehungsweise
-angehalten (ausstehende Schreibvorgänge werden abgewartet, keine Daten werden gelöscht).
+Dokumentstand wird vor dem Schließen gespeichert. Ausstehende Schreibvorgänge
+werden abgewartet und anschließend weitere Datenbankzugriffe angehalten.
 Bei gesperrtem Speicher oder Schreibfehler wird der Neustart verhindert.
 Der Updater prüft minisign-Signatur **und signierte Versionsnummer**. Fremde
 Downloadadressen, Vorschauversionen und Downgrades werden nicht akzeptiert.
