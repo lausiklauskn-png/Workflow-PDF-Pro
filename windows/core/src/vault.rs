@@ -43,7 +43,7 @@ fn is_uuid(name: &str) -> bool {
 fn is_commit(name: &str) -> bool {
     // commit-<20 Ziffern>-<uuid>.json
     name.len() == 7 + 20 + 1 + 36 + 5 && name.starts_with("commit-") && name.ends_with(".json")
-        && name[7..27].bytes().all(|b| b.is_ascii_digit()) && &name[27..28] == "-" && is_uuid(&name[28..64])
+        && name.as_bytes()[7..27].iter().all(u8::is_ascii_digit) && &name[27..28] == "-" && is_uuid(&name[28..64])
 }
 
 fn commit_prefix(revision: i64) -> String {
