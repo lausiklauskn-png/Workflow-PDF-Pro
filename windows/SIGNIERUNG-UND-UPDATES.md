@@ -96,11 +96,15 @@ und erneut vergleichen. Erst danach wird der Update-Zeiger freigegeben.
 Fehlende Signierkonfiguration führt vor der Veröffentlichung zum Abbruch.
 
 WebView2-SmartScreen wird nicht mehr abgeschaltet. Die CSP erlaubt lokale Skripte,
+die bereits verwendete, fest versionierte Transformers-Bibliothek von jsDelivr,
 benötigte WebAssembly/Worker, Inline-Stile und bestehende HTTPS-/WSS-Netzfunktionen;
 beliebige Inline-Skripte, JavaScript-eval, Objekte, fremde Basisadressen und
 Formularübermittlung sind gesperrt. Tauri ergänzt die Hashes der unveränderten
 lokalen Inline-Startskripte. IPC-Aufrufe werden auf das jeweilige lokale
 Haupt-/Passwort-/Übersetzungsfenster begrenzt. CDP bleibt ausschließlich im Prüfbau.
+Die bestehende eingebettete Sicherheitshilfe darf innerhalb derselben App-Herkunft
+weiter angezeigt werden. Update-Adapter und Dialogskripte tragen Inhaltsprüfsummen in ihren URLs,
+damit der unveränderte Service Worker bei App-Updates keine alte Adapterfassung liefert.
 
 Die tatsächlichen Abnahmeergebnisse gehören in `docs/portierung/BAUSTAND-WINDOWS.md`.
 Ein GitHub-Windows-Runner ersetzt keine physische Windows-10-/11-Geräteprüfung.

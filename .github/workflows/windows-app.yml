@@ -79,6 +79,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Native updater tests failed.' }
       - name: Prüfbau (mit lokalem Prüfzugang) bauen
         working-directory: windows
+        env:
+          WFP_WINDOWS_PROBE: '1'
         run: |
           npx tauri build --features messprobe
           New-Item -ItemType Directory -Force ../pruef-out | Out-Null
@@ -87,6 +89,7 @@ jobs:
         working-directory: windows
         run: |
           npx tauri build
+          if (Test-Path dist/windows/csp-probe.js) { throw 'CSP probe must not ship in the production bundle.' }
           New-Item -ItemType Directory -Force ../auslieferung | Out-Null
           $version = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
           $name = "Workflow-PDF-Pro-Windows-$version-Setup.exe"

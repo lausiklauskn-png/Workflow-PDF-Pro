@@ -83,6 +83,8 @@ async function makePdf(title, withField) {
 async function password(text, expectFailure) {
   const dialog = await findPage(url => url.includes('/windows/kennwort.html'));
   watch(dialog);
+  const denied = await dialog.evaluate(() => window.__TAURI_INTERNALS__.invoke('wfp_update', {operation: 'status'}).then(() => false, error => String(error) === 'NOT_ALLOWED'));
+  expect(denied, 'Password window must not have update privileges');
   await dialog.waitForSelector('#erstes');
   await dialog.fill('#erstes', text);
   if (await dialog.isVisible('#zweites')) await dialog.fill('#zweites', text);
@@ -114,17 +116,23 @@ await step('umgebung', () => page.evaluate(async () => ({
 if (phase === 'erst') {
   await step('sicherheitUndUpdates', async () => {
     const policy = await page.evaluate(async () => {
-      let evalBlocked = false;
-      try { (0, eval)('window.__wfpUnsafeEval=1'); } catch {evalBlocked = true;}
-      const script = document.createElement('script'); script.textContent = 'window.__wfpUnsafeInline=1'; document.body.append(script);
-      await new Promise(resolve => setTimeout(resolve, 100)); script.remove();
-      return {evalBlocked, inlineBlocked: !window.__wfpUnsafeInline,
+      const probe=await window.__WFPCspProbe;
+      return {...probe,
         updateAdapter: typeof window.WFPWindowsUpdates?.check === 'function',
         status: await window.__TAURI_INTERNALS__.invoke('wfp_update', {operation: 'status'})};
     });
-    expect(policy.evalBlocked && policy.inlineBlocked && policy.updateAdapter && policy.status.current === '1.0.2', 'CSP/update adapter did not enforce the intended rules');
+    expect(policy.evalBlocked && policy.inlineBlocked && policy.updateAdapter && policy.status.current === '1.0.2', 'CSP/update adapter: ' + JSON.stringify(policy));
     return policy;
   });
+  await step('eingebetteteSicherheitshilfe', () => page.evaluate(async () => {
+    // The existing Mycel wizard embeds this local help page.
+    const frame=document.createElement('iframe');frame.src='sicherheit.html';frame.hidden=true;document.body.append(frame);
+    try {
+      await new Promise((resolve,reject)=>{frame.onload=resolve;frame.onerror=reject;setTimeout(()=>reject(Error('Sicherheitshilfe lädt nicht')),15000);});
+      if((frame.contentDocument?.body?.textContent||'').trim().length<100) throw Error('Sicherheitshilfe durch CSP blockiert');
+      return {lokaleHilfeErreichbar:true};
+    } finally {frame.remove();}
+  }));
   const form = await makePdf('Workflow PDF Pro Windows', true);
   const dir = env('WFP_PRUEF_ARBEIT');
   await mkdir(dir, { recursive: true });
@@ -141,6 +149,18 @@ if (phase === 'erst') {
     for (const m of ['ausfuellbar', 'fest', 'vorlage']) { const e = await WFP.Export.exportieren(w.S.doc, w.S.bytes, m); r[m] = new TextDecoder('latin1').decode(e.bytes.slice(0, 5)) === '%PDF-' ? e.bytes.length : 0; }
     return r;
   }).then(v => { expect(v.ausfuellbar && v.fest && v.vorlage, 'PDF-Ausgabe fehlt'); return v; }));
+  await step('arbeitsstandVorUpdate', () => page.evaluate(async () => {
+    const doc=window.__wfpdf.S.doc, original=doc.fields[0].value;
+    doc.fields[0].value='Müller – Update-Speicherprobe';
+    const gate=await WFPWindowsUpdates.saveBeforeRestart();
+    try {
+      const saved=await gate.target.get('docs',doc.id);
+      if(saved.fields[0].value!==doc.fields[0].value || !gate.blocked) throw Error('Arbeitsstand nicht vor Neustart gespeichert');
+      return {gespeichert:true,angehalten:gate.blocked};
+    } finally {
+      gate.resume();doc.fields[0].value=original;await WFP.DB.put('docs',structuredClone(doc));
+    }
+  }));
   await step('texterkennung', () => page.evaluate(async () => {
     if (!window.Tesseract) await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'vendor/tesseract/tesseract.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
     const abs = u => new URL(u, location.href).href;
@@ -149,6 +169,15 @@ if (phase === 'erst') {
     g.fillStyle = '#fff'; g.fillRect(0, 0, 1200, 200); g.fillStyle = '#000'; g.font = '64px Arial'; g.fillText('Antrag Bewohnerparkausweis', 30, 120);
     const r = await w.recognize(c); await w.terminate(); return r.data.text.trim();
   }).then(v => { expect(/Bewohnerparkausweis/.test(v), 'Texterkennung falsch'); return v; }));
+  await step('bedeutungBibliothekUnterCsp', () => page.evaluate(async () => {
+    const url=URL.createObjectURL(new Blob([`import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2').then(m=>self.postMessage({ok:typeof m.pipeline==='function'})).catch(e=>self.postMessage({error:String(e)}));`], {type:'text/javascript'}));
+    const worker=new Worker(url,{type:'module'});
+    try {
+      const result=await new Promise((resolve,reject)=>{worker.onmessage=e=>resolve(e.data);worker.onerror=e=>reject(Error(e.message));setTimeout(()=>reject(Error('Modellbibliothek lädt nicht')),60000);});
+      if(!result.ok)throw Error(result.error||'Bedeutungssuche durch CSP blockiert');
+      return {modellBibliothekImWorker:true,keinModellDownload:true};
+    } finally {worker.terminate();URL.revokeObjectURL(url);}
+  }));
   await step('speichernUnter', async () => {
     const target = env('WFP_PRUEF_SPEICHERN');
     await mkdir(target, { recursive: true });
@@ -249,7 +278,9 @@ if (phase === 'abgezogen') {
     const state = await vaultState();
     const text = await page.locator('dialog[open] p').first().textContent();
     expect(!state.unlocked && /nicht durch eine leere/.test(text), 'Kein klarer Sperrhinweis');
-    return { problem: state.problem, hinweis: text };
+    const updateBlocked=await page.evaluate(() => WFPWindowsUpdates.saveBeforeRestart().then(()=>false,()=>true));
+    expect(updateBlocked,'Update must not restart with unavailable storage');
+    return { problem: state.problem, hinweis: text, updateBlockiert:updateBlocked };
   });
 }
 

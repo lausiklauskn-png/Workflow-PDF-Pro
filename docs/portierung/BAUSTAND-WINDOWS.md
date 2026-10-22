@@ -113,3 +113,39 @@ in Chrome). Nichts davon ist auf Klaus' PC gemessen.
   SHA-256 `f7d5bffd800c7bd01915744d71aea42b3f7c6b05c3de60a37ecc2f18d179a099`. Zusätzlich aus
   dieser Sitzung heruntergeladen und gegengeprüft: gleich (NSIS-Installer, PE32).
 - Unsigniert. Auf Klaus' Windows-PC nicht gemessen.
+
+## Windows 1.0.2: Sicherheit, Updates und Signiervorbereitung (22.10.2026)
+
+Noch nicht veröffentlicht. Der Download oben bleibt die unveränderte, unsignierte 1.0.1.
+Die Änderungen liegen zunächst in PR #13 (`codex/windows-security-updates`).
+
+- WebView2-SmartScreen wird nicht mehr abgeschaltet. Neue CSP mit lokalen Skripten,
+  der bereits fest versionierten Transformers-Bibliothek, WebAssembly und Workern;
+  eingebettete lokale Sicherheitshilfe bleibt möglich. Kein JavaScript-eval und
+  keine beliebigen Inline-Skripte. Native Aufrufe prüfen Fenster und lokale Seite.
+- Windows-Update-Adapter: automatische Suche nach dem Start und alle sechs Stunden,
+  abschaltbar und manuell auslösbar; sichtbarer Download, versionsgebundene Signatur,
+  fester HTTPS-Downloadpfad, native Installationsbestätigung. Arbeitsstand und
+  ausstehende Journal-Schreibvorgänge werden vor dem Neustart gesichert. Fehlender
+  Speicher oder Schreibfehler blockiert die Installation.
+- Inhaltsprüfsummen in Adapter-/Dialog-URLs verhindern veraltete Fassungen aus dem
+  unveränderten Service-Worker-Cache. Dokumentdaten und Modellvorräte bleiben erhalten.
+- Release-Vorbereitung: bereits abgenommenen Installer über Microsoft Artifact
+  Signing mit OIDC signieren, Herausgeber/Vertrauenskette/Zeitstempel prüfen,
+  endgültige Bytes mit dem Tauri-Schlüssel samt Version signieren und unabhängig
+  gegenprüfen. Downloadvergleich kommt vor der Aktualisierung des Windows-Update-Zeigers.
+
+Klaus hat bestätigt, dass noch kein Windows-Code-Signing-Zertifikat oder Signierdienst
+vorhanden ist. Es wurde kein kostenpflichtiges Konto angelegt. Auch der dauerhafte
+Update-Schlüssel muss einmal sicher eingerichtet werden. Das leere `updater.pub`
+schaltet Updates aus; der Release-Workflow bricht ohne Signierkonfiguration ab.
+Keine neue signierte Veröffentlichung oder echte Update-Installation behaupten.
+Einrichtung: [Windows-Signierung und Updates](../../windows/SIGNIERUNG-UND-UPDATES.md).
+
+Prüfverlauf: Der erste neue Windows-Lauf 39761375330 scheiterte vor den Host-Tests
+am noch nicht erzeugten Web-Bündel (`frontendDist`). Der Vorbereitungsschritt wurde
+ergänzt, die aufgelösten Abhängigkeiten eingecheckt und die Prüfungen neu gestartet.
+Kryptografische Gegenproben mit Node und echten Tauri-CLI-Signaturen sowie die
+ursprünglichen Rust-/Android-Formatprüfungen bestanden bereits. Der vollständige
+aktuelle Windows-Nachweis wird nach Abschluss der neuen Produktabnahme ergänzt.
+

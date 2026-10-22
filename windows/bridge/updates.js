@@ -52,6 +52,9 @@
     document.activeElement?.blur();
     const current = window.__wfpdf?.S?.doc;
     if (current) await window.WFP.DB.put('docs', structuredClone(current));
+    // A journal read is also a barrier for preference writes queued outside the
+    // document gate, including when no document is open.
+    await window.WFP.DB.keys('docs');
     await gate.pause();
     if (gate.fault) throw Error('STORAGE_NOT_READY');
     return gate;
