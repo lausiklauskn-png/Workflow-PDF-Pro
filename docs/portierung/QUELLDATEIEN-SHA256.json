@@ -1,6 +1,11 @@
 {
-  "commit": "db3830e23b1207498efa083d00678f2de31379f7",
+  "commit": "d6d090b407cffddb75782df6b2fd3c120767e6e0",
   "files": [
+    {
+      "path": ".github/workflows/quality.yml",
+      "bytes": 676,
+      "sha256": "66ee26e2f0da55e74dd4df14aaa25fe2e9a8be5e6cda3aa2e3351c2302fb8729"
+    },
     {
       "path": ".gitignore",
       "bytes": 20,
@@ -185,6 +190,11 @@
       "path": "beispiele/Workfloh-PDF-Benutzerhandbuch.pdf",
       "bytes": 1255420,
       "sha256": "be0f61d89e564a0e6d7d1eb14961efebe9a49a4ee13a31332c8be3af49cf338e"
+    },
+    {
+      "path": "docs/QUALITAETSPRUEFUNG-2026-10-22.md",
+      "bytes": 1602,
+      "sha256": "9dd688408f2ca81ebddffe17d9785af4c0b6f8039e189e60b65ef2c4c90c070c"
     },
     {
       "path": "docs/TODO.md",
@@ -373,8 +383,8 @@
     },
     {
       "path": "package.json",
-      "bytes": 1202,
-      "sha256": "1869054fc44ce71035ac20f59ea8a4d0fc1a5626a3f526ada78490a31471b25b"
+      "bytes": 1237,
+      "sha256": "c23d96cf91d60b8e797605fad467005852b98e9383b8fd79543493fcd5e74763"
     },
     {
       "path": "sbkim/01_storage.js",
@@ -438,8 +448,8 @@
     },
     {
       "path": "sw.js",
-      "bytes": 4835,
-      "sha256": "b2782a8a3e920ef1b972c0b82eebd68912451b545ae8080b7ed905fc9051e3cc"
+      "bytes": 4994,
+      "sha256": "5a9e71af814daa89706436e9e0b9682da776dc62853f3fb044c26baff0acd41e"
     },
     {
       "path": "tests/bedeutung.mjs",
@@ -800,6 +810,11 @@
       "path": "tests/video.mjs",
       "bytes": 21011,
       "sha256": "f58adcf99ce2642f7f7f22ecbc0c97b4083dc024e56eecb011e91ed80bf1867c"
+    },
+    {
+      "path": "tests/vorrat-isolation.mjs",
+      "bytes": 2961,
+      "sha256": "0fac5e981a4871de5fe2a8072be471f98a279896ffc8b04a51915b8b9ca130c6"
     },
     {
       "path": "tests/zuschneiden.mjs",

@@ -32,7 +32,10 @@
   Historische Baufortsetzung: `BRIEF_NACHFOLGE_2026-10-21_APP_FERTIGSTELLEN.md`.
 
 - Verbindlich: `BRIEF_NACHFOLGE_2026-10-20_NATIVE_APP.md` vollständig lesen.
-  Der Quellcheckout Workflow-PDF und `upstream/workflow-pdf` bleiben unverändert;
+  Beim ursprünglichen Portierungsauftrag blieben Quelle und Kopie unverändert.
+  Der neue Qualitätsauftrag erlaubt konkrete Fehlerkorrekturen in Workflow-PDF;
+  diese zuerst dort pflegen und anschließend bytegleich samt Herkunftsmanifest
+  nach `upstream/workflow-pdf` übernehmen. Keine abweichende native Kernkopie pflegen.
   `node tools/onboarding/verify-upstream.mjs` prüft die bytegleiche Übernahme.
 - Entscheidungen: Android/Samsung DeX zuerst, Windows danach, iOS anschließend.
   Chrome-Variante A ist zur Erprobung gewählt. Neue wesentliche Abweichungen
