@@ -208,25 +208,144 @@ final class DocumentVault {
         Place p = new Place(); p.tree = Uri.parse(prefs.getString("tree", "")); p.root = prefs.getString("root", ""); p.label = prefs.getString("label", FOLDER);
         open(p, password, remember);
     }
-    void open(Place candidate, CharSequence password, boolean remember) throws Exception {
-        if (transferring()) throw failure("VAULT_BUSY");
+    static final String RECOVERY_PREFIX = "workflow-pdf-pro.ersatz-", SLOT_PREFIX = "workflow-pdf-pro.kennwort-";
+    private JSONObject readHeader(Place candidate) throws Exception {
         Entry header = child(candidate, candidate.root, HEADER);
         if (header == null) throw failure("VAULT_NOT_FOUND");
         JSONObject meta = new JSONObject(new String(small(candidate, header.id, 65536), StandardCharsets.UTF_8));
-        int rounds = meta.getInt("iterations");
-        if (!FORMAT.equals(meta.getString("app")) || meta.getInt("v") != 1 || rounds < VaultCrypto.MIN_ITERATIONS || rounds > VaultCrypto.MAX_ITERATIONS) throw failure("VAULT_DAMAGED");
+        checkPasswordMeta(meta);
         candidate.id = meta.getString("id");
         if (!candidate.id.matches("[a-f0-9-]{36}")) throw failure("VAULT_DAMAGED");
+        return meta;
+    }
+    private static void checkPasswordMeta(JSONObject meta) throws Exception {
+        int rounds = meta.getInt("iterations");
+        if (!FORMAT.equals(meta.getString("app")) || meta.getInt("v") != 1 || rounds < VaultCrypto.MIN_ITERATIONS || rounds > VaultCrypto.MAX_ITERATIONS) throw failure("VAULT_DAMAGED");
+    }
+    /** Datenschlüssel mit einem Passwort aus Kopf oder Passwortfach öffnen. */
+    private static byte[] unwrapPassword(Place candidate, JSONObject meta, CharSequence password) throws Exception {
+        checkPasswordMeta(meta);
         byte[] salt = un64(meta.getString("salt")), wrapped = un64(meta.getString("wrapped"));
         if (salt.length != 16 || wrapped.length != VaultCrypto.NONCE + VaultCrypto.KEY + VaultCrypto.TAG) throw failure("VAULT_DAMAGED");
         byte[] pw = VaultCrypto.passwordBytes(password), derived = null;
         try {
-            derived = VaultCrypto.pbkdf2(pw, salt, rounds);
-            try { candidate.key = VaultCrypto.open(derived, wrapped, bytes(logical(candidate, "password"))); }
+            derived = VaultCrypto.pbkdf2(pw, salt, meta.getInt("iterations"));
+            byte[] key;
+            try { key = VaultCrypto.open(derived, wrapped, bytes(logical(candidate, "password"))); }
             catch (GeneralSecurityException error) { throw failure("VAULT_PASSWORD"); }
-            if (candidate.key.length != 32) throw failure("VAULT_DAMAGED");
+            if (key.length != 32) { Arrays.fill(key, (byte) 0); throw failure("VAULT_DAMAGED"); }
+            return key;
+        } finally { Arrays.fill(pw, (byte) 0); if (derived != null) Arrays.fill(derived, (byte) 0); }
+    }
+    /** Zusätzliche Passwortfächer nach einer Wiederherstellung mit Ersatzschlüsseln. */
+    private List<JSONObject> passwordSlots(Place p) throws Exception {
+        ArrayList<JSONObject> slots = new ArrayList<>();
+        for (Entry e : children(p, p.root)) {
+            if (e.name == null || !e.name.matches(java.util.regex.Pattern.quote(SLOT_PREFIX) + "[a-f0-9-]{36}\\.json")) continue;
+            JSONObject meta = new JSONObject(new String(small(p, e.id, 65536), StandardCharsets.UTF_8));
+            if (p.id.equals(meta.optString("id"))) slots.add(meta);
+        }
+        return slots;
+    }
+    void open(Place candidate, CharSequence password, boolean remember) throws Exception {
+        if (transferring()) throw failure("VAULT_BUSY");
+        JSONObject meta = readHeader(candidate);
+        try {
+            try { candidate.key = unwrapPassword(candidate, meta, password); }
+            catch (IOException error) {
+                if (!"VAULT_PASSWORD".equals(error.getMessage())) throw error;
+                for (JSONObject slot : passwordSlots(candidate)) {
+                    try { candidate.key = unwrapPassword(candidate, slot, password); break; }
+                    catch (IOException wrong) { if (!"VAULT_PASSWORD".equals(wrong.getMessage())) throw wrong; }
+                }
+                if (candidate.key == null) throw failure("VAULT_PASSWORD");
+            }
             loadIndex(candidate); select(candidate, remember);
-        } finally { Arrays.fill(pw, (byte) 0); if (derived != null) Arrays.fill(derived, (byte) 0); if (active != candidate && candidate.key != null) Arrays.fill(candidate.key, (byte) 0); }
+        } finally { if (active != candidate && candidate.key != null) Arrays.fill(candidate.key, (byte) 0); }
+    }
+    private void writeNew(Place p, String name, byte[] data) throws Exception {
+        String id = create(p, p.root, "application/json", name);
+        try (OutputStream out = resolver.openOutputStream(doc(p, id), "w")) { if (out == null) throw failure("VAULT_FOLDER_UNAVAILABLE"); out.write(data); }
+        catch (Exception error) { delete(p, id); throw error; }
+    }
+    private Entry named(Place p, String name) throws IOException { return child(p, p.root, name); }
+    /** Ersatzschlüssel für den entsperrten Tresor: n Teile, k genügen. Ein neuer Satz
+     *  ersetzt frühere erst, nachdem er geprüft geschrieben ist. */
+    List<String> createRecovery(int n, int k) throws Exception {
+        Place p = require();
+        byte[] secret = VaultCrypto.random(VaultRecovery.SECRET), set = VaultCrypto.random(4);
+        String setHex = VaultCrypto.hex(set), name = RECOVERY_PREFIX + setHex + ".json";
+        try {
+            List<VaultRecovery.Share> shares = VaultRecovery.split(secret, set, n, k);
+            byte[] wrapped = VaultCrypto.seal(secret, p.key, bytes(logical(p, "recovery:" + setHex)));
+            JSONObject file = new JSONObject().put("app", FORMAT).put("v", 1).put("id", p.id).put("set", setHex).put("n", n).put("k", k).put("created", System.currentTimeMillis()).put("wrapped", b64(wrapped));
+            writeNew(p, name, bytes(file.toString()));
+            Entry written = named(p, name);
+            try {
+                if (written == null) throw failure("VAULT_DAMAGED");
+                JSONObject back = new JSONObject(new String(small(p, written.id, 65536), StandardCharsets.UTF_8));
+                byte[] key;
+                try { key = VaultCrypto.open(secret, un64(back.getString("wrapped")), bytes(logical(p, "recovery:" + setHex))); }
+                catch (GeneralSecurityException error) { throw failure("VAULT_DAMAGED"); }
+                boolean same = MessageDigest.isEqual(key, p.key); Arrays.fill(key, (byte) 0);
+                byte[] again = VaultRecovery.combine(shares.subList(0, k));
+                same &= MessageDigest.isEqual(again, secret); Arrays.fill(again, (byte) 0);
+                if (!same) throw failure("VAULT_DAMAGED");
+            } catch (Exception error) { if (written != null) delete(p, written.id); throw error; }
+            for (Entry e : children(p, p.root)) if (e.name != null && e.name.startsWith(RECOVERY_PREFIX) && !e.name.equals(name)) delete(p, e.id);
+            ArrayList<String> out = new ArrayList<>();
+            for (VaultRecovery.Share share : shares) { out.add(VaultRecovery.encode(share)); Arrays.fill(share.data, (byte) 0); }
+            return out;
+        } finally { Arrays.fill(secret, (byte) 0); }
+    }
+    JSONObject recoveryInfo() throws Exception {
+        Place p = require();
+        for (Entry e : children(p, p.root)) {
+            if (e.name == null || !e.name.startsWith(RECOVERY_PREFIX) || !e.name.endsWith(".json")) continue;
+            JSONObject meta = new JSONObject(new String(small(p, e.id, 65536), StandardCharsets.UTF_8));
+            if (p.id.equals(meta.optString("id"))) return new JSONObject().put("exists", true).put("set", meta.optString("set")).put("n", meta.optInt("n")).put("k", meta.optInt("k")).put("created", meta.optLong("created"));
+        }
+        return new JSONObject().put("exists", false);
+    }
+    /** Mit genug Ersatzschlüsseln öffnen und ein neues Passwort setzen. Der Tresorkopf
+     *  bleibt unverändert; das neue Passwort liegt in einem eigenen Passwortfach. */
+    void recover(Place candidate, List<String> texts, CharSequence newPassword, boolean remember) throws Exception {
+        if (transferring()) throw failure("VAULT_BUSY");
+        String normalized = Normalizer.normalize(newPassword, Normalizer.Form.NFC);
+        if (normalized.codePointCount(0, normalized.length()) < 10) throw failure("VAULT_PASSWORD_SHORT");
+        ArrayList<VaultRecovery.Share> shares = new ArrayList<>();
+        for (String text : texts) if (text != null && !text.trim().isEmpty()) shares.add(VaultRecovery.decode(text));
+        byte[] secret = VaultRecovery.combine(shares), derived = null, pw = null;
+        try {
+            String setHex = VaultCrypto.hex(shares.get(0).set);
+            readHeader(candidate);
+            Entry file = named(candidate, RECOVERY_PREFIX + setHex + ".json");
+            if (file == null) throw failure("VAULT_RECOVERY_UNKNOWN");
+            JSONObject meta = new JSONObject(new String(small(candidate, file.id, 65536), StandardCharsets.UTF_8));
+            if (!FORMAT.equals(meta.optString("app")) || !candidate.id.equals(meta.optString("id")) || !setHex.equals(meta.optString("set"))) throw failure("VAULT_RECOVERY_UNKNOWN");
+            try { candidate.key = VaultCrypto.open(secret, un64(meta.getString("wrapped")), bytes(logical(candidate, "recovery:" + setHex))); }
+            catch (GeneralSecurityException error) { throw failure("VAULT_RECOVERY_INVALID"); }
+            if (candidate.key.length != 32) throw failure("VAULT_DAMAGED");
+            loadIndex(candidate);
+            byte[] salt = VaultCrypto.random(16); pw = VaultCrypto.passwordBytes(newPassword);
+            derived = VaultCrypto.pbkdf2(pw, salt, VaultCrypto.ITERATIONS);
+            byte[] wrapped = VaultCrypto.seal(derived, candidate.key, bytes(logical(candidate, "password")));
+            JSONObject slot = new JSONObject().put("app", FORMAT).put("v", 1).put("id", candidate.id).put("iterations", VaultCrypto.ITERATIONS).put("salt", b64(salt)).put("wrapped", b64(wrapped));
+            String name = SLOT_PREFIX + UUID.randomUUID() + ".json";
+            writeNew(candidate, name, bytes(slot.toString()));
+            Entry written = named(candidate, name);
+            try {
+                if (written == null) throw failure("VAULT_DAMAGED");
+                byte[] key = unwrapPassword(candidate, new JSONObject(new String(small(candidate, written.id, 65536), StandardCharsets.UTF_8)), newPassword);
+                boolean same = MessageDigest.isEqual(key, candidate.key); Arrays.fill(key, (byte) 0);
+                if (!same) throw failure("VAULT_DAMAGED");
+            } catch (Exception error) { if (written != null) delete(candidate, written.id); throw error; }
+            select(candidate, remember);
+        } finally {
+            Arrays.fill(secret, (byte) 0); if (pw != null) Arrays.fill(pw, (byte) 0); if (derived != null) Arrays.fill(derived, (byte) 0);
+            for (VaultRecovery.Share share : shares) Arrays.fill(share.data, (byte) 0);
+            if (active != candidate && candidate.key != null) Arrays.fill(candidate.key, (byte) 0);
+        }
     }
     void initialize(Place candidate, CharSequence password, boolean remember) throws Exception {
         if (transferring()) throw failure("VAULT_BUSY");

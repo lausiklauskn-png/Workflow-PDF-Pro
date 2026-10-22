@@ -6,6 +6,7 @@ pub mod crypto;
 pub mod error;
 pub mod fsutil;
 pub mod prefs;
+pub mod recovery;
 pub mod vault;
 pub mod locations;
 pub mod inbox;

@@ -14,6 +14,16 @@ impl DeviceProtect for NoRemember {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
+    if args[1] == "share-split" {
+        let secret: Vec<u8> = (0..32).map(|i| u8::from_str_radix(&args[2][2 * i..2 * i + 2], 16).unwrap()).collect();
+        for s in wfp_core::recovery::split(&secret, [5, 6, 7, 8], 5, 3).unwrap() { println!("{}", wfp_core::recovery::encode(&s)); }
+        return;
+    }
+    if args[1] == "share-combine" {
+        let shares: Vec<_> = args[2..].iter().map(|t| wfp_core::recovery::decode(t).unwrap()).collect();
+        println!("{}", wfp_core::crypto::hex(&wfp_core::recovery::combine(&shares).unwrap()));
+        return;
+    }
     let app = std::env::temp_dir().join(format!("wfp-compat-{}", uuid::Uuid::new_v4()));
     let mut locs = VaultLocations::new(&app.join("prefs"), &app.join("cache"), Arc::new(NoRemember)).unwrap();
     let mut candidate = locs.candidate().unwrap();
