@@ -1,5 +1,5 @@
 {
-  "commit": "73e02b802557635846f76063d7bd6ff879630ace",
+  "commit": "f253205702ea07710ca9ca249328b21b1a9dd3ed",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
@@ -153,8 +153,8 @@
     },
     {
       "path": "assets/style.css",
-      "bytes": 45693,
-      "sha256": "52f306682da7258dec930f158fe9a302b85d318c5964ea0990e007045481d40a"
+      "bytes": 45769,
+      "sha256": "9181f82999de4fcd307dcecdaa9e7c3b897d16d4feff6dce252bfde521687595"
     },
     {
       "path": "assets/suche.js",
@@ -193,8 +193,8 @@
     },
     {
       "path": "docs/QUALITAETSPRUEFUNG-2026-10-22.md",
-      "bytes": 1602,
-      "sha256": "9dd688408f2ca81ebddffe17d9785af4c0b6f8039e189e60b65ef2c4c90c070c"
+      "bytes": 2315,
+      "sha256": "32a3b3385b8d033c5797d0388afcd3b1142e98d9754bd13c9724a675182dae1a"
     },
     {
       "path": "docs/TODO.md",
@@ -369,7 +369,7 @@
     {
       "path": "index.html",
       "bytes": 12282,
-      "sha256": "a571bf36bd97f50874d2f4a7805657a76955555abb141fae43dbd64a7fa8b92e"
+      "sha256": "ee269f8715379dfb2bf7975416b87e955058721c6ae2297378a3acab069231f3"
     },
     {
       "path": "manifest.webmanifest",
@@ -449,7 +449,7 @@
     {
       "path": "sw.js",
       "bytes": 5004,
-      "sha256": "4a2000f15a80fa0ea3d497fce9639b628fdc9b208f6dbdd97a727a25f4d38060"
+      "sha256": "ec9ec8349ba29e245400070d4bc4c9a34de712d6a0e22c7e82c0e1650c3a1346"
     },
     {
       "path": "tests/bedeutung.mjs",
