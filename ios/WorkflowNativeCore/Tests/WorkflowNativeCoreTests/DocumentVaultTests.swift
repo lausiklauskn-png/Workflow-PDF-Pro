@@ -2,6 +2,33 @@ import XCTest
 @testable import WorkflowNativeCore
 
 final class DocumentVaultTests: XCTestCase {
+    func testRecoveryReplacementKeepsPreviouslySavedKeysUntilNativeConfirmation() throws {
+        let local = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: local, withIntermediateDirectories: false)
+        defer { try? FileManager.default.removeItem(at: local) }
+        let root = local.appendingPathComponent("vault")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+        let grant = VaultFolderGrant(metadata: local.appendingPathComponent("grant")); try grant.select(root)
+        func session() throws -> DocumentVault {
+            try DocumentVault(folder: VaultFolder(grant: grant), scratch: local.appendingPathComponent(UUID().uuidString), checkpoint: local.appendingPathComponent("checkpoint"))
+        }
+        let original = try session(); try original.initialize(password: "Original password 123")
+        let old = try original.createRecovery()
+        let fresh = try original.createRecovery(replacePrevious: false)
+        let set = try VaultRecovery.decode(fresh[0]).set.map { String(format: "%02x", $0) }.joined()
+        original.lock()
+        let restarted = try session()
+        try restarted.recover(shares: Array(old.prefix(3)), newPassword: "Recovered password 456")
+        XCTAssertTrue(restarted.unlocked, "Previous recovery keys must survive interruption before confirmation")
+        XCTAssertNotNil(try restarted.recoveryInfo())
+        XCTAssertThrowsError(try restarted.confirmRecovery(shares: ["invalid"]))
+        try restarted.confirmRecovery(shares: fresh)
+        restarted.lock()
+        XCTAssertThrowsError(try restarted.recover(shares: Array(old.prefix(3)), newPassword: "Another password 789"))
+        try restarted.recover(shares: Array(fresh.prefix(3)), newPassword: "Another password 789")
+        XCTAssertTrue(restarted.unlocked)
+        XCTAssertEqual(try restarted.recoveryInfo()?.set, set)
+    }
     func testSameRevisionReplacementIsRejectedWhileOpenAndAfterRestart() throws {
         let local = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: local, withIntermediateDirectories: false)

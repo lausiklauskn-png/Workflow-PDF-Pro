@@ -185,14 +185,16 @@ public final class DocumentVault {
         }
     }
     public func dataKey() throws -> SymmetricKey { try require() }
-    public func recoveryInfo() throws -> RecoveryInfo? {
+    public func recoveryInfo(set: String? = nil) throws -> RecoveryInfo? {
         _ = try require()
         let names = try recoveryNames()
-        guard names.count <= 1 else { throw DocumentVaultFailure.damaged }
-        guard let name = names.first else { return nil }
-        let info = try small(name, as: RecoveryInfo.self)
-        try validateRecovery(info, name: name)
-        return info
+        let entries = try names.sorted().map { name -> RecoveryInfo in
+            let info = try small(name, as: RecoveryInfo.self)
+            try validateRecovery(info, name: name)
+            return info
+        }
+        if let set = set { return entries.first { $0.set == set } }
+        return entries.max { $0.created == $1.created ? $0.set < $1.set : $0.created < $1.created }
     }
     private func recoveryNames() throws -> [String] {
         try folder.names().filter { $0.range(of: "^workflow-pdf-pro\\.ersatz-[0-9a-f]{8}\\.json$", options: .regularExpression) != nil }
@@ -202,7 +204,7 @@ public final class DocumentVault {
               info.n == 5, info.k == 3, info.wrapped.count == 60,
               name == "workflow-pdf-pro.ersatz-" + info.set + ".json" else { throw DocumentVaultFailure.damaged }
     }
-    public func createRecovery() throws -> [String] {
+    public func createRecovery(replacePrevious: Bool = true) throws -> [String] {
         let dataKey = try require()
         guard !busy else { throw DocumentVaultFailure.busy }
         let previous = try recoveryNames()
@@ -223,8 +225,29 @@ public final class DocumentVault {
         var checked = try VaultCrypto.open(back.wrapped, key: secret, aad: Data(logical("recovery:" + setHex).utf8))
         defer { checked.resetBytes(in: 0..<checked.count) }
         guard checked == rawData, try VaultRecovery.combine(Array(shares.prefix(3))) == rawSecret else { throw DocumentVaultFailure.damaged }
-        for old in previous { try folder.remove(old) }
-        return shares.map(VaultRecovery.encode)
+        let encoded = shares.map(VaultRecovery.encode)
+        if replacePrevious { try confirmRecovery(shares: encoded) }
+        return encoded
+    }
+    /// The native UI calls this only after the user confirms keeping the keys.
+    /// Until then, interruption/restart must leave the previously held keys valid.
+    public func confirmRecovery(shares: [String]) throws {
+        let key = try require()
+        guard !busy else { throw DocumentVaultFailure.busy }
+        let decoded = try shares.map(VaultRecovery.decode)
+        var secret = try VaultRecovery.combine(decoded)
+        defer { secret.resetBytes(in: 0..<secret.count) }
+        let set = decoded[0].set.map { String(format: "%02x", $0) }.joined()
+        let name = "workflow-pdf-pro.ersatz-" + set + ".json"
+        let info = try small(name, as: RecoveryInfo.self)
+        try validateRecovery(info, name: name)
+        var checked = try VaultCrypto.open(info.wrapped, key: SymmetricKey(data: secret), aad: Data(logical("recovery:" + set).utf8))
+        var expected = key.withUnsafeBytes { Data($0) }
+        defer { checked.resetBytes(in: 0..<checked.count); expected.resetBytes(in: 0..<expected.count) }
+        guard checked == expected else { throw DocumentVaultFailure.damaged }
+        let names = try recoveryNames()
+        for old in names { try validateRecovery(small(old, as: RecoveryInfo.self), name: old) }
+        for old in names where old != name { try folder.remove(old) }
     }
     public func recover(shares: [String], newPassword: String) throws {
         guard !busy else { throw DocumentVaultFailure.busy }

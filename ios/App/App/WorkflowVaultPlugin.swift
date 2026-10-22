@@ -258,8 +258,9 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
             uiBusy = true
             Self.io.async { [self] in
                 do {
-                    let vault = try self.vault(call, store()), shares = try vault.createRecovery()
-                    guard let info = try vault.recoveryInfo() else { throw DocumentVaultFailure.damaged }
+                    let vault = try self.vault(call, store()), shares = try vault.createRecovery(replacePrevious: false)
+                    let set = try VaultRecovery.decode(shares[0]).set.map { String(format: "%02x", $0) }.joined()
+                    guard let info = try vault.recoveryInfo(set: set) else { throw DocumentVaultFailure.damaged }
                     DispatchQueue.main.async { self.showShares(shares, info: info, call: call) }
                 } catch { DispatchQueue.main.async { self.uiBusy = false; let code = VaultLocations.code(error); call.reject(code, code) } }
             }
@@ -269,8 +270,15 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
         let text = t("keep", call) + "\n\n" + shares.enumerated().map { "\($0.offset + 1). \($0.element)" }.joined(separator: "\n\n")
         let alert = UIAlertController(title: t("keys", call), message: text + (status.map { "\n\n" + $0 } ?? ""), preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: t("done", call), style: .default) { _ in
-            self.returnToShares = nil; self.uiBusy = false
-            call.resolve(["created": true, "set": info.set, "n": info.n, "k": info.k, "createdAt": Double(info.created)])
+            Self.io.async {
+                do {
+                    try self.vault(call, self.store()).confirmRecovery(shares: shares)
+                    DispatchQueue.main.async {
+                        self.returnToShares = nil; self.uiBusy = false
+                        call.resolve(["created": true, "set": info.set, "n": info.n, "k": info.k, "createdAt": Double(info.created)])
+                    }
+                } catch { DispatchQueue.main.async { self.showShares(shares, info: info, call: call, status: self.t("failed", call)) } }
+            }
         })
         alert.addAction(UIAlertAction(title: t("save", call), style: .default) { _ in
             do {
