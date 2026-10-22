@@ -110,3 +110,29 @@ Angriffstest aus fremden Frames steht noch aus.
 Das ist ein laufender Implementierungsstand, keine funktionsreduzierte fertige
 Pro-Ausgabe. Vor einem größeren Eingriff in den gemeinsamen Kern gelten weiterhin
 die dokumentierten Grenzen. Die Folgesitzung setzt an diesen offenen Punkten an.
+
+## Fortsetzung: Apple-Tresorformat (22.10.2026)
+
+Der exakte PR-Commit `1dcb17b` wurde nachgelesen: Apple-Lauf
+[39815991648](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39815991648)
+mit Job `119955043942` ist vollständig grün. Das Rohprotokoll bestätigt **7/7**
+Swift-Dateitests und **4/4** Hosttests, einschließlich PDF/Formular/Original und
+Neuladen; auch der unsignierte Gerätebau bestand. Android-Lauf `39815991801`
+ist ebenfalls erfolgreich. Diese Nachweise gelten für diesen Ausgangscommit.
+
+Neu ergänzt: Apple-PBV1-Dateicodec (AES-256-GCM, 256-KiB-Blöcke, gebundener Name,
+Position und Endmarke), NFC/PBKDF2 sowie kompatible WFP1-Ersatzschlüssel 3 von 5.
+Dateicodec schreibt nur neue Dateien, synchronisiert und überschreibt keine
+bestehende Datei oder symbolische Verknüpfung. Leere Dateien werden ebenfalls
+authentifiziert; nichtkanonische zusätzliche Leerblöcke werden abgewiesen.
+
+Neue macOS-Gegenprobe: unveränderter Android-Java-Code und Windows-Rust-Kern
+gegen Apple CryptoKit, sechs Größen einschließlich leerer Datei und Blockgrenzen,
+alle neun Schreib-/Leserichtungen, NFC-Passwortableitung sowie alle zehn
+Dreierkombinationen für jede der neun Ersatzschlüsselrichtungen. Swift-Gegenproben
+prüfen zusätzlich falsche Schlüssel/Namen, Manipulation, Reihenfolge, Abschneiden,
+zusätzliche Daten und Überschreibschutz. Neue Apple-Nachweise stehen noch aus.
+
+Diese Bausteine sind noch nicht als produktiver `WorkflowVault`-Adapter aktiviert.
+Ordnerrechte, Keychain, Index/Journal, Migration und native Passwort-/Recovery-UI
+bleiben anzubinden. Keine vollständige Tresor- oder Geräteabnahme daraus ableiten.

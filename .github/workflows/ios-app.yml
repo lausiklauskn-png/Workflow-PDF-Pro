@@ -33,6 +33,8 @@ jobs:
       - run: node --test ios/tools/test-bundle.mjs
       - name: Native Datei- und Empfangsverträge
         run: swift test --package-path ios/WorkflowNativeCore
+      - name: Tresorformat und Ersatzschlüssel Apple ↔ Android ↔ Windows
+        run: node ios/tools/test-vault-interop.mjs
       - name: Unsigned simulator build and real WKWebView tests
         shell: bash
         run: |

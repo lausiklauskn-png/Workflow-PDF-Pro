@@ -18,3 +18,4 @@ App/App/config.xml
 *.xcuserstate
 DerivedData-device/
 results/
+compat/rust/target/

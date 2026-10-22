@@ -2,4 +2,6 @@
 import PackageDescription
 let package = Package(name: "WorkflowNativeCore", platforms: [.iOS(.v15), .macOS(.v12)],
     products: [.library(name: "WorkflowNativeCore", targets: ["WorkflowNativeCore"])],
-    targets: [.target(name: "WorkflowNativeCore"), .testTarget(name: "WorkflowNativeCoreTests", dependencies: ["WorkflowNativeCore"])])
+    targets: [.target(name: "WorkflowNativeCore"),
+              .executableTarget(name: "WorkflowVaultCompat", dependencies: ["WorkflowNativeCore"]),
+              .testTarget(name: "WorkflowNativeCoreTests", dependencies: ["WorkflowNativeCore"])])
