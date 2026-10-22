@@ -26,7 +26,8 @@ def wait_node(predicate,seconds=45):
             root=hierarchy()
             for node in root.iter('node'):
                 if predicate(node.attrib):return node.attrib
-        except (ET.ParseError,subprocess.CalledProcessError):pass
+        # uiautomator dump fails now and then while the UI is busy; try again.
+        except (ET.ParseError,subprocess.CalledProcessError,RuntimeError):pass
         time.sleep(.5)
     visible=[node.get('text','') for node in root.iter('node') if node.get('text')]
     raise RuntimeError('Expected release UI element not found; visible emulator labels: '+repr(visible)[-3000:])

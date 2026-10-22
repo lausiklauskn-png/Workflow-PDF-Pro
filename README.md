@@ -1,6 +1,6 @@
 # Workflow PDF Pro
 
-**[Android-APK 1.0.1 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.1/Workflow-PDF-Pro-1.0.1.apk)** · [Erstinstallation](docs/ANDROID-START.md)
+**[Android-APK 1.0.2 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.2/Workflow-PDF-Pro-1.0.2.apk)** · [Erstinstallation](docs/ANDROID-START.md)
 
 **[Windows 1.0.1 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.1/Workflow-PDF-Pro-Windows-1.0.1-Setup.exe)** (Windows 10/11, 64 Bit) ·
 [Prüfsumme](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.1/Workflow-PDF-Pro-Windows-1.0.1-Setup.exe.sha256) ·

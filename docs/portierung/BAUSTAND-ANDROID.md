@@ -1038,3 +1038,11 @@ zweiten Gerät im Emulator (`NativeDocumentVaultTest`), Verwaltungsanzeige
 (`NativeVaultProductTest`) und Austauschbarkeit mit Windows (`compat/run.sh`). Die nativen
 Android-Fenster selbst (Anzeige der Teile, Eingabe) sind nicht automatisch per UI
 geprüft. Nicht auf Klaus' Tablet gemessen.
+
+Veröffentlicht 22.10.2026 als [v1.0.2](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.2)
+von `1a31272d70541a821d9b4965f36e8561d6cdb35f` (Lauf 39779355145). Der erste Versuch des
+publish-Jobs brach bei einem vorübergehenden `uiautomator dump`-Fehler im Installationsnachweis
+ab; die einmalige Wiederholung lief durch. APK 83.126.582 Bytes, SHA-256
+`405e49f56a6d9b0315e8ec2843f6050fec842a7e849c5bfef8232d95c07b5ba7`. Der Download wurde
+unabhängig geladen und verglichen.
+[APK direkt herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.2/Workflow-PDF-Pro-1.0.2.apk).

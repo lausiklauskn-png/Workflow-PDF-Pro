@@ -1,6 +1,6 @@
 # Workflow PDF Pro auf Android
 
-**[Workflow PDF Pro 1.0.1 als APK herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.1/Workflow-PDF-Pro-1.0.1.apk)**
+**[Workflow PDF Pro 1.0.2 als APK herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.2/Workflow-PDF-Pro-1.0.2.apk)**
 
 Die reguläre APK ist veröffentlicht. Signatur, öffentliche Downloadbytes und
 tatsächliche Produktionsinstallation mit erhaltenen Daten nach erneuter
