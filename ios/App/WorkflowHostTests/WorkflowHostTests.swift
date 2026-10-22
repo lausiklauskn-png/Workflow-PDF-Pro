@@ -67,7 +67,7 @@ import Speech
               for(let i=0;i<100&&!seen.has('ios-frame-probe-control');i++)await new Promise(r=>setTimeout(r,10));
               await new Promise((resolve,reject)=>{frame.onload=resolve;frame.onerror=reject;frame.src=location.href;document.body.append(frame);});
               const exposed=Boolean(frame.contentWindow.webkit?.messageHandlers?.bridge);
-              if(exposed)frame.contentWindow.eval("window.webkit.messageHandlers.bridge.postMessage({type:'message',pluginId:'WorkflowFiles',methodName:'appInfo',callbackId:'ios-frame-probe-attack',options:{}})");
+              if(exposed)frame.contentWindow.webkit.messageHandlers.bridge.postMessage({type:'message',pluginId:'WorkflowFiles',methodName:'appInfo',callbackId:'ios-frame-probe-attack',options:{}});
               await new Promise(r=>setTimeout(r,500));
               return {control:seen.has('ios-frame-probe-control'),exposed,attackReturned:seen.has('ios-frame-probe-attack')};
             } finally {frame.remove();Capacitor.fromNative=original;}
