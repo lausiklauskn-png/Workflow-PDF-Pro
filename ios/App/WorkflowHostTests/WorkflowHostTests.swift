@@ -9,7 +9,8 @@ import UIKit
         return try XCTUnwrap(controllers.first?.webView)
     }
     private func js(_ code: String) async throws -> Any? {
-        try await webView().callAsyncJavaScript(code, arguments: [:], in: nil, contentWorld: .page)
+        let bounded = "return await Promise.race([(async()=>{\(code)})(),new Promise((_,reject)=>setTimeout(()=>reject(Error('iOS probe timeout')),15000))]);"
+        return try await webView().callAsyncJavaScript(bounded, arguments: [:], in: nil, contentWorld: .page)
     }
     private func ready() async throws {
         for _ in 0..<150 {

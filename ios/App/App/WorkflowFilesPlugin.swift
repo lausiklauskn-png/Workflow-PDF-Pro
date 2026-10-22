@@ -150,7 +150,10 @@ final class WorkflowFilesPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
                         if error != nil { call.reject("FILE_PRINT_FAILED", "FILE_PRINT_FAILED") }
                         else { call.resolve(["printed": completed, "cancelled": !completed]) }
                     }
-                    printer.present(from: CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 1, height: 1), in: view, animated: true, completionHandler: done)
+                    if !printer.present(from: CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 1, height: 1), in: view, animated: true, completionHandler: done) {
+                        presenting = false
+                        call.reject("Der Druckdialog konnte nicht geöffnet werden.", "FILE_PRINT_UNAVAILABLE")
+                    }
                 }
             } catch { call.reject("FILE_INVALID_TRANSFER", "FILE_INVALID_TRANSFER") }
         }

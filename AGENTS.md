@@ -1,7 +1,8 @@
 # Workflow PDF Pro — gemeinsame Arbeitsgrundlage
 
 - Aktueller Auftrag von Klaus: iOS-Bau ist nach der parallelen Claude-Arbeit freigegeben.
-  Fortsetzung: `docs/portierung/BAUSTAND-IOS.md` und der neueste iOS-Fortsetzungsbrief.
+  Fortsetzung: `docs/portierung/BAUSTAND-IOS.md` und
+  `BRIEF_NACHFOLGE_2026-10-22_IOS_FORTSETZUNG.md`.
   Den identischen gemeinsamen Kern wie Windows verwenden; alte Vorbereitungssperren
   sind durch das ausdrückliche Go aufgehoben. Unvollständigen Host nicht veröffentlichen.
 
