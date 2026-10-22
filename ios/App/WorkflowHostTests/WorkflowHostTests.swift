@@ -1,5 +1,6 @@
 import XCTest
 import WebKit
+import UIKit
 @testable import App
 
 @MainActor final class WorkflowHostTests: XCTestCase {

@@ -29,6 +29,7 @@ jobs:
       - run: npm ci
       - run: npm run verify:upstream
       - run: npm run sync:ios
+      - run: node --test ios/tools/test-bundle.mjs
       - name: Native Datei- und Empfangsverträge
         run: swift test --package-path ios/WorkflowNativeCore
       - name: Unsigned simulator build and real WKWebView tests

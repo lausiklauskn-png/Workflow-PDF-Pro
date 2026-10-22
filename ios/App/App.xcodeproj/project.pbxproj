@@ -141,6 +141,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				44BF1DC4375A46DF9D3EAA2E /* PBXTargetDependency */,
 			);
 		};
 /* End PBXNativeTarget section */
@@ -488,6 +489,24 @@
 			productName = WorkflowNativeCore;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin PBXTargetDependency section */
+		44BF1DC4375A46DF9D3EAA2E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 504EC3031FED79650016851F /* App */;
+			targetProxy = FB8C2D932C4B4DF0ACB73377 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		FB8C2D932C4B4DF0ACB73377 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 504EC3031FED79650016851F;
+			remoteInfo = App;
+		};
+/* End PBXContainerItemProxy section */
 	};
 	rootObject = 504EC2FC1FED79650016851F /* Project object */;
 }
