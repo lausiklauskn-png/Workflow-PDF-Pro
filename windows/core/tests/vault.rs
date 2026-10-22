@@ -181,3 +181,47 @@ fn batch_abort_leaves_no_records() {
     let records = std::fs::read_dir(if root.exists() { root } else { chosen.clone() }).unwrap().filter(|e| e.as_ref().unwrap().file_name().to_string_lossy().ends_with(".wpv")).count();
     assert_eq!(records, 1, "nur die Indexdatei der Einrichtung");
 }
+
+#[test]
+fn spare_keys_restore_access_with_a_new_password() {
+    let app = temp("app4");
+    let chosen = temp("ordner4");
+    let mut locs = locations(&app);
+    let mut candidate = locs.candidate().unwrap();
+    let place = candidate.inspect(&chosen).unwrap();
+    candidate.initialize(place, "vergessenes-Passwort-1", false).unwrap();
+    let id = locs.adopt(candidate).unwrap();
+    locs.select(Some(&id)).unwrap();
+    let v = locs.get(None).unwrap();
+    put(v, "files", "doc", b"wichtiger Inhalt");
+    assert_eq!(v.recovery_info().unwrap()["exists"], json!(false));
+    let first = v.create_recovery(5, 3).unwrap();
+    let shares = v.create_recovery(5, 3).unwrap();
+    assert_eq!(shares.len(), 5);
+    assert_ne!(first, shares, "neuer Satz");
+    assert_eq!(v.recovery_info().unwrap()["k"], json!(3));
+    let root = chosen.join(FOLDER);
+    let sets = std::fs::read_dir(&root).unwrap().filter(|e| e.as_ref().unwrap().file_name().to_string_lossy().starts_with("workflow-pdf-pro.ersatz-")).count();
+    assert_eq!(sets, 1, "alter Satz entfernt");
+
+    // Anderes Gerät, Passwort vergessen: zwei Teile reichen nicht, alte Teile gelten nicht.
+    let other = temp("geraet4");
+    let mut locs2 = locations(&other);
+    let mut c = locs2.candidate().unwrap();
+    let p = c.inspect(&chosen).unwrap();
+    assert_eq!(c.recover(p.clone(), &shares[..2], "neues-Passwort-2026", false).unwrap_err().vault_code(), "VAULT_RECOVERY_INCOMPLETE");
+    assert_eq!(c.recover(p.clone(), &first[..3], "neues-Passwort-2026", false).unwrap_err().vault_code(), "VAULT_RECOVERY_UNKNOWN");
+    assert_eq!(c.recover(p.clone(), &[shares[4].clone(), shares[1].clone(), shares[2].clone()], "kurz", false).unwrap_err().vault_code(), "VAULT_PASSWORD_SHORT");
+    c.recover(p.clone(), &[shares[4].clone(), shares[1].clone(), shares[2].clone()], "neues-Passwort-2026", false).unwrap();
+    let id2 = locs2.adopt(c).unwrap();
+    assert_eq!(get(locs2.get(Some(&id2)).unwrap(), "files", "doc"), b"wichtiger Inhalt");
+
+    // Danach öffnet das neue Passwort, das alte bleibt gültig, ein falsches nicht.
+    let third = temp("geraet5");
+    let locs3 = locations(&third);
+    for (pw, ok) in [("neues-Passwort-2026", true), ("vergessenes-Passwort-1", true), ("ganz-falsches-Passwort", false)] {
+        let mut c = locs3.candidate().unwrap();
+        let p = c.inspect(&chosen).unwrap();
+        assert_eq!(c.open(p, pw, false).is_ok(), ok, "{pw}");
+    }
+}

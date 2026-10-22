@@ -32,6 +32,7 @@ pub type Reply = std::result::Result<Value, String>;
 
 pub enum DialogMessage {
     Submit { password: String, repeat: String, notice: bool, remember: bool, answer: Sender<Value> },
+    Recover { keys: Vec<String>, password: String, repeat: String, remember: bool, answer: Sender<Value> },
     Cancel,
 }
 
@@ -45,6 +46,9 @@ pub struct Host {
     vault: Mutex<Option<VaultLocations>>,
     choosing: AtomicBool,
     pub dialog: Mutex<Option<Sender<DialogMessage>>>,
+    /// Gerade angezeigte Ersatzschlüssel; nur das Ersatzschlüsselfenster darf sie lesen.
+    pub shares: Mutex<Option<Vec<String>>>,
+    pub shares_done: Mutex<Option<Sender<()>>>,
     chrome: Mutex<Option<(Arc<ChromeSession>, bool)>>,
     data_dir: PathBuf,
     cache_dir: PathBuf,
@@ -89,6 +93,8 @@ impl Host {
             vault: Mutex::new(None),
             choosing: AtomicBool::new(false),
             dialog: Mutex::new(None),
+            shares: Mutex::new(None),
+            shares_done: Mutex::new(None),
             chrome: Mutex::new(None),
             data_dir,
             cache_dir,
@@ -362,6 +368,8 @@ impl Host {
                 self.with_vault(|l| { l.get(location)?.remove(store, id, prefix)?; Ok(json!({"saved": true})) })
             }
             "choose" => self.vault_choose(o),
+            "recoveryInfo" => self.with_vault(|l| l.get(location)?.recovery_info()),
+            "createRecovery" => self.vault_create_recovery(o),
             "unlock" => self.vault_unlock(o),
             _ => Err("NOT_IMPLEMENTED".into()),
         }
@@ -426,6 +434,31 @@ impl Host {
         let outcome = loop {
             match rx.recv() {
                 Err(_) | Ok(DialogMessage::Cancel) => break Ok(json!({"cancelled": true})),
+                Ok(DialogMessage::Recover { keys, password, repeat, remember, answer }) => {
+                    let keys: Vec<zeroize::Zeroizing<String>> = keys.into_iter().map(zeroize::Zeroizing::new).collect();
+                    let password = zeroize::Zeroizing::new(password);
+                    let repeat = zeroize::Zeroizing::new(repeat);
+                    if mode == 0 {
+                        let _ = answer.send(json!({"code": "VAULT_RECOVERY_INVALID"}));
+                        continue;
+                    }
+                    if wfp_core::crypto::nfc_len(&password) < 10 || wfp_core::crypto::password_bytes(&password) != wfp_core::crypto::password_bytes(&repeat) {
+                        let _ = answer.send(json!({"code": "VAULT_PASSWORD_SHORT"}));
+                        continue;
+                    }
+                    let texts: Vec<String> = keys.iter().map(|k| k.to_string()).collect();
+                    let result = self.apply_recovery(&mut target, mode, &texts, &password, remember, expected.as_deref());
+                    drop(texts);
+                    match result {
+                        Ok(value) => {
+                            let _ = answer.send(json!({"done": true}));
+                            break Ok(value);
+                        }
+                        Err(code) => {
+                            let _ = answer.send(json!({"code": code}));
+                        }
+                    }
+                }
                 Ok(DialogMessage::Submit { password, repeat, notice, remember, answer }) => {
                     let password = zeroize::Zeroizing::new(password);
                     let repeat = zeroize::Zeroizing::new(repeat);
@@ -450,6 +483,100 @@ impl Host {
             let _ = window.destroy();
         }
         outcome
+    }
+
+    fn apply_recovery(&self, target: &mut Target, mode: u8, texts: &[String], password: &str, remember: bool, expected: Option<&str>) -> std::result::Result<Value, String> {
+        match target {
+            Target::Candidate(candidate, place) => {
+                candidate.recover(place.clone(), texts, password, remember).map_err(|e| e.vault_code().to_string())?;
+                if let Some(expected) = expected {
+                    if expected != candidate.identity() {
+                        let _ = candidate.lock();
+                        return Err("VAULT_WRONG_FOLDER".into());
+                    }
+                }
+                let taken = std::mem::replace(candidate, self.with_vault(|l| l.candidate())?);
+                let location = self.with_vault(|l| l.adopt(taken))?;
+                let state = self.with_vault(|l| l.state(Some(&location)))?;
+                Ok(json!({"location": location, "state": state, "created": false, "opened": mode == 1, "unlocked": true, "recovered": true}))
+            }
+            Target::Existing(location) => self.with_vault(|l| {
+                let v = l.get(location.as_deref())?;
+                v.recover_stored(texts, password, remember)?;
+                if let Some(expected) = expected {
+                    if expected != v.identity() {
+                        v.lock()?;
+                        return Err(Error::code("VAULT_WRONG_FOLDER"));
+                    }
+                }
+                let id = v.location_id();
+                let state = l.state(Some(&id))?;
+                Ok(json!({"location": id, "state": state, "created": false, "opened": false, "unlocked": true, "recovered": true}))
+            }),
+        }
+    }
+
+    /// Neue Ersatzschlüssel (5, davon 3 nötig) in einem eigenen Fenster zeigen.
+    fn vault_create_recovery(self: &Arc<Self>, o: &Value) -> Reply {
+        if self.choosing.swap(true, Ordering::SeqCst) {
+            return Err("VAULT_BUSY".into());
+        }
+        let location = s(o, "location").map(str::to_owned);
+        let result = (|| {
+            let (shares, info) = self.with_vault(|l| {
+                let v = l.get(location.as_deref())?;
+                let shares = v.create_recovery(wfp_core::recovery::DEFAULT_N, wfp_core::recovery::DEFAULT_K)?;
+                Ok((shares, v.recovery_info()?))
+            })?;
+            let (tx, rx) = channel();
+            *self.shares.lock().unwrap() = Some(shares);
+            *self.shares_done.lock().unwrap() = Some(tx);
+            let lang = ["de", "en", "ru", "ar"][language_index(o)];
+            let opened = self.open_dialog("ersatz", &format!("windows/ersatz.html?sprache={lang}"), 620.0, 640.0);
+            if opened.is_ok() {
+                let _ = rx.recv();
+            }
+            *self.shares.lock().unwrap() = None;
+            *self.shares_done.lock().unwrap() = None;
+            if let Some(window) = self.app.get_webview_window("ersatz") {
+                let _ = window.destroy();
+            }
+            opened?;
+            Ok(json!({"created": true, "set": info["set"], "n": info["n"], "k": info["k"], "createdAt": info["created"]}))
+        })();
+        self.choosing.store(false, Ordering::SeqCst);
+        result
+    }
+
+    /// Ersatzschlüssel als Textdatei speichern (Systemdialog, danach Prüfung).
+    pub fn save_shares(&self, language: &str) -> Reply {
+        let shares = self.shares.lock().unwrap().clone().ok_or_else(|| "VAULT_CANCELLED".to_string())?;
+        let lang = ["de", "en", "ru", "ar"].iter().position(|l| *l == language).unwrap_or(0);
+        let title = ["Ersatzschlüssel (3 von 5)", "Recovery keys (3 of 5)", "Ключи восстановления (3 из 5)", "مفاتيح الاسترداد (3 من 5)"][lang];
+        let help = ["Diese fünf Ersatzschlüssel getrennt aufbewahren. Drei beliebige genügen, um ein vergessenes Passwort zu ersetzen. Wer drei Teile hat, kann den Tresor öffnen.", "Keep these five recovery keys separately. Any three replace a forgotten password. Anyone holding three keys can open the vault.", "Храните пять ключей раздельно. Любые три заменяют забытый пароль. Владелец трёх ключей может открыть хранилище.", "احتفظ بمفاتيح الاسترداد الخمسة بشكل منفصل. أي ثلاثة منها تستبدل كلمة مرور منسية. من يملك ثلاثة مفاتيح يمكنه فتح الخزنة."][lang];
+        let part = ["Teil", "Key", "Ключ", "المفتاح"][lang];
+        let mut text = zeroize::Zeroizing::new(format!("Workflow PDF Pro – {title}\r\n\r\n{help}\r\n\r\n"));
+        for (i, share) in shares.iter().enumerate() {
+            text.push_str(&format!("{part} {}/{}:  {share}\r\n\r\n", i + 1, shares.len()));
+        }
+        let name = "Workflow-PDF-Pro-Ersatzschluessel.txt";
+        let target = match test_override("WFP_PRUEF_SPEICHERN") {
+            Some(dir) => Some(dir.join(name)),
+            None => {
+                let mut dialog = self.app.dialog().file().set_file_name(name).add_filter("Text", &["txt"]);
+                if let Some(window) = self.app.get_webview_window("ersatz") {
+                    dialog = dialog.set_parent(&window);
+                }
+                dialog.blocking_save_file().map(|t| t.into_path().map_err(|_| "FILE_SAVE_FAILED".to_string())).transpose()?
+            }
+        };
+        let Some(target) = target else { return Ok(json!({"cancelled": true})) };
+        std::fs::write(&target, text.as_bytes()).map_err(|_| "FILE_SAVE_FAILED".to_string())?;
+        let back = std::fs::read(&target).map_err(|_| "FILE_SAVE_FAILED".to_string())?;
+        if back != text.as_bytes() {
+            return Err("FILE_SAVE_FAILED".into());
+        }
+        Ok(json!({"saved": true}))
     }
 
     fn apply(&self, target: &mut Target, mode: u8, password: &str, remember: bool, expected: Option<&str>) -> std::result::Result<Value, String> {

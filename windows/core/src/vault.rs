@@ -8,6 +8,7 @@ use crate::crypto::{self, Reader, Writer, CHUNK};
 use crate::error::{Error, Result};
 use crate::fsutil::{self, children, create_new, read_limited};
 use crate::prefs::Prefs;
+use crate::recovery;
 use crate::DeviceProtect;
 use base64::engine::general_purpose::STANDARD as B64;
 use base64::Engine;
@@ -22,6 +23,8 @@ use zeroize::Zeroizing;
 
 pub const FOLDER: &str = "Workflow PDF Pro";
 pub const HEADER: &str = "workflow-pdf-pro.tresor.json";
+pub const RECOVERY_PREFIX: &str = "workflow-pdf-pro.ersatz-";
+pub const SLOT_PREFIX: &str = "workflow-pdf-pro.kennwort-";
 pub const FORMAT: &str = "workflow-pdf-pro-vault";
 pub const STORES: [&str; 6] = ["folders", "docs", "files", "texte", "vektoren", "settings"];
 
@@ -356,32 +359,186 @@ impl DocumentVault {
         self.open(candidate, password, remember)
     }
 
-    pub fn open(&mut self, mut candidate: Place, password: &str, remember: bool) -> Result<()> {
-        if self.transferring() {
-            return Err(fail("VAULT_BUSY"));
-        }
+    /// Tresorkopf lesen und prüfen; liefert die Kopfdaten und setzt die Tresorkennung.
+    fn read_header(&self, candidate: &mut Place) -> Result<Value> {
         let header = self.child(&candidate.root, HEADER)?.ok_or_else(|| fail("VAULT_NOT_FOUND"))?;
         let meta: Value = serde_json::from_slice(&read_limited(&header.path, 65536)?)?;
-        let rounds = meta["iterations"].as_i64().ok_or(Error::Json)?;
-        if meta["app"].as_str() != Some(FORMAT) || meta["v"].as_i64() != Some(1) || rounds < crypto::MIN_ITERATIONS as i64 || rounds > crypto::MAX_ITERATIONS as i64 {
-            return Err(fail("VAULT_DAMAGED"));
-        }
+        Self::check_password_meta(&meta)?;
         candidate.id = meta["id"].as_str().ok_or(Error::Json)?.to_owned();
         if !is_uuid(&candidate.id) {
             return Err(fail("VAULT_DAMAGED"));
         }
+        Ok(meta)
+    }
+
+    fn check_password_meta(meta: &Value) -> Result<()> {
+        let rounds = meta["iterations"].as_i64().ok_or(Error::Json)?;
+        if meta["app"].as_str() != Some(FORMAT) || meta["v"].as_i64() != Some(1) || rounds < crypto::MIN_ITERATIONS as i64 || rounds > crypto::MAX_ITERATIONS as i64 {
+            return Err(fail("VAULT_DAMAGED"));
+        }
+        Ok(())
+    }
+
+    /// Datenschlüssel mit einem Passwort aus Kopf oder Passwortfach öffnen.
+    fn unwrap_password(candidate: &Place, meta: &Value, password: &str) -> Result<Zeroizing<Vec<u8>>> {
+        Self::check_password_meta(meta)?;
         let salt = B64.decode(meta["salt"].as_str().ok_or(Error::Json)?).map_err(|_| fail("VAULT_DAMAGED"))?;
         let wrapped = B64.decode(meta["wrapped"].as_str().ok_or(Error::Json)?).map_err(|_| fail("VAULT_DAMAGED"))?;
         if salt.len() != 16 || wrapped.len() != crypto::NONCE + crypto::KEY + crypto::TAG {
             return Err(fail("VAULT_DAMAGED"));
         }
-        let derived = crypto::pbkdf2(&crypto::password_bytes(password), &salt, rounds as u32)?;
+        let rounds = meta["iterations"].as_i64().ok_or(Error::Json)? as u32;
+        let derived = crypto::pbkdf2(&crypto::password_bytes(password), &salt, rounds)?;
         let key = crypto::open(&derived, &wrapped, candidate.logical("password").as_bytes()).map_err(|_| fail("VAULT_PASSWORD"))?;
         if key.len() != 32 {
             return Err(fail("VAULT_DAMAGED"));
         }
+        Ok(key)
+    }
+
+    /// Zusätzliche Passwortfächer (nach einer Wiederherstellung mit Ersatzschlüsseln).
+    fn password_slots(&self, p: &Place) -> Result<Vec<Value>> {
+        let mut slots = Vec::new();
+        for entry in children(&p.root)? {
+            let Some(rest) = entry.name.strip_prefix(SLOT_PREFIX) else { continue };
+            let Some(id) = rest.strip_suffix(".json") else { continue };
+            if !is_uuid(id) {
+                continue;
+            }
+            let meta: Value = serde_json::from_slice(&read_limited(&entry.path, 65536)?)?;
+            if meta["id"].as_str() == Some(p.id.as_str()) {
+                slots.push(meta);
+            }
+        }
+        Ok(slots)
+    }
+
+    pub fn open(&mut self, mut candidate: Place, password: &str, remember: bool) -> Result<()> {
+        if self.transferring() {
+            return Err(fail("VAULT_BUSY"));
+        }
+        let meta = self.read_header(&mut candidate)?;
+        let key = match Self::unwrap_password(&candidate, &meta, password) {
+            Ok(key) => key,
+            Err(Error::Code("VAULT_PASSWORD")) => {
+                let mut found = None;
+                for slot in self.password_slots(&candidate)? {
+                    if let Ok(key) = Self::unwrap_password(&candidate, &slot, password) {
+                        found = Some(key);
+                        break;
+                    }
+                }
+                found.ok_or_else(|| fail("VAULT_PASSWORD"))?
+            }
+            Err(error) => return Err(error),
+        };
         candidate.key = Some(Arc::new(key));
         self.load_index(&mut candidate)?;
+        self.select(candidate, remember)
+    }
+
+    /// Ersatzschlüssel für den entsperrten Tresor erzeugen: n Teile, k genügen.
+    /// Ein neuer Satz ersetzt frühere Sätze erst, nachdem er geprüft geschrieben ist.
+    pub fn create_recovery(&mut self, n: u8, k: u8) -> Result<Vec<String>> {
+        let mut p = self.require()?;
+        let secret = Zeroizing::new(crypto::random(recovery::SECRET));
+        let set: [u8; 4] = crypto::random(4).try_into().unwrap();
+        let set_hex = recovery::set_hex(&set);
+        let shares = recovery::split(&secret, set, n, k)?;
+        let wrapped = crypto::seal(&secret, p.key()?, p.logical(&format!("recovery:{set_hex}")).as_bytes())?;
+        let created = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_millis() as i64).unwrap_or(0);
+        let file = json!({"app": FORMAT, "v": 1, "id": p.id, "set": set_hex, "n": n, "k": k, "created": created, "wrapped": B64.encode(&wrapped)});
+        let name = format!("{RECOVERY_PREFIX}{set_hex}.json");
+        let path = Self::create_file(&mut p, &name, &serde_json::to_vec(&file)?)?;
+        let verify = (|| -> Result<()> {
+            let back: Value = serde_json::from_slice(&read_limited(&path, 65536)?)?;
+            let wrapped = B64.decode(back["wrapped"].as_str().ok_or(Error::Json)?).map_err(|_| fail("VAULT_DAMAGED"))?;
+            let key = crypto::open(&secret, &wrapped, p.logical(&format!("recovery:{set_hex}")).as_bytes()).map_err(|_| fail("VAULT_DAMAGED"))?;
+            if key.as_slice() != p.key()? || &*recovery::combine(&shares[..k as usize])? != secret.as_slice() {
+                return Err(fail("VAULT_DAMAGED"));
+            }
+            Ok(())
+        })();
+        if let Err(error) = verify {
+            let _ = fs::remove_file(&path);
+            return Err(error);
+        }
+        for entry in children(&p.root)? {
+            if entry.name.starts_with(RECOVERY_PREFIX) && entry.name != name {
+                let _ = fs::remove_file(&entry.path);
+            }
+        }
+        Ok(shares.iter().map(recovery::encode).collect())
+    }
+
+    /// Angaben zum aktuellen Ersatzschlüssel-Satz (ohne Geheimnisse).
+    pub fn recovery_info(&mut self) -> Result<Value> {
+        let p = self.require()?;
+        for entry in children(&p.root)? {
+            if entry.name.starts_with(RECOVERY_PREFIX) && entry.name.ends_with(".json") {
+                let meta: Value = serde_json::from_slice(&read_limited(&entry.path, 65536)?)?;
+                if meta["id"].as_str() == Some(p.id.as_str()) {
+                    return Ok(json!({"exists": true, "set": meta["set"], "n": meta["n"], "k": meta["k"], "created": meta["created"]}));
+                }
+            }
+        }
+        Ok(json!({"exists": false}))
+    }
+
+    /// Gespeicherten Tresor mit Ersatzschlüsseln öffnen (Passwort vergessen).
+    pub fn recover_stored(&mut self, texts: &[String], new_password: &str, remember: bool) -> Result<()> {
+        if !self.configured() {
+            return Err(fail("VAULT_NOT_CONFIGURED"));
+        }
+        let candidate = self.stored_place();
+        self.recover(candidate, texts, new_password, remember)
+    }
+
+    /// Mit genug Ersatzschlüsseln öffnen und ein neues Passwort setzen. Der bisherige
+    /// Tresorkopf bleibt unverändert; das neue Passwort liegt in einem eigenen Passwortfach.
+    pub fn recover(&mut self, mut candidate: Place, texts: &[String], new_password: &str, remember: bool) -> Result<()> {
+        if self.transferring() {
+            return Err(fail("VAULT_BUSY"));
+        }
+        if crypto::nfc_len(new_password) < 10 {
+            return Err(fail("VAULT_PASSWORD_SHORT"));
+        }
+        let shares = texts.iter().filter(|t| !t.trim().is_empty()).map(|t| recovery::decode(t)).collect::<Result<Vec<_>>>()?;
+        let secret = recovery::combine(&shares)?;
+        let set_hex = recovery::set_hex(&shares[0].set);
+        let header = self.read_header(&mut candidate)?;
+        let file = self.child(&candidate.root, &format!("{RECOVERY_PREFIX}{set_hex}.json"))?.ok_or_else(|| fail("VAULT_RECOVERY_UNKNOWN"))?;
+        let meta: Value = serde_json::from_slice(&read_limited(&file.path, 65536)?)?;
+        if meta["app"].as_str() != Some(FORMAT) || meta["id"].as_str() != Some(candidate.id.as_str()) || meta["set"].as_str() != Some(set_hex.as_str()) {
+            return Err(fail("VAULT_RECOVERY_UNKNOWN"));
+        }
+        let wrapped = B64.decode(meta["wrapped"].as_str().ok_or(Error::Json)?).map_err(|_| fail("VAULT_DAMAGED"))?;
+        let key = crypto::open(&secret, &wrapped, candidate.logical(&format!("recovery:{set_hex}")).as_bytes()).map_err(|_| fail("VAULT_RECOVERY_INVALID"))?;
+        if key.len() != 32 {
+            return Err(fail("VAULT_DAMAGED"));
+        }
+        candidate.key = Some(Arc::new(key));
+        // Index vor dem Schreiben prüfen: ein beschädigter Tresor bekommt kein neues Fach.
+        self.load_index(&mut candidate)?;
+        let salt = crypto::random(16);
+        let derived = crypto::pbkdf2(&crypto::password_bytes(new_password), &salt, crypto::ITERATIONS)?;
+        let slot_wrapped = crypto::seal(&derived, candidate.key()?, candidate.logical("password").as_bytes())?;
+        let slot = json!({"app": FORMAT, "v": 1, "id": candidate.id, "iterations": crypto::ITERATIONS, "salt": B64.encode(&salt), "wrapped": B64.encode(&slot_wrapped)});
+        let name = format!("{SLOT_PREFIX}{}.json", uuid::Uuid::new_v4());
+        let path = Self::create_file(&mut candidate, &name, &serde_json::to_vec(&slot)?)?;
+        let checked = (|| -> Result<()> {
+            let back: Value = serde_json::from_slice(&read_limited(&path, 65536)?)?;
+            let key = Self::unwrap_password(&candidate, &back, new_password)?;
+            if key.as_slice() != candidate.key()? {
+                return Err(fail("VAULT_DAMAGED"));
+            }
+            Ok(())
+        })();
+        if let Err(error) = checked {
+            let _ = fs::remove_file(&path);
+            return Err(error);
+        }
+        let _ = header;
         self.select(candidate, remember)
     }
 

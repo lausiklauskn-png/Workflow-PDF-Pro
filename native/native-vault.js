@@ -25,7 +25,10 @@
     blocked:['Speicher gesperrt oder nicht erreichbar. Die Bibliothek wird nicht durch eine leere ersetzt.','Storage is locked or unavailable. The library will not be replaced by an empty one.','Хранилище заблокировано или недоступно. Библиотека не будет заменена пустой.','التخزين مقفل أو غير متاح. لن تُستبدل المكتبة بمكتبة فارغة.'],
     conflict:['Gleiche Kennungen mit anderem Inhalt gefunden. Es wurde nichts überschrieben. Bitte einen neuen leeren Zielordner wählen.','Conflicting IDs contain different data. Nothing was overwritten. Choose a new empty destination folder.','Найдены одинаковые идентификаторы с разным содержимым. Ничего не перезаписано. Выберите новую пустую папку.','وُجدت معرفات متطابقة بمحتوى مختلف. لم تُستبدل أي بيانات. اختر مجلداً جديداً فارغاً.'],
     failed:['Speichern/Übernahme nicht abgeschlossen. Bisherige Daten bleiben erhalten. Erneut versuchen.','Save/transfer did not complete. Existing data is retained. Retry.','Сохранение/перенос не завершены. Прежние данные сохранены. Повторите попытку.','لم يكتمل الحفظ أو النقل. تبقى البيانات السابقة محفوظة. أعد المحاولة.'],
-    cancelled:['Übernahme abgebrochen; die bisherige Bibliothek bleibt erhalten.','Transfer cancelled; the previous library is retained.','Перенос отменён; прежняя библиотека сохранена.','أُلغي النقل وتبقى المكتبة السابقة محفوظة.']
+    cancelled:['Übernahme abgebrochen; die bisherige Bibliothek bleibt erhalten.','Transfer cancelled; the previous library is retained.','Перенос отменён; прежняя библиотека сохранена.','أُلغي النقل وتبقى المكتبة السابقة محفوظة.'],
+    recovery:['Ersatzschlüssel erzeugen (3 von 5) …','Create recovery keys (3 of 5) …','Создать ключи восстановления (3 из 5) …','إنشاء مفاتيح الاسترداد (3 من 5) …'],
+    recoveryNone:['Noch keine Ersatzschlüssel. Ohne Passwort und ohne Ersatzschlüssel sind die Daten nicht mehr zu öffnen.','No recovery keys yet. Without the password and without recovery keys the data cannot be opened.','Ключей восстановления пока нет. Без пароля и без ключей данные не открыть.','لا توجد مفاتيح استرداد بعد. بدون كلمة المرور ومفاتيح الاسترداد لا يمكن فتح البيانات.'],
+    recoveryDone:['Ersatzschlüssel vorhanden (3 von 5), erstellt am ','Recovery keys exist (3 of 5), created on ','Ключи восстановления есть (3 из 5), созданы ','مفاتيح الاسترداد موجودة (3 من 5)، أُنشئت في ']
   };
   const t=key=>words[key][Math.max(0,['de','en','ru','ar'].indexOf(document.documentElement.lang))];
   const language=()=>document.documentElement.lang||'de';
@@ -161,6 +164,12 @@
       });
     }else{
       button(actions,'choose',async()=>{const answer=await api.choose({language:language()});if(!answer.cancelled)await confirmMove(answer.state);});
+      if(active&&typeof api.createRecovery==='function'){
+        const line=document.createElement('p');line.id='nativeVaultRecovery';panel.insertBefore(line,actions);
+        const show=info=>{line.textContent=info?.exists?t('recoveryDone')+new Date(info.created||info.createdAt).toLocaleDateString(language()):t('recoveryNone');};
+        void api.recoveryInfo({location:active.state.location}).then(show).catch(()=>{});
+        button(actions,'recovery',async()=>{const answer=await api.createRecovery({location:active.state.location,language:language()});if(answer?.created)show({exists:true,createdAt:answer.createdAt});});
+      }
       if(active)button(actions,'lock',async()=>{document.activeElement?.blur();await gate.pause();await active.journal.tail;await api.lock();await boot();});
       button(actions,'close',async()=>{panel.close();panel.remove();panel=null;});
     }

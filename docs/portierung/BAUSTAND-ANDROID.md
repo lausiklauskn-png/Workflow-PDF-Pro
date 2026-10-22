@@ -1028,3 +1028,13 @@ Hinweis für spätere Testpflege: Der Debug-Installationshelfer trägt noch eine
 historisch fest kodierte Buildnummer 1 ein; daraus keine Versionsprüfung ableiten.
 Die Produktionsversion 2 ist durch aapt, Signaturreceipt und tatsächliche
 Produktionsinstallation unabhängig belegt. Keine App-/Signiergates absenken.
+
+## 1.0.2: Ersatzschlüssel 3 von 5
+
+versionCode 3 / versionName 1.0.2. Neu: Ersatzschlüssel für den Ordner-/SD-Tresor
+(Einstellungen → Speicher und Dokumenttresor) und „Passwort vergessen?“ im
+Passwortdialog. Automatisch geprüft: Kernlogik (Unit-Test), Wiederherstellung auf einem
+zweiten Gerät im Emulator (`NativeDocumentVaultTest`), Verwaltungsanzeige
+(`NativeVaultProductTest`) und Austauschbarkeit mit Windows (`compat/run.sh`). Die nativen
+Android-Fenster selbst (Anzeige der Teile, Eingabe) sind nicht automatisch per UI
+geprüft. Nicht auf Klaus' Tablet gemessen.

@@ -153,3 +153,17 @@ Exakte Laufnummer und Grenzen siehe [BAUSTAND-ANDROID.md](BAUSTAND-ANDROID.md).
 
 Statische Speicherzuordnung für die weitere Anbindung: [Speicherinventar](SPEICHERINVENTAR.md).
 Keine bereits ausgeführte Migration oder zusätzliche Speicherentscheidung.
+
+
+## Ersatzschlüssel (Auftrag Klaus 22.10.2026, umgesetzt in Android 1.0.2 / Windows)
+
+Shamir-Aufteilung über GF(256), 5 Teile mit Schwelle 3, nach dem Vorbild von Private
+Brain Pro. Hier gilt sie aber für den Ordner-/SD-Tresor. Aufgeteilt wird ein zufälliger
+256-Bit-Wiederherstellungsschlüssel, nicht das Passwort. Er umhüllt den Datenschlüssel in
+`workflow-pdf-pro.ersatz-<satz>.json` (AES-GCM, gebunden an Tresorkennung und Satz).
+Die Wiederherstellung legt ein Passwortfach `workflow-pdf-pro.kennwort-<uuid>.json` an.
+Der Tresorkopf wird nicht verändert. Teile: `WFP1-` + Crockford-Base32 mit Satz,
+Schwelle, Index und 2-Byte-Prüfsumme. Die Teile werden nur in nativen Fenstern
+angezeigt bzw. eingegeben und gelangen nie in die Webseite.
+Kern: `windows/core/src/recovery.rs`, `VaultRecovery.java`. Die Gegenprobe Android ↔ Windows
+läuft in `windows/core/compat/run.sh`. Nicht auf Klaus' Geräten gemessen.
