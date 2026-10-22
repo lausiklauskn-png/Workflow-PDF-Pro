@@ -7,8 +7,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        clearTransientFiles()
         return true
+    }
+
+    private func clearTransientFiles() {
+        let manager = FileManager.default, root = FileManager.default.temporaryDirectory
+        guard let files = try? manager.contentsOfDirectory(at: root, includingPropertiesForKeys: [.contentModificationDateKey]) else { return }
+        for file in files {
+            let name = file.lastPathComponent
+            // These exact namespaces contain only disposable copies from a
+            // previous process. Durable inboxes and vault metadata live elsewhere.
+            let prefixes = ["wfp-recovery-", "wfp-received-", "wfp-import-", "wfp-transfers-"]
+            guard let prefix = prefixes.first(where: { name.hasPrefix($0) }), UUID(uuidString: String(name.dropFirst(prefix.count))) != nil else { continue }
+            if prefix == "wfp-transfers-" {
+                // A receiver may still read after the share sheet closes.
+                guard let modified = try? file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate,
+                      modified < Date().addingTimeInterval(-86_400) else { continue }
+            }
+            try? manager.removeItem(at: file)
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
