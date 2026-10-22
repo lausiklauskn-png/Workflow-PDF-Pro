@@ -301,6 +301,7 @@ import Speech
                     XCTAssertEqual(result["direction"] as? String, language == "ar" ? "rtl" : "ltr")
                     XCTAssertEqual(result["bodyDirection"] as? String, language == "ar" ? "rtl" : "ltr")
                     XCTAssertGreaterThan(result["width"] as? Int ?? 0, 0)
+                    XCTAssertEqual(Double(result["width"] as? Int ?? 0), Double(size.width), accuracy: 2, "Measure the requested WKWebView size rather than only changing its native frame")
                     XCTAssertEqual(result["editor"] as? Bool, true)
                     measurements.append(result)
                 }
