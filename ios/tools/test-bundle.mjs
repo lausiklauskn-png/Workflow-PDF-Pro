@@ -53,5 +53,6 @@ test('Apple entry point sets its CSP before scripts and keeps the core entry poi
   assert.match(html, /base-uri 'none'/);
   assert.match(html, /<meta name="wfp-version" content=""/);
   assert.ok(html.indexOf('ios/host.js?') < html.indexOf('src="assets/app.js?'));
+  assert.equal(hash(await readFile(new URL('ios/host.js', base))), hash(await readFile(new URL('ios/host.js', root))));
   for (const file of receipt.iosFiles) assert.equal(hash(await readFile(new URL(file.path, base))), file.sha256);
 });
