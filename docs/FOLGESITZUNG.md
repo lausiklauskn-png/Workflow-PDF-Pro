@@ -1,5 +1,12 @@
 # Selbstständig weiterarbeiten: Codex und Claude Code
 
+## Neuester Auftrag vom 22.10.2026
+
+[Versionsnummer, „Alle prüfen“, Erklärvideo](../BRIEF_NACHFOLGE_2026-10-22_VERSION-UND-VIDEO.md).
+Veröffentlicht ist jetzt [Android 1.0.2](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.2)
+mit Ersatzschlüsseln 3 von 5; Abschluss in
+[BRIEF_ABSCHLUSS_2026-10-22_ERSATZSCHLUESSEL.md](../BRIEF_ABSCHLUSS_2026-10-22_ERSATZSCHLUESSEL.md).
+
 ## Übergabe vom 22.10.2026
 
 Windows ist auf Klaus' Wunsch vorerst abgeschlossen. Maßgeblich sind der
