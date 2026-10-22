@@ -3,6 +3,8 @@ import WebKit
 import UIKit
 import CryptoKit
 import WorkflowNativeCore
+import Translation
+import Speech
 @testable import App
 
 @MainActor final class WorkflowHostTests: XCTestCase {
@@ -176,6 +178,36 @@ import WorkflowNativeCore
         XCTAssertEqual(result?.count, 3)
         let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: result ?? [], options: .prettyPrinted), uniformTypeIdentifier: "public.json")
         attachment.name = "Local OCR Worker WASM recognition of synthetic DE EN RU text"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+    func testNativeLanguageCapabilitiesWithoutSendingDocuments() async throws {
+        var result: [String: Any] = ["translationSessionExecuted": false, "speechRecognitionExecuted": false]
+        if #available(iOS 18.0, *) {
+            let availability = LanguageAvailability()
+            var pairs: [[String: String]] = []
+            for source in ["de", "en", "ru"] {
+                for target in ["de", "en", "ru"] where source != target {
+                    let status = await availability.status(from: Locale.Language(identifier: source), to: Locale.Language(identifier: target))
+                    let value: String
+                    switch status {
+                    case .installed: value = "installed"
+                    case .supported: value = "supported-download-needed"
+                    case .unsupported: value = "unsupported"
+                    @unknown default: value = "unknown"
+                    }
+                    pairs.append(["from": source, "to": target, "status": value])
+                }
+            }
+            result["appleTranslationPairs"] = pairs
+        } else { result["appleTranslation"] = "requires-iOS-18" }
+        result["speech"] = ["de-DE", "en-US", "ru-RU", "ar-SA"].map { language -> [String: Any] in
+            let recognizer = SFSpeechRecognizer(locale: Locale(identifier: language))
+            return ["language": language, "available": recognizer?.isAvailable ?? false,
+                    "supportsOnDevice": recognizer?.supportsOnDeviceRecognition ?? false]
+        }
+        let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: result, options: .prettyPrinted), uniformTypeIdentifier: "public.json")
+        attachment.name = "Native language API availability only; no translation or speech recognition proof"
         attachment.lifetime = .keepAlways
         add(attachment)
     }
