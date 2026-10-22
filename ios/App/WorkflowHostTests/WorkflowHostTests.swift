@@ -6,7 +6,10 @@ import UIKit
 @MainActor final class WorkflowHostTests: XCTestCase {
     private func webView() throws -> WKWebView {
         let controllers = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows).compactMap { $0.rootViewController as? WorkflowBridgeViewController }
-        return try XCTUnwrap(controllers.first?.webView)
+        guard let view = controllers.first?.webView else {
+            throw NSError(domain: "WorkflowHostTests", code: 3, userInfo: [NSLocalizedDescriptionKey: "App scene is not ready yet"])
+        }
+        return view
     }
     // Use the Objective-C completion API: the Swift async WebKit overlay is
     // not shipped by every supported simulator runtime.
@@ -31,7 +34,7 @@ import UIKit
             try await Task.sleep(nanoseconds: 100_000_000)
         }
         _ = try? await evaluate("delete window['\(key)'];null;")
-        throw NSError(domain: "WorkflowProbe", code: 2, userInfo: [NSLocalizedDescriptionKey: "iOS probe timeout"])
+        throw NSError(domain: "WorkflowProbe", code: 2, userInfo: [NSLocalizedDescriptionKey: "iOS probe timeout: " + String(code.prefix(160))])
     }
     private func ready() async throws {
         for _ in 0..<150 {
@@ -99,8 +102,20 @@ import UIKit
         XCTAssertFalse(["sauber","clean"].contains(before?["status"] as? String ?? ""))
         let id = try XCTUnwrap(before?["id"] as? String)
         let bytes = try await js("return Array.from(await WFP.DB.getFile(__wfpdf.S.doc.id));") as? [Int]
+        _ = try await js("window.__iosBeforeReload=true;return true;")
         try webView().reload()
-        try await ready()
+        var newDocument = false
+        for _ in 0..<150 {
+            // reload() schedules navigation. Old globals may still be visible;
+            // await a genuinely new document before starting any async probe.
+            if (try? await evaluate("Boolean(!window.__iosBeforeReload && window.__wfpdf && window.WFP?.DB && window.PDFLib)")) as? Bool == true {
+                newDocument = true
+                break
+            }
+            try await Task.sleep(nanoseconds: 200_000_000)
+        }
+        XCTAssertTrue(newDocument, "A new local document must load before checking persisted bytes")
+        guard newDocument else { throw NSError(domain: "WorkflowHostTests", code: 4) }
         let idJSON = String(data: try JSONSerialization.data(withJSONObject: [id]), encoding: .utf8)!
         let after = try await js("return Array.from(await WFP.DB.getFile(\(idJSON)[0]));") as? [Int]
         XCTAssertEqual(after, bytes)

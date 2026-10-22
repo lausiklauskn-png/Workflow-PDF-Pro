@@ -29,6 +29,7 @@ jobs:
       - run: npm ci
       - run: npm run verify:upstream
       - run: npm run sync:ios
+        id: apple_sync
       - run: node --test ios/tools/test-bundle.mjs
       - name: Native Datei- und Empfangsverträge
         run: swift test --package-path ios/WorkflowNativeCore
@@ -51,6 +52,7 @@ jobs:
             -derivedDataPath ios/DerivedData -resultBundlePath ios/results/Workflow.xcresult \
             CODE_SIGNING_ALLOWED=NO test 2>&1 | tee ios/results/xcodebuild.log
       - name: Produktionsbau ohne Signierung
+        if: ${{ !cancelled() && steps.apple_sync.outcome == 'success' }}
         run: |
           set -euo pipefail
           xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
