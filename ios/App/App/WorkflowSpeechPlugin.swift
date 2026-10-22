@@ -10,7 +10,7 @@ import WebKit
 final class WorkflowSpeechPlugin: WorkflowPlugin, CAPBridgedPlugin {
     let identifier = "WorkflowSpeechPlugin"
     let jsName = "WorkflowSpeech"
-    let pluginMethods = ["available", "start", "stop"].map { CAPPluginMethod(name: $0, returnType: CAPPluginReturnPromise) }
+    let pluginMethods: [CAPPluginMethod] = ["available", "start", "stop"].map { CAPPluginMethod(name: $0, returnType: CAPPluginReturnPromise) }
     private var active: String?
     private var recognizer: SFSpeechRecognizer?
     private var engine: AVAudioEngine?

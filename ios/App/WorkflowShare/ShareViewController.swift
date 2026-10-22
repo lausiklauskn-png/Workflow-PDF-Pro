@@ -45,23 +45,24 @@ final class ShareViewController: UIViewController {
         accept.isEnabled = false
         status.text = text(["Dateien werden vollständig kopiert …", "Copying all files …", "Копирование всех файлов …", "جارٍ نسخ جميع الملفات …"])
         let inputs = providers
-        receiver = Task.detached { [weak self] in
+        receiver = Task.detached { [self] in
             do {
                 let store = try SharedIncomingStore.live()
-                _ = try await IncomingProviders.receive(inputs, into: store, staging: FileManager.default.temporaryDirectory, willCommit: { [weak self] in
-                    await MainActor.run { self?.cancel.isEnabled = false }
+                _ = try await IncomingProviders.receive(inputs, into: store, staging: FileManager.default.temporaryDirectory, willCommit: { [self] in
+                    await MainActor.run { self.cancel.isEnabled = false }
                 })
                 await MainActor.run {
-                    guard let self = self else { return }
                     self.finished = true; self.receiver = nil; self.accept.isEnabled = true; self.cancel.isHidden = true
                     self.status.text = self.text(["Im Eingang gespeichert. Öffne Workflow PDF Pro, um den Import zu bestätigen.", "Saved in the inbox. Open Workflow PDF Pro to confirm the import.", "Сохранено во входящих. Откройте Workflow PDF Pro для подтверждения импорта.", "تم الحفظ في الوارد. افتح Workflow PDF Pro لتأكيد الاستيراد."])
                     self.accept.setTitle(self.text(["Fertig", "Done", "Готово", "تم"]), for: .normal)
                 }
             } catch is CancellationError {
-                await MainActor.run { self?.extensionContext?.cancelRequest(withError: NSError(domain: NSCocoaErrorDomain, code: NSUserCancelledError)) }
+                await MainActor.run {
+                    self.receiver = nil
+                    self.extensionContext?.cancelRequest(withError: NSError(domain: NSCocoaErrorDomain, code: NSUserCancelledError))
+                }
             } catch {
                 await MainActor.run {
-                    guard let self = self else { return }
                     self.receiver = nil; self.cancel.isEnabled = true
                     self.status.text = self.text(["Die Übernahme wurde nicht bestätigt. Prüfe den Eingang in Workflow PDF Pro, bevor du die Dateien erneut teilst. Bereits gespeicherte Dokumente bleiben erhalten.", "Receipt could not be confirmed. Check the inbox in Workflow PDF Pro before sharing again. Existing documents are preserved.", "Получение не подтверждено. Проверьте входящие в Workflow PDF Pro перед повторной отправкой. Существующие документы сохранены.", "تعذّر تأكيد الاستلام. تحقّق من الوارد في Workflow PDF Pro قبل المشاركة مجددًا. المستندات الموجودة محفوظة."])
                 }
