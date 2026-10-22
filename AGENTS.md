@@ -1,5 +1,9 @@
 # Workflow PDF Pro — gemeinsame Arbeitsgrundlage
 
+- **Produktstand und Veröffentlichungsregel:** `docs/PRODUKTSTAND.md`. iOS wird nur vorbereitet
+  und höchstens privat installiert, nicht veröffentlicht (Klaus, 22.10.2026). iOS-Bau: Codex,
+  Zweig `codex/ios-native-host`. Als Nächstes veröffentlicht wird nur Private Brain Pro für Windows
+  (anderes Repo, andere Sitzung).
 - Wiederaufnahme, tatsächliche Zugriffsprüfung und Bauumgebung: `docs/FOLGESITZUNG.md`.
   **Neueste Übergabe (22.10.2026, abends):** `BRIEF_ABSCHLUSS_2026-10-22_VERSION-UND-VIDEO.md`
   (Android 1.0.3 und Windows 1.0.3 veröffentlicht, Web 1.1.0, Video mit Prüfteil) und
