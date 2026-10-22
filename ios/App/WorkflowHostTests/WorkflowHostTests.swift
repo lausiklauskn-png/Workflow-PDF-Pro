@@ -240,6 +240,47 @@ import Speech
         }
         XCTAssertEqual(result?["unicode"] as? String, "Müller Москва العربية")
     }
+    func testEmbeddedLatinAndCyrillicFontsRenderWithoutMissingLetters() async throws {
+        try await ready()
+        // Port the existing upstream schrift.mjs ink measurement to actual
+        // WKWebView/pdf.js. Correct extracted text alone misses lost glyphs.
+        let result = try await js("""
+            const lines=['Anspruchsteller Schadenssache Rechtsanwaltsgesellschaft Fragebogen','Уважаемые дамы и господа пожалуйста заполните анкету полностью','Datum der Anmeldung Uhrzeit Kennzeichen Versicherungsnummer'];
+            const pdf=await PDFLib.PDFDocument.create();pdf.addPage([595,842]);const blank=await pdf.save();
+            const font=await WFP.Uebersetzung.schriftLaden('vendor/');
+            const ink=async bytes=>{
+              const pdf=await pdfjsLib.getDocument({data:bytes.slice(0)}).promise;
+              try {
+                const page=await pdf.getPage(1),viewport=page.getViewport({scale:2}),canvas=document.createElement('canvas');
+                canvas.width=viewport.width;canvas.height=viewport.height;const context=canvas.getContext('2d');
+                await page.render({canvasContext:context,viewport}).promise;
+                const data=context.getImageData(0,0,canvas.width,canvas.height).data,bands=[];let band=null;
+                const dark=(x,y)=>{const i=(y*canvas.width+x)*4;return data[i]+data[i+1]+data[i+2]<380;};
+                for(let y=0;y<canvas.height;y++){
+                  let has=false;for(let x=0;x<canvas.width;x++)if(dark(x,y)){has=true;break;}
+                  if(has&&!band)band=[y,y];else if(has)band[1]=y;else if(band){bands.push(band);band=null;}
+                }
+                return bands.filter(b=>b[1]-b[0]>6).map(([a,b])=>{
+                  let first=-1,last=-1,count=0;
+                  for(let x=0;x<canvas.width;x++){let has=false;for(let y=a;y<=b;y++)if(dark(x,y)){has=true;break;}if(has){count++;if(first<0)first=x;last=x;}}
+                  return count/(last-first+1);
+                });
+              } finally {await pdf.destroy();}
+            };
+            const translated=await WFP.Uebersetzung.pdfBauen(blank,[{b:lines.map((text,i)=>[40,40+i*60,520,40,14]),u:lines}],font,{});
+            const doc={pages:[{t:[1,0,0,-1,0,842],w:595,h:842}],fields:lines.map((value,i)=>({id:'f'+i,name:'f'+i,type:'text',page:0,x:6,y:5+i*8,w:90,h:3.5,value,geprueft:true}))};
+            const exported=await WFP.Export.exportieren(doc,blank,'fest',{schrift:font});
+            return {translation:await ink(translated.bytes),export:await ink(exported.bytes)};
+            """, seconds: 60) as? [String: Any]
+        for key in ["translation", "export"] {
+            let values = result?[key] as? [Double] ?? []
+            XCTAssertEqual(values.count, 3, key)
+            XCTAssertTrue(values.allSatisfy { $0 >= 0.55 }, "Visible ink must match the upstream glyph coverage threshold: \(key) \(values)")
+        }
+        let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: result ?? [:], options: .prettyPrinted), uniformTypeIdentifier: "public.json")
+        attachment.name = "Visible Latin and Cyrillic glyph coverage from the unchanged export and PDF builder"
+        attachment.lifetime = .keepAlways; add(attachment)
+    }
     func testFourUILanguagesAndArabicDirectionAtPhoneAndTabletViewportSizes() async throws {
         try await ready()
         let view = try webView(), previousFrame = view.frame
