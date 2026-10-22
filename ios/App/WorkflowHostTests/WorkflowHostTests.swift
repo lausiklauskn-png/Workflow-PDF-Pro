@@ -271,6 +271,23 @@ import Speech
     }
     func testLocalOCRWorkerAndWASMRecognizeThreeLanguages() async throws {
         try await ready()
+        let ruleID = "ios-offline-ocr-" + UUID().uuidString
+        let rules: WKContentRuleList = try await withCheckedThrowingContinuation { continuation in
+            WKContentRuleListStore.default().compileContentRuleList(forIdentifier: ruleID,
+                encodedContentRuleList: """
+                [{"trigger":{"url-filter":"^https?://"},"action":{"type":"block"}}]
+                """) { rules, error in
+                    if let error = error { continuation.resume(throwing: error) }
+                    else if let rules = rules { continuation.resume(returning: rules) }
+                    else { continuation.resume(throwing: NSError(domain: "WorkflowOfflineOCR", code: 1)) }
+                }
+        }
+        let content = try webView().configuration.userContentController
+        content.add(rules)
+        defer {
+            content.remove(rules)
+            WKContentRuleListStore.default().removeContentRuleList(forIdentifier: ruleID) { _ in }
+        }
         let result = try await js("""
             if (!window.Tesseract) await new Promise((resolve,reject)=>{
               const script=document.createElement('script');
@@ -293,7 +310,7 @@ import Speech
             """, seconds: 90) as? [[String: Any]]
         XCTAssertEqual(result?.count, 3)
         let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: result ?? [], options: .prettyPrinted), uniformTypeIdentifier: "public.json")
-        attachment.name = "Local OCR Worker WASM recognition of synthetic DE EN RU text"
+        attachment.name = "Local OCR Worker WASM recognition of synthetic DE EN RU text with HTTP and HTTPS blocked"
         attachment.lifetime = .keepAlways
         add(attachment)
     }
