@@ -1,3 +1,7 @@
+# NICHT IN GEBRAUCH (seit 22.10.2026). Gehört zum früher vorbereiteten signierten
+# Ablauf mit Update-Zeiger. Windows wird unsigniert ohne Updater veröffentlicht
+# (.github/workflows/windows-release.yml). Nur als Vorlage für eine spätere,
+# ausdrücklich beauftragte Signierung aufbewahrt. Nicht aus einem Workflow aufrufen.
 $ErrorActionPreference = 'Stop'
 $head = gh api "repos/$env:GITHUB_REPOSITORY/branches/main" --jq .commit.sha
 if ($LASTEXITCODE -ne 0 -or $head -cne $env:GITHUB_SHA) { throw 'main changed; revalidate the current commit.' }

@@ -190,3 +190,29 @@ eigenes Fenster `windows/ersatz.html` (Anzeigen, Speichern, Drucken, Bestätigen
 das Hauptfenster, Tippfehlererkennung, Ablehnung von nur zwei Teilen und das Öffnen mit
 neuem Passwort nach Neustart. Laut Klaus' Entscheidung vom 22.10.2026 wird jetzt kein
 neuer Windows-Installer veröffentlicht; veröffentlicht bleibt 1.0.1 ohne Ersatzschlüssel.
+
+## Releaseablauf unsigniert, ohne Updater (22.10.2026)
+
+Noch nicht ausgeführt. Es gibt dadurch noch keine neue Veröffentlichung.
+Veröffentlicht bleibt 1.0.1. Der Quellstand trägt 1.0.3.
+
+`.github/workflows/windows-release.yml` passt jetzt zu Klaus' Wahl: unsignierter
+Setup.exe-Installer, keine automatischen Updates, kein Secret, kein Signierkonto,
+kein Update-Schlüssel. Der Ablauf folgt dem Weg von 1.0.1: kein Neubau, sondern
+genau der Auslieferungsbau aus dem grünen Lauf „Windows-App (Tauri)“ auf demselben
+main-Commit. Neu sind: Version muss steigen, `updater.pub` muss leer sein,
+Authenticode-Status muss `NotSigned` sein, eine Installationsprobe auf Windows,
+Veröffentlichung erst als Entwurf und Rücknahme als Entwurf, wenn der anonyme
+Download abweicht. Das Installer-Artefakt bleibt jetzt 90 statt 14 Tage.
+
+Anstoß aus Claude Code (kein `workflow_dispatch` nötig):
+`node tools/signing/request-release.mjs windows-v1.0.3`. Das legt den Branch
+`release-requests/windows-v1.0.3` auf dem aktuellen main-Commit an.
+`release-request.yml` startet dann `windows-release.yml` auf main.
+
+Voraussetzung: Auf dem aktuellen main-Commit muss „Windows-App (Tauri)“ grün sein.
+Der Lauf startet nur, wenn ein Commit Dateien unter `windows/`, `native/`,
+`upstream/`, `tools/native/` oder `windows-app.yml` ändert. Nach einem reinen
+Doku-Commit auf main fehlt dieser Lauf; dann bricht die Veröffentlichung ab.
+
+Einzelheiten: [Windows-Signierung und Updates](../../windows/SIGNIERUNG-UND-UPDATES.md).

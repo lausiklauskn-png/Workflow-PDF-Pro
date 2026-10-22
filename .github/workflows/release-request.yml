@@ -1,7 +1,7 @@
 name: Gemeinsamen Release-Auftrag weitergeben
 on:
   push:
-    branches: ['release-requests/v*']
+    branches: ['release-requests/v*', 'release-requests/windows-v*']
 permissions:
   contents: read
   actions: write
@@ -15,6 +15,8 @@ jobs:
       # No checkout, package install or signing secret is needed here. An agent
       # with Git push access can request the same guarded main release without
       # sharing another agent's API identity or the APK unlock key.
+      # release-requests/vX.Y.Z         -> Android (workflow-pdf-release.yml)
+      # release-requests/windows-vX.Y.Z -> Windows, unsigniert (windows-release.yml)
       - name: Nur unveränderten aktuellen main-Commit weitergeben
         env:
           GH_TOKEN: ${{ github.token }}
@@ -24,11 +26,18 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$GITHUB_REPOSITORY" == 'lausiklauskn-png/Workflow-PDF-Pro' ]]
-          [[ "$REQUEST_REF" =~ ^refs/heads/release-requests/v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          semver='(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)'
+          if [[ "$REQUEST_REF" =~ ^refs/heads/release-requests/v${semver}$ ]]; then
+            workflow=workflow-pdf-release.yml
+          elif [[ "$REQUEST_REF" =~ ^refs/heads/release-requests/windows-v${semver}$ ]]; then
+            workflow=windows-release.yml
+          else
+            echo 'Unbekannter Release-Auftrag.'; exit 1
+          fi
           [[ "$REQUEST_COMMIT" =~ ^[a-f0-9]{40}$ ]]
           current=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
           [[ "$REQUEST_COMMIT" == "$current" ]]
           tag=${REQUEST_REF#refs/heads/release-requests/}
-          gh workflow run workflow-pdf-release.yml --repo "$GITHUB_REPOSITORY" --ref main \
+          gh workflow run "$workflow" --repo "$GITHUB_REPOSITORY" --ref main \
             -f "tag=$tag" -f "commit=$REQUEST_COMMIT"
-          echo 'Regulären Release-Workflow angefordert. Das bestätigt noch keine Veröffentlichung.'
+          echo "Release-Workflow $workflow angefordert. Das bestätigt noch keine Veröffentlichung."

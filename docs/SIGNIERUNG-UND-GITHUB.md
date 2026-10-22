@@ -260,5 +260,7 @@ Folge für den gemeinsamen Ablauf: Claude Code kann alles bis auf das **direkte
 Starten** eines Workflows. Codex kann es (Identitäts-`check` Lauf 39501737287, oben).
 Einen Release fordert Claude Code über die Git-Brücke an: `request-release.mjs`
 fällt nach dem 403 auf einen Push nach `release-requests/vX.Y.Z` zurück, sobald
-`release-request.yml` auf main steht. Ein `check` der Identität hat keine solche
+`release-request.yml` auf main steht. Windows (unsigniert, ohne Updater) geht
+seit 22.10.2026 genauso: `request-release.mjs windows-vX.Y.Z` pusht nach
+`release-requests/windows-vX.Y.Z`, das startet `windows-release.yml`. Ein `check` der Identität hat keine solche
 Brücke; den starten Klaus („Run workflow“) oder Codex.

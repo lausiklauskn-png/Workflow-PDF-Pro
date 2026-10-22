@@ -1,3 +1,6 @@
+# NICHT IN GEBRAUCH (seit 22.10.2026). Prüft eine Authenticode-Signatur für den
+# früher vorbereiteten signierten Ablauf. Windows wird derzeit unsigniert
+# veröffentlicht; windows-release.yml verlangt dort "NotSigned".
 param(
     [Parameter(Mandatory=$true)][string]$File,
     [Parameter(Mandatory=$true)][string]$ExpectedSubject
