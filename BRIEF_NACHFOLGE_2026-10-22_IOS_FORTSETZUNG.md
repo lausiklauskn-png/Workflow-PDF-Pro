@@ -110,14 +110,35 @@ Neue lokale Prüfungen: 193/193 Herkunftsdateien, 33/33 gemeinsame Browserfälle
 41/41 Tresorkomponenten und 3/3 Apple-Bündelprüfungen bestanden, jeweils ohne Skips.
 Erster Apple-Lauf `39810507308`: sechs native Dateitests bestanden, Simulatorbau
 fehlgeschlagen. Danach wurden eine siebte Dateigegenprobe und Korrekturen ergänzt.
+Danach auf `ff20b56`: sieben Dateitests und drei von vier echten WKWebView-Fällen
+bestanden. PDF/Formular/Original/Neuladen hatte ein Timeout. Korrektur in `1b60246`:
+nach reload explizit auf einen neuen Dokumentkontext warten, Datenassertionen erhalten.
+Lauf `39815186968` zur Nachprüfung war zuletzt noch eingereiht; als Erstes prüfen.
+Der unsignierte Release-Bau läuft jetzt unabhängig von einem fehlgeschlagenen Hosttest.
+
+Gemessen auf WKWebView: sicherer Kontext, IndexedDB, CacheStorage, Worker und WASM
+vorhanden; russische Sprachdatei (3.861.738 Bytes) geladen. Service Worker fehlt,
+Browser-Translator fehlt; Speech-Konstruktor vorhanden, Erkennung nicht gemessen.
+Daraus keine OCR-, Offline-Modell- oder Übersetzungsabnahme ableiten.
 Maßgeblich für aktuelle Apple-Ergebnisse ist der neueste Eintrag im iOS-Baustand.
 Kein Testergebnis aus dieser Notiz auf ungeprüfte neuere Commits übertragen.
 
 Cloud-Installations-/Startanweisungen wurden aktualisiert. Netzergänzungen
-`api.github.com` und `results-receiver.actions.githubusercontent.com` wurden als
+`api.github.com`, `results-receiver.actions.githubusercontent.com` und
+`productionresultssa1.blob.core.windows.net` wurden als
 Entwurf gespeichert; tatsächlicher API-/Logzugriff gelang nach erneutem Prüfen.
 Entwurfsspeicherung ist keine Veröffentlichung oder bestätigte Wiederherstellung
 in einer neuen Cloud-Task.
+
+Für die Protokolldiagnose funktionierte bei noch nicht abgeschlossener Run-Metadaten-
+Anzeige der direkte Abruf `gh api repos/lausiklauskn-png/Workflow-PDF-Pro/actions/jobs/<job-id>/logs`.
+Signed Log-/Artifact-URLs nie in Brief oder Chat kopieren. Widersprüchliche oder noch
+nicht aktualisierte Run-Metadaten nicht als Erfolg lesen; Jobschritte, aktuelle
+Zeitstempel, Rohprotokoll und xcresult gemeinsam prüfen.
+
+Zeitnachweis: Fast-Forward im Reflog am 22.10.2026 um 15:54:01 UTC als Beginn der
+aktuellen Implementierung. Endstand über `git log -1 --format=%cI` prüfen; keine
+aktive Arbeitsdauer aus der vorherigen Vorbereitung am Vormittag ableiten.
 
 Bei der Übergabe verbleibende Fähigkeiten und Grenzen konkret nennen. Erst wenn
 Workflow PDF Pro für iOS vollständig fertig und geprüft ist, den gewünschten Brief

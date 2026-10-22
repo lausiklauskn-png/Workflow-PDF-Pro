@@ -49,8 +49,37 @@ Mindestversion verändern. Apple-Team und Bundle-ID-Verfügbarkeit sind ungeprü
 - Bei der Untersuchung korrigiert: UInt64 als nicht unterstützter JSValue-Typ und
   falsche von der Projektbibliothek erzeugte Testpaket-Endung. Zusätzliche Gegenprobe
   gegen das stille Zurücksetzen eines Empfangsindex ergänzt.
-- Aktuelle Wiederholung und genaue Apple-Werkzeuge/Ergebnisse werden nach Abschluss
-  des zugehörigen GitHub-Laufs ergänzt. Keine offene Prüfung als Erfolg zählen.
+- Lauf `39811790747` auf `bdd9321`: **7/7** Swift-Dateitests bestanden. Der native
+  Simulatorhost wurde kompiliert und gestartet, das Testpaket konnte wegen der
+  fehlenden Swift-WebKit-Laufzeitbibliothek nicht geladen werden. Keine eigentlichen
+  WKWebView-Tests ausgeführt; Lauf bei der Ablösung abgebrochen.
+- Gegenmaßnahme: WebKit-Proben verwenden die Objective-C-Completion-Schnittstelle
+  mit eigener begrenzter Promise-Beobachtung; Swift-Laufzeit wird eingebunden.
+  Lauf `39813164051` auf `ff20b56` bestätigt die behobene Testpaket-Ladung:
+  **7/7** Dateitests und **3/4** echte WKWebView-Tests bestanden. Native Dateiübergabe,
+  Version und Herkunftsprüfung funktionieren in diesen Proben. Die PDF-/Formular-/
+  Original-/Neuladeprobe lief in ein Timeout; sie ist ausdrücklich nicht bestanden.
+  Eine wahrscheinliche Rennbedingung in der Probe (alte Globals direkt nach reload)
+  ist in `1b60246` korrigiert, mit unveränderten Datenassertionen. Nachprüfung im Lauf
+  `39815186968` war beim Dokumentieren noch eingereiht. Ursache erst nach dessen
+  Ergebnis als bestätigt betrachten.
+- Tatsächliche erste Apple-Werkzeuge: Xcode 16.4 (16F6), Swift 6.1.2,
+  iOS-Simulator-SDK 18.5. Weitere Simulator-/Gerätenachweise bleiben offen.
+- SwiftPM ist zusätzlich auf den bestätigten 8.5.3-Tag-Commit
+  `4c7f346d16196e21fbe23d4a7a6fc7af62af6742` festgelegt; die offiziellen
+  Binärprüfsummen bleiben unverändert. Keine offene Prüfung als Erfolg zählen.
+
+- GitHub-Job `119945319456` auf `ff20b56`: die vollständige unveränderte Original-
+  Testkette, gemeinsame Browserfälle, Release-Auftragsgegenproben und Tresor-/
+  Journalfälle bestanden. Das ist kein nativer Android-/Windows-Gerätenachweis.
+- Gemessene WKWebView-Fähigkeiten aus dem xcresult: sicherer Kontext,
+  IndexedDB und CacheStorage vorhanden; Worker und WebAssembly vorhanden;
+  lokale russische OCR-Sprachdatei mit 3.861.738 Bytes vollständig geladen.
+  **Kein Service Worker, keine Browser-Translator-API.** Ein vorhandener Speech-
+  Konstruktor belegt keine erfolgreiche Aufnahme/Erkennung. Dateiladen belegt keine OCR.
+- Nachweise: `nachweise/2026-10-22-ios-foundation.json` und
+  `nachweise/2026-10-22-ios-wkwebview-capabilities.json`. Noch kein signierter Bau,
+  keine physische Geräteprüfung und kein App-Store-/TestFlight-Release.
 
 ## Noch erforderlich, bevor die Pro-App vollständig ist
 
