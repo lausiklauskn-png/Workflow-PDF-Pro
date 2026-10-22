@@ -1,5 +1,9 @@
 # Workflow PDF Pro — gemeinsame Arbeitsgrundlage
 
+- **Gleichstandsregel (immer, ohne Erinnerung):** Wird eine Fassung (PWA, APK, Windows, iOS) verbessert
+  und fertig gemacht, werden alle anderen Fassungen derselben App gleich mit nachgezogen. Gilt für
+  Workflow PDF Pro, Private Brain Pro und jede künftige App. Fertig ist eine Arbeit erst, wenn alle
+  Fassungen gleich stehen oder `docs/PRODUKTSTAND.md` die Lücke mit Grund nennt.
 - **Produktstand und Veröffentlichungsregel:** `docs/PRODUKTSTAND.md`. iOS wird nur vorbereitet
   und höchstens privat installiert, nicht veröffentlicht (Klaus, 22.10.2026). iOS-Bau: Codex,
   Zweig `codex/ios-native-host`. Als Nächstes veröffentlicht wird nur Private Brain Pro für Windows

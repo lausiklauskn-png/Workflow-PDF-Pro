@@ -1,5 +1,8 @@
 # Workflow PDF Pro — Claude Code und Codex
 
+**Immer:** Wird eine Fassung (PWA, APK, Windows, iOS) fertig gemacht, alle anderen Fassungen
+derselben App gleich mit nachziehen. Klaus muss das nicht erwähnen. Siehe `docs/PRODUKTSTAND.md`.
+
 Die gemeinsame Arbeitsgrundlage steht vollständig in [`AGENTS.md`](AGENTS.md).
 Zuerst den dort genannten Nachfolgebrief lesen.
 Wiederanlauf ohne Schlüsselübergabe: [`docs/FOLGESITZUNG.md`](docs/FOLGESITZUNG.md).

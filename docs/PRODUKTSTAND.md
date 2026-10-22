@@ -15,6 +15,18 @@ Stand 22.10.2026 abends. Festgelegt von Klaus in der Claude-Code-Sitzung
 | Private Brain Pro | Windows | in Arbeit (laut Klaus; eigenes Repo, nicht in dieser Sitzung) | geplant |
 | Private Brain Pro | iOS | noch nicht begonnen | später: nur vorbereiten |
 
+## Gleichstandsregel (Klaus, 22.10.2026, gilt immer)
+
+Wird eine Fassung verbessert und fertig gemacht, ob PWA, Android-APK, Windows oder später iOS,
+dann werden **alle anderen Fassungen derselben App gleich mit nachgezogen**. Keine Fassung
+bleibt zurück. Ziel: keine Lücken und keine Frage, welche Fassung was schon hat.
+
+- Gilt für Workflow PDF (Pro), Private Brain Pro und jede künftige App.
+- Klaus muss das nicht jedes Mal sagen. Es ist Teil jedes Auftrags.
+- Eine Arbeit ist erst fertig, wenn alle Fassungen den neuen Stand haben oder hier ausdrücklich
+  steht, welche Fassung noch fehlt und warum (zum Beispiel iOS: nur vorbereitet, nicht veröffentlicht).
+- Nach jeder Veröffentlichung die Übersicht oben aktualisieren.
+
 ## Entscheidung zu iOS (Klaus, 22.10.2026)
 
 - Die iOS-Version von Workflow PDF Pro wird **fertig vorbereitet**, aber **nicht veröffentlicht**.
