@@ -117,7 +117,7 @@ in Chrome). Nichts davon ist auf Klaus' PC gemessen.
 ## Windows 1.0.2: Sicherheit, Updates und Signiervorbereitung (22.10.2026)
 
 Noch nicht veröffentlicht. Der Download oben bleibt die unveränderte, unsignierte 1.0.1.
-Die Änderungen liegen zunächst in PR #13 (`codex/windows-security-updates`).
+Die Änderungen aus PR #13 wurden nach erfolgreicher Windows-Abnahme auf main übernommen.
 
 - WebView2-SmartScreen wird nicht mehr abgeschaltet. Neue CSP mit lokalen Skripten,
   der bereits fest versionierten Transformers-Bibliothek, WebAssembly und Workern;
@@ -145,7 +145,24 @@ Einrichtung: [Windows-Signierung und Updates](../../windows/SIGNIERUNG-UND-UPDAT
 Prüfverlauf: Der erste neue Windows-Lauf 39761375330 scheiterte vor den Host-Tests
 am noch nicht erzeugten Web-Bündel (`frontendDist`). Der Vorbereitungsschritt wurde
 ergänzt, die aufgelösten Abhängigkeiten eingecheckt und die Prüfungen neu gestartet.
-Kryptografische Gegenproben mit Node und echten Tauri-CLI-Signaturen sowie die
-ursprünglichen Rust-/Android-Formatprüfungen bestanden bereits. Der vollständige
-aktuelle Windows-Nachweis wird nach Abschluss der neuen Produktabnahme ergänzt.
+Der zweite Lauf 39766322384 baute beide Installer und bestand PDF, OCR, Tresor,
+Chrome-Abbruch, Neustart, fehlenden Ordner und Neuinstallation; nur die neue
+CSP-Probe aus DevTools war rot. Die CSP-Probe wurde in ein normales, ausschließlich
+im Prüfbau enthaltenes App-Skript verlegt. Ein separater Test verhindert die
+Übernahme dieses Prüfsystems in den Auslieferungsbau.
+
+**Vollständiger neuer Windows-Nachweis: Lauf 39768752969 auf `7cf2f51`, grün.**
+Rust-Update-Regeln, Node-Signaturgegenproben und Speicher-/Journalfehlerfälle,
+Gegenprobe mit echten Tauri-CLI-Signaturen sowie Linux-Rust-/Android-Formatprüfungen
+bestanden. Im installierten WebView2: `evalBlocked:true`, `inlineBlocked:true`,
+Update-Adapter vorhanden, Version 1.0.2 und `configured:false` bei leerem Schlüssel.
+Eingebettete Sicherheitshilfe, originale Transformers-Bibliothek im Worker,
+PDF/Formular/OCR/Export, Speichern und Anhalten vor Update, Passwortdialog ohne
+Update-Rechte, fehlender Tresorordner mit Update-Sperre und Datenerhalt nach
+Neuinstallation bestanden. Auslieferungsbau läuft ohne CDP-Prüfzugang und ohne
+CSP-Prüfskript. 191/191 Quelldateien unverändert.
+
+Das ist keine ausgeführte Authenticode-Signierung oder echte Update-Installation
+und keine physische Windows-10-/11-Abnahme. Einrichtung und anschließende
+Neuveröffentlichung bleiben wegen fehlendem Signierkonto und Update-Schlüssel offen.
 
