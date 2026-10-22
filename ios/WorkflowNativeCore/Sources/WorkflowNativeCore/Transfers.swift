@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 
 public enum WorkflowError: String, Error {
     case invalidTransfer = "FILE_INVALID_TRANSFER"
@@ -120,6 +121,13 @@ public final class IncomingStore {
     }
     private func save(_ state: State) throws {
         try JSONEncoder().encode(state).write(to: index, options: .atomic)
+        let handle = try FileHandle(forWritingTo: index)
+        defer { try? handle.close() }
+        try handle.synchronize()
+        let directory = Darwin.open(root.path, O_RDONLY)
+        guard directory >= 0 else { throw WorkflowError.unavailable }
+        defer { Darwin.close(directory) }
+        guard fsync(directory) == 0 else { throw WorkflowError.unavailable }
     }
     private func path(_ batch: String, _ file: String) -> URL {
         root.appendingPathComponent(batch, isDirectory: true).appendingPathComponent(file)
@@ -130,6 +138,7 @@ public final class IncomingStore {
         let batchID = UUID().uuidString
         let directory = root.appendingPathComponent(batchID, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false)
+        var publishing = false
         do {
             var files: [IncomingFile] = []
             for url in urls {
@@ -138,6 +147,9 @@ public final class IncomingStore {
                 let id = UUID().uuidString
                 let destination = path(batchID, id)
                 try FileManager.default.copyItem(at: url, to: destination)
+                let copied = try FileHandle(forWritingTo: destination)
+                do { try copied.synchronize(); try copied.close() }
+                catch { try? copied.close(); throw error }
                 let size = try destination.resourceValues(forKeys: [.fileSizeKey]).fileSize!
                 guard size == values.fileSize else { throw WorkflowError.unavailable }
                 let ext = url.pathExtension.lowercased()
@@ -145,11 +157,18 @@ public final class IncomingStore {
                 files.append(IncomingFile(id: id, name: Transfers.filename(url.lastPathComponent), mime: mime, size: UInt64(size)))
             }
             let batch = IncomingBatch(id: batchID, files: files)
+            let descriptor = Darwin.open(directory.path, O_RDONLY)
+            guard descriptor >= 0 else { throw WorkflowError.unavailable }
+            defer { Darwin.close(descriptor) }
+            guard fsync(descriptor) == 0 else { throw WorkflowError.unavailable }
             state.pending.append(batch)
+            publishing = true
             try save(state)
             return batch
         } catch {
-            try? FileManager.default.removeItem(at: directory)
+            // Once metadata publication begins it may already reference these
+            // bytes, even if a later fsync fails. Retain them on uncertain commit.
+            if !publishing { try? FileManager.default.removeItem(at: directory) }
             throw error
         }
     }
