@@ -1,5 +1,11 @@
 # iOS-Baustand – Workflow PDF Pro
 
+> **Zurückgestellt auf Wunsch von Klaus (22.10.2026):** Vorbereitung für später,
+> derzeit ohne Apple-Gerät oder kostenpflichtige Apple-Mitgliedschaft.
+> Aktueller Auftrag und letzter vollständiger Nachweis stehen in
+> [IOS-ZURUECKGESTELLT-2026-10-22.md](IOS-ZURUECKGESTELLT-2026-10-22.md).
+
+
 Stand 22.10.2026. Klaus hat nach Abschluss der parallelen Claude-Arbeit den Bau
 freigegeben. Gemeint ist Workflow PDF Pro aus derselben Quelle wie Windows.
 
@@ -280,3 +286,13 @@ SHA-256-Rücklesen eingegangener Dateien, Apple-MIME-Typen, Unicode-Dateinamen m
 erhaltener Endung und lokalisierte native Kamer-/Mikrofon-/Speech-Freigabehinweise.
 Diese Ergänzungen benötigen ihren eigenen Apple-Lauf. Reguläre Hardware-Drehung,
 externe Tastatur und Dateianbieter bleiben davon getrennte Geräteproben.
+
+## Letzter Nachweis vor der Zurückstellung
+
+Auf `7f66c7f9320b476f0eae32d67c7dbf7f459d0a40` ist Apple-Lauf
+[39856502604](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39856502604)
+vollständig grün: 21 Swift-Tests, je 15 Hosttests auf iPhone und iPad,
+54 Datei-/drei Passwort-/90 Recovery-/neun Tresor-Ordner-Gegenproben sowie
+unsignierter Release-Gerätebau. Damit sind auch die oben zuletzt genannten
+Schrift-, Viewport-, MIME- und Dateieingangsänderungen nachgeprüft.
+Die ausdrücklich genannten physischen Geräte- und Produktgrenzen bleiben offen.

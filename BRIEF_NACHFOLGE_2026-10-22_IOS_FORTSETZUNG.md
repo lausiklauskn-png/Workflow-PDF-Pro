@@ -1,5 +1,14 @@
 # Fortsetzung: Workflow PDF Pro für iPhone und iPad
 
+> **Aktualisierte Entscheidung von Klaus, 22.10.2026:** iOS ist zurückgestellt.
+> Kein Apple-Gerät und derzeit keine kostenpflichtige Apple-Mitgliedschaft.
+> Die folgende Aufgabenliste ist historische Bauplanung, kein aktueller Auftrag
+> zur Fortsetzung. Code und Simulatornachweise bleiben im Entwurf-PR #17 erhalten.
+> Weiter geht es mit der Qualitätsprüfung der vorhandenen Workflow- und
+> Private-Brain-Varianten. Siehe
+> [dauerhafte Notiz](docs/portierung/IOS-ZURUECKGESTELLT-2026-10-22.md).
+
+
 Klaus hat am 22.10.2026 nach Abschluss der parallelen Claude-Code-Arbeit ausdrücklich
 mit dem iOS-Bau begonnen und selbstständige technische Arbeit freigegeben. Die frühere
 Vorgabe „nur vorbereiten, keinen Code schreiben“ gilt nicht mehr. „Book Club PDF Pro“
