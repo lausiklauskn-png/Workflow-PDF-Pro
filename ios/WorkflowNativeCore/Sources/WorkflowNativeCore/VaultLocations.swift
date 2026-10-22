@@ -58,6 +58,9 @@ public final class VaultLocations {
     }
     private func save(_ next: Catalog) throws {
         try JSONEncoder().encode(next).write(to: catalogURL, options: .atomic)
+        // Publication has happened even if the subsequent durability check fails.
+        // Keep memory aligned with the published catalogue and preserve its files.
+        catalog = next
         let handle = try FileHandle(forWritingTo: catalogURL)
         defer { try? handle.close() }
         try handle.synchronize()
@@ -65,7 +68,6 @@ public final class VaultLocations {
         guard descriptor >= 0 else { throw VaultLocationFailure.unavailable }
         defer { Darwin.close(descriptor) }
         guard fsync(descriptor) == 0 else { throw VaultLocationFailure.unavailable }
-        catalog = next
     }
     private func session(_ directory: URL) throws -> DocumentVault {
         let grant = VaultFolderGrant(metadata: directory.appendingPathComponent("folder.bookmark"))
@@ -92,6 +94,17 @@ public final class VaultLocations {
         try ensureIdle()
         guard !candidate.vault.busy else { throw DocumentVaultFailure.busy }
         let key = try candidate.vault.dataKey()
+        // Regranting a folder must preserve document/form metadata as well as PDF
+        // bytes. The shared adapter's file-reference hashes cannot detect a
+        // metadata-only rollback or a different branch at the same revision.
+        for entry in catalog.items where entry.vaultID == candidate.vault.identity {
+            guard let known = try DocumentVault.savedCheckpoint(at: root.appendingPathComponent(entry.location).appendingPathComponent("checkpoint.json")),
+                  known.id == candidate.vault.identity else { throw VaultLocationFailure.recoveryRequired }
+            guard candidate.vault.revision >= known.revision,
+                  candidate.vault.revision != known.revision || known.hash == nil || known.hash == candidate.vault.generationHash else {
+                throw VaultLocationFailure.recoveryRequired
+            }
+        }
         let location = SHA256.hash(data: Data(UUID().uuidString.utf8)).map { String(format: "%02x", $0) }.joined()
         let directory = root.appendingPathComponent(location)
         try FileManager.default.moveItem(at: candidate.directory, to: directory)
@@ -105,7 +118,10 @@ public final class VaultLocations {
             candidate.vault.lock()
             return location
         } catch {
-            try? FileManager.default.moveItem(at: directory, to: candidate.directory)
+            // Never move a directory away from an already published catalogue.
+            if !catalog.items.contains(where: { $0.location == location }) {
+                try? FileManager.default.moveItem(at: directory, to: candidate.directory)
+            }
             throw error
         }
     }

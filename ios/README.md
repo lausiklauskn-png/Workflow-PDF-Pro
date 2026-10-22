@@ -2,9 +2,9 @@
 
 Dieser Host verwendet denselben `tools/native/prepare-web.mjs` wie Windows und Android.
 `upstream/workflow-pdf` bleibt unverändert. Der Apple-Host ist noch keine vollständige
-oder veröffentlichte App. Der portable Tresorbaustein, Ordnerfreigaben und Keychain sind begonnen; ihre
-produktive Bibliotheksanbindung, Übersetzungswege und vollständige Geräteabnahme
-fehlen noch.
+oder veröffentlichte App. Portabler Tresor, Ordnerfreigaben, Keychain und die
+Bibliotheksanbindung sind implementiert und im Simulator geprüft. Übersetzungswege,
+Share Extension und vollständige Geräteabnahme fehlen noch.
 
 ## Reproduzierbarer Bau
 
@@ -33,7 +33,7 @@ Auf macOS mit Xcode:
 swift test --package-path ios/WorkflowNativeCore
 xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
   -destination 'platform=iOS Simulator,name=<verfügbares iPhone>' \
-  -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test
+  -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test
 xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
   -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
 ```
@@ -41,6 +41,8 @@ xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
 Die konkrete verfügbare Simulator-ID zeigt `xcrun simctl list devices available`.
 CI wählt eine verfügbare iPhone-ID automatisch. Ein unsignierter Gerätebau ist
 keine installierbare IPA und kein Ersatz für Apple-Signierung.
+Der Simulator nutzt ausschließlich lokale Ad-hoc-Signierung für die Keychain-Probe,
+keine Apple-Vertriebsidentität.
 
 ## Implementierte Grenzen
 
@@ -60,7 +62,8 @@ keine installierbare IPA und kein Ersatz für Apple-Signierung.
 
 Der unvollständige Host darf noch nicht als reguläre Pro-Ausgabe verteilt werden.
 Dateieingang/temporäre Dateien sind durch die iOS-Sandbox und System-Dateischutz
-abgesichert; daraus folgt kein bereits implementierter portabler Dokumenttresor.
+abgesichert. Die Bibliothek kann zusätzlich den portablen verschlüsselten Tresor
+als Hauptablage verwenden.
 
 Aktuelle Messergebnisse und offene Aufgaben: `docs/portierung/BAUSTAND-IOS.md`.
 
@@ -70,8 +73,9 @@ Aktuelle Messergebnisse und offene Aufgaben: `docs/portierung/BAUSTAND-IOS.md`.
 dauerhafte Ordner-Bookmarks, koordinierte Dateianbieterzugriffe, gerätegebundene
 Keychain-Ablage und `DocumentVault` mit verschlüsseltem Index, Generationen,
 Schreibchargen und Passwortfächern nach Ersatzschlüssel-Wiederherstellung.
-Diese Komponenten sind **noch nicht** als `WorkflowVault`-Plugin registriert.
-Die laufende Bibliothek verwendet damit noch keinen Apple-Haupttresor.
+`WorkflowVaultPlugin` bindet diese Komponenten an den unveränderten gemeinsamen
+Bibliotheks-, Journal- und Migrationsadapter an. Passwort und Ersatzschlüssel werden
+in nativen Dialogen eingegeben; JavaScript erhält keine Schlüssel.
 
 Auf macOS prüfen:
 
@@ -90,5 +94,7 @@ vollständiger Ordner- oder Produktnachweis.
 `VaultFolder` bestätigt synchronisiertes Schreiben und Rücklesen beim Dateianbieter;
 das bestätigt keine abgeschlossene Synchronisation mit einem iCloud-Server.
 Fehlende/widerrufene Freigaben führen zu Fehlern. Es gibt keinen Ersatzordner.
-`DocumentVault` behält alte verschlüsselte Generationen vorerst vollständig;
-eine generationenbewusste Aufräumregel und die produktive Migration fehlen noch.
+`DocumentVault` validiert vor dem Aufräumen alle Generationen und behält die drei
+neuesten mit ihren gemeinsam verwendeten Datensätzen. Beschädigung stoppt das
+Aufräumen. Der lokale Revisions-/Indexprüfpunkt schützt auch Dokumentmetadaten
+vor Rücksetzung beim erneuten Auswählen eines älteren Tresorordners.

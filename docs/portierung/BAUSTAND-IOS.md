@@ -133,9 +133,9 @@ Dreierkombinationen für jede der neun Ersatzschlüsselrichtungen. Swift-Gegenpr
 prüfen zusätzlich falsche Schlüssel/Namen, Manipulation, Reihenfolge, Abschneiden,
 zusätzliche Daten und Überschreibschutz. Neue Apple-Nachweise stehen noch aus.
 
-Diese Bausteine sind noch nicht als produktiver `WorkflowVault`-Adapter aktiviert.
-Ordnerrechte, Keychain, Index/Journal, Migration und native Passwort-/Recovery-UI
-bleiben anzubinden. Keine vollständige Tresor- oder Geräteabnahme daraus ableiten.
+An diesem Zwischenstand waren die Bausteine noch nicht als `WorkflowVault`-Adapter
+aktiviert. Die inzwischen geprüfte Anbindung ist im folgenden aktuellen Eintrag
+beschrieben. Keine vollständige Geräteabnahme daraus ableiten.
 
 ### Weitere Implementierung derselben Fortsetzung
 
@@ -157,9 +157,9 @@ bleiben anzubinden. Keine vollständige Tresor- oder Geräteabnahme daraus ablei
   Passwortfächer. Neuste beschädigte Generation wird nicht übersprungen;
   verschobene Generationen und doppelte Revisionsmarkierungen sperren den Zugriff.
   Apple↔Android↔Windows-Ordnerproben und deren Swift-Tests stehen noch aus.
-- Alte verschlüsselte Generationen werden vorerst erhalten. Aufräumregel,
-  `VaultLocations`, Plugin-/Passwort-UI, native Recovery-Anzeige und produktive
-  Bibliotheks-/Journal-/Migrationsanbindung fehlen weiterhin.
+- Zu diesem Zwischenstand fehlten noch Aufräumregel, `VaultLocations`,
+  Plugin-/Passwort-UI, native Recovery-Anzeige und die produktive Anbindung.
+  Diese Komponenten sind inzwischen implementiert (aktueller Eintrag unten).
 - Neue Hostproben führen echte DE/EN/RU-OCR mit lokalem Worker/WASM aus und
   messen native Übersetzungs-Sprachpaare/Spracheingabe-Verfügbarkeit. Für deren
   Ergebnis den aktuellen Apple-Lauf prüfen; eine Verfügbarkeitsabfrage ist kein
@@ -170,3 +170,37 @@ bleiben anzubinden. Keine vollständige Tresor- oder Geräteabnahme daraus ablei
 
 Workflow PDF Pro für iOS ist weiterhin nicht vollständig abgeschlossen. Es wurde
 kein Nachfolgebrief für Private Brain Pro erstellt.
+
+### Aktuelle Anbindung und bestandene Apple-Prüfung
+
+Commit `cd9169662264632db6a20c4f65fc295d80782e33`, Apple-Lauf
+[39849604499](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/39849604499),
+Job `120071918263`: vollständig erfolgreich. Rohprotokoll bestätigt **16/16**
+Swift-Datei-/Tresortests, **54** Dateicodec-Richtungen, **3** NFC-Ableitungen,
+**90** Ersatzschlüsselkombinationen, **9** vollständige Ordner-Richtungen und
+**8/8** echte App-gehostete WKWebView-Tests. Unsigned Release-Gerätebau bestanden.
+Der Simulator verwendet Ad-hoc-Signierung für den tatsächlichen Keychain-Zugriff;
+das ist keine Apple-Vertriebssignierung.
+
+- `WorkflowVaultPlugin` ist registriert. `VaultLocations` erhält Hauptablage und
+  Migrationszeiger dauerhaft; native Passwort-/Recovery-Dialoge und optionaler
+  gerätegebundener Keychain-Schlüssel sind angebunden. Gemeinsame Adapter unverändert.
+- Die WKWebView-Probe migriert echte IndexedDB-Datensätze und PDF-Bytes über den
+  unveränderten gemeinsamen Adapter in einen realen nativen Tresor. Der interne
+  Dateidatensatz wird eine Referenz; strukturierter Übersetzungsauftrag bleibt
+  erhalten. Entfernen des Ordners sperrt anschließend Auftragslesen und -schreiben.
+- Lokale Worker-/WASM-OCR erkennt synthetische Texte tatsächlich in DE/EN/RU.
+  Die native Übersetzungs-Verfügbarkeitsprobe meldet im Simulator alle sechs
+  DE/EN/RU-Richtungen als nicht unterstützt. Kein Übersetzungslauf ausgeführt.
+  Auch Spracheingabe wurde lediglich auf Verfügbarkeit geprüft.
+- Neuere, noch nachzuprüfende Ergänzungen: generationenbewusstes Aufräumen nach
+  Schreibabschluss, direktes Subframe-Angriffsszenario, Files-App-Sichtbarkeit,
+  koordinierter App-Group-Empfangsbaustein und stärkere lokale Kontinuitätsprüfung
+  beim Wiederanbinden älterer oder abweichender Tresorkopien. App-Group-Baustein
+  allein ist noch keine fertige Share Extension.
+
+Offen bleiben insbesondere vollständige Übersetzungs-/Rückwege, Spracheingabe,
+Share Extension, iPad-/Mindestversionsabnahme, physische Geräte und echte
+Dateianbieter-/Unterbrechungsproben sowie spätere Signierung und Verteilung.
+Die oben stehende historische Aufgabenliste ist anhand dieses Eintrags zu lesen;
+ein bestandener Simulatorlauf ist keine vollständige Produktabnahme.

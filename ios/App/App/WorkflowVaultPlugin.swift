@@ -169,11 +169,11 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
                     } catch { operationError = error }
                 }
                 if let error = coordinationError ?? operationError as NSError? { throw error }
-                DispatchQueue.main.async { self.password(call, selected: root, existing: existing) }
+                DispatchQueue.main.async { self.password(call, selected: root, grantURL: selected, existing: existing) }
             } catch { DispatchQueue.main.async { self.uiBusy = false; let code = VaultLocations.code(error); call.reject(code, code) } }
         }
     }
-    private func password(_ call: CAPPluginCall, selected: URL?, existing: Bool, recovery: Bool = false, failed: Bool = false) {
+    private func password(_ call: CAPPluginCall, selected: URL?, grantURL: URL? = nil, existing: Bool, recovery: Bool = false, failed: Bool = false) {
         let alert = UIAlertController(title: t(recovery ? "recover" : (existing ? "open" : "create"), call), message: failed ? t("failed", call) : (existing ? nil : t("notice", call)), preferredStyle: .alert)
         if recovery {
             for index in 1...3 { alert.addTextField { field in field.placeholder = self.t("key", call) + " \(index)"; field.autocapitalizationType = .allCharacters; field.autocorrectionType = .no; field.textContentType = .oneTimeCode } }
@@ -181,7 +181,7 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
         alert.addTextField { field in field.placeholder = self.t("password", call); field.isSecureTextEntry = true; field.textContentType = existing && !recovery ? .password : .newPassword }
         if !existing || recovery { alert.addTextField { field in field.placeholder = self.t("repeat", call); field.isSecureTextEntry = true; field.textContentType = .newPassword } }
         alert.addAction(UIAlertAction(title: t("cancel", call), style: .cancel) { _ in self.uiBusy = false; call.resolve(["cancelled": true]) })
-        if existing && !recovery { alert.addAction(UIAlertAction(title: t("forgot", call), style: .default) { _ in alert.dismiss(animated: true) { self.password(call, selected: selected, existing: existing, recovery: true) } }) }
+        if existing && !recovery { alert.addAction(UIAlertAction(title: t("forgot", call), style: .default) { _ in alert.dismiss(animated: true) { self.password(call, selected: selected, grantURL: grantURL, existing: existing, recovery: true) } }) }
         for remember in [false, true] {
             alert.addAction(UIAlertAction(title: t(remember ? "remember" : "continue", call), style: .default) { _ in
                 let fields = alert.textFields ?? [], offset = recovery ? 3 : 0
@@ -190,15 +190,19 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
                 let shares = recovery ? fields.prefix(3).map { $0.text ?? "" } : []
                 fields.forEach { $0.text = nil }
                 if (!existing || recovery) && (password.unicodeScalars.count < 10 || password != repeated) {
-                    alert.dismiss(animated: true) { self.password(call, selected: selected, existing: existing, recovery: recovery, failed: true) }; return
+                    alert.dismiss(animated: true) { self.password(call, selected: selected, grantURL: grantURL, existing: existing, recovery: recovery, failed: true) }; return
                 }
                 Self.io.async { [self] in
                     do {
                         let locations = try store()
                         let location: String
                         if let selected = selected {
-                            let scoped = selected.startAccessingSecurityScopedResource()
-                            defer { if scoped { selected.stopAccessingSecurityScopedResource() } }
+                            // Preserve the exact picker grant while opening a
+                            // vault child folder. A child path alone need not
+                            // carry its parent's security-scoped permission.
+                            let permission = grantURL ?? selected
+                            let scoped = permission.startAccessingSecurityScopedResource()
+                            defer { if scoped { permission.stopAccessingSecurityScopedResource() } }
                             var root = selected
                             var createdFolder: URL?
                             if !existing && root.lastPathComponent != "Workflow PDF Pro" {
@@ -239,7 +243,7 @@ final class WorkflowVaultPlugin: WorkflowPlugin, CAPBridgedPlugin, UIDocumentPic
                         let code = VaultLocations.code(error)
                         DispatchQueue.main.async {
                             if code == "VAULT_PASSWORD" || code == "VAULT_PASSWORD_SHORT" || error is RecoveryFailure {
-                                alert.dismiss(animated: true) { self.password(call, selected: selected, existing: existing, recovery: recovery, failed: true) }
+                                alert.dismiss(animated: true) { self.password(call, selected: selected, grantURL: grantURL, existing: existing, recovery: recovery, failed: true) }
                             } else { self.uiBusy = false; call.reject(code, code) }
                         }
                     }

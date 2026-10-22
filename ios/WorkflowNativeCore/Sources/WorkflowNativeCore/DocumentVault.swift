@@ -1,5 +1,6 @@
 import Foundation
 import CryptoKit
+import Darwin
 
 public enum DocumentVaultFailure: String, Error {
     case locked = "VAULT_LOCKED"
@@ -39,7 +40,12 @@ public final class DocumentVault {
     private struct Envelope: Codable {
         let app: String; let v: Int; let revision: UInt64; let records: [String: Record]
     }
-    private struct Checkpoint: Codable { let id: String; let revision: UInt64 }
+    public struct Checkpoint: Codable {
+        public let id: String
+        public let revision: UInt64
+        // Optional only to read checkpoints from an earlier app build.
+        public let hash: String?
+    }
     public struct RecoveryInfo: Codable {
         public let app: String; public let v: Int; public let id: String
         public let set: String; public let n: Int; public let k: Int
@@ -55,6 +61,8 @@ public final class DocumentVault {
     private var key: SymmetricKey?
     public private(set) var identity = ""
     public private(set) var revision: UInt64 = 0
+    public private(set) var generationHash: String?
+    private var generationMarker: String?
     private var records: [String: Record] = [:]
     private var batch: [String: Record]?
     private var batchFiles = Set<String>()
@@ -73,7 +81,7 @@ public final class DocumentVault {
         let names = try folder.names() // Missing provider never becomes an empty record set.
         if revision > 0 {
             let commits = commitNames(names)
-            guard let newest = commits.last, newest.hasPrefix(String(format: "commit-%020llu-", revision)),
+            guard let newest = commits.last, newest == generationMarker,
                   commits.filter({ $0.hasPrefix(String(format: "commit-%020llu-", revision)) }).count == 1 else { throw DocumentVaultFailure.changed }
         }
         return key
@@ -249,6 +257,21 @@ public final class DocumentVault {
         abortBatch()
         for item in pending.values { try? FileManager.default.removeItem(at: item.file) }
         pending = [:]; batch = nil; records = [:]; key = nil; revision = 0
+        generationHash = nil; generationMarker = nil
+    }
+    /// Native continuity evidence, read without resolving a revoked folder grant.
+    public static func savedCheckpoint(at url: URL) throws -> Checkpoint? {
+        guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+        let values = try url.resourceValues(forKeys: [.fileSizeKey, .isRegularFileKey, .isSymbolicLinkKey])
+        guard values.isRegularFile == true, values.isSymbolicLink != true,
+              let size = values.fileSize, size <= 4096 else { throw DocumentVaultFailure.damaged }
+        let stored = try JSONDecoder().decode(Checkpoint.self, from: Data(contentsOf: url))
+        guard UUID(uuidString: stored.id) != nil, stored.id == stored.id.lowercased(),
+              stored.revision > 0, stored.revision <= UInt64(Int64.max),
+              stored.hash.map({ $0.range(of: "^[0-9a-f]{64}$", options: .regularExpression) != nil }) ?? true else {
+            throw DocumentVaultFailure.damaged
+        }
+        return stored
     }
     private func loadIndex() throws {
         let names = commitNames(try folder.names())
@@ -257,29 +280,41 @@ public final class DocumentVault {
         guard marker.revision > 0, marker.revision <= UInt64(Int64.max),
               newest.hasPrefix(String(format: "commit-%020llu-", marker.revision)) else { throw DocumentVaultFailure.damaged }
         guard names.filter({ $0.hasPrefix(String(format: "commit-%020llu-", marker.revision)) }).count == 1 else { throw DocumentVaultFailure.damaged }
-        if FileManager.default.fileExists(atPath: checkpoint.path) {
-            let stored = try JSONDecoder().decode(Checkpoint.self, from: Data(contentsOf: checkpoint))
+        let stored = try Self.savedCheckpoint(at: checkpoint)
+        if let stored = stored {
             guard stored.id == identity, marker.revision >= stored.revision else { throw DocumentVaultFailure.damaged }
         }
         try fileName(marker.index)
         let key = try require()
-        let envelope: Envelope = try folder.read(marker.index) { url in
+        let (envelope, hash): (Envelope, String) = try folder.read(marker.index) { url in
             let reader = try VaultCrypto.Reader(url: url, key: key, name: logical("index"))
             var bytes = Data()
             for index in 0..<max(1, (reader.size + UInt64(VaultCrypto.chunk) - 1) / UInt64(VaultCrypto.chunk)) { bytes.append(try reader.block(index)) }
-            return try JSONDecoder().decode(Envelope.self, from: bytes)
+            return (try JSONDecoder().decode(Envelope.self, from: bytes), SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined())
         }
         guard envelope.app == Self.format, envelope.v == 1, envelope.revision == marker.revision else { throw DocumentVaultFailure.damaged }
         for (name, record) in envelope.records {
             guard name == (try recordName(record.store, record.id)), record.hash.range(of: "^[0-9a-f]{64}$", options: .regularExpression) != nil else { throw DocumentVaultFailure.damaged }
             try fileName(record.file)
         }
+        if let stored = stored, stored.revision == marker.revision, let known = stored.hash {
+            guard known == hash else { throw DocumentVaultFailure.changed }
+        }
         records = envelope.records; revision = marker.revision
+        generationHash = hash; generationMarker = newest
+        _ = try require()
         try checkpointRevision()
     }
     private func checkpointRevision() throws {
         try FileManager.default.createDirectory(at: checkpoint.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try encode(Checkpoint(id: identity, revision: revision)).write(to: checkpoint, options: .atomic)
+        try encode(Checkpoint(id: identity, revision: revision, hash: generationHash)).write(to: checkpoint, options: .atomic)
+        let handle = try FileHandle(forWritingTo: checkpoint)
+        defer { try? handle.close() }
+        try handle.synchronize()
+        let descriptor = Darwin.open(checkpoint.deletingLastPathComponent().path, O_RDONLY)
+        guard descriptor >= 0 else { throw VaultFolderFailure.unavailable }
+        defer { Darwin.close(descriptor) }
+        guard fsync(descriptor) == 0 else { throw VaultFolderFailure.unavailable }
     }
     /// Validate all generations before deleting anything. Keep the same three
     /// committed generations as Windows; unknown/uncommitted objects are retained.
@@ -327,10 +362,13 @@ public final class DocumentVault {
         let updated = revision + 1, source = temporary()
         defer { try? FileManager.default.removeItem(at: source) }
         try encode(Envelope(app: Self.format, v: 1, revision: updated, records: next)).write(to: source, options: .atomic)
-        let (file, _, _) = try encrypted(source, kind: "index")
+        let (file, _, hash) = try encrypted(source, kind: "index")
         let marker = Marker(index: file, revision: updated)
-        try publish(marker, name: String(format: "commit-%020llu-", updated) + UUID().uuidString.lowercased() + ".json")
+        let name = String(format: "commit-%020llu-", updated) + UUID().uuidString.lowercased() + ".json"
+        try publish(marker, name: name)
         records = next; revision = updated
+        generationHash = hash; generationMarker = name
+        _ = try require()
         // If local checkpointing fails after publication, report failure. A retry
         // must reopen the committed generation; never claim the old state saved.
         try checkpointRevision()

@@ -2,6 +2,41 @@ import XCTest
 @testable import WorkflowNativeCore
 
 final class DocumentVaultTests: XCTestCase {
+    func testSameRevisionReplacementIsRejectedWhileOpenAndAfterRestart() throws {
+        let local = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: local, withIntermediateDirectories: false)
+        defer { try? FileManager.default.removeItem(at: local) }
+        let root = local.appendingPathComponent("vault"), forkRoot = local.appendingPathComponent("fork")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+        func session(_ folder: URL, name: String) throws -> DocumentVault {
+            let grant = VaultFolderGrant(metadata: local.appendingPathComponent(name + ".bookmark"))
+            try grant.select(folder)
+            return try DocumentVault(folder: VaultFolder(grant: grant), scratch: local.appendingPathComponent(name + "-scratch"), checkpoint: local.appendingPathComponent(name + ".checkpoint"))
+        }
+        func put(_ vault: DocumentVault, _ text: String) throws {
+            let bytes = Data(text.utf8), ticket = try vault.begin(store: "docs", id: "document")
+            try vault.append(ticket: ticket, offset: 0, bytes: bytes)
+            try vault.finish(ticket: ticket, size: UInt64(bytes.count))
+        }
+        let vault = try session(root, name: "current")
+        try vault.initialize(password: "Test password 123")
+        try FileManager.default.copyItem(at: root, to: forkRoot)
+        let fork = try session(forkRoot, name: "fork")
+        try fork.open(password: "Test password 123")
+        try put(vault, "My form edits")
+        try put(fork, "Other form edits")
+        XCTAssertEqual(vault.revision, fork.revision)
+        for name in try FileManager.default.contentsOfDirectory(atPath: root.path) {
+            try FileManager.default.removeItem(at: root.appendingPathComponent(name))
+        }
+        for name in try FileManager.default.contentsOfDirectory(atPath: forkRoot.path) {
+            try FileManager.default.copyItem(at: forkRoot.appendingPathComponent(name), to: root.appendingPathComponent(name))
+        }
+        XCTAssertThrowsError(try vault.dataKey())
+        vault.lock()
+        XCTAssertThrowsError(try vault.open(password: "Test password 123"))
+        XCTAssertFalse(vault.unlocked)
+    }
     func testRetentionKeepsThreeGenerationsAndDamageStopsCleanup() throws {
         let local = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: local, withIntermediateDirectories: false)
