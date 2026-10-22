@@ -24,10 +24,10 @@ import WorkflowNativeCore
             }
         }
     }
-    private func js(_ code: String) async throws -> Any? {
+    private func js(_ code: String, seconds: Int = 15) async throws -> Any? {
         let key = "__iosProbe_" + UUID().uuidString.replacingOccurrences(of: "-", with: "")
         _ = try await evaluate("window['\(key)']=null;(async()=>{\(code)})().then(value=>window['\(key)']={done:true,value:value??null},error=>window['\(key)']={done:true,error:String(error)});null;")
-        for _ in 0..<150 {
+        for _ in 0..<(seconds * 10) {
             if let result = try await evaluate("window['\(key)']") as? [String: Any], result["done"] as? Bool == true {
                 _ = try await evaluate("delete window['\(key)'];null;")
                 if let error = result["error"] as? String { throw NSError(domain: "WorkflowProbe", code: 1, userInfo: [NSLocalizedDescriptionKey: error]) }
@@ -148,6 +148,34 @@ import WorkflowNativeCore
         XCTAssertGreaterThan(result?["modelBytes"] as? Int ?? 0, 100_000)
         let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: result ?? [:], options: .prettyPrinted), uniformTypeIdentifier: "public.json")
         attachment.name = "Actual WKWebView capabilities (not full offline or translation proof)"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+    func testLocalOCRWorkerAndWASMRecognizeThreeLanguages() async throws {
+        try await ready()
+        let result = try await js("""
+            if (!window.Tesseract) await new Promise((resolve,reject)=>{
+              const script=document.createElement('script');
+              script.src='vendor/tesseract/tesseract.min.js';script.onload=resolve;script.onerror=reject;document.head.append(script);
+            });
+            const base=new URL('vendor/tesseract/',location.href).href;
+            const output=[];
+            for (const [language,text,word] of [['eng','WORKFLOW 12345','WORKFLOW'],['deu','DOKUMENT 12345','DOKUMENT'],['rus','ДОКУМЕНТ 12345','ДОКУМЕНТ']]) {
+              const worker=await Tesseract.createWorker(language,1,{workerPath:base+'worker.min.js',corePath:base,langPath:base+'lang',gzip:false,cacheMethod:'none'});
+              try {
+                const canvas=document.createElement('canvas');canvas.width=1800;canvas.height=240;
+                const context=canvas.getContext('2d');context.fillStyle='white';context.fillRect(0,0,canvas.width,canvas.height);
+                context.fillStyle='black';context.font='72px sans-serif';context.fillText(text,60,140);
+                const {data}=await worker.recognize(canvas);
+                if (!data.text.toUpperCase().includes(word)) throw Error(language+' OCR did not recognize synthetic word');
+                output.push({language,recognizedWord:true,confidence:data.confidence});
+              } finally {await worker.terminate();}
+            }
+            return output;
+            """, seconds: 90) as? [[String: Any]]
+        XCTAssertEqual(result?.count, 3)
+        let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: result ?? [], options: .prettyPrinted), uniformTypeIdentifier: "public.json")
+        attachment.name = "Local OCR Worker WASM recognition of synthetic DE EN RU text"
         attachment.lifetime = .keepAlways
         add(attachment)
     }
