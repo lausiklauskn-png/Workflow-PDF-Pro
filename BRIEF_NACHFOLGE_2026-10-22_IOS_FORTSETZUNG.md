@@ -110,7 +110,7 @@ Neue lokale Prüfungen: 193/193 Herkunftsdateien, 33/33 gemeinsame Browserfälle
 41/41 Tresorkomponenten und 3/3 Apple-Bündelprüfungen bestanden, jeweils ohne Skips.
 Erster Apple-Lauf `39810507308`: sechs native Dateitests bestanden, Simulatorbau
 fehlgeschlagen. Danach wurden eine siebte Dateigegenprobe und Korrekturen ergänzt.
-Danach auf `ff20b56`: sieben Dateitests und drei von vier echten WKWebView-Fällen
+Danach auf `ff20b56`: sieben Dateitests und drei von vier App-gehosteten Testfällen
 bestanden. PDF/Formular/Original/Neuladen hatte ein Timeout. Korrektur in `1b60246`:
 nach reload explizit auf einen neuen Dokumentkontext warten, Datenassertionen erhalten.
 Lauf `39815186968` zur Nachprüfung war zuletzt noch eingereiht; als Erstes prüfen.

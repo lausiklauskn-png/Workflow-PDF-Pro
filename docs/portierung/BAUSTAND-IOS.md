@@ -56,7 +56,7 @@ Mindestversion verändern. Apple-Team und Bundle-ID-Verfügbarkeit sind ungeprü
 - Gegenmaßnahme: WebKit-Proben verwenden die Objective-C-Completion-Schnittstelle
   mit eigener begrenzter Promise-Beobachtung; Swift-Laufzeit wird eingebunden.
   Lauf `39813164051` auf `ff20b56` bestätigt die behobene Testpaket-Ladung:
-  **7/7** Dateitests und **3/4** echte WKWebView-Tests bestanden. Native Dateiübergabe,
+  **7/7** Dateitests und **3/4** App-gehostete Tests bestanden. Native Dateiübergabe,
   Version und Herkunftsprüfung funktionieren in diesen Proben. Die PDF-/Formular-/
   Original-/Neuladeprobe lief in ein Timeout; sie ist ausdrücklich nicht bestanden.
   Eine wahrscheinliche Rennbedingung in der Probe (alte Globals direkt nach reload)
@@ -80,6 +80,9 @@ Mindestversion verändern. Apple-Team und Bundle-ID-Verfügbarkeit sind ungeprü
 - Nachweise: `nachweise/2026-10-22-ios-foundation.json` und
   `nachweise/2026-10-22-ios-wkwebview-capabilities.json`. Noch kein signierter Bau,
   keine physische Geräteprüfung und kein App-Store-/TestFlight-Release.
+
+Die URL-Herkunftsregeln wurden als native Policy-Gegenprobe geprüft; ein vollständiger
+Angriffstest aus fremden Frames steht noch aus.
 
 ## Noch erforderlich, bevor die Pro-App vollständig ist
 
