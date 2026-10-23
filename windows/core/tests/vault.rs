@@ -225,3 +225,32 @@ fn spare_keys_restore_access_with_a_new_password() {
         assert_eq!(c.open(p, pw, false).is_ok(), ok, "{pw}");
     }
 }
+
+#[test]
+fn foreign_unicode_marker_name_cannot_crash_vault_reopening() {
+    let app = temp("unicode-marker");
+    let chosen = temp("unicode-folder");
+    let mut locs = locations(&app);
+    let mut c = locs.candidate().unwrap();
+    let p = c.inspect(&chosen).unwrap();
+    c.initialize(p, "richtig-langes-Passwort", false).unwrap();
+    let root = c.inspect(&chosen).unwrap().root;
+    let id = locs.adopt(c).unwrap();
+    let v = locs.get(Some(&id)).unwrap();
+    put(v, "files", "doc", b"Original bleibt erhalten");
+    // 69 UTF-8-Bytes wie ein Commitname; U+00E9 überquert die bisherige Slice-Grenze.
+    let foreign_names = [
+        format!("commit-{}é{}.json", "0".repeat(19), "a".repeat(36)),
+        format!("commit-{}é{}.json", "0".repeat(20), "a".repeat(35)),
+    ];
+    for foreign in &foreign_names {
+        assert_eq!(foreign.len(), 69);
+        std::fs::write(root.join(foreign), b"fremde Datei").unwrap();
+    }
+    v.lock().unwrap();
+    v.unlock("richtig-langes-Passwort", false).unwrap();
+    assert_eq!(get(v, "files", "doc"), b"Original bleibt erhalten");
+    for foreign in foreign_names {
+        assert_eq!(std::fs::read(root.join(foreign)).unwrap(), b"fremde Datei");
+    }
+}

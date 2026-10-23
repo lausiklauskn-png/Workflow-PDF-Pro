@@ -72,6 +72,11 @@ jobs:
         run: |
           node windows/tools/test-tauri-signatures.mjs
           if ($LASTEXITCODE -ne 0) { throw 'Signature interoperability failed.' }
+      - name: Tresor und Unicode-Dateien auf dem Windows-Dateisystem prüfen
+        working-directory: windows/core
+        run: |
+          cargo test --locked --release
+          if ($LASTEXITCODE -ne 0) { throw 'Windows filesystem tests failed.' }
       - name: Native Update- und Herkunftsregeln prüfen
         working-directory: windows/src-tauri
         run: |

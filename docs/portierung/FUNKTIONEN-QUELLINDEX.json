@@ -7273,7 +7273,7 @@
   },
   {
     "source": "sw.js",
-    "line": 53,
+    "line": 55,
     "function": "teilenEmpfangen",
     "parameters": "r"
   }
