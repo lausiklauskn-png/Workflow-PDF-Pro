@@ -28,7 +28,7 @@ Zwischen den Blöcken keine Arbeit. Spannen sind Obergrenzen; Wartezeit auf Helf
    - `docs/PRODUKTSTAND.md`: alle Fassungen, Gleichstandsregel, iOS-Entscheidung, Sammelliste.
    - `docs/IPHONE-WEBVERSION.md`: Webversion auf iPhone/iPad zum Home-Bildschirm (kostenlos).
    - `AGENTS.md` neu: Dauerregeln und getroffene Entscheidungen; `CLAUDE.md` nur Verweis;
-     `docs/FOLGESITZUNG.md` auf Zugriff und Bauumgebung gekürzt. Startdateien von ~16.000 auf ~6.900 Zeichen.
+     `docs/FOLGESITZUNG.md` auf Zugriff und Bauumgebung gekürzt. Startdateien von ~17.100 auf ~6.900 Zeichen.
    - Dieser Brief und `BRIEF_NACHFOLGE_2026-10-23_GLEICHSTAND.md`.
 2. **Kimhub** (Zweig `claude/codex-nachtrag-2026-10-23`): 15 Codex-Einträge (19.–23.10., vier Repos),
    2 Einträge dieser Sitzung, Notiz `forschung/messungen/zwei-ki-parallel-2026-10-19-bis-23.md`,
