@@ -1,50 +1,63 @@
-# Workflow PDF Pro — gemeinsame Arbeitsgrundlage
+# Workflow PDF Pro — gemeinsame Arbeitsgrundlage (Codex und Claude Code)
 
-- Wiederaufnahme, tatsächliche Zugriffsprüfung und Bauumgebung: `docs/FOLGESITZUNG.md`.
-  **Neueste Übergabe (22.10.2026, abends):** `BRIEF_ABSCHLUSS_2026-10-22_VERSION-UND-VIDEO.md`
-  (Android 1.0.3 und Windows 1.0.3 veröffentlicht, Web 1.1.0, Video mit Prüfteil) und
-  `BRIEF_NACHFOLGE_2026-10-22_NACH-VERSION-UND-VIDEO.md` (nächster Schritt iOS).
-  Windows-Releases jetzt unsigniert ohne Schlüssel über `request-release.mjs windows-vX.Y.Z`.
-  Davor: `BRIEF_ABSCHLUSS_2026-10-22_ERSATZSCHLUESSEL.md` (Android 1.0.2).
-  Eigene bestehende GitHub-Verbindung nutzen; Signierfreigabe bleibt in Actions.
-  Neueste Übergabe vom 22.10.2026: `BRIEF_ABSCHLUSS_2026-10-22_WINDOWS.md` und
-  `BRIEF_NACHFOLGE_2026-10-22_IOS.md`. Windows vorerst beendet; iOS ist die nächste Sitzung.
-  Windows bleibt vorerst bei manuellen unsignierten Installern ohne Update-Schlüssel;
-  der vorbereitete Releaseablauf verlangt technisch noch Signierung und ist vor
-  einer späteren Windows-Veröffentlichung entsprechend zu korrigieren.
-  Aktueller Zusatzbrief: `BRIEF_NACHFOLGE_2026-10-21_ANDROID_APK_AUSGELIEFERT.md`.
-  Windows (Tauri 2, Claude Code): `BRIEF_NACHFOLGE_2026-10-21_WINDOWS.md`, Stand in
-  `docs/portierung/BAUSTAND-WINDOWS.md`. Windows-Teile liegen nur unter `windows/` und in
-  `.github/workflows/windows-*.yml`; `native/*.js` laufen dort unverändert über eine Brücke.
-  Änderungen an `native/*.js` wirken auf Android **und** Windows: beide Prüfketten grün halten.
-  Historische Baufortsetzung: `BRIEF_NACHFOLGE_2026-10-21_APP_FERTIGSTELLEN.md`.
+Zuerst lesen: den neuesten `BRIEF_ABSCHLUSS_*` und `BRIEF_NACHFOLGE_*` (nach Datum).
+Stand aller Fassungen: `docs/PRODUKTSTAND.md`. Wiederanlauf: `docs/FOLGESITZUNG.md`.
+Grundauftrag mit allen Einzelheiten: `BRIEF_NACHFOLGE_2026-10-20_NATIVE_APP.md` (gilt weiter;
+lesen, bevor Kern, Schutzfunktionen, Übersetzung oder Speicher berührt werden).
+Ältere Zwischenbriefe sind Geschichte.
 
-- Verbindlich: `BRIEF_NACHFOLGE_2026-10-20_NATIVE_APP.md` vollständig lesen.
-  Der Quellcheckout Workflow-PDF und `upstream/workflow-pdf` bleiben unverändert;
-  `node tools/onboarding/verify-upstream.mjs` prüft die bytegleiche Übernahme.
-- Entscheidungen: Android/Samsung DeX zuerst, Windows danach, iOS anschließend.
-  Chrome-Variante A ist zur Erprobung gewählt. Neue wesentliche Abweichungen
-  vorher mit Klaus anhand konkreter Möglichkeiten besprechen.
-- Bestand und aktuelle Nachweise: `docs/portierung/README.md`.
-  Historische Tests oder simulierte Übersetzung sind keine neuen Geräteprüfungen.
-- Verbindlicher zusätzlicher Speicherauftrag: `docs/portierung/SPEICHERORT-UND-TRESOR.md`
-  lesen. SD-Karte/frei gewählter Ordner für Dokumente und App-Arbeitsdaten,
-  Private-Brain-Pro-Speicher-/Tresor-Grundgerüst wiederverwenden. Kein bloßer
-  Export als vollständige externe Ablage; komplexe Kernanbindung vorher besprechen.
-  SD ist optional: vollständiges Arbeiten im Gerätespeicher und später unter
-  Windows mit frei gewähltem Rechnerordner erhalten. Gewählt ist die Kombination
-  aus interner Arbeitsdatenbank und verschlüsseltem Ordner als Hauptablage.
-- Signierung und GitHub-Zugang für Claude Code **und** Codex:
-  `docs/SIGNIERUNG-UND-GITHUB.md` lesen. Beide verwenden denselben Release-Workflow.
-  GitHub-Anmeldung und Android-Signierschlüssel sind getrennte Berechtigungen.
-- Keine Schlüssel/Token/Passwörter im Klartext in Git oder Chat. Nur das
-  AES-GCM-Paket `signing/android-release.enc.json` und dessen öffentlicher
-  Zertifikats-Pin dürfen eingecheckt werden. Entschlüsselungsfreigabe separat
-  im GitHub-Environment-Secret `WF_PDF_SIGNING_UNLOCK` für `android-production`.
-- Vorhandene App-Identität niemals ersetzen; Private-Brain-Schlüssel nicht
-  übernehmen. `init` ist einmalig; danach `check` und dieselbe Identität nutzen.
-- Reguläre Releases nur vom vollständig geprüften main-Commit, ohne Preview-/
-  Testkanal; Version und Android-Buildnummer müssen steigen. Kein fertiges
-  Produkt behaupten, solange native Implementierung oder Nachweise fehlen.
-- Bestehende Checkouts verwenden; ohne ausdrücklichen Auftrag keinen Worktree
-  erzeugen. Agenten dürfen keine Plattform-Zugangsdaten auslesen oder übertragen.
+## Dauerhafte Regeln von Klaus (bewährt, nicht neu verhandeln)
+
+1. **Gleichstand:** Wird eine Fassung (PWA, APK, Windows, iOS) fertig gemacht, ziehen alle anderen
+   Fassungen derselben App mit. Gilt für alle Apps von Klaus. Fertig ist eine Arbeit erst, wenn
+   alle Fassungen gleich stehen oder `docs/PRODUKTSTAND.md` die Lücke mit Grund nennt.
+2. **Nichts vergessen, nichts umschreiben.** Kern bytegleich übernehmen; Geräteanbindung nur in
+   Adaptern. Keine Funktion still entfernen, vereinfachen oder ausdünnen. Workflow-PDF und
+   `upstream/workflow-pdf` hier nie von Hand ändern; `node tools/onboarding/verify-upstream.mjs`.
+3. **Vorher fragen, mit Möglichkeiten:** Vor Kerneingriff, unvermeidbarer Abweichung, komplexer
+   Umstellung, neuem externem oder kostenpflichtigem Dienst: 2–4 umsetzbare Varianten mit Begründung,
+   Folgen (Bedienung, Daten, Datenschutz, Kosten, offline) und Empfehlung. Antwort abwarten.
+   Routine selbst entscheiden. Bereits Entschiedenes nicht erneut fragen (siehe unten).
+4. **Ehrlich nachweisen:** Mock, Browser, Emulator/Simulator und echtes Gerät getrennt nennen.
+   Übersprungenes zählt nicht als Erfolg. Alte Läufe oder simulierte Übersetzung sind keine neue
+   Prüfung. Kein fertiges Produkt behaupten ohne Nachweis; Push, Workflow oder Simulator ist keine
+   Veröffentlichung. Neue Tests mit Gegenprobe belegen (Fehler einbauen → Test wird rot).
+   „Wacklig“ ist keine Ursache: Ursache suchen statt nur wiederholen. Tests nie abschalten.
+5. **Schutzfunktionen** (Prüfer, SBKIM, Schlüsseltresor) unverändert; Hashes nie anpassen, um grün
+   zu werden. Prüfung nur auf Knopfdruck; ehrlich „nicht geprüft“/„nicht ganz geprüft“ anzeigen.
+   Kein „Virenschutz“, keine Erkennung aller Schadsoftware behaupten. Keine ungefragten Datei-Uploads;
+   keine privaten Dokumente als Prüfdaten. Vor Übertragungen: Reinigung, Rückfrage, Abbruch ohne Senden.
+6. **Geheimnisse:** keine Schlüssel, Token, Passwörter in Git oder Chat. Eingecheckt sind nur
+   `signing/android-release.enc.json` und der Zertifikats-Pin; Freigabe über `WF_PDF_SIGNING_UNLOCK`
+   im Environment `android-production`. Signieridentität: `init` war einmalig, danach nur `check`;
+   nie ersetzen. App-ID `de.familyprojekt.workflowpdf.pro` bleibt. Keine Private-Brain-Schlüssel.
+   GitHub-Recht und Signierschlüssel sind getrennt; jeder Dienst nutzt seine eigene Verbindung.
+   Keine Plattform-Zugangsdaten auslesen oder weitergeben.
+7. **Release** nur vom geprüften main-Commit, kein Preview-/Testkanal, Version und Buildnummer steigen.
+   Android `node tools/signing/request-release.mjs vX.Y.Z` nach grünem `native-acceptance`;
+   Windows `… windows-vX.Y.Z` nach grünem `windows-app` (unsigniert, ohne Updater).
+   Danach öffentlichen Download erneut laden und per SHA-256 vergleichen. `docs/SIGNIERUNG-UND-GITHUB.md`.
+8. **Versionen:** Wer im Kern `CACHE_VERSION` erhöht, erhöht auch die Webversion (Meta und
+   `package.json`). Neue App-Version: `versionName`/`versionCode`, `tauri.conf.json`, `Cargo.toml`,
+   `windows/package.json`.
+9. **Updates bewahren Daten:** als Update installierbar, Einstellungen und Dokumente bleiben.
+
+## Getroffene Entscheidungen (nicht erneut fragen)
+
+- Plattformfolge Android/DeX → Windows → iOS. Android: Capacitor. Windows: Tauri 2, Teile nur unter
+  `windows/` und `.github/workflows/windows-*.yml`. iOS: Capacitor, Codex, Zweig `codex/ios-native-host`.
+- `native/*.js` wirkt auf alle Plattformen: alle Prüfketten grün halten.
+- Übersetzung: Chrome-Variante A; Android mit Vordergrunddienst, sichtbarer Benachrichtigung und
+  Abbruch. Für iOS gilt das nicht automatisch: dort neu messen.
+- Speicher: interne Arbeitsdatenbank plus verschlüsselter Tresor im gewählten Ordner (Grundgerüst aus
+  Private Brain Pro). SD-Karte optional; nie still auf eine leere Bibliothek wechseln. Kein bloßer
+  Export als Ablage. `docs/portierung/SPEICHERORT-UND-TRESOR.md`.
+- iOS nur vorbereiten und höchstens privat installieren, nicht veröffentlichen. Kein Apple-Konto
+  und keine Kosten ungefragt.
+- Kleine Korrekturen sammeln und gemeinsam in alle Fassungen bringen (`docs/PRODUKTSTAND.md`).
+
+## Schreibweise und Abschluss
+
+Deutsch, kurze Sätze. Nie „von Microsoft geprüft“. Bestehenden Checkout nutzen, keinen Worktree
+ohne Auftrag. Am Ende jeder Sitzung: Abschlussbrief mit Zeitnachweis, Kimhub-Eintrag (`arm: "voll"`),
+neuer Nachfolgebrief, Download-Link für Klaus.
