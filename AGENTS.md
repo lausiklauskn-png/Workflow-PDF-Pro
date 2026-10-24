@@ -41,6 +41,8 @@ lesen, bevor Kern, Schutzfunktionen, Übersetzung oder Speicher berührt werden)
    `package.json`). Neue App-Version: `versionName`/`versionCode`, `tauri.conf.json`, `Cargo.toml`,
    `windows/package.json`.
 9. **Updates bewahren Daten:** als Update installierbar, Einstellungen und Dokumente bleiben.
+10. **Selbst-Merge-Freibrief** (Klaus, netzweit): eigene PRs nach grüner CI selbst mergen, ohne auf ein
+    „mergen“ zu warten. Nicht bei echtem Zweifel oder wenn Klaus vorher draufschauen will.
 
 ## Getroffene Entscheidungen (nicht erneut fragen)
 
