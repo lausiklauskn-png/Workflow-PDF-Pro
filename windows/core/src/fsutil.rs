@@ -4,6 +4,7 @@ use crate::error::{Error, Result};
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
+use unicode_normalization::UnicodeNormalization;
 
 /// Atomar ersetzen: temporäre Datei schreiben, auf Platte bringen, umbenennen.
 pub fn write_atomic(path: &Path, data: &[u8]) -> Result<()> {
@@ -78,7 +79,9 @@ pub fn children(dir: &Path) -> Result<Vec<Entry>> {
 /// zusätzlich unter Windows unzulässige Zeichen und reservierte Namen.
 pub fn filename(value: Option<&str>) -> String {
     let raw = value.unwrap_or("Dokument");
-    let mut name: String = raw.chars().map(|c| if c.is_control() || "/\\:*?\"<>|".contains(c) { '_' } else { c }).collect();
+    // NFC (Klaus 2026-10-26): „Café" aus e + Akzent wird EIN Zeichen — sonst gelten zwei Schreibweisen desselben
+    // Namens als zwei Dateien, und die Grenzen unten zählen falsch.
+    let mut name: String = raw.nfc().map(|c| if c.is_control() || "/\\:*?\"<>|".contains(c) { '_' } else { c }).collect();
     name = name.trim().trim_end_matches(['.', ' ']).to_string();
     if name.is_empty() || name == "." || name == ".." {
         return "Dokument".into();
@@ -88,8 +91,23 @@ pub fn filename(value: Option<&str>) -> String {
     if RESERVED.contains(&stem.as_str()) {
         name.insert(0, '_');
     }
-    if name.chars().count() > 180 {
-        name = name.chars().take(180).collect();
+    // Grenzen: Windows zählt UTF-16-Einheiten (Pfadbudget), ext4/FAT zählen UTF-8-Bytes (255 je Name).
+    // Beim Kürzen bleibt die Dateiendung — sonst verliert „Öffnen mit" den Typ (Klaus' Sichttest, 1.0.4).
+    const MAX_UTF16: usize = 180;
+    const MAX_BYTES: usize = 240;
+    if name.encode_utf16().count() > MAX_UTF16 || name.len() > MAX_BYTES {
+        let endung = name.rsplit_once('.').map(|(_, e)| e)
+            .filter(|e| !e.is_empty() && e.len() <= 16 && e.is_ascii() && !e.contains(' '))
+            .map(|e| format!(".{e}")).unwrap_or_default();
+        let stamm = &name[..name.len() - endung.len()];
+        let (mut einheiten, mut bytes) = (0usize, 0usize);
+        let kurz: String = stamm.chars().take_while(|c| {
+            einheiten += c.len_utf16();
+            bytes += c.len_utf8();
+            einheiten + endung.len() <= MAX_UTF16 && bytes + endung.len() <= MAX_BYTES
+        }).collect();
+        let kurz = kurz.trim_end_matches(['.', ' ']);
+        name = if kurz.is_empty() { format!("Dokument{endung}") } else { format!("{kurz}{endung}") };
     }
     name
 }

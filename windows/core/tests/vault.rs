@@ -225,3 +225,34 @@ fn spare_keys_restore_access_with_a_new_password() {
         assert_eq!(c.open(p, pw, false).is_ok(), ok, "{pw}");
     }
 }
+
+#[test]
+fn fremder_name_mit_umlaut_an_der_schnittgrenze_bringt_den_tresor_nicht_zum_absturz() {
+    // Ein fremder Dateiname im Tresorordner, 69 Bytes lang wie ein Commit-Name, mit é (2 Bytes) genau dort,
+    // wo is_commit früher per str-Slice schnitt → Panik beim Öffnen. Jetzt: ignoriert, Daten unberührt.
+    let app = temp("umlaut-marker");
+    let chosen = temp("umlaut-ordner");
+    let mut locs = locations(&app);
+    let mut c = locs.candidate().unwrap();
+    let p = c.inspect(&chosen).unwrap();
+    c.initialize(p, "richtig-langes-Passwort", false).unwrap();
+    let root = c.inspect(&chosen).unwrap().root;
+    let id = locs.adopt(c).unwrap();
+    let v = locs.get(Some(&id)).unwrap();
+    put(v, "files", "doc", b"Original bleibt erhalten");
+    let fremde = [
+        format!("commit-{}é{}.json", "0".repeat(19), "a".repeat(36)),
+        format!("commit-{}é{}.json", "0".repeat(20), "a".repeat(35)),
+        format!("commit-{}-{}é.json", "0".repeat(20), "a".repeat(34)),
+    ];
+    for f in &fremde {
+        assert_eq!(f.len(), 69, "{f}");
+        std::fs::write(root.join(f), b"fremde Datei").unwrap();
+    }
+    v.lock().unwrap();
+    v.unlock("richtig-langes-Passwort", false).unwrap();
+    assert_eq!(get(v, "files", "doc"), b"Original bleibt erhalten");
+    for f in &fremde {
+        assert_eq!(std::fs::read(root.join(f)).unwrap(), b"fremde Datei", "fremde Datei muss liegen bleiben: {f}");
+    }
+}
