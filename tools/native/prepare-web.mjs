@@ -62,8 +62,8 @@ export async function prepareWeb(out = join(root, 'www')) {
   const versionMeta = html.match(/<meta name="wfp-version" content="[^"]*"/g) || [];
   if (versionMeta.length !== 1) throw new Error('Native injection anchor changed: wfp-version');
   html = html.replace(versionMeta[0], '<meta name="wfp-version" content=""');
-  html = replaceOnce(html, '<script defer src="assets/app.js?v=70"></script>',
-    ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=70"></script>');
+  html = replaceOnce(html, '<script defer src="assets/app.js?v=71"></script>',
+    ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=71"></script>');
   await rm(out, { recursive: true, force: true });
   await mkdir(out, { recursive: true });
   const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding, adapter tags and empty wfp-version (filled by the app)'], files: [] };

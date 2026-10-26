@@ -1,5 +1,5 @@
 {
-  "commit": "56b45ecd80c0ae4d89c99507b673da53bcc3bcec",
+  "commit": "3bf07ab4c637fd6306002cddeb77488a7795d9cf",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
@@ -18,8 +18,8 @@
     },
     {
       "path": "CLAUDE.md",
-      "bytes": 93766,
-      "sha256": "2e2538c271f679cf85bf33bc5bc7ba3fd935e4a9357f20a3f3041b90f2dad81c"
+      "bytes": 96939,
+      "sha256": "656bc286399da213120c2bec9199b8e09b4693e7ef3b611b736396d85907c12b"
     },
     {
       "path": "LICENSE",
@@ -43,13 +43,18 @@
     },
     {
       "path": "assets/app.js",
-      "bytes": 268964,
-      "sha256": "eaeedb9d6c5c81b5d922a1e3fd3f447ada019faccb220a0d76dac08f5ef21650"
+      "bytes": 270879,
+      "sha256": "09fd43d5cb58bfd88acbfcdcbee0b9721e8bb98ef8af4258827270bcb0ebbb03"
     },
     {
       "path": "assets/bedeutung.js",
       "bytes": 9634,
       "sha256": "749cea778b0bcc9bb86c733827aa7467a8468286cf78f22f7f189f465223ac7d"
+    },
+    {
+      "path": "assets/bildbeschreibung.js",
+      "bytes": 21109,
+      "sha256": "09542c00450ec1e0fd9b1f29343ec3f9bec00de9edca18756037e29acebbeafc"
     },
     {
       "path": "assets/blatt.js",
@@ -138,8 +143,8 @@
     },
     {
       "path": "assets/sprache-texte.js",
-      "bytes": 383756,
-      "sha256": "abb02ea3f8e3b404684511d7d811b9c570a45c9fba77e2d1ea870f9746c64717"
+      "bytes": 400048,
+      "sha256": "5022dcb509083f4bb28442ff2fe42f4dcf2dd8538333fc11ade8ff58f9473606"
     },
     {
       "path": "assets/sprache.js",
@@ -153,8 +158,8 @@
     },
     {
       "path": "assets/style.css",
-      "bytes": 45769,
-      "sha256": "9181f82999de4fcd307dcecdaa9e7c3b897d16d4feff6dce252bfde521687595"
+      "bytes": 48753,
+      "sha256": "1ece562598e62ba6afe419b621cee5ce53fc208497333dd3c6bb505a324e8ae3"
     },
     {
       "path": "assets/suche.js",
@@ -358,13 +363,13 @@
     },
     {
       "path": "impressum.html",
-      "bytes": 6681,
-      "sha256": "57164a09746ec5da073ad5c3f5749ea990d9716ee9c43f1766455d2517672caa"
+      "bytes": 7191,
+      "sha256": "b2a4a0fce6271e61e37c9a3583c1969eb099b5fccefff283b00a7ab6881dc5b0"
     },
     {
       "path": "index.html",
-      "bytes": 12282,
-      "sha256": "4bdfee0742c8096a85ed34e90e89ba6014d03040302634042b1ba3934371a914"
+      "bytes": 12830,
+      "sha256": "80bd9069b1cba5505866e507d5a92b0e8f9c5a876b20398be485d6e947f1f45b"
     },
     {
       "path": "manifest.webmanifest",
@@ -378,8 +383,8 @@
     },
     {
       "path": "package.json",
-      "bytes": 1303,
-      "sha256": "7791ae84f0a8dd897a45620ac692eae0d6af36bc75ff48c7651f037109a3630d"
+      "bytes": 1338,
+      "sha256": "83557a093b570b7b83e284c990bfe0c99ff3a7026b7efb0973a998e2597891a6"
     },
     {
       "path": "sbkim/01_storage.js",
@@ -443,8 +448,8 @@
     },
     {
       "path": "sw.js",
-      "bytes": 5232,
-      "sha256": "f9a82bcca32d9a9efc4c81763aad13fffc4f55f197448b42c3101834b041a21b"
+      "bytes": 5268,
+      "sha256": "2fae20fb412bda7a54e2a1d1b48e51fbd363782648144027fbd3ceaf9543e25e"
     },
     {
       "path": "tests/bedeutung.mjs",
@@ -465,6 +470,11 @@
       "path": "tests/bibliothek.mjs",
       "bytes": 20438,
       "sha256": "7a6ed98fe2c2c3ff6e2ac8b1c5e643ef0a900d0c81b2ed5ad0648cd4ba54d63c"
+    },
+    {
+      "path": "tests/bildbeschreibung.mjs",
+      "bytes": 26591,
+      "sha256": "e6a2498151bb1d38096a1501cec31e1b1cfcdf60ba713ef0736648591b2fcb32"
     },
     {
       "path": "tests/bilder.mjs",
@@ -540,6 +550,11 @@
       "path": "tests/gegenprobe_bibliothek.mjs",
       "bytes": 9363,
       "sha256": "a1a270c939fcd944bc4de12ef772b95280377e97ce45438aff511e1dc480566a"
+    },
+    {
+      "path": "tests/gegenprobe_bildbeschreibung.mjs",
+      "bytes": 6337,
+      "sha256": "ca230654aec58f8660fdaaa313044d1fe4ba39129941a615ad699dbc2306ac6a"
     },
     {
       "path": "tests/gegenprobe_bilder.mjs",
@@ -618,8 +633,8 @@
     },
     {
       "path": "tests/knoten.mjs",
-      "bytes": 18295,
-      "sha256": "bcb934311fd2de2fe79356ec43fd3678535e69cebdd6ad5e8e200d29f416a722"
+      "bytes": 18663,
+      "sha256": "4063d8b8c425b2675771daad2ada405ebc25aeb4f8596588a69e078166f2a912"
     },
     {
       "path": "tests/kopfzeile-schrift.mjs",
@@ -798,8 +813,8 @@
     },
     {
       "path": "tests/teilen.mjs",
-      "bytes": 25800,
-      "sha256": "f70541fd4d283f2e24a3cc67e6cb4d4717fc6f4c1fb98ab04616df270885dafa"
+      "bytes": 26110,
+      "sha256": "15aaa0d6b92926e32c557971f89a87a251874039a35171175c734fd4ea5032eb"
     },
     {
       "path": "tests/uebersetzung.mjs",
