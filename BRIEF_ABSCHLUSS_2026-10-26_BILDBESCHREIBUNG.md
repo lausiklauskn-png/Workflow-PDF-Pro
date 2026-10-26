@@ -4,7 +4,7 @@
 (Punkte 12–14 der [Sammlung](https://github.com/lausiklauskn-png/Privat-Brain-Pro/blob/main/docs/design/aenderungen-2026-10-26/SAMMLUNG.md)).
 **Klaus:** „Die soll Workflow PDF Pro und Workflow PDF bekommen. Auch die Suche … Alle.“ Name überall **„Bildbeschreibung“**.
 
-## Was im Kern neu ist (Workflow-PDF `f52118d`, 1.1.3, Cache v108)
+## Was im Kern neu ist (Workflow-PDF `3bf07ab`, 1.1.3, Cache v108)
 
 - `assets/bildbeschreibung.js` (neu) mit fünf Nähten in `app.js`; Feld „Bildbeschreibung“ an jeder Foto-Karte und im
   Editor (eigene Worte per Text oder Mikrofon, getrennt von der Modellbeschreibung, beide in der Wortsuche mit
@@ -16,10 +16,10 @@
 
 ## Was hier nachgezogen ist
 
-- `upstream/workflow-pdf` = `f52118d`, 200 Dateien, `verify-upstream` 0 Abweichungen; Manifest und Quellindices
+- `upstream/workflow-pdf` = `3bf07ab`, 200 Dateien, `verify-upstream` 0 Abweichungen; Manifest und Quellindices
   neu erzeugt (Skript wie `tools/onboarding/inventar.py` mit Pfaden als Argumente).
 - Anker `app.js?v=71` in `tools/native/prepare-web.mjs` (zweimal) und `windows/tools/build-web.mjs`.
-- `native/native-bootstrap.js`: `sourceCommit` = `f52118d…` (stand seit 1.0.3 auf `db3830e`; die Quittung
+- `native/native-bootstrap.js`: `sourceCommit` = `3bf07ab…` (stand seit 1.0.3 auf `db3830e`; die Quittung
   `native-bundle.json` nimmt ohnehin den Manifest-Commit).
 - Version **1.0.5**, Android-Buildnummer **6** (`build.gradle`, `package.json`+lock, `windows/package.json`+lock,
   `tauri.conf.json`, `Cargo.toml`+lock). Paketkennung und Signieridentität unverändert.

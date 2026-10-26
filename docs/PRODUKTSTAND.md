@@ -79,13 +79,13 @@ auch BookLedger). Entscheidung von Klaus nötig: Inhalt hier neu einbauen oder d
 
 Klaus (26.10.2026, Sitzung 3 von Private Brain Pro): „Die soll Workflow PDF Pro und Workflow PDF bekommen. Auch die
 Suche … Alle.“ Kurzer Name überall **„Bildbeschreibung“**. Die PWA (Workflow-PDF, Zweig `ccr-2068cf6c-0u3a7n`,
-Commit `f52118d`, **1.1.3**, Cache v108) hat an jedem Foto ein flaches Feld für eigene Worte (Text oder Mikrofon), getrennt
+Commit `3bf07ab`, **1.1.3**, Cache v108) hat an jedem Foto ein flaches Feld für eigene Worte (Text oder Mikrofon), getrennt
 von der Beschreibung eines Modells; die Wortsuche findet beide (Fundzeile „Bildbeschreibung“); ein Schalter unter der Suche
 zeigt nur beschriebene Fotos; „Fotos beschreiben lassen“ holt das Bildmodell (`vit-gpt2-image-captioning`, 256 MB) erst
 auf Knopfdruck in den Browser-Vorrat – mit den **gemessenen** Zahlen im Dialog (Prüfrechner: 256 MB Download, 1,2 GB
 Arbeitsspeicher in der Spitze, rund 3 s je Foto; **nicht am Tablet gemessen**). Keine Emojis, Liniensymbole.
 
-Workflow PDF Pro übernimmt denselben Kern bytegleich: `upstream/workflow-pdf` = `f52118d` (200 Dateien,
+Workflow PDF Pro übernimmt denselben Kern bytegleich: `upstream/workflow-pdf` = `3bf07ab` (200 Dateien,
 `verify-upstream` 0 Abweichungen), Anker `app.js?v=71` in `tools/native/prepare-web.mjs` und
 `windows/tools/build-web.mjs`, `native-bootstrap.js` `sourceCommit` nachgezogen, gemeinsame Version **1.0.5**,
 Android-Buildnummer **6**. In der App läuft das Modell in der WebView (Android) bzw. WebView2 (Windows) wie in der

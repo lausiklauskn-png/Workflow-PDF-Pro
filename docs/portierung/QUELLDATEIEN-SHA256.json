@@ -1,5 +1,5 @@
 {
-  "commit": "f52118d564d4aa8491e638b15707b0d9f1920b18",
+  "commit": "3bf07ab4c637fd6306002cddeb77488a7795d9cf",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
@@ -633,8 +633,8 @@
     },
     {
       "path": "tests/knoten.mjs",
-      "bytes": 18295,
-      "sha256": "bcb934311fd2de2fe79356ec43fd3678535e69cebdd6ad5e8e200d29f416a722"
+      "bytes": 18663,
+      "sha256": "4063d8b8c425b2675771daad2ada405ebc25aeb4f8596588a69e078166f2a912"
     },
     {
       "path": "tests/kopfzeile-schrift.mjs",
