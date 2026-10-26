@@ -9,6 +9,9 @@ Noch unsigniert: Bei „Der Computer wurde durch Windows geschützt“ auf „We
 „Trotzdem ausführen“ klicken. Keine automatischen Updates: eine neue Version von Hand über die alte
 installieren. Auf einem eigenen Windows-PC ist die App noch nicht gemessen.
 
+Version 1.0.4 (26.10.2026, auf main vorbereitet, noch nicht veröffentlicht): Webkern 1.1.1 mit Direktstart des
+Scanners aus BookLedgerPro (`?scan=1&von=<App>`); Android-Buildnummer 5. Downloads oben bleiben 1.0.3.
+
 Version 1.0.3 (22.10.2026): Versionsnummer unten bei „Impressum & Datenschutz“ und in den
 Einstellungen, Knopf „▶ Alle prüfen“, Webkern 1.1.0.
 

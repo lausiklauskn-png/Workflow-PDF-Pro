@@ -1,5 +1,5 @@
 {
-  "commit": "db3830e23b1207498efa083d00678f2de31379f7",
+  "commit": "5d32527f01e4fb5eaadca74a5e6b769b13a92641",
   "files": [
     {
       "path": ".gitignore",
@@ -13,8 +13,8 @@
     },
     {
       "path": "CLAUDE.md",
-      "bytes": 90266,
-      "sha256": "3021a8ce4c944a50b5ed151f1f240deba9eea02cb071f2c815c0c8b3aaf4b8c0"
+      "bytes": 91694,
+      "sha256": "2addfa1edba64b00635324f6e9a09b024b9179f70c5ddba0d075b52dad273e6c"
     },
     {
       "path": "LICENSE",
@@ -38,8 +38,8 @@
     },
     {
       "path": "assets/app.js",
-      "bytes": 267444,
-      "sha256": "7c0beb37f951b01883f4b08d39f3146a03286a0b8bb7b04df2a1d9eccd9cbcd1"
+      "bytes": 268964,
+      "sha256": "eaeedb9d6c5c81b5d922a1e3fd3f447ada019faccb220a0d76dac08f5ef21650"
     },
     {
       "path": "assets/bedeutung.js",
@@ -133,8 +133,8 @@
     },
     {
       "path": "assets/sprache-texte.js",
-      "bytes": 382374,
-      "sha256": "2fa44f1f1b23e93c0bd2765f4a895d9df4fcedd90b15d19bed55fbbaaf888e26"
+      "bytes": 383756,
+      "sha256": "abb02ea3f8e3b404684511d7d811b9c570a45c9fba77e2d1ea870f9746c64717"
     },
     {
       "path": "assets/sprache.js",
@@ -359,7 +359,7 @@
     {
       "path": "index.html",
       "bytes": 12282,
-      "sha256": "f0d30d161a30965e92d7577c5f741700b761ec801fec3c74c4e04cc5e3eebe50"
+      "sha256": "0be1ffb8df6faee5f37cc4ba87488ca712b7f278f6871e30290080494eb795a6"
     },
     {
       "path": "manifest.webmanifest",
@@ -369,12 +369,12 @@
     {
       "path": "package-lock.json",
       "bytes": 2973,
-      "sha256": "d79fff66bae6228f54cf0a3d57e523da1f7eb945df658aeb35692968e166c880"
+      "sha256": "01d1ada4be82899789c33b234dc61e1475091feb39595360e540e212ce580629"
     },
     {
       "path": "package.json",
-      "bytes": 1202,
-      "sha256": "1869054fc44ce71035ac20f59ea8a4d0fc1a5626a3f526ada78490a31471b25b"
+      "bytes": 1232,
+      "sha256": "a1c09d5b0173275ca2b02c12db8807f4dafaf6ee6b4acd15b9912ef7742bedb7"
     },
     {
       "path": "sbkim/01_storage.js",
@@ -439,7 +439,7 @@
     {
       "path": "sw.js",
       "bytes": 4835,
-      "sha256": "b2782a8a3e920ef1b972c0b82eebd68912451b545ae8080b7ed905fc9051e3cc"
+      "sha256": "b8eac8ec962fd8b1222aa36da0811025235bd721446b6a863c9b1d200fc29408"
     },
     {
       "path": "tests/bedeutung.mjs",
@@ -475,6 +475,11 @@
       "path": "tests/chrome.mjs",
       "bytes": 26813,
       "sha256": "045a1b60ff7cf3aef147dc170c859df983508a4ef73bb2008f110b4ab62a466b"
+    },
+    {
+      "path": "tests/direktstart.mjs",
+      "bytes": 6092,
+      "sha256": "dd22b181864a67b37674df5fa6fc4b02716abf983344f385a8250bd27f7cdd94"
     },
     {
       "path": "tests/e2e.mjs",

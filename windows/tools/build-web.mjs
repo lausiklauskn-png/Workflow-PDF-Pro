@@ -39,7 +39,7 @@ for (const name of ['updates.js', 'updates.css']) {
 }
 const indexPath = join(dist, 'index.html');
 let html = await readFile(indexPath, 'utf8');
-const anchor = '<script defer src="assets/app.js?v=69"></script>';
+const anchor = '<script defer src="assets/app.js?v=70"></script>';
 if (html.split(anchor).length !== 2) throw Error('Windows update injection anchor changed');
 let probe = '';
 if (process.env.WFP_WINDOWS_PROBE === '1') {

@@ -226,3 +226,11 @@ auch die Abnahme mit „Version 1.0.3“ im Fuß). Release
 `Workflow-PDF-Pro-Windows-1.0.3-Setup.exe`, 15.854.566 Bytes, SHA-256
 `4795946f26aac4f1d6e9d37df9c59279b8f66733feccf4f6e8144a181f19ea68`, unabhängig geladen und
 verglichen. Unsigniert, ohne automatische Updates. Auf Klaus' Windows-PC nicht gemessen.
+
+## 1.0.4: Direktstart des Scanners, Webkern 1.1.1 (26.10.2026, vorbereitet)
+
+Gleicher Kern wie Android (`upstream/workflow-pdf` = Workflow-PDF `5d32527`), Anker `app.js?v=70` in
+`windows/tools/build-web.mjs`; `node windows/tools/build-web.mjs` lokal: 86 Kerndateien, 9 Dialogdateien.
+Version 1.0.4 in `windows/package.json`, `tauri.conf.json`, `Cargo.toml`, `Cargo.lock`. Tauri hat keinen
+Link-Empfang: der Knopf „Mit Workflow PDF scannen“ in BookLedgerPro öffnet am PC die Web-Fassung; der Scanner
+dort ist derselbe. Windows-Bau und WebView2-Abnahme nur in CI (`windows-app`); **nicht veröffentlicht**.
