@@ -8,11 +8,11 @@ Stand 22.10.2026 abends. Festgelegt von Klaus in der Claude-Code-Sitzung
 | Produkt | Plattform | Stand | Öffentlich? |
 |---|---|---|---|
 | Workflow PDF (Web) | Browser/PWA | 1.1.2 live: <https://lausiklauskn-png.github.io/Workflow-PDF/>; **1.1.3 (Bildbeschreibung, 26.10.) auf main, Pages liefert aus** | ja (1.1.3) |
-| Workflow PDF Pro | Android (APK) | 1.0.3 veröffentlicht; 1.0.4 (Direktstart) auf main vorbereitet, nicht veröffentlicht; **1.0.5 (Kern 1.1.3, Bildbeschreibung, Buildnummer 6) auf main, nicht veröffentlicht**. Letztes Release: [v1.0.3](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.3) | ja |
-| Workflow PDF Pro | Windows (Setup.exe, unsigniert) | 1.0.3 veröffentlicht; 1.0.4 (Direktstart) auf main vorbereitet, nicht veröffentlicht; **1.0.5 (Kern 1.1.3, Bildbeschreibung) auf main, nicht veröffentlicht**. Letztes Release: [windows-v1.0.3](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.3) | ja |
+| Workflow PDF Pro | Android (APK) | **1.0.5 veröffentlicht 26.10.2026** (Kern 1.1.3, Bildbeschreibung + Direktstart, Buildnummer 6): [v1.0.5](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.5), 83.147.148 B, SHA-256 `c9b8e67e…`, Lauf 40383096577 | ja (1.0.5) |
+| Workflow PDF Pro | Windows (Setup.exe, unsigniert) | **1.0.5 veröffentlicht 26.10.2026**: [windows-v1.0.5](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.5), 15.866.577 B, SHA-256 `7e4e9195…`, Lauf 40384462589 (Installer aus Windows-Bau 40383101175) | ja (1.0.5) |
 | Workflow PDF Pro | iOS (iPhone/iPad) | in Vorbereitung durch Codex, Zweig `codex/ios-native-host` | **nein, nur privat** |
-| Private Brain Pro | Android (APK) | vorhanden (laut Klaus; eigenes Repo, hier nicht geprüft) | ja |
-| Private Brain Pro | Windows | in Arbeit (laut Klaus; eigenes Repo, nicht in dieser Sitzung) | geplant |
+| Private Brain Pro | Android (APK) | 1.0.39 veröffentlicht 26.10.2026 (eigenes Repo) | ja |
+| Private Brain Pro | Windows | 1.0.39 veröffentlicht 26.10.2026 (eigenes Repo) | ja |
 | Private Brain Pro | iOS | noch nicht begonnen | später: nur vorbereiten |
 
 ## Gleichstandsregel (Klaus, 22.10.2026, gilt immer)
@@ -92,14 +92,13 @@ Android-Buildnummer **6**. In der App läuft das Modell in der WebView (Android)
 PWA: Download aus dem Netz in den Browser-Vorrat der App, kein Paket mit dem Modell. Mikrofon im Feld: der native
 Sprachadapter (`native-speech.js`) hängt sich an jedes Textfeld, also auch an das neue.
 
-**Auf main seit 26.10.2026 (#26, Klaus' Wort), nicht veröffentlicht** – Release nur auf Klaus' Wort. Nicht gemessen: Gerät, WebView-Arbeitsspeicher
+**Auf main seit 26.10.2026 (#26, Klaus' Wort) und am selben Abend als 1.0.5 veröffentlicht** (siehe „Veröffentlichen“). Nicht gemessen: Gerät, WebView-Arbeitsspeicher
 beim Beschreiben (1,2 GB im Prüfrechner sind für ein Tablet ein Risiko), ob `family-projekt.de` das Modell liefert.
-Veröffentlichen 1.0.5 wie unter „Veröffentlichen“ (Android nach grünem `native-acceptance`, Windows nach grünem
-`windows-app`).
 
 ## Veröffentlichen
 
-Als Nächstes veröffentlicht wird nur **Private Brain Pro für Windows**. Daran arbeitet gerade
-eine andere Sitzung. Aus diesem Repo wird dafür nichts gestartet.
+**1.0.5 veröffentlicht 2026-10-26 (Klaus: „wenn das die aktuellste ist, muss die raus“):** [Android-APK](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.5/Workflow-PDF-Pro-1.0.5.apk) (Lauf 40383096577, Tag `v1.0.5`, 83.147.148 B, SHA-256 `c9b8e67ef67bb1d38b0497d484937c271ed7f54e085b8e615d7200298512af65`, Buildnummer 6, Zertifikat `0da805c9…`, signierte Erstinstallation mit erhaltenem Ordner im Lauf) · [Windows-Setup](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.5/Workflow-PDF-Pro-Windows-1.0.5-Setup.exe) (Lauf 40384462589, Tag `windows-v1.0.5`, 15.866.577 B, SHA-256 `7e4e9195d2aa5c60ff3c7fcbf617532b6800cd4e2c60f2884c330fc06516f70c`, unsigniert, Installer aus dem Windows-Bau 40383101175 auf main, dort Installieren/Starten/Entfernen geprüft). Quelle `ba5d54e2e97e654881ebe8037995963c7d9dcef1`. Beide Downloads unabhängig geladen, Größe und SHA-256 gleich den veröffentlichten Prüfsummen. Geschenk für Jens trägt 1.0.5. Diese Veröffentlichung ist erledigt; nicht erneut auslösen. ⚠ Am Tablet und am eigenen Windows-PC nicht gemessen.
+Ablauf war: `workflow-pdf-release.yml` (tag `v1.0.5`, commit main) direkt nach grünem `native-acceptance` auf main; `windows-app.yml` auf main einmal von Hand gestartet, weil der
+Anker-Commit #27 seine Pfadfilter nicht traf, dann `windows-release.yml` (tag `windows-v1.0.5`). Beide über `workflow_dispatch` aus der Claude-Code-Sitzung, kein Git-Brückenbranch nötig.
 
 Ein Push, ein gespeicherter Workflow oder ein grüner Simulatorlauf ist keine Veröffentlichung.
