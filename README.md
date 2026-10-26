@@ -1,16 +1,17 @@
 # Workflow PDF Pro
 
-**[Android-APK 1.0.3 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.3/Workflow-PDF-Pro-1.0.3.apk)** · [Erstinstallation](docs/ANDROID-START.md)
+**[Android-APK 1.0.5 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.5/Workflow-PDF-Pro-1.0.5.apk)** · [Erstinstallation](docs/ANDROID-START.md)
 
-**[Windows 1.0.3 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.3/Workflow-PDF-Pro-Windows-1.0.3-Setup.exe)** (Windows 10/11, 64 Bit) ·
-[Prüfsumme](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.3/Workflow-PDF-Pro-Windows-1.0.3-Setup.exe.sha256) ·
+**[Windows 1.0.5 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.5/Workflow-PDF-Pro-Windows-1.0.5-Setup.exe)** (Windows 10/11, 64 Bit) ·
+[Prüfsumme](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.5/Workflow-PDF-Pro-Windows-1.0.5-Setup.exe.sha256) ·
 [Windows-Baustand](docs/portierung/BAUSTAND-WINDOWS.md). Doppelt anklicken; keine Administratorrechte nötig.
 Noch unsigniert: Bei „Der Computer wurde durch Windows geschützt“ auf „Weitere Informationen“ und dann
 „Trotzdem ausführen“ klicken. Keine automatischen Updates: eine neue Version von Hand über die alte
 installieren. Auf einem eigenen Windows-PC ist die App noch nicht gemessen.
 
-Version 1.0.4 (26.10.2026, auf main vorbereitet, noch nicht veröffentlicht): Webkern 1.1.1 mit Direktstart des
-Scanners aus BookLedgerPro (`?scan=1&von=<App>`); Android-Buildnummer 5. Downloads oben bleiben 1.0.3.
+Version 1.0.5 (26.10.2026): Bildbeschreibung an jedem Foto (eigene Worte oder Bildmodell, in der Suche findbar), Webkern 1.1.3;
+enthält 1.0.4 (Direktstart des Scanners aus BookLedgerPro, `?scan=1&von=<App>`, Webkern 1.1.1) und Kern 1.1.2 (Worker löscht nur noch
+eigene Vorräte). Android-Buildnummer 6. Als Update über die vorhandene App installieren.
 
 Version 1.0.3 (22.10.2026): Versionsnummer unten bei „Impressum & Datenschutz“ und in den
 Einstellungen, Knopf „▶ Alle prüfen“, Webkern 1.1.0.
