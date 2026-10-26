@@ -1063,3 +1063,14 @@ Ursache des wackligen Android-12-Emulators nicht behoben. APK 83.130.678 Bytes, 
 `d90860d83d08a98891a7ac3bcf02aaf4cc40472a167804e2ec97fc48c8da1975`, Zertifikat wie bisher
 (`0da805c9…3837`). Download unabhängig geladen und verglichen. Nicht auf Klaus' Geräten gemessen.
 [APK direkt herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.3/Workflow-PDF-Pro-1.0.3.apk).
+
+## 1.0.4: Direktstart des Scanners aus BookLedgerPro, Webkern 1.1.1 (26.10.2026, vorbereitet)
+
+versionCode 5 / versionName 1.0.4. Webkern bytegleich aus Workflow-PDF `5d32527` (#132): `./?scan=1&von=<App>`
+öffnet den Scanner sofort mit „Durchsuchbar“ (nur für diesen Scan), putzt die Adresse und nennt den Rückweg
+(nach „PDF erstellen“ 📤 Teilen → App). Der Anker für die Adapter-Skripte ist `assets/app.js?v=70`
+(`prepare-web.mjs`); `verify-upstream` 194 Dateien, 0 Abweichungen. Lokal in dieser Sitzung (Linux-Behälter,
+Chromium des Behälters): `npm run build:web` 86 Laufzeitdateien, `test:native-web` 33/33,
+`test-request-release` + Tresor-Proben 42/42. Emulator, `native-acceptance` und Gerät: nur in CI bzw. offen.
+Kein Android-App-Link für die Web-Adresse gebaut; der `intent://`-Weg aus BookLedgerPro fällt sonst auf die
+Web-Fassung zurück. **Nicht veröffentlicht**; Release nur auf Klaus' Wort.

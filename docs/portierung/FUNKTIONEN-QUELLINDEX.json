@@ -1003,7 +1003,13 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3210,
+    "line": 3217,
+    "function": "scanDirektstart",
+    "parameters": ""
+  },
+  {
+    "source": "assets/app.js",
+    "line": 3229,
     "function": "oeffnenMitEmpfangen",
     "parameters": ""
   },
