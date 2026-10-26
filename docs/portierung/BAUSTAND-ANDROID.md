@@ -1074,3 +1074,11 @@ Chromium des Behälters): `npm run build:web` 86 Laufzeitdateien, `test:native-w
 `test-request-release` + Tresor-Proben 42/42. Emulator, `native-acceptance` und Gerät: nur in CI bzw. offen.
 Kein Android-App-Link für die Web-Adresse gebaut; der `intent://`-Weg aus BookLedgerPro fällt sonst auf die
 Web-Fassung zurück. **Nicht veröffentlicht**; Release nur auf Klaus' Wort.
+
+## 1.0.4, zweiter Kernstand: Webkern 1.1.2 (26.10.2026, vorbereitet)
+
+`upstream/workflow-pdf` = Workflow-PDF `56b45ecd80c0ae4d89c99507b673da53bcc3bcec` (#133, 197 Dateien, neu `tests/vorrat-isolation.mjs`,
+`tests/kopfzeile-schrift.mjs`, `.github/workflows/quality.yml`): der Worker löscht beim Aktivieren nur noch eigene Schalen
+(`workfloh-pdf-v…`), nie fremde Vorräte desselben Ursprungs; Kopfzeile mit breiter Systemschrift. Anker `app.js?v=70` unverändert;
+`verify-upstream` 0 Abweichungen. Lokal: `build:web` 86 Dateien, `test:native-web` 33/33. Version bleibt 1.0.4/Code 5 (noch nicht
+veröffentlicht). Emulator/Gerät: nur CI bzw. offen. **Nicht veröffentlicht.**

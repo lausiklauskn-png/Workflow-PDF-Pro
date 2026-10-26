@@ -234,3 +234,9 @@ Gleicher Kern wie Android (`upstream/workflow-pdf` = Workflow-PDF `5d32527`), An
 Version 1.0.4 in `windows/package.json`, `tauri.conf.json`, `Cargo.toml`, `Cargo.lock`. Tauri hat keinen
 Link-Empfang: der Knopf „Mit Workflow PDF scannen“ in BookLedgerPro öffnet am PC die Web-Fassung; der Scanner
 dort ist derselbe. Windows-Bau und WebView2-Abnahme nur in CI (`windows-app`); **nicht veröffentlicht**.
+
+## 1.0.4, zweiter Kernstand: Webkern 1.1.2 (26.10.2026, vorbereitet)
+
+Gleicher Kern wie Android (`upstream/workflow-pdf` = `56b45ec`), `node windows/tools/build-web.mjs` lokal 86 + 9 Dateien. Dazu auf
+main (#23): `fsutil::filename` mit NFC und Endungserhalt, `vault::is_commit` byteweise; `windows/core`-Tests laufen auch auf dem
+Windows-Läufer. Version 1.0.4. **Nicht veröffentlicht.**

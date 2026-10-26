@@ -7,7 +7,7 @@ Stand 22.10.2026 abends. Festgelegt von Klaus in der Claude-Code-Sitzung
 
 | Produkt | Plattform | Stand | Öffentlich? |
 |---|---|---|---|
-| Workflow PDF (Web) | Browser/PWA | 1.1.1 (Direktstart, 26.10.), live: <https://lausiklauskn-png.github.io/Workflow-PDF/> | ja |
+| Workflow PDF (Web) | Browser/PWA | 1.1.2 (Direktstart; Worker löscht nur eigene Schalen, 26.10.), live: <https://lausiklauskn-png.github.io/Workflow-PDF/> | ja |
 | Workflow PDF Pro | Android (APK) | 1.0.3 veröffentlicht; 1.0.4 (Direktstart) auf main vorbereitet, nicht veröffentlicht. Letztes Release: [v1.0.3](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.3) | ja |
 | Workflow PDF Pro | Windows (Setup.exe, unsigniert) | 1.0.3 veröffentlicht; 1.0.4 (Direktstart) auf main vorbereitet, nicht veröffentlicht. Letztes Release: [windows-v1.0.3](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.3) | ja |
 | Workflow PDF Pro | iOS (iPhone/iPad) | in Vorbereitung durch Codex, Zweig `codex/ios-native-host` | **nein, nur privat** |
@@ -63,6 +63,11 @@ Was den Direktstart in der nativen App begrenzt (ehrlich): Die Pro-App nimmt kei
 Web-Adresse an (kein Android-App-Link); der `intent://`-Link aus BookLedgerPro öffnet die Pro-App nur, wenn
 Android ihr Paket kennt und den Link zustellt, sonst die Web-Fassung. Windows (Tauri) hat keinen Link-Empfang.
 Der Scanner selbst steht in allen drei Fassungen gleich. Nicht am Gerät gemessen.
+
+**Nachtrag 26.10. (Claude Code):** Kern **1.1.2** (Workflow-PDF #133: Worker löscht nur noch eigene Schalen `workfloh-pdf-v…`,
+Kopfzeile mit breiter Systemschrift, neue Browser-CI) ist bytegleich in `upstream/workflow-pdf` (`56b45ec`, 197 Dateien);
+Windows-Kern-Fixes (#23: Unicode-Dateinamen behalten die Endung, Tresor stürzt an fremden Namen nicht ab) sind auf main.
+Die Inhalte der Codex-Entwürfe sind damit hier neu gebaut; die Entwürfe selbst bleiben unberührt.
 
 Offene Codex-Entwürfe (Klaus 26.10.: Codex wird für diese Sitzungen nicht angerührt): Workflow-PDF #131
 (fremde App-Caches erhalten, schmale Kopfleiste, Cache v107) und Workflow-PDF-Pro #20 (Windows-Dateinamen,
