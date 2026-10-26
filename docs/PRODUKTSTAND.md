@@ -7,9 +7,9 @@ Stand 22.10.2026 abends. Festgelegt von Klaus in der Claude-Code-Sitzung
 
 | Produkt | Plattform | Stand | Öffentlich? |
 |---|---|---|---|
-| Workflow PDF (Web) | Browser/PWA | 1.1.2 live: <https://lausiklauskn-png.github.io/Workflow-PDF/>; **1.1.3 (Bildbeschreibung, 26.10.) als Entwurfs-PR, nicht übernommen** | ja (1.1.2) |
-| Workflow PDF Pro | Android (APK) | 1.0.3 veröffentlicht; 1.0.4 (Direktstart) auf main vorbereitet, nicht veröffentlicht; **1.0.5 (Kern 1.1.3, Bildbeschreibung, Buildnummer 6) als Entwurfs-PR**. Letztes Release: [v1.0.3](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.3) | ja |
-| Workflow PDF Pro | Windows (Setup.exe, unsigniert) | 1.0.3 veröffentlicht; 1.0.4 (Direktstart) auf main vorbereitet, nicht veröffentlicht; **1.0.5 (Kern 1.1.3, Bildbeschreibung) als Entwurfs-PR**. Letztes Release: [windows-v1.0.3](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.3) | ja |
+| Workflow PDF (Web) | Browser/PWA | 1.1.2 live: <https://lausiklauskn-png.github.io/Workflow-PDF/>; **1.1.3 (Bildbeschreibung, 26.10.) auf main, Pages liefert aus** | ja (1.1.3) |
+| Workflow PDF Pro | Android (APK) | 1.0.3 veröffentlicht; 1.0.4 (Direktstart) auf main vorbereitet, nicht veröffentlicht; **1.0.5 (Kern 1.1.3, Bildbeschreibung, Buildnummer 6) auf main, nicht veröffentlicht**. Letztes Release: [v1.0.3](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.3) | ja |
+| Workflow PDF Pro | Windows (Setup.exe, unsigniert) | 1.0.3 veröffentlicht; 1.0.4 (Direktstart) auf main vorbereitet, nicht veröffentlicht; **1.0.5 (Kern 1.1.3, Bildbeschreibung) auf main, nicht veröffentlicht**. Letztes Release: [windows-v1.0.3](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.3) | ja |
 | Workflow PDF Pro | iOS (iPhone/iPad) | in Vorbereitung durch Codex, Zweig `codex/ios-native-host` | **nein, nur privat** |
 | Private Brain Pro | Android (APK) | vorhanden (laut Klaus; eigenes Repo, hier nicht geprüft) | ja |
 | Private Brain Pro | Windows | in Arbeit (laut Klaus; eigenes Repo, nicht in dieser Sitzung) | geplant |
@@ -92,7 +92,7 @@ Android-Buildnummer **6**. In der App läuft das Modell in der WebView (Android)
 PWA: Download aus dem Netz in den Browser-Vorrat der App, kein Paket mit dem Modell. Mikrofon im Feld: der native
 Sprachadapter (`native-speech.js`) hängt sich an jedes Textfeld, also auch an das neue.
 
-**Nicht übernommen, nicht veröffentlicht** – Entwurfs-PR, Klaus' Wort. Nicht gemessen: Gerät, WebView-Arbeitsspeicher
+**Auf main seit 26.10.2026 (#26, Klaus' Wort), nicht veröffentlicht** – Release nur auf Klaus' Wort. Nicht gemessen: Gerät, WebView-Arbeitsspeicher
 beim Beschreiben (1,2 GB im Prüfrechner sind für ein Tablet ein Risiko), ob `family-projekt.de` das Modell liefert.
 Veröffentlichen 1.0.5 wie unter „Veröffentlichen“ (Android nach grünem `native-acceptance`, Windows nach grünem
 `windows-app`).

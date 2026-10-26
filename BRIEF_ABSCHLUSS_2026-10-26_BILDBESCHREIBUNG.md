@@ -31,8 +31,11 @@
   Empfang, Tresor, Chrome-Helfer, Sprache, Übersetzung): **33 bestanden, 0 fehlgeschlagen** (lokal, Chromium des Behälters).
 - Nicht gemessen: Gerät (Android/Windows), Arbeitsspeicher der WebView beim Beschreiben, Modell auf family-projekt.de.
 
+## Nachtrag: übernommen, nicht veröffentlicht
+
+- PR #26 ist seit dem 26.10.2026 auf main (Klaus' Wort, CI grün). Die vorbereitete 1.0.4 ist damit überholt (nie veröffentlicht).
+
 ## Nicht getan (Klaus' Wort nötig)
 
-- Übernahme des Entwurfs-PR und Veröffentlichung 1.0.5 (Android `request-release.mjs v1.0.5` nach grünem
-  `native-acceptance`, Windows `windows-v1.0.5` nach grünem `windows-app`); dann `README.md`, `docs/ANDROID-START.md`,
-  Produktstand auf 1.0.5. Die vorbereitete 1.0.4 ist damit überholt (nie veröffentlicht).
+- Veröffentlichung 1.0.5 (Android `request-release.mjs v1.0.5` nach grünem `native-acceptance`, Windows `windows-v1.0.5`
+  nach grünem `windows-app`); dann `README.md`, `docs/ANDROID-START.md`, Produktstand auf 1.0.5.
