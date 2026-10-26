@@ -29,6 +29,14 @@ getrennt gemessen.
   Direktstart: Vorbelegung entfernt → 2 rote Zeilen mit Namen.
 - Doku: `docs/PRODUKTSTAND.md`, `docs/portierung/BAUSTAND-ANDROID.md`, `BAUSTAND-WINDOWS.md`, `README.md`.
 
+## Nachtrag (später am 26.10.)
+
+- #23 übernommen: Windows-Kern-Fixes (Unicode-Dateinamen behalten die Endung, `is_commit` byteweise) — die Befunde aus dem
+  Codex-Entwurf #20, hier neu gebaut, Gegenprobe mit alter Quelle rot/Panik.
+- #24 übernommen: Kern **1.1.2** bytegleich (Workflow-PDF #133, hier gebaut: Worker löscht nur noch eigene Schalen,
+  Kopfzeile mit breiter Schrift, Browser-CI). Version bleibt 1.0.4 / Code 5, **unveröffentlicht**.
+- Klaus (26.10.): nur Claude Code, Codex wird nicht angerührt; die Entwürfe #20/#131 bleiben unberührt, ihr Inhalt ist nachgebaut.
+
 ## Nicht gemacht, ehrlich
 
 - **Keine Veröffentlichung.** 1.0.4 steht nur im Quellstand. Release erst auf Klaus' Wort und nach grünem
