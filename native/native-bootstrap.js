@@ -5,7 +5,7 @@
   document.documentElement.dataset.wfpNative = 'android';
   window.WFPNative = Object.freeze({
     appId: 'de.familyprojekt.workflowpdf.pro',
-    sourceCommit: 'db3830e23b1207498efa083d00678f2de31379f7'
+    sourceCommit: 'f52118d564d4aa8491e638b15707b0d9f1920b18'
   });
   /* Versionsnummer (Klaus 2026-10-22): der Kern zeigt, was in <meta name="wfp-version"> steht, im Fuß
      und in den Einstellungen. Die Pro trägt dort ihre App-Nummer ein — unter Android aus dem Paket
