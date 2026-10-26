@@ -1,6 +1,11 @@
 {
-  "commit": "5d32527f01e4fb5eaadca74a5e6b769b13a92641",
+  "commit": "56b45ecd80c0ae4d89c99507b673da53bcc3bcec",
   "files": [
+    {
+      "path": ".github/workflows/quality.yml",
+      "bytes": 896,
+      "sha256": "a797cda0caf37ddeae74281de22d9eb568f7ef8d648d28fc1c6f9141ba24594d"
+    },
     {
       "path": ".gitignore",
       "bytes": 20,
@@ -13,8 +18,8 @@
     },
     {
       "path": "CLAUDE.md",
-      "bytes": 91694,
-      "sha256": "2addfa1edba64b00635324f6e9a09b024b9179f70c5ddba0d075b52dad273e6c"
+      "bytes": 93766,
+      "sha256": "2e2538c271f679cf85bf33bc5bc7ba3fd935e4a9357f20a3f3041b90f2dad81c"
     },
     {
       "path": "LICENSE",
@@ -148,8 +153,8 @@
     },
     {
       "path": "assets/style.css",
-      "bytes": 45693,
-      "sha256": "52f306682da7258dec930f158fe9a302b85d318c5964ea0990e007045481d40a"
+      "bytes": 45769,
+      "sha256": "9181f82999de4fcd307dcecdaa9e7c3b897d16d4feff6dce252bfde521687595"
     },
     {
       "path": "assets/suche.js",
@@ -359,7 +364,7 @@
     {
       "path": "index.html",
       "bytes": 12282,
-      "sha256": "0be1ffb8df6faee5f37cc4ba87488ca712b7f278f6871e30290080494eb795a6"
+      "sha256": "4bdfee0742c8096a85ed34e90e89ba6014d03040302634042b1ba3934371a914"
     },
     {
       "path": "manifest.webmanifest",
@@ -369,12 +374,12 @@
     {
       "path": "package-lock.json",
       "bytes": 2973,
-      "sha256": "01d1ada4be82899789c33b234dc61e1475091feb39595360e540e212ce580629"
+      "sha256": "62e83ad9686cf386fc90da0c4cd369eb79d934fcd26379c36354a70d0c0b69cb"
     },
     {
       "path": "package.json",
-      "bytes": 1232,
-      "sha256": "a1c09d5b0173275ca2b02c12db8807f4dafaf6ee6b4acd15b9912ef7742bedb7"
+      "bytes": 1303,
+      "sha256": "7791ae84f0a8dd897a45620ac692eae0d6af36bc75ff48c7651f037109a3630d"
     },
     {
       "path": "sbkim/01_storage.js",
@@ -438,8 +443,8 @@
     },
     {
       "path": "sw.js",
-      "bytes": 4835,
-      "sha256": "b8eac8ec962fd8b1222aa36da0811025235bd721446b6a863c9b1d200fc29408"
+      "bytes": 5232,
+      "sha256": "f9a82bcca32d9a9efc4c81763aad13fffc4f55f197448b42c3101834b041a21b"
     },
     {
       "path": "tests/bedeutung.mjs",
@@ -615,6 +620,11 @@
       "path": "tests/knoten.mjs",
       "bytes": 18295,
       "sha256": "bcb934311fd2de2fe79356ec43fd3678535e69cebdd6ad5e8e200d29f416a722"
+    },
+    {
+      "path": "tests/kopfzeile-schrift.mjs",
+      "bytes": 4189,
+      "sha256": "4aa4ba62bb55bf11474bbc6d12d859bc2ec016abb05d3f0189c5475891d25e5e"
     },
     {
       "path": "tests/kreis.mjs",
@@ -805,6 +815,11 @@
       "path": "tests/video.mjs",
       "bytes": 21011,
       "sha256": "f58adcf99ce2642f7f7f22ecbc0c97b4083dc024e56eecb011e91ed80bf1867c"
+    },
+    {
+      "path": "tests/vorrat-isolation.mjs",
+      "bytes": 5263,
+      "sha256": "7f243ab5587b38972e294920e990d443353665e970b8684c92b1624614aa47b4"
     },
     {
       "path": "tests/zuschneiden.mjs",
