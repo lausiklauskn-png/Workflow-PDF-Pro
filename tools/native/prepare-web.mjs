@@ -8,7 +8,7 @@ export const root = fileURLToPath(new URL('../../', import.meta.url));
 export const runtimeRoots = ['assets/', 'vendor/', 'icons/', 'sbkim/', 'beispiele/'];
 export const runtimeFiles = ['index.html', 'sw.js', 'manifest.webmanifest', 'impressum.html',
   'sicherheit.html', 'LICENSE', 'RECHTE.md', 'THIRD_PARTY.md'];
-export const vaultFiles=['vault-codec.js','vault-records.js','vault-journal.js','vault-db.js','vault-gate.js','vault-preferences.js','vault-migration.js','native-vault.js'];
+export const vaultFiles=['vault-codec.js','vault-records.js','vault-journal.js','vault-db.js','vault-gate.js','vault-preferences.js','vault-migration.js','native-vault.js','native-tresorordner.js'];
 export const nativeFiles = ['native-bootstrap.js', 'native-files.js', 'native-import.js', 'native-incoming.js', 'native-chrome.js', 'native-speech.js', 'native-translate.js', 'chrome/helper.html', 'chrome/helper.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
 export const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 

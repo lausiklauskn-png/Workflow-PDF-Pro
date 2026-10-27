@@ -77,3 +77,48 @@ die Gegenprobe nimmt jetzt beide weg).
   Windows-Engine ist Java und kann das Paket direkt nehmen (`DateiAblage`).
 - Zwei Apps, die gleichzeitig dasselbe Fach zum ersten Mal anlegen: die zweite nimmt den Schlüssel der ersten (Datei schon da).
   Echte Gleichzeitigkeit auf einer SD-Karte ist nicht gemessen.
+
+## Schritt D1: Workflow PDF Pro zieht ein (27.10.2026)
+
+Klaus' Wahl: der Knopf steht im **Tresor-Kasten der Einstellungen** („Speicher und Dokumenttresor“), sichtbar nur bei entsperrtem
+Dokumenttresor. Probe zuerst an einer **Kopie** der SD-Karte (Dateien-App), erst dann der echte Ordner.
+
+| Zustand | Anzeige | Knopf |
+|---|---|---|
+| noch nicht eingezogen | Erklärung (ein Passwort für alle Pro-Apps, Probe an einer Kopie, nur zwei neue Einträge) | **In den Tresorordner einziehen …** |
+| eingezogen, offen | „Mit dem Tresorordner verbunden: <Ordner> · Einträge im Inhaltsverzeichnis: N“ | Inhaltsverzeichnis jetzt schreiben · Tresorordner sperren · Anderen Tresorordner wählen … |
+| eingezogen, gesperrt | „Tresorordner gesperrt: <Ordner>“ | Tresorordner entsperren … · Anderen … |
+| nicht erreichbar | „… nicht erreichbar (SD-Karte eingelegt?)“ | Anderen … |
+
+**Ablauf:** Androids Ordnerwahl → gewählt wird die Ebene **über** „Workflow PDF Pro“. Sie passt nur, wenn darin genau der entsperrte
+Tresor liegt (gleiche Kennung im Kopf `workflow-pdf-pro.tresor.json`) — eine byte-gleiche Kopie passt also auch; das macht die Probe
+möglich, ohne die App auf die Kopie umzustellen. Sonst klare Meldung und nichts geschrieben: kein „Workflow PDF Pro“ darin · der
+Ordner „Workflow PDF Pro“ selbst gewählt (Ebene darüber freigeben) · anderer Tresor · schon ein anderer Workflow-Tresor eingezogen.
+Dann das Passwort **im Android-Fenster** (anlegen: zweimal + Hinweis; öffnen: einmal; „Auf diesem Gerät entsperrt halten“ merkt den
+Hauptschlüssel im Android-Schlüsselspeicher, eigener Alias). `fachEinziehen("workflow-pdf-pro", Datenschlüssel)` + Eingangsfach
+`Eingang-WorkflowPDF` anlegen. Rückweg: `tresorordner.json`, `Tresorordner/` und den leeren `Eingang-WorkflowPDF/` löschen.
+
+**Inhaltsverzeichnis:** aus der Bibliothek (`docs` + `texte`): je Dokument Name (`.pdf`), Datum, Größe und SHA-256 der Datei
+(aus dem Satz-Index, ohne die Datei zu lesen), Seitentext-Auszug ≤ 1000 Zeichen, `verweis: docs/<id>`, `verschluesselung: "app"`
+(andere Apps zeigen nur die Zeile). Geschrieben nach dem Einzug, auf Knopfdruck und beim Verlassen der App (höchstens alle 2 Minuten),
+**nur bei einer Änderung** (Java vergleicht mit dem eigenen Stand). Nur bei passendem Ordner (Kennung).
+
+Teile: `TresorEinzug.java` (rein, JVM-Probe), `ProTresorordner.java` (Freigabe, Schlüsselspeicher), `ProVaultPlugin` (`tresorZustand`,
+`tresorEinziehen`, `tresorVerzeichnis`, `tresorSperren`, Passwort-Dialog), `DocumentVault.tresorSchluessel()` (Kopie, nur nativ),
+`native/native-tresorordner.js` (Abschnitt, Zeilen), Haken in `native/native-vault.js`.
+
+Proben (gemessen 27.10.2026 im Behälter):
+
+```bash
+# JVM ohne Gradle (CI: testReleaseUnitTest): TresorEinzugTest 3 grün
+WFP_CHROMIUM=… node --test tools/native/test-tresorordner.mjs        # 8 grün (echter Kern, echte Bibliothek, Brücke gestellt)
+TRESOR_JARS=… WFP_CHROMIUM=… node tools/native/gegenprobe-tresorordner.mjs   # 9 gefangen · 0 durchgerutscht · 2 Kontrollen grün
+```
+
+`TresorEinzugTest`: Ordnerprüfung (passt · Fach selbst · ohne · fremder Kopf) · **Probe an einer Kopie**: Original unberührt, im Fach jede
+Datei byte-gleich, neu nur die drei Einträge, BookLedgerPro bekommt mit demselben Passwort genau den Datenschlüssel, Rückweg ergibt den
+Ausgangszustand · Inhaltsverzeichnis nur bei Änderung, Schreiber/Format fest, ungültige Kennung abgelehnt, Private Brain liest es.
+
+⚠ Grenzen: das Android-Plugin ist hier nicht übersetzt (kein SDK im Behälter) — gebaut und gelintet in GitHub, **nicht im Emulator und
+nicht am Gerät gefahren**; keine echte SD-Karte. Nur der aktive Speicherort zieht ein. Ohne Dokumenttresor (nur Gerätespeicher) gibt es
+keinen Einzug. Windows: Lücke (kein Rust-Zwilling, `docs/PRODUKTSTAND.md`); die Datei tut dort nichts (keine Brücke).

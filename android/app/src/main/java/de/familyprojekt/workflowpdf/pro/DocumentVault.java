@@ -400,6 +400,8 @@ final class DocumentVault {
     }
     private void clearActive() { if (active != null && active.key != null) Arrays.fill(active.key, (byte) 0); active = null; }
     boolean configured() { return prefs.contains("tree"); }
+    /** Kopie des Datenschlüssels für den Einzug in den gemeinsamen Tresorordner (Schritt D1). Bleibt nativ, nie an die WebView. */
+    byte[] tresorSchluessel() throws Exception { return require().key.clone(); }
     boolean transferring() { return !pending.isEmpty()||batch!=null; }
     String identity() { return prefs.getString("id", ""); }
     String locationId() throws Exception {

@@ -11,3 +11,5 @@ Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 **Gemeinsamer Tresorordner (27.10.2026, Klaus: Paket wird hier gepflegt):** `android/app/src/main/java/de/familyprojekt/tresor/`
 ist die Quelle für alle Pro-Apps (BookLedgerPro, Private Brain Pro kopieren byte-gleich). Nach jeder Änderung
 `node tools/tresor/pins.mjs --schreiben`, dann in den anderen Repos nachziehen. Format und Regeln: [docs/TRESORORDNER.md](docs/TRESORORDNER.md).
+**Schritt D1 (27.10.2026):** Workflow PDF Pro zieht in den Tresorordner ein — Knopf im Tresor-Kasten der Einstellungen, Ordner über
+„Workflow PDF Pro“ (auch eine Kopie zur Probe, geprüft über die Kennung), Inhaltsverzeichnis aus der Bibliothek. Nicht am Gerät gemessen.

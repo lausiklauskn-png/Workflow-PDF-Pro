@@ -33,6 +33,10 @@ Paket `de.familyprojekt.tresor` wird **hier** gepflegt (Klaus' Wahl), byte-gleic
 Stand: Java-Paket mit JVM-Proben, noch **nicht** in der Workflow-PDF-Pro-App verdrahtet (Schritt D) und **ohne** Rust-Zwilling
 für Windows (Windows-Sitzung). Keine Veröffentlichung. Einzelheiten: `docs/TRESORORDNER.md`.
 
+**Schritt D1 (27.10.2026): Android zieht ein** — Knopf im Tresor-Kasten, Ordnerprüfung über die Kennung, Inhaltsverzeichnis aus der
+Bibliothek. **Lücke Windows:** kein Einzug, weil das Paket dort keinen Rust-Zwilling hat; kommt mit der Windows-Sitzung (Gleichstandsregel).
+PWA (Workflow-PDF): ohne Tresorordner, bewusst (PWAs bleiben bei Teilen/Links). Nicht veröffentlicht.
+
 ## Gesammelt für die nächste gemeinsame Version
 
 Kleine Korrekturen werden gesammelt und dann zusammen in alle Fassungen gebracht (Klaus, 22.10.2026).
