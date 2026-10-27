@@ -68,6 +68,9 @@ jobs:
       - name: Git-Release-Auftrag mit Gegenproben prüfen
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test tools/signing/test-request-release.mjs
+      - name: Gemeinsames Tresorordner-Paket gepinnt (de.familyprojekt.tresor)
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: node tools/tresor/pins.mjs
       - name: Binäre Tresor-Datensätze und Übersetzungsstände prüfen
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test tools/native/test-vault-codec.mjs tools/native/test-vault-records.mjs tools/native/test-vault-journal.mjs tools/native/test-vault-gate.mjs tools/native/test-vault-migration.mjs
