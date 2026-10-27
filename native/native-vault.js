@@ -170,6 +170,8 @@
         void api.recoveryInfo({location:active.state.location}).then(show).catch(()=>{});
         button(actions,'recovery',async()=>{const answer=await api.createRecovery({location:active.state.location,language:language()});if(answer?.created)show({exists:true,createdAt:answer.createdAt});});
       }
+      // Gemeinsamer Tresorordner (Schritt D1): eigener Abschnitt, nur bei entsperrtem Dokumenttresor.
+      if(active&&window.WFPTresorordner)void WFPTresorordner.abschnitt(panel,actions,active.state).catch(()=>{});
       if(active)button(actions,'lock',async()=>{document.activeElement?.blur();await gate.pause();await active.journal.tail;await api.lock();await boot();});
       button(actions,'close',async()=>{panel.close();panel.remove();panel=null;});
     }
@@ -200,6 +202,6 @@
     }
     return result;
   };
-  window.WFPNativeVault=Object.freeze({manage,boot,gate,selectLocation:confirmMove});
+  window.WFPNativeVault=Object.freeze({manage,boot,gate,selectLocation:confirmMove,aktiv:()=>active?.state||null});
   void boot().catch(error=>{status('error');void manage(true,error);});
 })();

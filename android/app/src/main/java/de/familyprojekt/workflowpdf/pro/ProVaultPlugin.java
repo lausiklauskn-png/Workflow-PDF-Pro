@@ -24,12 +24,13 @@ public final class ProVaultPlugin extends Plugin {
     private final PluginWorker worker=new PluginWorker("vault");
     private final AtomicBoolean choosing=new AtomicBoolean();
     private VaultLocations locations;
-    @Override public void load(){worker.execute(()->locations=new VaultLocations(getContext()));}
+    private ProTresorordner tresor;
+    @Override public void load(){worker.execute(()->{locations=new VaultLocations(getContext());tresor=new ProTresorordner(getContext());});}
     private DocumentVault vault(PluginCall call)throws Exception{return locations.get(call.getString("location"));}
     private interface Work{JSONObject run()throws Exception;}
     private static String code(Exception error){
         String message=error.getMessage();
-        if(message!=null&&message.matches("VAULT_[A-Z_]+"))return message;
+        if(message!=null&&message.matches("(VAULT|TRESOR)_[A-Z_]+"))return message;
         return error instanceof JSONException?"VAULT_DAMAGED":error instanceof SecurityException||error instanceof java.io.FileNotFoundException?"VAULT_FOLDER_UNAVAILABLE":"VAULT_UNAVAILABLE";
     }
     private void work(PluginCall call,Work task){worker.submit(call,()->{try{call.resolve(JSObject.fromJSONObject(task.run()));}catch(Exception error){String code=code(error);call.reject(code,code);}});}
@@ -263,5 +264,98 @@ public final class ProVaultPlugin extends Plugin {
     @PluginMethod public void read(PluginCall call){work(call,()->new JSONObject().put("data",Base64.encodeToString(vault(call).read(call.getString("store"),call.getString("id"),ProFilesPlugin.integer(call.getData().opt("offset")),call.getString("hash")),Base64.NO_WRAP)));}
     @PluginMethod public void list(PluginCall call){work(call,()->new JSONObject().put("ids",vault(call).list(call.getString("store"))));}
     @PluginMethod public void remove(PluginCall call){work(call,()->{vault(call).remove(call.getString("store"),call.getString("id"),call.getBoolean("prefix",false));return new JSONObject().put("saved",true);});}
-    @Override protected void handleOnDestroy(){worker.close(()->locations.close());}
+    // ---------- Gemeinsamer Tresorordner (Schritt D1, Klaus 2026-10-27) ----------
+    // Der Knopf „In den Tresorordner einziehen“ steht im Tresor-Kasten der Einstellungen. Gewählt wird die Ebene ÜBER
+    // „Workflow PDF Pro“; sie passt nur, wenn darin genau der entsperrte Tresor liegt (auch als Kopie, für die Probe).
+    // Passwort nur im nativen Dialog; der Datenschlüssel verlässt Java nicht (TresorEinzug, ProTresorordner).
+    private static final String[][] T_WORDS={
+        {"Tresorordner anlegen","Create shared vault folder","Создать общую папку-хранилище","إنشاء مجلد الخزنة المشترك"},
+        {"Tresorordner entsperren","Unlock shared vault folder","Разблокировать общую папку-хранилище","فتح مجلد الخزنة المشترك"},
+        {"Ein Passwort für alle Pro-Apps (Private Brain Pro, Workflow PDF Pro, BookLedgerPro). Es verlässt das Gerät nie. Mindestens 10 Zeichen.","One password for all Pro apps (Private Brain Pro, Workflow PDF Pro, BookLedgerPro). It never leaves the device. At least 10 characters.","Один пароль для всех Pro-приложений (Private Brain Pro, Workflow PDF Pro, BookLedgerPro). Он не покидает устройство. Не менее 10 символов.","كلمة مرور واحدة لكل تطبيقات Pro (Private Brain Pro وWorkflow PDF Pro وBookLedgerPro). لا تغادر الجهاز أبداً. 10 أحرف على الأقل."},
+        {"Das Passwort des Tresorordners (dasselbe wie in den anderen Pro-Apps).","The shared vault folder password (the same as in the other Pro apps).","Пароль общей папки (тот же, что в других Pro-приложениях).","كلمة مرور المجلد المشترك (نفسها في تطبيقات Pro الأخرى)."},
+        {"Passwort vergessen = ohne Ersatzschlüssel kein Zugang. Ich bewahre es sicher auf.","Forgotten password = no access without recovery keys. I will keep it safe.","Забытый пароль = без ключей восстановления доступа нет. Я сохраню его надёжно.","نسيان كلمة المرور يعني عدم الوصول بدون مفاتيح الاسترداد. سأحتفظ بها بأمان."},
+        {"Passwort falsch oder Ordner nicht erreichbar. Nichts wurde verändert.","Wrong password or folder unavailable. Nothing was changed.","Неверный пароль или папка недоступна. Ничего не изменено.","كلمة المرور غير صحيحة أو المجلد غير متاح. لم يتغير شيء."}
+    };
+    private DocumentVault vaultOrNull(PluginCall call){try{return vault(call);}catch(Exception error){return null;}}
+    @PluginMethod public void tresorZustand(PluginCall call){work(call,()->tresor.zustand(vaultOrNull(call)));}
+    @PluginMethod public void tresorSperren(PluginCall call){work(call,()->{tresor.sperren(call.getBoolean("vergessen",false));return tresor.zustand(vaultOrNull(call));});}
+    @PluginMethod public void tresorVerzeichnis(PluginCall call){work(call,()->{JSONArray zeilen=call.getData().optJSONArray("zeilen");if(zeilen==null)throw new java.io.IOException("TRESOR_EINTRAG_UNGUELTIG");return tresor.verzeichnis(zeilen,vault(call));});}
+    @PluginMethod public void tresorEinziehen(PluginCall call){
+        if(worker.closed()){call.reject("NATIVE_ACTIVITY_CLOSED");return;}
+        if(!choosing.compareAndSet(false,true)){call.reject("VAULT_BUSY","VAULT_BUSY");return;}
+        worker.submit(call,()->{
+            try{
+                DocumentVault v=vault(call);byte[] probe=v.tresorSchluessel();Arrays.fill(probe,(byte)0); // nur entsperrt
+                boolean neu=call.getBoolean("neuWaehlen",false)||!tresor.gewaehlt();
+                if(!neu){try{neu=!"PASST".equals(tresor.pruefung(v.identity()));}catch(java.io.IOException unerreichbar){neu=true;}}
+                if(neu){getActivity().runOnUiThread(()->tresorOrdnerWaehlen(call));return;}
+                tresorWeiter(call,v);
+            }catch(Exception error){choosing.set(false);String code=code(error);call.reject(code,code);}
+        });
+    }
+    private void tresorOrdnerWaehlen(PluginCall call){
+        Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION|Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION|Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        try{startActivityForResult(call,intent,"tresorGewaehlt");}
+        catch(Exception error){choosing.set(false);call.reject("TRESOR_ORDNER_NICHT_ERREICHBAR","TRESOR_ORDNER_NICHT_ERREICHBAR");}
+    }
+    @ActivityCallback private void tresorGewaehlt(PluginCall call,ActivityResult result){
+        if(call==null){choosing.set(false);return;}
+        Intent data=result.getData();
+        if(result.getResultCode()!=Activity.RESULT_OK||data==null||data.getData()==null){choosing.set(false);call.resolve(new JSObject().put("abgebrochen",true));return;}
+        Uri tree=data.getData();int flags=Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+        worker.submit(call,()->{
+            try{
+                if(!"content".equals(tree.getScheme())||(data.getFlags()&flags)!=flags)throw new SecurityException();
+                getContext().getContentResolver().takePersistableUriPermission(tree,flags);
+                DocumentVault v=vault(call);String pruefung=tresor.pruefen(tree,v.identity());
+                // Nichts übernehmen, wenn der Ordner nicht genau diesen Tresor enthält. Die Freigabe bleibt (sie kann die des Tresors selbst sein).
+                if(!"PASST".equals(pruefung))throw new java.io.IOException("TRESOR_ORDNER_"+pruefung);
+                tresor.baumSetzen(tree);
+                tresorWeiter(call,v);
+            }catch(Exception error){choosing.set(false);String code=code(error);call.reject(code,code);}
+        });
+    }
+    /** Auf dem Arbeits-Thread: offen oder gemerkt → gleich einziehen, sonst Passwort-Dialog. */
+    private void tresorWeiter(PluginCall call,DocumentVault v)throws Exception{
+        if(tresor.istOffen()||tresor.gemerktEntsperren()){tresor.einziehen(v);choosing.set(false);call.resolve(JSObject.fromJSONObject(tresor.zustand(v).put("eingezogenJetzt",true)));return;}
+        boolean anlegen=!tresor.vorhanden();
+        getActivity().runOnUiThread(()->tresorPasswort(call,v,anlegen));
+    }
+    private void tresorPasswort(PluginCall call,DocumentVault v,boolean anlegen){
+        if(worker.closed()||getActivity().isFinishing()||getActivity().isDestroyed()){choosing.set(false);call.reject("NATIVE_ACTIVITY_CLOSED");return;}
+        String language=call.getString("language","de");int index=Arrays.asList("de","en","ru","ar").indexOf(language);final int lang=index<0?0:index;
+        LinearLayout box=new LinearLayout(getContext());box.setOrientation(LinearLayout.VERTICAL);int pad=(int)(20*getContext().getResources().getDisplayMetrics().density);box.setPadding(pad,pad,pad,pad);
+        if(lang==3)box.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView help=new TextView(getContext());help.setText(T_WORDS[anlegen?2:3][lang]);box.addView(help);
+        EditText first=new EditText(getContext()),second=new EditText(getContext());
+        for(EditText field:new EditText[]{first,second}){field.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);if(Build.VERSION.SDK_INT>=26)field.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);}
+        first.setHint(WORDS[2][lang]);second.setHint(WORDS[3][lang]);box.addView(first);if(anlegen)box.addView(second);
+        CheckBox notice=new CheckBox(getContext());notice.setText(T_WORDS[4][lang]);if(anlegen)box.addView(notice);
+        CheckBox remember=new CheckBox(getContext());remember.setText(WORDS[5][lang]);remember.setChecked(true);box.addView(remember);
+        TextView status=new TextView(getContext());box.addView(status);ScrollView scroll=new ScrollView(getContext());scroll.addView(box);
+        Runnable clear=()->{first.getText().clear();second.getText().clear();};
+        AlertDialog dialog=new AlertDialog.Builder(getActivity()).setTitle(T_WORDS[anlegen?0:1][lang]).setView(scroll)
+            .setNegativeButton(WORDS[6][lang],(d,w)->{clear.run();choosing.set(false);call.resolve(new JSObject().put("abgebrochen",true));})
+            .setPositiveButton(WORDS[7][lang],null).create();
+        dialog.setOnCancelListener(d->{clear.run();choosing.set(false);call.resolve(new JSObject().put("abgebrochen",true));});
+        dialog.setOnShowListener(d->dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(x->{
+            String p=java.text.Normalizer.normalize(first.getText(),java.text.Normalizer.Form.NFC);
+            if(p.codePointCount(0,p.length())<10||anlegen&&(!p.equals(java.text.Normalizer.normalize(second.getText(),java.text.Normalizer.Form.NFC))||!notice.isChecked())){status.setText(WORDS[8][lang]);return;}
+            boolean keep=remember.isChecked();dialog.setCancelable(false);dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
+            worker.submit(call,()->{
+                try{
+                    tresor.mitPasswort(p,anlegen,keep,v);
+                    JSObject state=JSObject.fromJSONObject(tresor.zustand(v).put("eingezogenJetzt",true).put("angelegt",anlegen));
+                    getActivity().runOnUiThread(()->{clear.run();dialog.dismiss();choosing.set(false);call.resolve(state);});
+                }catch(Exception error){
+                    String code=code(error);
+                    // Ein falsches Passwort darf neu versucht werden; ein belegtes Fach oder ein anderer Ordner nicht.
+                    if("TRESOR_PASSWORT".equals(code)||"TRESOR_PASSWORT_FALSCH".equals(code)||"TRESOR_ORDNER_NICHT_ERREICHBAR".equals(code))
+                        getActivity().runOnUiThread(()->{clear.run();status.setText(T_WORDS[5][lang]);dialog.setCancelable(true);dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);});
+                    else getActivity().runOnUiThread(()->{clear.run();dialog.dismiss();choosing.set(false);call.reject(code,code);});
+                }
+            });
+        }));dialog.show();first.requestFocus();
+    }
+    @Override protected void handleOnDestroy(){worker.close(()->{tresor.schliessen();locations.close();});}
 }
