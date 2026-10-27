@@ -27,6 +27,12 @@ bleibt zurück. Ziel: keine Lücken und keine Frage, welche Fassung was schon ha
   steht, welche Fassung noch fehlt und warum (zum Beispiel iOS: nur vorbereitet, nicht veröffentlicht).
 - Nach jeder Veröffentlichung die Übersicht oben aktualisieren.
 
+## Gemeinsamer Tresorordner (Schritt B, 27.10.2026)
+
+Paket `de.familyprojekt.tresor` wird **hier** gepflegt (Klaus' Wahl), byte-gleich in BookLedgerPro und Private Brain Pro.
+Stand: Java-Paket mit JVM-Proben, noch **nicht** in der Workflow-PDF-Pro-App verdrahtet (Schritt D) und **ohne** Rust-Zwilling
+für Windows (Windows-Sitzung). Keine Veröffentlichung. Einzelheiten: `docs/TRESORORDNER.md`.
+
 ## Gesammelt für die nächste gemeinsame Version
 
 Kleine Korrekturen werden gesammelt und dann zusammen in alle Fassungen gebracht (Klaus, 22.10.2026).
