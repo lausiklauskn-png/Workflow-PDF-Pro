@@ -45,6 +45,8 @@
         </activity>
 
         <service android:name=".ChromeService" android:exported="false" android:foregroundServiceType="dataSync" />
+        <!-- Pro-Umbau 4: gemeinsame Hintergrundaufgabe (Sichern, Prüfen, Einordnen, Beschreiben laufen weiter). -->
+        <service android:name="de.familyprojekt.hintergrund.ProHintergrundDienst" android:exported="false" android:foregroundServiceType="dataSync" />
         <!-- Initialize the optional Google model SDK only after an explicit
              informed choice, never merely because the app was launched. -->
         <provider android:name="com.google.mlkit.common.internal.MlKitInitProvider"
