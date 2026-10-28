@@ -144,3 +144,21 @@ Wie Private Brain Pro #107 (Leitfaden `BookLedgerPro/docs/design/LEITFADEN-PRO-A
   Gegenprobe: Schicht leer → DE und EN rot; als PWA stehen die Browser-Sätze da (dort richtig).
 - ⚠ Nicht am Gerät gemessen; ob Androids Dateien-App einen Ordner per ACTION_VIEW zeigt, ist offen. Sicherung gestreamt (~50 MB) ist
   noch nicht gebaut (eigener PR).
+
+## Eingang-WorkflowPDF anzeigen und übernehmen (Pro-Umbau 5, 2026-10-28)
+
+Andere Pro-Apps legen Dateien für Workflow PDF Pro in das Übergabefach **„Eingang-WorkflowPDF“** (BookLedgerPro: „An Pro-App geben …“).
+Bisher zeigte Workflow PDF Pro es nicht an. Jetzt:
+- **Einstellungen → Tresor & Ablage → Tresor (alle Pro-Apps)**, verbunden: Block „Eingang-WorkflowPDF“ mit „Neu im Eingang: N“, je Datei Name ·
+  Datum · Größe, Erklärung hinter ⓘ, ein farbiger Knopf **„Übernehmen (N)“**. Ohne Neues: „Im Eingang liegt nichts Neues.“
+- **Über den Karten** eine flache Zeile „Neu im Eingang: N“ mit „Übernehmen (N)“, solange der Tresorordner offen ist und etwas Neues liegt
+  (4 s nach dem Start und beim Zurückkehren in die App).
+- „Übernehmen“ liest **alle** neuen Dateien in Stücken zu 192 KB (`tresorEingangOeffnen`/`tresorEingangTeil`), gibt sie wie „Datei einlesen“ an
+  den Kern (`importDateien`: ungeprüft, Prüfen auf Knopfdruck) und markiert sie **erst danach** als übernommen (`tresorEingangMarkieren` →
+  `TresorOrdner.markeSetzen`). Im Fach wird nichts gelöscht. Schon markierte Einträge stehen nicht mehr da.
+- Java: `ProTresorordner.eingang/eingangOeffnen/eingangTeil/eingangMarkieren` über `offenOderGemerkt()` (dieselbe Regel wie das
+  Inhaltsverzeichnis: nach „Sperren“ von Hand öffnet der gemerkte Schlüssel nicht wieder), Plugin `WorkflowVault.tresorEingang*`.
+  Das Paket `de.familyprojekt.tresor` ist **unverändert** (Pins bleiben).
+- Probe: `tools/native/test-tresorordner.mjs` (Brücke gestellt: ein neuer und ein schon übernommener Eintrag, Hinweiszeile, Block, Übernehmen in
+  mehreren Stücken, erst gelesen dann markiert, Dokument mit 3 Seiten ungeprüft in der Bibliothek, Hinweis danach weg).
+- ⚠ Nicht am Gerät; die Java-Seite ist nur in der CI gebaut (JVM-Proben, `assembleRelease`), nicht mit einem echten SAF-Ordner gefahren.

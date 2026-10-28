@@ -56,3 +56,23 @@ Auswahl prüft alle → je rot.
 - Proben: `tools/native/test-hintergrund-dienst.mjs` (Gegenprobe als PWA: der Kern lädt das Bildmodell beim Öffnen; Bildmodell als kleines
   Modul gestellt). Gegenprobe von Hand: Bild-Schutz weg · Meldung weg · Abbruch wirkungslos → je rot. `npm run test:native-web` 54 grün (vorher 53).
 - ⚠ Nicht am Gerät gemessen (Mitteilung, Energiesparen des Herstellers, Timer in verborgener WebView).
+
+## Pro-Umbau 5 (2026-10-28): der Kern kann es selbst — Umwege entfernt
+
+Workflow-PDF 1.1.4 (Kern, `upstream/workflow-pdf`) startet beim Öffnen nichts mehr von selbst: die Bedeutung lädt nur das Modell, ordnet erst
+auf „Einordnen“ ein; die Bildbeschreibung wartet auf „Beschreiben“; „Prüfen“ und „Einordnen“ stehen nebeneinander über den Karten, wirken auf
+die Auswahl oder fragen „Alle N …?“, und alle drei melden sich selbst bei `window.ProHintergrund` an. Deshalb sind aus
+`native/native-hintergrund.js` entfernt, ohne Funktion zu verlieren:
+- das Anhalten von `SbkimEmbedding.embedPassageBatch` und der eigene Knopf „Einordnen“ in der Bedeutungszeile,
+- das Abfangen von „Alle prüfen“ mit eigener Frage und der Knopf „N gewählte prüfen“ in der Auswahl-Leiste,
+- das Umhüllen von `WFP.Bild.start` und der eigene Knopf „Beschreiben“,
+- der Blick je Sekunde auf den Kern für die Hintergrundaufgabe.
+Geblieben ist nur der **Tipp-Schutz** (Start-Knöpfe reagieren nur auf einen Tipp, der auf ihnen begann) — den hat der Kern nicht; Liste jetzt
+`[data-pruef-alle-los], [data-einordnen], [data-bild-beschreiben], [data-bed-an], #siErstellen`.
+- Proben: `tools/native/test-hintergrund.mjs` (keine Umwege mehr, Einordnen wartet, Frage, Auswahl, Tipp-Schutz mit Gegenprobe als PWA) und
+  `tools/native/test-hintergrund-dienst.mjs` (Bildbeschreibung wartet; Prüfen/Einordnen/Beschreiben melden sich mit Stand beim gestellten
+  Android-Dienst an und ab; „Abbrechen“ aus der Mitteilung hält das Einordnen an).
+- Nebenbefund: `native-ohne-web.js` ersetzte einen Hilfe-Satz, in dem „🌐“ steht. Seit den Strichgrafiken des Kerns steht er in zwei Textknoten
+  (getrennt am Symbol) und wurde nicht mehr ersetzt (`test-ohne-web` war rot: „installiert“ sichtbar). Jetzt zwei Teile; fällt der zweite weg,
+  geht das Symbol davor mit.
+- ⚠ Nicht am Gerät gemessen.

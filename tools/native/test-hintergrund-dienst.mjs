@@ -1,5 +1,6 @@
-// Pro-Umbau 4: Bildbeschreibung startet nicht von selbst; Prüfen, Einordnen und Beschreiben melden sich beim
-// gemeinsamen Hintergrund-Dienst (pro-hintergrund.js → Android ProHintergrundDienst) an und wieder ab.
+// Pro-Umbau 4/5: Bildbeschreibung startet nicht von selbst; Prüfen, Einordnen und Beschreiben melden sich beim
+// gemeinsamen Hintergrund-Dienst (pro-hintergrund.js → Android ProHintergrundDienst) an und wieder ab. Seit Pro-Umbau 5 tut
+// das der Kern selbst (window.ProHintergrund) — die Pro-Schicht schaut nicht mehr je Sekunde nach.
 // Die Android-Brücke ist gestellt (zählt beginnen/stand/ende); das Bildmodell ist nicht erreichbar (jsDelivr gesperrt) —
 // gemessen wird, OB der Kern zu laden beginnt, nicht ob das Modell beschreibt. Gegenprobe als PWA (ohne App-Schicht).
 import test from 'node:test';
@@ -58,52 +59,53 @@ test('Bildbeschreibung wartet auf „Beschreiben“, lange Läufe melden sich be
   const foto=page=>page.evaluate(async()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');g.fillStyle='#38a';g.fillRect(0,0,64,64);g.fillStyle='#fd3';g.fillRect(10,10,20,20);
     const b=await new Promise(r=>c.toBlob(r,'image/png'));const [d]=await __wfpdf.importDateien([new File([b],'Urlaub.png',{type:'image/png'})],null,{still:true});return d.quelle;});
 
-  // ---------- Gegenprobe PWA: der Kern beginnt beim Öffnen von selbst, das Bildmodell zu laden ----------
+  // ---------- Gegenprobe PWA: ohne ProHintergrund läuft dasselbe einfach so, ohne Anmeldung ----------
   {const {page}=await seite(false);
-   await page.waitForFunction(()=>WFP.Bild.zustand().zustand!=='aus',null,{timeout:15000}).catch(()=>{});
-   assert.notEqual(await page.evaluate(()=>WFP.Bild.zustand().zustand),'aus','Gegenprobe: ohne App-Schicht startet die Bildbeschreibung beim Öffnen (sonst wäre die Probe blind)');
+   await page.waitForSelector('#bildLeiste [data-bild-beschreiben]',{timeout:20000});
+   assert.equal(await page.evaluate(()=>window.ProHintergrund?.verfuegbar?.()??false),false,'Gegenprobe: als PWA steht kein Android-Dienst dahinter');
    await page.context().close();}
 
   const {page,errors}=await seite(true);
-  // 1 · Bildbeschreibung wartet auf den Knopf
-  await page.waitForSelector('#bildLeiste [data-wpp-beschreiben]',{timeout:20000});
+  // 1 · Bildbeschreibung wartet auf den Knopf (Kern)
+  await page.waitForSelector('#bildLeiste [data-bild-beschreiben]',{timeout:20000});
   await warte(1500);
-  assert.equal(await page.evaluate(()=>WFP.Bild.zustand().zustand),'aus','beim Öffnen wird kein Bildmodell geladen');
-  assert.equal(await page.evaluate(()=>WFPNativeHintergrund.bildWartet()),true);
+  assert.equal(await page.evaluate(()=>WFP.Bild.zustand().zustand),'wartet','beim Öffnen wird kein Bildmodell geladen');
   assert.equal(await foto(page),'foto');
   await page.waitForFunction(()=>/1 Foto\(s\) noch nicht beschrieben/.test(document.getElementById('bildLeiste').textContent),null,{timeout:10000});
-  assert.equal(await page.evaluate(()=>WFP.Bild.zustand().zustand),'aus','ein neues Foto startet es auch nicht');
-  await page.tap('#bildLeiste [data-wpp-beschreiben]');
-  await page.waitForSelector('dialog[data-wpp-frage][open]');
-  assert.match(await page.textContent('dialog[data-wpp-frage]'),/1 Foto\(s\) beschreiben\?/);
-  assert.match(await page.textContent('dialog[data-wpp-frage]'),/256 MB/);
-  await page.tap('dialog[data-wpp-frage] [data-wpp-antwort="nein"]');
-  await warte(400);assert.equal(await page.evaluate(()=>WFP.Bild.zustand().zustand),'aus','„Abbrechen“ in der Frage startet nichts');
-  await page.tap('#bildLeiste [data-wpp-beschreiben]');
-  await page.tap('dialog[data-wpp-frage] [data-wpp-antwort="ja"]');
-  await page.waitForFunction(()=>WFP.Bild.zustand().zustand!=='aus',null,{timeout:10000});
-  assert.equal(await page.evaluate(()=>WFPNativeHintergrund.bildFreigegeben()),true,'nach „Beschreiben“ läuft der Kern');
+  assert.equal(await page.evaluate(()=>WFP.Bild.zustand().zustand),'wartet','ein neues Foto startet es auch nicht');
+  await page.tap('#bildLeiste [data-bild-beschreiben]');
+  await page.waitForSelector('.dlg');
+  assert.match(await page.textContent('.dlg'),/1 Foto\(s\) beschreiben\?/);
+  assert.match(await page.textContent('.dlg'),/256 MB/);
+  await page.tap('.dlg [data-n]');
+  await warte(400);assert.equal(await page.evaluate(()=>WFP.Bild.zustand().zustand),'wartet','„Abbrechen“ in der Frage startet nichts');
+  await page.tap('#bildLeiste [data-bild-beschreiben]');
+  await page.tap('.dlg [data-j]');
   await page.waitForFunction(()=>__hg.some(e=>e[0]==='beginnen'&&e[1]==='beschreiben'&&e[2]==='Bildbeschreibung läuft'),null,{timeout:10000});
   await page.waitForFunction(()=>WFP.Bild.zustand().zustand==='bereit'&&__hg.some(e=>e[0]==='ende'&&e[1]==='beschreiben'),null,{timeout:20000});
   assert.ok(await page.evaluate(()=>__wfpdf.S.docs.some(d=>d.bild&&d.bild.modell==='a blue square')),'das Foto ist beschrieben');
+  assert.ok(await page.evaluate(()=>__hg.some(e=>e[0]==='stand'&&e[1]==='beschreiben'&&/Foto 1 von 1/.test(e[2]))),'Stand je Foto');
 
-  // 2 · Dienst beim Laden aufgeräumt; Prüfen meldet sich an und ab
+  // 2 · Dienst beim Laden aufgeräumt; Prüfen meldet sich an, mit Stand, und ab
   assert.equal(await page.evaluate(()=>__hg[0][0]),'aufraeumen');
   await page.evaluate(async b64=>{const b=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));await __wfpdf.importDateien([new File([b],'Brief.pdf',{type:'application/pdf'})],null,{still:true});},bytes);
   await page.waitForSelector('[data-pruef-alle-los]');
   await page.tap('[data-pruef-alle-los]');
-  await page.tap('dialog[data-wpp-frage] [data-wpp-antwort="ja"]');
+  await page.tap('.dlg [data-j]');
   await page.waitForFunction(()=>__hg.some(e=>e[0]==='beginnen'&&e[1]==='pruefen'),null,{timeout:10000});
   assert.ok(await page.evaluate(()=>__hg.some(e=>e[0]==='beginnen'&&e[1]==='pruefen'&&e[2]==='Prüfen läuft')),'Titel der Mitteilung „Prüfen läuft“');
   await page.waitForFunction(()=>!__wfpdf.eingang.ALLE.an&&__hg.some(e=>e[0]==='ende'&&e[1]==='pruefen'),null,{timeout:90000});
+  assert.ok(await page.evaluate(()=>__hg.some(e=>e[0]==='stand'&&e[1]==='pruefen'&&/Dokument 1 von/.test(e[2]))),'Stand je Dokument');
 
-  // 3 · Einordnen meldet sich an; „Abbrechen“ aus der Mitteilung hält es an (Knopf „Einordnen“ wieder da)
-  await page.waitForSelector('#bedeutungLeiste [data-wpp-einordnen]',{timeout:20000});
-  await page.tap('#bedeutungLeiste [data-wpp-einordnen]');
-  await page.tap('dialog[data-wpp-frage] [data-wpp-antwort="ja"]');
-  await page.waitForFunction(()=>__hg.some(e=>e[0]==='beginnen'&&e[1]==='einordnen'&&e[2]==='Einordnen läuft'),null,{timeout:15000}).catch(async e=>{console.log(JSON.stringify(await page.evaluate(()=>({hg:__hg,z:__wfpdf.bedeutung.BED.zustand,b:__emb.batches,f:WFPNativeHintergrund.freigegeben(),a:WFPNativeHintergrund.aufgaben()}))));throw e;});
+  // 3 · Einordnen meldet sich an; „Abbrechen“ aus der Mitteilung hält es an (die Zeile sagt „Angehalten“)
+  await page.waitForSelector('#pruefAlle [data-einordnen]',{timeout:20000});
+  await page.tap('#pruefAlle [data-einordnen]');
+  await page.tap('.dlg [data-j]');
+  await page.waitForFunction(()=>__hg.some(e=>e[0]==='beginnen'&&e[1]==='einordnen'&&e[2]==='Einordnen läuft'),null,{timeout:15000});
   assert.ok(await page.evaluate(()=>__hgAbbruch('einordnen')),'Abbruch aus der Mitteilung nachgestellt');
-  await page.waitForFunction(()=>!WFPNativeHintergrund.freigegeben()&&__hg.some(e=>e[0]==='ende'&&e[1]==='einordnen'),null,{timeout:10000});
-  await page.waitForSelector('#bedeutungLeiste [data-wpp-einordnen]',{timeout:20000});
+  await page.waitForFunction(()=>!__wfpdf.bedeutung.BED.einLauf&&__hg.some(e=>e[0]==='ende'&&e[1]==='einordnen'),null,{timeout:15000});
+  assert.ok(await page.evaluate(()=>__wfpdf.bedeutung.offeneEinordnen().length>0),'nach dem Abbruch bleibt etwas offen');
+  assert.match(await page.textContent('#bedeutungLeiste'),/Angehalten/);
+  assert.ok(await page.isVisible('#pruefAlle [data-einordnen]'),'„Einordnen“ steht wieder da');
   assert.deepEqual(errors,[]);
 });

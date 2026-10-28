@@ -105,6 +105,16 @@ Sprachadapter (`native-speech.js`) hängt sich an jedes Textfeld, also auch an d
 **Auf main seit 26.10.2026 (#26, Klaus' Wort) und am selben Abend als 1.0.5 veröffentlicht** (siehe „Veröffentlichen“). Nicht gemessen: Gerät, WebView-Arbeitsspeicher
 beim Beschreiben (1,2 GB im Prüfrechner sind für ein Tablet ein Risiko), ob `family-projekt.de` das Modell liefert.
 
+## Pro-Umbau 5, Schritt 4: Kern 1.1.4, Scanner-Direktstart, Eingangsfach (28.10.2026)
+
+PWA (Workflow-PDF #136, **1.1.4**, Cache v109): nichts startet beim Öffnen (Einordnen erst auf „Einordnen“, Bildbeschreibung erst auf
+„Beschreiben“), „Prüfen“ und „Einordnen“ nebeneinander für die Auswahl oder „Alle N …?“, Datei für Datei mit Stand und Abbrechen, Anmeldung bei
+`window.ProHintergrund`, Strichgrafiken statt Emojis, Knöpfe 32 px, die Bibliothek öffnet beim Anzeigen kein PDF. Workflow PDF Pro übernimmt den
+Kern bytegleich (`upstream/workflow-pdf` = Stand von #136, `verify-upstream` 0 Abweichungen), Anker `app.js?v=72`, App **1.0.8**/Buildnummer 9.
+Nur in der App: Scanner-Direktstart per Intent (`de.familyprojekt.workflowpdf.pro.SCANNEN`, Extra `von`) und das Fach „Eingang-WorkflowPDF“.
+Windows bekommt den Kern gleich; den Intent gibt es dort nicht (Windows hat keinen Weg, mit dem BookLedgerPro Windows den Scanner direkt
+öffnet — benannte Lücke). Nicht veröffentlicht, nicht am Gerät gemessen.
+
 ## Veröffentlichen
 
 **1.0.5 veröffentlicht 2026-10-26 (Klaus: „wenn das die aktuellste ist, muss die raus“):** [Android-APK](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.5/Workflow-PDF-Pro-1.0.5.apk) (Lauf 40383096577, Tag `v1.0.5`, 83.147.148 B, SHA-256 `c9b8e67ef67bb1d38b0497d484937c271ed7f54e085b8e615d7200298512af65`, Buildnummer 6, Zertifikat `0da805c9…`, signierte Erstinstallation mit erhaltenem Ordner im Lauf) · [Windows-Setup](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.5/Workflow-PDF-Pro-Windows-1.0.5-Setup.exe) (Lauf 40384462589, Tag `windows-v1.0.5`, 15.866.577 B, SHA-256 `7e4e9195d2aa5c60ff3c7fcbf617532b6800cd4e2c60f2884c330fc06516f70c`, unsigniert, Installer aus dem Windows-Bau 40383101175 auf main, dort Installieren/Starten/Entfernen geprüft). Quelle `ba5d54e2e97e654881ebe8037995963c7d9dcef1`. Beide Downloads unabhängig geladen, Größe und SHA-256 gleich den veröffentlichten Prüfsummen. Geschenk für Jens trägt 1.0.5. Diese Veröffentlichung ist erledigt; nicht erneut auslösen. ⚠ Am Tablet und am eigenen Windows-PC nicht gemessen.

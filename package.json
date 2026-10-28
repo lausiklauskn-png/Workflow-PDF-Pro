@@ -1,6 +1,6 @@
 {
   "name": "workflow-pdf-pro",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "type": "module",
   "description": "Workflow PDF Pro — lokal gebündelter unveränderter Workflow-PDF-Kern mit nativen Geräteadaptern",
@@ -10,7 +10,7 @@
     "build:web": "node tools/native/prepare-web.mjs",
     "sync:android": "npm run build:web && cap sync android",
     "build:android": "npm run sync:android && cd android && ./gradlew --no-daemon --max-workers=2 assembleRelease",
-    "test:native-web": "npm run build:web && node --test --test-concurrency=1 tools/native/test-web-bundle.mjs tools/native/test-file-adapter.mjs tools/native/test-folder-import.mjs tools/native/test-incoming.mjs tools/native/test-vault-product.mjs tools/native/test-tresorordner.mjs tools/native/test-ohne-web.mjs tools/native/test-sicherung.mjs tools/native/test-hintergrund.mjs tools/native/test-hintergrund-dienst.mjs tools/native/test-bedienung-pin.mjs tools/native/test-pro-bedienung.mjs tools/native/test-native-chrome.mjs tools/native/test-native-speech.mjs tools/native/test-native-translate.mjs"
+    "test:native-web": "npm run build:web && node --test --test-concurrency=1 tools/native/test-web-bundle.mjs tools/native/test-file-adapter.mjs tools/native/test-folder-import.mjs tools/native/test-incoming.mjs tools/native/test-vault-product.mjs tools/native/test-tresorordner.mjs tools/native/test-ohne-web.mjs tools/native/test-sicherung.mjs tools/native/test-hintergrund.mjs tools/native/test-hintergrund-dienst.mjs tools/native/test-scan-direkt.mjs tools/native/test-bedienung-pin.mjs tools/native/test-pro-bedienung.mjs tools/native/test-native-chrome.mjs tools/native/test-native-speech.mjs tools/native/test-native-translate.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.3",
