@@ -35,7 +35,9 @@
     WorkflowVault: plugin('WorkflowVault', ['state', 'locations', 'migration', 'prepareMigration', 'completeMigration', 'cancelMigration',
       'beginBatch', 'commitBatch', 'abortBatch', 'setPrimary', 'volumes', 'choose', 'unlock', 'lock', 'begin', 'append', 'finish', 'abort',
       'info', 'read', 'list', 'remove', 'recoveryInfo', 'createRecovery']),
-    WorkflowChrome: plugin('WorkflowChrome', ['begin', 'translate', 'close'])
+    WorkflowChrome: plugin('WorkflowChrome', ['begin', 'translate', 'close']),
+    // Scanner über Windows-WIA (windows/scanner/scanner.rs, gemeinsamer Baustein der Pro-Hüllen).
+    ProScanner: plugin('ProScanner', ['geraete', 'scannen'])
   });
   window.Capacitor = Object.freeze({
     isNativePlatform: () => true,

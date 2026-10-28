@@ -117,6 +117,7 @@ impl Host {
             "WorkflowIncoming" => self.incoming(method, &options),
             "WorkflowVault" => self.vault(method, &options),
             "WorkflowChrome" => self.chrome(method, &options),
+            "ProScanner" => crate::scanner::call(method, &options, &self.cache_dir.join("scanner-arbeit")),
             _ => Err("NOT_IMPLEMENTED".into()),
         }
     }

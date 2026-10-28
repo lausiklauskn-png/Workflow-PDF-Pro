@@ -1,0 +1,21 @@
+{
+  "_": "Scanner und Kamera der Pro-Apps unter Windows. Quelle: Workflow PDF Pro. In Kopien nie von Hand ändern.",
+  "quelle": "lausiklauskn-png/Workflow-PDF-Pro",
+  "fassung": 1,
+  "pfade": [
+    "native/pro-scanner.js",
+    "native/pro-scanner.css",
+    "windows/scanner/scanner.rs",
+    "windows/scanner/wia.ps1",
+    "windows/scanner/test-wia.mjs",
+    "tools/native/test-pro-scanner.mjs"
+  ],
+  "dateien": {
+    "native/pro-scanner.js": "930e55cc5df82c270c3db125b09356b87801574ee852627653249f8af59cf642",
+    "native/pro-scanner.css": "536983e7fc8d8bfb45d0056e6dad249670e31645126837dc6187dc01c682fdc8",
+    "windows/scanner/scanner.rs": "553b32771488a50e3a4a780ecc8ddb3473c94a7601db7dd9feeb39b2de0d4663",
+    "windows/scanner/wia.ps1": "1af1c5f485a5617f769021aa00f795e0a7f1367867450c292eabce1d0f146ec7",
+    "windows/scanner/test-wia.mjs": "09edc1774bfa6154f5c26e90ad88011c91e785ae8a86a4a390933772eeeea86a",
+    "tools/native/test-pro-scanner.mjs": "42c2982a1d93c093381f55445d5a11ae6f6053e3012375c68f793a29f70c3f3b"
+  }
+}

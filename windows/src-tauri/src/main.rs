@@ -5,6 +5,8 @@
 mod host;
 mod win;
 mod updates;
+#[path = "../../scanner/scanner.rs"]
+mod scanner;
 
 use host::{DialogMessage, Host};
 use serde_json::{json, Value};

@@ -1,0 +1,24 @@
+/* Scanner/Kamera-Auswahl der Pro-Apps (Quelle Workflow PDF Pro, byte-gleich kopiert). Flach, Knöpfe ≤ 32 px, ein farbiger Knopf. */
+.pros{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;gap:10px;margin:auto;max-width:560px;max-height:min(92vh,760px);
+  padding:16px;border-radius:10px;background:var(--pro-flaeche,#fff);color:var(--pro-text,#1f2933);box-shadow:0 10px 40px rgba(0,0,0,.35);
+  font:15px/1.4 system-ui,sans-serif;overflow:auto;box-sizing:border-box}
+.pros-kopf{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pros-liste{display:flex;flex-direction:column;gap:4px}
+.pros-geraet{display:flex;align-items:center;gap:8px;min-height:32px;padding:4px 10px;border:1px solid rgba(127,127,127,.35);border-radius:6px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.pros-geraet[aria-checked="true"]{border-color:var(--pro-akzent,#1d4ed8);box-shadow:inset 3px 0 0 var(--pro-akzent,#1d4ed8)}
+.pros-art{font-size:.8em;opacity:.7;min-width:4.5em}
+.pros-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pros-verbindung{font-size:.8em;opacity:.7}
+.pros-optionen{display:flex;flex-wrap:wrap;gap:8px}
+.pros-feld{display:flex;flex-direction:column;gap:2px;font-size:.85em}
+.pros-feld select{height:30px;font:inherit;font-size:15px}
+.pros-vorschau{position:relative;background:#111;border-radius:6px;overflow:hidden}
+.pros-vorschau video{display:block;width:100%;max-height:50vh;object-fit:contain}
+.pros-zahl{position:absolute;right:8px;bottom:8px;padding:2px 8px;border-radius:4px;background:rgba(0,0,0,.6);color:#fff;font-size:.85em}
+.pros-zahl:empty{display:none}
+.pros-status{margin:0;min-height:1.2em;font-size:.9em}
+.pros-aktion{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px}
+.pros-knopf{min-height:30px;max-height:32px;padding:0 12px;border:1px solid rgba(127,127,127,.5);border-radius:6px;background:transparent;color:inherit;font:inherit;cursor:pointer}
+.pros-knopf:disabled{opacity:.5;cursor:default}
+.pros-haupt{background:var(--pro-akzent,#1d4ed8);border-color:var(--pro-akzent,#1d4ed8);color:#fff}
+@media (prefers-color-scheme:dark){.pros{background:var(--pro-flaeche,#1f2933);color:var(--pro-text,#eef2f6)}}
