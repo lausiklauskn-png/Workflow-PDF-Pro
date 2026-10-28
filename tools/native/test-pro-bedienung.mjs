@@ -134,5 +134,27 @@ try {
   ok('Stand gedrosselt: sofort einer, danach der letzte („5 von 5“)', h.sofort === 1 && h.spaeter.length === 2 && h.spaeter[1][1] === '5 von 5' && h.spaeter[1][2] === 5);
   ok('„Abbrechen“ in der Mitteilung bricht die Aufgabe ab (signal)', h.abgebrochen);
   ok('ende genau einmal; lauf meldet ende auch bei Fehler', h.log.filter(e => e[0] === 'ende').length === 2 && h.zweite === 'kaputt' && h.aktiv === 0);
+
+  // ---------- Gerätecheck (pro-geraet.js): Stufe und Urteil aus gestellten Messwerten, Nachfrage bei „nicht empfohlen“ ----------
+  const gjs = readFileSync(resolve(dir, 'pro-geraet.js'), 'utf8');
+  ok('Gerätecheck: kein Netz, keine Emojis, nur eigener Merker', !/fetch\(|XMLHttpRequest|WebSocket|indexedDB/.test(gjs) && !/\p{Extended_Pictographic}/u.test(gjs) && (gjs.match(/localStorage\./g) || []).length === 2);
+  const geraet = async (mess) => { const pg = await browser.newPage(); await leer(pg); await pg.goto('https://pro-bedienung.test/');
+    await pg.evaluate(m => { window.__mess = 0; window.Capacitor = { isNativePlatform: () => true, Plugins: { ProDevice: { measure: async () => { __mess++; return m; } } } }; }, mess);
+    await pg.addScriptTag({ content: gjs }); return pg; };
+  const stark = await geraet({ platform: 'windows', ramBytes: 32 * 2 ** 30, cores: 16, cpu: 'Testprozessor', gpu: [{ name: 'Testgrafik', vramBytes: 8 * 2 ** 30 }], freeBytes: 200 * 2 ** 30 });
+  const g1 = await stark.evaluate(async () => { const m = await ProGeraet.messen(); const v = await ProGeraet.vorDemLaden('bedeutung', { fragen: () => { throw new Error('darf nicht fragen'); } });
+    const zweite = await ProGeraet.messen(); return { stufe: m.stufe, quelle: m.quelle, ram: m.ramGB, gpu: m.gpu[0], satz: v.satz, weiter: v.weiter, bild: ProGeraet.urteil(m, 'bild').stand, ki: ProGeraet.urteil(m, 'kiGross').stand, gemerkt: __mess === 1 && zweite.zeit === m.zeit }; });
+  ok('Starker Rechner (32 GB, 16 Kerne, 8 GB Grafik): Stufe Groß, Bedeutungssuche und Bildbeschreibung passen', g1.stufe === 'gross' && g1.quelle === 'windows' && g1.ram === 32 && g1.weiter && g1.bild === 'passt');
+  ok('Satz nennt Werte, Stufe, Modell und Urteil', /32 GB Arbeitsspeicher/.test(g1.satz) && /16 Kerne/.test(g1.satz) && /Testgrafik \(8 GB\)/.test(g1.satz) && /Stufe Groß/.test(g1.satz) && /e5-small/.test(g1.satz) && /passt\.$/.test(g1.satz));
+  ok('Noch nicht Gebautes heißt so (lokale KI: „geplant“), und die Messung wird gemerkt', g1.ki === 'geplant' && g1.gemerkt);
+  const schwach = await geraet({ platform: 'android', ramBytes: 2 * 2 ** 30, cores: 4, freeBytes: 20 * 2 ** 30, gpu: [] });
+  const g2 = await schwach.evaluate(async () => { let gefragt = ''; const v = await ProGeraet.vorDemLaden('bild', { fragen: t => { gefragt = t; return false; } });
+    const m = v.messung; return { stufe: m.stufe, weiter: v.weiter, gefragt, bed: ProGeraet.urteil(m, 'bedeutung').stand }; });
+  ok('Schwaches Gerät (2 GB): Stufe Klein, Bildbeschreibung „nicht empfohlen“ fragt nach, Nein hält an', g2.stufe === 'klein' && g2.weiter === false && /nicht empfohlen/.test(g2.gefragt) && /Trotzdem laden\?/.test(g2.gefragt));
+  ok('… die Bedeutungssuche (klein) bleibt dort erlaubt', g2.bed !== 'nein');
+  const voll = await geraet({ platform: 'windows', ramBytes: 16 * 2 ** 30, cores: 8, freeBytes: 0.1 * 2 ** 30, gpu: [] });
+  ok('Kein Platz: „nicht empfohlen“ trotz starker Werte', await voll.evaluate(async () => ProGeraet.urteil(await ProGeraet.messen(), 'bedeutung').stand === 'nein'));
+  const ohneB = await browser.newPage(); await leer(ohneB); await ohneB.goto('https://pro-bedienung.test/'); await ohneB.addScriptTag({ content: gjs });
+  ok('Ohne Brücke (PWA): misst im Browser, sagt „Stufe“ nie „Groß“ ohne Speicherwert', await ohneB.evaluate(async () => { const m = await ProGeraet.messen({ neu: true }); return m.quelle === 'browser' && m.probeMs >= 0 && (m.ramGB == null) && m.stufe !== 'gross'; }));
 } finally { await browser.close(); }
 console.log(count + ' Proben der gemeinsamen Bausteine (Bedienung + Hintergrund) bestanden.');

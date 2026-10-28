@@ -27,6 +27,7 @@ jobs:
         run: |
           node windows/tools/test-update-feed.mjs
           node windows/tools/test-update-ui.mjs
+          node windows/tools/test-github-updates.mjs
       - name: Tresor, Empfang, Übergaben und Chrome-Sitzung (Rust)
         working-directory: windows/core
         run: cargo test --release
