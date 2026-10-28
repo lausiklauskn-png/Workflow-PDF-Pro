@@ -1,0 +1,55 @@
+/* Gemeinsame Bedien-Bausteine aller Pro-Apps (Quelle: Private Brain Pro, byte-gleich kopiert; siehe pro-bedienung.js).
+   Farben aus den Tokens der jeweiligen App, mit Rückfall: Private Brain (--ink/--mut/--line/--acc/--card),
+   BookLedgerPro (--text/--text-muted/--border/--accent/--surface), Workflow PDF (--ink/--ink2/--linie/--blau/--flaeche). */
+:root {
+  --pro-tinte: var(--ink, var(--text, #1d2127));
+  --pro-leise: var(--mut, var(--text-muted, var(--ink2, #5c6470)));
+  --pro-linie: var(--line, var(--border, var(--linie, #d5d9df)));
+  --pro-akzent: var(--acc, var(--accent-btn, var(--accent, var(--blau, #2f5fa8))));
+  --pro-auf-akzent: var(--on-accent, #fff);
+  --pro-flaeche: var(--card, var(--surface, var(--flaeche, #fff)));
+  --pro-flaeche2: var(--bg2, var(--surface-2, var(--grund, #f3f4f6)));
+  --pro-gut: var(--success, var(--ok, #2e7d4f));
+  --pro-warn: var(--warn-text, var(--rot, #b3261e));
+}
+.pro-knopf { display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:30px;height:auto;padding:4px 12px;margin:0;border:1px solid var(--pro-linie);border-radius:6px;background:var(--pro-flaeche);color:var(--pro-tinte);font:inherit;font-size:.92rem;line-height:1.2;box-shadow:none;cursor:pointer;max-width:100%;white-space:normal;text-align:center;overflow-wrap:anywhere; }
+.pro-knopf:hover { background:var(--pro-flaeche2); }
+.pro-knopf:focus-visible { outline:2px solid var(--pro-akzent);outline-offset:2px; }
+.pro-knopf[data-pro-haupt] { background:var(--pro-akzent);border-color:var(--pro-akzent);color:var(--pro-auf-akzent);font-weight:600; }
+.pro-knopf[disabled] { opacity:.55;cursor:default; }
+.pro-knoepfe { display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0;align-items:center; }
+
+.pro-kasten { margin:0 0 12px;padding:12px 14px;border:1px solid var(--pro-linie);border-radius:8px;background:var(--pro-flaeche);color:var(--pro-tinte);min-width:0; }
+.pro-kasten-kopf { display:flex;align-items:center;gap:8px;min-width:0; }
+.pro-kasten-kopf > h3 { flex:1 1 auto;min-width:0;margin:0;font-size:1rem;line-height:1.3;overflow-wrap:anywhere; }
+.pro-kasten-rumpf { min-width:0; }
+.pro-kasten-rumpf > * + * { margin-top:8px; }
+.pro-unterkasten { padding:8px 0 0;border-top:1px solid var(--pro-linie);margin-top:10px; }
+.pro-unterkasten > h4 { margin:0 0 4px;font-size:.95rem; }
+
+.pro-info { display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:30px;height:30px;padding:4px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--pro-leise);cursor:pointer; }
+.pro-info:hover, .pro-info[aria-expanded="true"] { color:var(--pro-tinte);background:var(--pro-flaeche2);border-color:var(--pro-linie); }
+.pro-info:focus-visible { outline:2px solid var(--pro-akzent);outline-offset:2px; }
+.pro-info svg { width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;pointer-events:none; }
+.pro-info-inhalt { margin:6px 0 8px;padding:6px 10px;border-left:2px solid var(--pro-linie);color:var(--pro-leise);font-size:.88rem;line-height:1.45;overflow-wrap:anywhere; }
+.pro-info-inhalt[hidden] { display:none!important; }
+.pro-info-inhalt > :first-child { margin-top:0; } .pro-info-inhalt > :last-child { margin-bottom:0; }
+
+.pro-zustand { display:inline-flex;align-items:center;gap:5px;font-size:.88rem;color:var(--pro-leise);white-space:nowrap; }
+.pro-punkt { width:9px;height:9px;border-radius:50%;background:var(--pro-warn);flex:0 0 auto; }
+.pro-zustand[data-pro-zustand="offen"] .pro-punkt { background:var(--pro-gut); }
+
+.pro-ordner { display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-width:0;font-size:.9rem; }
+.pro-pfad { flex:1 1 14em;min-width:0;color:var(--pro-leise);overflow-wrap:anywhere;font-family:var(--mono, ui-monospace, monospace);font-size:.85em; }
+
+.pro-fortschritt { display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:.9rem;color:var(--pro-tinte);min-width:0; }
+.pro-drehkreis { width:16px;height:16px;border:2px solid var(--pro-linie);border-top-color:var(--pro-akzent);border-radius:50%;animation:pro-drehen .9s linear infinite;flex:0 0 auto; }
+.pro-drehkreis[hidden], .pro-balken[hidden] { display:none!important; }
+.pro-balken { flex:1 1 8em;max-width:16em;height:6px;border-radius:3px;background:var(--pro-flaeche2);overflow:hidden; }
+.pro-balken-fuell { display:block;height:100%;width:0;background:var(--pro-akzent);transition:width .2s; }
+.pro-fortschritt-hinweis { color:var(--pro-leise);font-size:.85rem; }
+.pro-fortschritt[data-pro-fortschritt="fertig"] .pro-fortschritt-text { color:var(--pro-gut); }
+.pro-fortschritt[data-pro-fortschritt="fehler"] .pro-fortschritt-text, .pro-fortschritt[data-pro-fortschritt="abgebrochen"] .pro-fortschritt-text { color:var(--pro-warn); }
+@keyframes pro-drehen { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .pro-drehkreis { animation-duration:2.4s; } .pro-balken-fuell { transition:none; } }
+@media (pointer: coarse) { .pro-knopf { min-height:32px; } .pro-info { width:32px;height:32px; } }

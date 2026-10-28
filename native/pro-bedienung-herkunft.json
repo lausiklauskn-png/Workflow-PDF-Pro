@@ -1,0 +1,11 @@
+{
+  "_": "Gemeinsame Bedien-Bausteine aller Pro-Apps. Quelle: Private Brain Pro (native/). Nie von Hand ändern.",
+  "quelle": "lausiklauskn-png/Privat-Brain-Pro",
+  "fassung": 1,
+  "dateien": {
+    "pro-bedienung.js": "9dc7c0be686d5e42b18456da0b64bc781a9b7fefd45339a1c2598a2ef761688b",
+    "pro-bedienung.css": "e6440e0fa10ee1cc5b7ac45fae7c83899f0e4f9bfa4502e965d7259c56525f13"
+  },
+  "commit": "896dc371ee663c0b20e2df7fc13f36e7e1ee3c6f",
+  "probe": "98636d55a5be1a999364699969ba6cc242865cb699b2ada9905bf6be195a18b4"
+}
