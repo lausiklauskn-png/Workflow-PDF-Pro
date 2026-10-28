@@ -137,6 +137,8 @@
     ordnerDazu: [', {n} Ordner dazu', ', {n} folder(s) added', ', добавлено папок: {n}', '، أُضيف {n} مجلد'],
     neuLaden: [' Die Bibliothek wird neu geladen …', ' Reloading the library …', ' Библиотека перезагружается …', ' جارٍ إعادة تحميل المكتبة …'],
     abbrechen: ['Abbrechen', 'Cancel', 'Отмена', 'إلغاء'],
+    hgSichern: ['Sicherung läuft', 'Backup running', 'Идёт резервное копирование', 'النسخ قيد التشغيل'],
+    hgZurueck: ['Zurückholen läuft', 'Restore running', 'Идёт восстановление', 'الاستعادة قيد التشغيل'],
     abgebrochen: ['Abgebrochen. Es wurde keine Sicherungsdatei gespeichert.', 'Cancelled. No backup file was saved.', 'Отменено. Файл резервной копии не сохранён.', 'أُلغي. لم يُحفظ ملف النسخ.'],
     abgebrochenZ: ['Abgebrochen. Was schon zurückgeholt war, bleibt.', 'Cancelled. What was already restored stays.', 'Отменено. Уже восстановленное остаётся.', 'أُلغي. ما استُعيد يبقى.'],
     passwort: ['Das Passwort passt nicht zu dieser Sicherung.', 'The password does not match this backup.', 'Пароль не подходит к этой копии.', 'كلمة المرور لا تطابق هذه النسخة.'],
@@ -152,8 +154,14 @@
   const zweistellig = z => String(z).padStart(2, '0');
   const dateiname = d => 'Workflow-PDF-Pro-Sicherung-' + d.getFullYear() + '-' + zweistellig(d.getMonth() + 1) + '-' + zweistellig(d.getDate()) + '-' + zweistellig(d.getHours()) + zweistellig(d.getMinutes()) + '.wfps';
 
-  function lauf(dlg, vor) {
+  function lauf(dlg, vor, art = 'sichern') {
     const P = welt.ProBedienung, ctl = new AbortController();
+    // Pro-Umbau 4: in Android hält die gemeinsame Hintergrundaufgabe die App am Leben (Mitteilung mit Stand und „Abbrechen“).
+    let hg = null, vorbei = false;
+    if (welt.ProHintergrund) welt.ProHintergrund.beginnen({ art, titel: t(art === 'sichern' ? 'hgSichern' : 'hgZurueck'), text: t('schluessel') }).then(a => {
+      hg = a; if (vorbei) { a.ende(); return; }
+      a.signal.addEventListener('abort', () => ctl.abort(), { once: true });
+    }).catch(() => {});
     const host = document.createElement('div'); host.dataset.wfpSicherungLauf = ''; host.dataset.keinUe = '';
     vor.after(host);
     const f = P ? P.fortschritt(host, { schliessbar: false }) : null;
@@ -163,8 +171,9 @@
     for (const b of dlg.querySelectorAll('button:not([data-wfp-sicherung-abbrechen])')) { b.dataset.wfpWarAn = b.disabled ? '0' : '1'; b.disabled = true; }
     return {
       signal: ctl.signal,
-      text(s, i, n) { if (f) f.schritt(i, n, s); else zeile.textContent = s; },
+      text(s, i, n) { if (f) f.schritt(i, n, s); else zeile.textContent = s; if (hg) hg.stand(s, i, n); },
       ende(stand, s) {
+        vorbei = true; if (hg) hg.ende();
         k.remove(); for (const b of dlg.querySelectorAll('[data-wfp-war-an]')) { b.disabled = b.dataset.wfpWarAn === '0'; delete b.dataset.wfpWarAn; }
         if (f) f[stand](s); else zeile.textContent = s;
       }
@@ -204,7 +213,7 @@
     const SI = welt.WFP?.Sicherung, e = dlg.querySelector('#siZErg'), pw = dlg.querySelector('#siPwZ').value;
     if (!pw) { durchlassen = true; try { dlg.querySelector('#siZurueck').click(); } finally { durchlassen = false; } return; }
     e.textContent = ''; e.dataset.keinUe = '';
-    const l = lauf(dlg, e); l.text(t('schluessel'));
+    const l = lauf(dlg, e, 'zurueckholen'); l.text(t('schluessel'));
     const lies = async (von, bis) => new Uint8Array(await f.slice(von, bis).arrayBuffer());
     let ordner = [], erst = true, dazu = 0, schonDa = 0, ordnerDazu = 0;
     try {
