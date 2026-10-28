@@ -361,7 +361,7 @@ if (phase === 'abgezogen') {
   await step('ordnerFehlt', async () => {
     await page.waitForFunction(() => 'wfpVaultLocked' in document.documentElement.dataset, null, { timeout: 60000 });
     const state = await vaultState();
-    const text = await page.locator('dialog[open] p').first().textContent();
+    const text = await page.locator('dialog[open] #nativeAblageZeile').textContent();   // Sperr-Zeile der Ablage (die Erklärung steht hinter ⓘ)
     expect(!state.unlocked && /nicht durch eine leere/.test(text), 'Kein klarer Sperrhinweis');
     const updateBlocked=await page.evaluate(() => WFPWindowsUpdates.saveBeforeRestart().then(()=>false,()=>true));
     expect(updateBlocked,'Update must not restart with unavailable storage');
