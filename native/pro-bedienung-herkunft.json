@@ -1,21 +1,23 @@
 {
   "_": "Gemeinsame Bausteine aller Pro-Apps (Bedienung + Hintergrundaufgabe). Quelle: Private Brain Pro. Nie von Hand ändern.",
   "quelle": "lausiklauskn-png/Privat-Brain-Pro",
-  "fassung": 2,
+  "fassung": 3,
   "pfade": [
     "native/pro-bedienung.js",
     "native/pro-bedienung.css",
     "native/pro-hintergrund.js",
+    "native/pro-geraet.js",
     "android/app/src/main/java/de/familyprojekt/hintergrund/ProHintergrundPlugin.java",
     "android/app/src/main/java/de/familyprojekt/hintergrund/ProHintergrundDienst.java"
   ],
   "dateien": {
-    "pro-bedienung.js": "3e490835ea471b3dd632eb9b3d88e8d78b2e47bf942a8e32fb2180cc2291b6da",
+    "pro-bedienung.js": "9a36d8870b4896cfa3f98fdc4fd0428d7df879aeefe25e6db93b824cce4334bb",
     "pro-bedienung.css": "e6440e0fa10ee1cc5b7ac45fae7c83899f0e4f9bfa4502e965d7259c56525f13",
     "pro-hintergrund.js": "64e2e803df220650e45dde1c6e403711ebb7b76a6f6786ad6422043fb84c9e62",
+    "pro-geraet.js": "b18c26f8d0bd755c6a4fe5a8948e8457f7d9ed73b69dac938f8c9bab1326f710",
     "ProHintergrundPlugin.java": "551ae06d05e2b60d679930ef6c7bdee6794d3226f33398acee1403174aa9aa01",
     "ProHintergrundDienst.java": "b37268634112b206d2e07dd60e91866cb8285f68249c068ce4bf4d664a17b014"
   },
-  "commit": "fe42e0dbb00d1d1f1fa12722f33d43b0efd572ac",
-  "probe": "a836999dc9eb8a6c7af6fdb2ac9434128f66b0cadd6d947ede5ad07186c1446e"
+  "commit": "d8fc98b52ba64cd3efaa091f77c53129792a6dde",
+  "probe": "806513fb6e6695d5fd898428461d7499c743453a6a08b755a02b00dfdaca1c49"
 }
