@@ -7,6 +7,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import de.familyprojekt.tresor.Eintrag;
+import de.familyprojekt.tresor.Fach;
 import de.familyprojekt.tresor.SafAblage;
 import de.familyprojekt.tresor.TresorOrdner;
 import java.io.IOException;
@@ -181,7 +182,49 @@ final class ProTresorordner {
         if (vergessen) prefs().edit().remove("merken").remove("kennung").commit();
     }
 
-    void schliessen() { if (offen != null) offen.close(); offen = null; }
+    void schliessen() {
+        for (java.io.InputStream in : lesen.values()) try { in.close(); } catch (IOException ignoriert) { /* zu */ }
+        lesen.clear();
+        if (offen != null) offen.close(); offen = null;
+    }
+
+    // ---------- Übergabefach „Eingang-WorkflowPDF“ (Pro-Umbau 5): was andere Pro-Apps hier ablegen ----------
+    // Gelesen wird nur; im Fach wird nichts gelöscht. „Übernommen“ ist eine eigene Marke (TresorOrdner.markeSetzen).
+    private static final String EINGANG = Fach.EINGANG_WORKFLOW_PDF.slug;
+    private static final int TEIL = 192 * 1024;
+    private final Map<String, java.io.InputStream> lesen = new LinkedHashMap<>();
+    private TresorOrdner offenOderGemerkt() throws IOException {
+        if (offen == null && (vonHandGesperrt || !gemerktEntsperren())) throw new IOException("TRESOR_GESPERRT");
+        return offen;
+    }
+    JSONObject eingang() throws Exception {
+        TresorOrdner t = offenOderGemerkt();
+        JSONArray liste = new JSONArray(), marken = new JSONArray();
+        for (Eintrag e : t.verzeichnis(EINGANG)) liste.put(new JSONObject(e.alsMap()));
+        for (String m : t.marken(EINGANG)) marken.put(m);
+        return new JSONObject().put("ordner", Fach.EINGANG_WORKFLOW_PDF.ordner).put("eintraege", liste).put("marken", marken);
+    }
+    JSONObject eingangOeffnen(String id) throws Exception {
+        TresorOrdner t = offenOderGemerkt();
+        Eintrag gefunden = null;
+        for (Eintrag e : t.verzeichnis(EINGANG)) if (e.id.equals(id)) gefunden = e;
+        if (gefunden == null) throw new IOException("TRESOR_EINTRAG_FEHLT");
+        String ticket = java.util.UUID.randomUUID().toString();
+        lesen.put(ticket, t.oeffnen(EINGANG, gefunden));
+        return new JSONObject().put("ticket", ticket).put("groesse", gefunden.groesse).put("name", gefunden.name).put("art", gefunden.art);
+    }
+    JSONObject eingangTeil(String ticket) throws Exception {
+        java.io.InputStream in = lesen.get(ticket);
+        if (in == null) throw new IOException("TRESOR_UEBERGABE_UNGUELTIG");
+        try {
+            byte[] puffer = new byte[TEIL]; int n = 0, r;
+            while (n < puffer.length && (r = in.read(puffer, n, puffer.length - n)) != -1) n += r;
+            boolean fertig = n < puffer.length;
+            if (fertig) { lesen.remove(ticket); in.close(); }
+            return new JSONObject().put("data", Base64.encodeToString(puffer, 0, n, Base64.NO_WRAP)).put("fertig", fertig);
+        } catch (IOException e) { lesen.remove(ticket); try { in.close(); } catch (IOException ignoriert) { /* zu */ } throw e; }
+    }
+    void eingangMarkieren(String id) throws Exception { offenOderGemerkt().markeSetzen(EINGANG, id); }
 
     // ---------- Hauptschlüssel im Android-Schlüsselspeicher (wie BookLedgerPro, eigener Alias) ----------
     private SecretKey geraeteSchluessel(boolean anlegen) throws Exception {

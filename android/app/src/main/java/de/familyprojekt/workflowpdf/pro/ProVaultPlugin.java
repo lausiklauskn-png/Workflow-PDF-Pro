@@ -293,6 +293,11 @@ public final class ProVaultPlugin extends Plugin {
     @PluginMethod public void tresorZustand(PluginCall call){work(call,()->tresor.zustand(vaultOrNull(call)));}
     @PluginMethod public void tresorSperren(PluginCall call){work(call,()->{tresor.sperren(call.getBoolean("vergessen",false));return tresor.zustand(vaultOrNull(call));});}
     @PluginMethod public void tresorVerzeichnis(PluginCall call){work(call,()->{JSONArray zeilen=call.getData().optJSONArray("zeilen");if(zeilen==null)throw new java.io.IOException("TRESOR_EINTRAG_UNGUELTIG");return tresor.verzeichnis(zeilen,vault(call));});}
+    // Übergabefach „Eingang-WorkflowPDF“ (Pro-Umbau 5): ansehen, Stück für Stück lesen, als übernommen markieren
+    @PluginMethod public void tresorEingang(PluginCall call){work(call,()->tresor.eingang());}
+    @PluginMethod public void tresorEingangOeffnen(PluginCall call){work(call,()->tresor.eingangOeffnen(call.getString("id")));}
+    @PluginMethod public void tresorEingangTeil(PluginCall call){work(call,()->tresor.eingangTeil(call.getString("ticket")));}
+    @PluginMethod public void tresorEingangMarkieren(PluginCall call){work(call,()->{tresor.eingangMarkieren(call.getString("id"));return new JSONObject().put("markiert",true);});}
     @PluginMethod public void tresorEinziehen(PluginCall call){
         if(worker.closed()){call.reject("NATIVE_ACTIVITY_CLOSED");return;}
         if(!choosing.compareAndSet(false,true)){call.reject("VAULT_BUSY","VAULT_BUSY");return;}

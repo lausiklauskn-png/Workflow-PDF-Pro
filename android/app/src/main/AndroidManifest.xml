@@ -33,6 +33,12 @@
                 <data android:mimeType="image/*" />
                 <data android:mimeType="application/json" />
             </intent-filter>
+            <!-- Pro-Umbau 5: Scanner-Direktstart aus einer anderen Pro-App (BookLedgerPro), wie ?scan=1&von=… der PWA.
+                 Übergeben wird nur der Name der Absender-App (Extra „von“), keine Datei (ScanDirekt.java). -->
+            <intent-filter>
+                <action android:name="de.familyprojekt.workflowpdf.pro.SCANNEN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

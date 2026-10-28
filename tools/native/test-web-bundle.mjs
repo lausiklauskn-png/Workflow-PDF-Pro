@@ -24,7 +24,7 @@ test('bundle contains the complete public runtime and unchanged protected files'
   // Versionsnummer: in der App nie die Nummer der Webversion, bis die App ihre eigene setzt
   assert.equal((html.match(/<meta name="wfp-version" content=""/g) || []).length, 1);
   assert.ok(html.indexOf('native/native-bootstrap.js') < html.indexOf('assets/app.js'));
-  for (const name of ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js',...vaultFiles,'native.css','pro-bedienung.js','pro-bedienung.css','native-ohne-web.js','native-updates.js','native-hintergrund.js','native-sicherung.js','pro-hintergrund.js']) {
+  for (const name of ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js',...vaultFiles,'native.css','pro-bedienung.js','pro-bedienung.css','native-ohne-web.js','native-updates.js','native-hintergrund.js','native-scan-direkt.js','native-sicherung.js','pro-hintergrund.js']) {
     assert.ok(html.includes('native/' + name + '?v=' + digest(await readFile(join(root,'www/native',name)))));
   }
   assert.ok(html.indexOf('assets/db.js')<html.indexOf('native/native-vault.js'));
