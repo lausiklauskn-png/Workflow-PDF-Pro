@@ -46,10 +46,10 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
       fixture.tresor={gewaehlt:true,ordner:'Tresor-Probe',gemerkt:true,offen:true,eingezogen:true,erreichbar:true,vorhanden:true,pruefung:'PASST',eintraege:0};return {...fixture.tresor,eingezogenJetzt:true,angelegt:true};}
     if(method==='tresorVerzeichnis'){fixture.log.push(['tresorVerzeichnis',a]);const neu=JSON.stringify(a.zeilen)!==JSON.stringify(fixture.zeilen);fixture.zeilen=a.zeilen;fixture.tresor.eintraege=a.zeilen.length;return {geschrieben:neu,eintraege:a.zeilen.length};}
     if(method==='tresorSperren'){fixture.log.push(['tresorSperren',a]);fixture.tresor={...fixture.tresor,offen:false,eingezogen:false};return {...fixture.tresor};}
-    // Übergabefach „Eingang-WorkflowPDF“ (Pro-Umbau 5), Stücke zu 4000 Byte (Java: 192 KB) — so wird mehrfach gelesen
+    // Übergabefach „Eingang-WorkflowPDF“ (Pro-Umbau 5), Stücke zu 500 Byte (Java: 192 KB) — so wird mehrfach gelesen
     if(method==='tresorEingang'){fixture.log.push(['tresorEingang',a]);return {ordner:'Eingang-WorkflowPDF',eintraege:fixture.eingang,marken:fixture.marken};}
     if(method==='tresorEingangOeffnen'){fixture.log.push(['tresorEingangOeffnen',a]);const e=fixture.eingang.find(x=>x.id===a.id);if(!e)throw Error('TRESOR_EINTRAG_FEHLT');const ticket=randomUUID();fixture.eingangTickets.set(ticket,{data:fixture.eingangDaten.get(a.id),pos:0});return {ticket,groesse:e.groesse,name:e.name,art:e.art};}
-    if(method==='tresorEingangTeil'){const tk=fixture.eingangTickets.get(a.ticket);const teil=tk.data.subarray(tk.pos,tk.pos+4000);tk.pos+=teil.length;fixture.log.push(['tresorEingangTeil',teil.length]);const fertig=teil.length<4000;if(fertig)fixture.eingangTickets.delete(a.ticket);return {data:teil.toString('base64'),fertig};}
+    if(method==='tresorEingangTeil'){const tk=fixture.eingangTickets.get(a.ticket);const teil=tk.data.subarray(tk.pos,tk.pos+500);tk.pos+=teil.length;fixture.log.push(['tresorEingangTeil',teil.length]);const fertig=teil.length<500;if(fertig)fixture.eingangTickets.delete(a.ticket);return {data:teil.toString('base64'),fertig};}
     if(method==='tresorEingangMarkieren'){fixture.log.push(['tresorEingangMarkieren',a]);fixture.marken.push(a.id);return {markiert:true};}
     throw Error('Unknown bridge method '+method);
   }
@@ -154,6 +154,8 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
       assert.deepEqual(doc,{seiten:3,quelle:'pdf',pruefung:false},'wie eine eingelesene Datei: ungeprüft, Prüfen auf Knopfdruck');
       await page.evaluate(()=>WFPTresorordner.eingangHinweis());
       await page.waitForFunction(()=>!document.getElementById('nativeEingangHinweis'));
+      // Das übernommene Dokument gehört jetzt zur Bibliothek: Inhaltsverzeichnis nachziehen (die nächste Probe erwartet „aktuell“)
+      await page.evaluate(()=>WFPTresorordner.aktualisieren(true));
     });
     await t.test('„jetzt schreiben“ ohne Änderung meldet aktuell; Sperren zeigt gesperrt',async()=>{
       await knopf(page,'Inhaltsverzeichnis jetzt schreiben').click();
