@@ -1,6 +1,6 @@
 {
   "name": "workflow-pdf-pro-windows",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "private": true,
   "type": "module",
   "description": "Windows-Host (Tauri 2, WebView2) für den unveränderten Workflow-PDF-Kern",
