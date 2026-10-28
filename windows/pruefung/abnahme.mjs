@@ -233,7 +233,7 @@ if (phase === 'erst') {
   await step('ersatzschluesselErzeugen', async () => {
     await page.evaluate(() => { void WFPNativeVault.manage(); });
     await page.waitForFunction(() => /Noch keine Ersatzschlüssel/.test(document.getElementById('nativeVaultRecovery')?.textContent || ''), null, { timeout: 30000 });
-    await clickText('Ersatzschlüssel erzeugen');
+    await clickText('Ersatzschlüssel für die Ablage erzeugen');
     const win = await findPage(url => url.includes('/windows/ersatz.html'), 60000);
     watch(win);
     await win.waitForFunction(() => document.querySelectorAll('#teile li').length === 5, null, { timeout: 60000 });
@@ -295,7 +295,7 @@ if (phase === 'neustart') {
   });
   await step('sperrenUndEntsperren', async () => {
     await page.evaluate(() => { void WFPNativeVault.manage(); });
-    await clickText('Tresor sperren');
+    await clickText('Ablage sperren');
     await page.waitForFunction(() => 'wfpVaultLocked' in document.documentElement.dataset, null, { timeout: 60000 });
     const locked = await vaultState();
     expect(!locked.unlocked, 'nicht gesperrt');
@@ -314,7 +314,7 @@ if (phase === 'neustart') {
   await step('passwortVergessen', async () => {
     const shares = JSON.parse(await readFile(join(env('WFP_PRUEF_ARBEIT'), 'ersatz.json'), 'utf8'));
     await page.evaluate(() => { void WFPNativeVault.manage(); });
-    await clickText('Tresor sperren');
+    await clickText('Ablage sperren');
     await page.waitForFunction(() => 'wfpVaultLocked' in document.documentElement.dataset, null, { timeout: 60000 });
     await clickText('Entsperren');
     const dialog = await findPage(url => url.includes('/windows/kennwort.html'));
@@ -346,7 +346,7 @@ if (phase === 'neustart') {
     expect(names.filter(n => n.startsWith('workflow-pdf-pro.kennwort-')).length === 1, 'Passwortfach fehlt');
     // Danach öffnet auch das neue Passwort.
     await page.evaluate(() => { void WFPNativeVault.manage(); });
-    await clickText('Tresor sperren');
+    await clickText('Ablage sperren');
     await page.waitForFunction(() => 'wfpVaultLocked' in document.documentElement.dataset, null, { timeout: 60000 });
     await clickText('Entsperren');
     await password(NEUES_PASSWORT);

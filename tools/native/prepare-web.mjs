@@ -9,7 +9,9 @@ export const runtimeRoots = ['assets/', 'vendor/', 'icons/', 'sbkim/', 'beispiel
 export const runtimeFiles = ['index.html', 'sw.js', 'manifest.webmanifest', 'impressum.html',
   'sicherheit.html', 'LICENSE', 'RECHTE.md', 'THIRD_PARTY.md'];
 export const vaultFiles=['vault-codec.js','vault-records.js','vault-journal.js','vault-db.js','vault-gate.js','vault-preferences.js','vault-migration.js','native-vault.js','native-tresorordner.js'];
-export const nativeFiles = ['native-bootstrap.js', 'native-files.js', 'native-import.js', 'native-incoming.js', 'native-chrome.js', 'native-speech.js', 'native-translate.js', 'chrome/helper.html', 'chrome/helper.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
+// Gemeinsame Bedien-Bausteine aller Pro-Apps (Quelle Private Brain Pro, byte-gleich, Pin native/pro-bedienung-herkunft.json).
+export const bedienFiles = ['pro-bedienung.js', 'pro-bedienung.css'];
+export const nativeFiles = [...bedienFiles, 'native-ohne-web.js', 'native-updates.js', 'native-bootstrap.js', 'native-files.js', 'native-import.js', 'native-incoming.js', 'native-chrome.js', 'native-speech.js', 'native-translate.js', 'chrome/helper.html', 'chrome/helper.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
 export const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 
 // This allowlist is deliberately independent of a recursive checkout copy.
@@ -54,7 +56,7 @@ export async function prepareWeb(out = join(root, 'www')) {
   html = replaceOnce(html, '<title>Workfloh PDF —', '<title>Workflow PDF Pro —');
   html = replaceOnce(html, 'content="Workfloh PDF"', 'content="Workflow PDF Pro"');
   html = replaceOnce(html, 'Workfloh <b>PDF</b>', 'Workflow <b>PDF Pro</b>');
-  html = replaceOnce(html, '</head>', '<link rel="stylesheet" href="' + adapterUrl('native.css') + '">\n</head>');
+  html = replaceOnce(html, '</head>', '<link rel="stylesheet" href="' + adapterUrl('pro-bedienung.css') + '">\n<link rel="stylesheet" href="' + adapterUrl('native.css') + '">\n</head>');
   // Classic deferred scripts preserve source execution order. The source worker stays intact:
   // model caches and share receipt must remain functional in the native host as well.
   // Versionsnummer (Klaus 2026-10-22): die Webversion trägt ihre eigene Nummer im Meta. In der App steht
@@ -63,7 +65,7 @@ export async function prepareWeb(out = join(root, 'www')) {
   if (versionMeta.length !== 1) throw new Error('Native injection anchor changed: wfp-version');
   html = html.replace(versionMeta[0], '<meta name="wfp-version" content=""');
   html = replaceOnce(html, '<script defer src="assets/app.js?v=71"></script>',
-    ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=71"></script>');
+    ['pro-bedienung.js','native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles,'native-updates.js','native-ohne-web.js'].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=71"></script>');
   await rm(out, { recursive: true, force: true });
   await mkdir(out, { recursive: true });
   const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding, adapter tags and empty wfp-version (filled by the app)'], files: [] };

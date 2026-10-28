@@ -122,3 +122,25 @@ Ausgangszustand · Inhaltsverzeichnis nur bei Änderung, Schreiber/Format fest, 
 ⚠ Grenzen: das Android-Plugin ist hier nicht übersetzt (kein SDK im Behälter) — gebaut und gelintet in GitHub, **nicht im Emulator und
 nicht am Gerät gefahren**; keine echte SD-Karte. Nur der aktive Speicherort zieht ein. Ohne Dokumenttresor (nur Gerätespeicher) gibt es
 keinen Einzug. Windows: Lücke (kein Rust-Zwilling, `docs/PRODUKTSTAND.md`); die Datei tut dort nichts (keine Brücke).
+
+## Einstellungen nach dem Leitfaden: „Tresor & Ablage“ (Klaus 2026-10-28, Umbau 2)
+
+Wie Private Brain Pro #107 (Leitfaden `BookLedgerPro/docs/design/LEITFADEN-PRO-APPS-BEDIENUNG.md`):
+- Knopf in den Einstellungen und Fenster heißen **„Tresor & Ablage“**. Darin untereinander **„Ablage von Workflow PDF Pro“**
+  (der eigene verschlüsselte Ordner) und **„Tresor (alle Pro-Apps)“** (der Tresorordner), je mit **● Entsperrt / ● Gesperrt**,
+  ganzem Pfad (`SD-Karte/…`, `Gerät/…`) und **„In Dateien öffnen“** (`WorkflowVault.ordnerOeffnen`, ACTION_VIEW auf den Ordner;
+  ohne passende Dateien-App nennt die App den Pfad). Erklärungen hinter ⓘ, zugeklappt.
+- **Ein farbiger Knopf** = nächster Schritt: ohne Ordner „Ordner wählen“, sonst im Tresor „einziehen“ bzw. „entsperren“; verbunden
+  braucht keinen. „Ablage sperren“ nur bei offener Ablage, „Tresorordner sperren“ nur bei offenem Tresor.
+  Ersatzschlüssel-Knopf: „Ersatzschlüssel für die Ablage erzeugen (3 von 5) …“. Die Übernahme zeigt einen Balken.
+- **Keine Web-Reste** (`native/native-ohne-web.js`, nur in der App): „Browser“-Sätze des Kerns → App/Gerät (DE/EN/RU/AR),
+  „Als App installieren“ und „Dauerhaft speichern lassen“ weg; „Speicher“ in den Einstellungen nennt die Ablage. Der Kern
+  (`upstream/`) bleibt byte-1:1. Ausgenommen, wo es wirklich ein Browser ist (HTML-Ausgabe, Links im Feld, Chrome-Fläche, Diagnose).
+- **„Auf Updates prüfen“** (Android, `WorkflowUpdates`, nur auf Tipp, öffentliche GitHub-Veröffentlichungen `vX.Y.Z` mit APK):
+  „Du verwendest die aktuelle Version 1.0.6.“ / „Neu: 1.0.7 (du hast 1.0.6)“; „Neue Version herunterladen“ öffnet die feste Seite
+  der Veröffentlichung, installiert nichts. Windows nennt die Version ebenso (`windows/bridge/updates.js`).
+- Proben: `tools/native/test-ohne-web.mjs` (Rundgang durch Bibliothek, Einstellungen, Sicherung, Hilfe, Löschen, Ausgabe, Speichern,
+  Übersetzen in DE und EN; kein Hin und Her mit der Sprachschicht; Kasten, Pfad, Knopf; Updates) · JVM `UpdateRegelTest` (5).
+  Gegenprobe: Schicht leer → DE und EN rot; als PWA stehen die Browser-Sätze da (dort richtig).
+- ⚠ Nicht am Gerät gemessen; ob Androids Dateien-App einen Ordner per ACTION_VIEW zeigt, ist offen. Sicherung gestreamt (~50 MB) ist
+  noch nicht gebaut (eigener PR).

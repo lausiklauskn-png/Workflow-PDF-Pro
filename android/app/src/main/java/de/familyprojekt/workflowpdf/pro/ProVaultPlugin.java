@@ -277,6 +277,19 @@ public final class ProVaultPlugin extends Plugin {
         {"Passwort falsch oder Ordner nicht erreichbar. Nichts wurde verändert.","Wrong password or folder unavailable. Nothing was changed.","Неверный пароль или папка недоступна. Ничего не изменено.","كلمة المرور غير صحيحة أو المجلد غير متاح. لم يتغير شيء."}
     };
     private DocumentVault vaultOrNull(PluginCall call){try{return vault(call);}catch(Exception error){return null;}}
+    /** „In Dateien öffnen“ (Leitfaden § 5): zeigt die Ablage oder den Tresorordner in der Dateien-App. Nichts wird gelesen oder verändert. */
+    @PluginMethod public void ordnerOeffnen(PluginCall call){
+        worker.submit(call,()->{
+            Uri uri;
+            try{uri="tresor".equals(call.getString("welcher"))?tresor.ordnerUri():locations.get(null).ordnerUri();}catch(Exception none){uri=null;}
+            if(uri==null){call.reject("VAULT_NOT_CONFIGURED","VAULT_NOT_CONFIGURED");return;}
+            Intent intent=new Intent(Intent.ACTION_VIEW).setDataAndType(uri,android.provider.DocumentsContract.Document.MIME_TYPE_DIR)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_ACTIVITY_NEW_TASK);
+            try{getActivity().startActivity(intent);call.resolve();}
+            catch(ActivityNotFoundException none){call.reject("KEIN_DATEIEN_PROGRAMM","KEIN_DATEIEN_PROGRAMM");}
+            catch(SecurityException denied){call.reject("VAULT_FOLDER_UNAVAILABLE","VAULT_FOLDER_UNAVAILABLE");}
+        });
+    }
     @PluginMethod public void tresorZustand(PluginCall call){work(call,()->tresor.zustand(vaultOrNull(call)));}
     @PluginMethod public void tresorSperren(PluginCall call){work(call,()->{tresor.sperren(call.getBoolean("vergessen",false));return tresor.zustand(vaultOrNull(call));});}
     @PluginMethod public void tresorVerzeichnis(PluginCall call){work(call,()->{JSONArray zeilen=call.getData().optJSONArray("zeilen");if(zeilen==null)throw new java.io.IOException("TRESOR_EINTRAG_UNGUELTIG");return tresor.verzeichnis(zeilen,vault(call));});}

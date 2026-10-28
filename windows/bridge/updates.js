@@ -33,7 +33,10 @@
   function button(key, action) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'knopf'; b.textContent = t(key); b.onclick = action; panel.append(b);
   }
-  function offer() { show('available', pending.version); button('install', install); button('later', () => {panel.hidden = true;}); }
+  // Leitfaden § 6 (Klaus 2026-10-28): immer mit Version – „Du verwendest die aktuelle Version 1.0.6.“ / „Neu: 1.0.7 (du hast 1.0.6)“.
+  const ich = () => (document.querySelector?.('meta[name="wfp-version"]')?.content || '').trim();
+  const mitVersion = neu => { const P = window.ProBedienung; if (P && ich() && message) message.textContent = P.versionSatz(ich(), neu); };
+  function offer() { show('available', pending.version); mitVersion(pending.version); button('install', install); button('later', () => {panel.hidden = true;}); }
   async function check(manual = false) {
     if (busy) return; busy = true;
     try {
@@ -42,7 +45,7 @@
       if (!status.configured) { if (manual) {show('notConfigured'); button('later', () => {panel.hidden = true;});} return; }
       const result = await api('check'); pending = result.available ? result : null;
       if (pending) offer();
-      else if (manual) {show('current'); button('later', () => {panel.hidden = true;});}
+      else if (manual) {show('current'); mitVersion(); button('later', () => {panel.hidden = true;});}
     } catch {if (manual) {show('failed'); button('check', () => check(true)); button('later', () => {panel.hidden = true;});}}
     finally {busy = false;}
   }
