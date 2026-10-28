@@ -1,6 +1,6 @@
 [package]
 name = "workflow-pdf-pro"
-version = "1.0.6"
+version = "1.0.7"
 description = "Workflow PDF Pro für Windows"
 edition = "2021"
 publish = false
