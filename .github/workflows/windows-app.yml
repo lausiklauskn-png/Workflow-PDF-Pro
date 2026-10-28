@@ -68,6 +68,10 @@ jobs:
             [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
             if ($errors.Count) { throw ($errors | Out-String) }
           }
+      - name: Scanner-Skript (WIA) auf echtem Windows
+        run: |
+          node windows/scanner/test-wia.mjs
+          if ($LASTEXITCODE -ne 0) { throw 'WIA script probe failed.' }
       - name: Echte Tauri-Updatesignaturen gegenprüfen
         run: |
           node windows/tools/test-tauri-signatures.mjs

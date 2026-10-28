@@ -71,6 +71,9 @@ jobs:
       - name: Gemeinsames Tresorordner-Paket gepinnt (de.familyprojekt.tresor)
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node tools/tresor/pins.mjs
+      - name: Scanner-Baustein (Pro-Umbau 5) gepinnt und im Browser geprüft
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: node tools/native/scanner-pins.mjs && node tools/native/test-pro-scanner.mjs
       - name: Binäre Tresor-Datensätze und Übersetzungsstände prüfen
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: node --test tools/native/test-vault-codec.mjs tools/native/test-vault-records.mjs tools/native/test-vault-journal.mjs tools/native/test-vault-gate.mjs tools/native/test-vault-migration.mjs
