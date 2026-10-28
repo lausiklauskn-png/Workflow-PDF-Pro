@@ -147,3 +147,16 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
     });
   }finally{if(browser)await browser.close();await new Promise(r=>server.close(r));}
 });
+
+// Tablet-Probe 2026-10-28: „Tresorordner sperren“ öffnete sofort wieder, weil zustand() den gemerkten Schlüssel nahm
+// (dieselbe Lücke wie BookLedgerPro #382). Die Java-Seite läuft hier nicht; geprüft wird die Regel im Quelltext.
+test('Sperren von Hand bleibt gesperrt: zustand() und Inhaltsverzeichnis öffnen nicht mit dem gemerkten Schlüssel',async()=>{
+  const java=await readFile(join(root,'android/app/src/main/java/de/familyprojekt/workflowpdf/pro/ProTresorordner.java'),'utf8');
+  const plugin=await readFile(join(root,'android/app/src/main/java/de/familyprojekt/workflowpdf/pro/ProVaultPlugin.java'),'utf8');
+  assert.match(java,/if \(!vonHandGesperrt\) gemerktEntsperren\(\);/,'zustand() öffnet nach Sperren nicht wieder');
+  assert.match(java,/offen == null && \(vonHandGesperrt \|\| !gemerktEntsperren\(\)\)\) throw new IOException\("TRESOR_GESPERRT"\)/,'Hintergrund-Verzeichnis öffnet nicht wieder');
+  assert.match(java,/void sperren\(boolean vergessen\) \{\s*schliessen\(\);\s*vonHandGesperrt = true;/,'sperren() merkt sich das');
+  assert.match(java,/schliessen\(\);\s*vonHandGesperrt = false;\s*offen = t;/,'Passwort öffnet wieder');
+  assert.match(plugin,/tresorWeiter\(PluginCall call,DocumentVault v\)throws Exception\{\s*tresor\.entsperrenGewuenscht\(\);/,'„Entsperren“ von Hand darf den gemerkten Schlüssel nehmen');
+  assert.equal((java.match(/gemerktEntsperren\(\)/g)||[]).length,3,'keine weitere Stelle, die still entsperrt');
+});
