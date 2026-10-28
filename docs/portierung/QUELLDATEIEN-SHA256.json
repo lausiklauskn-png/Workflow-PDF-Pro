@@ -1,5 +1,5 @@
 {
-  "commit": "d21a308040d4f102984684e2a4e9faf47465023a",
+  "commit": "19374781441b21a020e79886d1ad813637969c98",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
@@ -18,8 +18,8 @@
     },
     {
       "path": "CLAUDE.md",
-      "bytes": 103469,
-      "sha256": "75297e5968866b1dbbe768bc52a55ecdfe24cd7f9521442ba78aab5224388657"
+      "bytes": 104190,
+      "sha256": "ff194fc41f20ad40eccfdccfe03187a941a01ba1e691d1510d8cf158ea9a47a6"
     },
     {
       "path": "LICENSE",
@@ -43,8 +43,8 @@
     },
     {
       "path": "assets/app.js",
-      "bytes": 280483,
-      "sha256": "7ddf1c419c0d61ea566a29942d8d9ff1c18b1d75ccb7ec2bdd1de7e208ab574e"
+      "bytes": 280852,
+      "sha256": "bc4d3b01a76519a2770a25c53b15b04a92240faafa5750530657ba4c7e6f2342"
     },
     {
       "path": "assets/bedeutung.js",
@@ -458,8 +458,8 @@
     },
     {
       "path": "tests/arbeit.mjs",
-      "bytes": 27516,
-      "sha256": "66b9790d3e8438282e9ec6276f82c5d5429d97cd1692fb2ea2d9234f9654ef6d"
+      "bytes": 29007,
+      "sha256": "8bf812b2322e949c6bbbf78db0a51a6ab54e28c1406f277630c8163ea7ce01f1"
     },
     {
       "path": "tests/bedeutung.mjs",
@@ -483,8 +483,8 @@
     },
     {
       "path": "tests/bildbeschreibung.mjs",
-      "bytes": 27123,
-      "sha256": "dc51c34e4dccc0e6f201ca66c9fcd4655e413a617d6b871e4656e5674f86d709"
+      "bytes": 27430,
+      "sha256": "7f6f0b5f16b7e00672fc6a263c82f1d958c6689b9a497720bc22d3a5249fdc54"
     },
     {
       "path": "tests/bilder.mjs",
@@ -553,8 +553,8 @@
     },
     {
       "path": "tests/gegenprobe_arbeit.mjs",
-      "bytes": 6552,
-      "sha256": "e5cabdfc36799927732711b62d464f9a45a40925f5f6d2a5b809c24fd48fd7e1"
+      "bytes": 6777,
+      "sha256": "f6c2f3f0329d4c5214d8cc68e065e003f7b13a70cb6fb27f7180a36fba75d892"
     },
     {
       "path": "tests/gegenprobe_bedeutung.mjs",

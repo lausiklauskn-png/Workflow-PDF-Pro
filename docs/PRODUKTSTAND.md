@@ -110,7 +110,7 @@ beim Beschreiben (1,2 GB im Prüfrechner sind für ein Tablet ein Risiko), ob `f
 PWA (Workflow-PDF #136, **1.1.4**, Cache v109): nichts startet beim Öffnen (Einordnen erst auf „Einordnen“, Bildbeschreibung erst auf
 „Beschreiben“), „Prüfen“ und „Einordnen“ nebeneinander für die Auswahl oder „Alle N …?“, Datei für Datei mit Stand und Abbrechen, Anmeldung bei
 `window.ProHintergrund`, Strichgrafiken statt Emojis, Knöpfe 32 px, die Bibliothek öffnet beim Anzeigen kein PDF. Workflow PDF Pro übernimmt den
-Kern bytegleich (`upstream/workflow-pdf` = `d21a308` (Stand von #136, 203 Dateien), `verify-upstream` 0 Abweichungen), Anker `app.js?v=72`, App **1.0.8**/Buildnummer 9.
+Kern bytegleich (`upstream/workflow-pdf` = `1937478` (Stand von #136, 203 Dateien), `verify-upstream` 0 Abweichungen), Anker `app.js?v=72`, App **1.0.8**/Buildnummer 9.
 Nur in der App: Scanner-Direktstart per Intent (`de.familyprojekt.workflowpdf.pro.SCANNEN`, Extra `von`) und das Fach „Eingang-WorkflowPDF“.
 Windows bekommt den Kern gleich; den Intent gibt es dort nicht (Windows hat keinen Weg, mit dem BookLedgerPro Windows den Scanner direkt
 öffnet — benannte Lücke). Nicht veröffentlicht, nicht am Gerät gemessen.
