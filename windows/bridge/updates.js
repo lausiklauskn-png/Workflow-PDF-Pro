@@ -81,9 +81,14 @@
       lock?.close(); lock?.remove(); lock = null; busy = false;
     }
   }
+  // Der Tauri-Weg zeigt sich nur, wenn er eingerichtet ist (Schlüssel vorhanden). Sonst gilt „Auf Updates prüfen“ wie unter
+  // Android (native/native-updates.js über WorkflowUpdates, Klaus 2026-10-28) — kein zweiter Knopf, kein „nicht eingerichtet“.
+  let eingerichtet = null;
   function settings() {
     const backup = document.getElementById('stSicherung');
     if (!backup || document.getElementById('stWindowsUpdates')) return;
+    if (eingerichtet === null) { eingerichtet = false; api('status').then(s => { eingerichtet = !!s?.configured; if (eingerichtet) settings(); }).catch(() => {}); return; }
+    if (!eingerichtet) return;
     const b = document.createElement('button'); b.id = 'stWindowsUpdates'; b.type = 'button'; b.className = 'knopf'; b.dataset.keinUe = ''; b.textContent = t('check'); b.onclick = () => check(true); backup.parentElement.append(b);
     const label = document.createElement('label'), input = document.createElement('input');
     input.type = 'checkbox'; input.checked = localStorage.getItem(autoKey) !== 'off';

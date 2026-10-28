@@ -28,7 +28,47 @@
     };
     return Object.freeze(api);
   }
+  // „Auf Updates prüfen“ unter Windows wie unter Android (Klaus 2026-10-28): der Tauri-Updater ist ohne Schlüssel und ohne
+  // latest.json nie eingerichtet worden. Gelesen werden die öffentlichen Veröffentlichungen „windows-vX.Y.Z“ mit hochgeladenem
+  // Setup; „Herunterladen“ öffnet deren feste Seite, installiert nichts. Gleiche Regel wie UpdateRegel.java (Android).
+  const REPO = 'lausiklauskn-png/Workflow-PDF-Pro';
+  const teile = (text, re) => { const m = re.exec(text || ''); return m ? [+m[1], +m[2], +m[3]] : null; };
+  const neuer = (a, b) => { for (let i = 0; i < 3; i++) if (a[i] !== b[i]) return a[i] > b[i]; return false; };
+  function auswerten(installiert, releases) {
+    const ich = teile(installiert, /^(\d{1,4})\.(\d{1,4})\.(\d{1,4})(?:-[A-Za-z0-9.]+)?$/);
+    if (!ich) throw new HostError('UPDATE_VERSION_UNBEKANNT');
+    let best = ich, bestTag = null;
+    for (const r of Array.isArray(releases) ? releases : []) {
+      if (!r || r.draft !== false || r.prerelease !== false) continue;
+      const v = teile(r.tag_name, /^windows-v(\d{1,4})\.(\d{1,4})\.(\d{1,4})$/);
+      if (!v || !neuer(v, best)) continue;
+      const name = 'Workflow-PDF-Pro-Windows-' + v.join('.') + '-Setup.exe';
+      if (!(r.assets || []).some(a => a && a.name === name && a.state === 'uploaded' && a.size > 0)) continue;
+      best = v; bestTag = r.tag_name;
+    }
+    const text = ich.join('.');
+    return bestTag ? { status: 'available', version: best.join('.'), installiert: text, tag: bestTag } : { status: 'current', version: text, installiert: text };
+  }
+  let updateTag = null;
+  const WorkflowUpdates = Object.freeze({
+    async check() {
+      updateTag = null;
+      const { version } = await call('WorkflowFiles', 'appInfo', {});
+      let antwort;
+      try { antwort = await fetch('https://api.github.com/repos/' + REPO + '/releases?per_page=30', { headers: { Accept: 'application/vnd.github+json' }, cache: 'no-store', credentials: 'omit' }); }
+      catch { throw new HostError('UPDATE_UNAVAILABLE'); }
+      if (!antwort.ok) throw new HostError('UPDATE_UNAVAILABLE');
+      const out = auswerten(version, await antwort.json());
+      updateTag = out.tag || null; return out;
+    },
+    async openDownload() {
+      if (!updateTag || !/^windows-v\d{1,4}\.\d{1,4}\.\d{1,4}$/.test(updateTag)) throw new HostError('UPDATE_CHECK_REQUIRED');
+      return call('WorkflowFiles', 'openLink', { url: 'https://github.com/' + REPO + '/releases/tag/' + updateTag });
+    },
+    addListener: async () => ({ remove: async () => {} })
+  });
   const Plugins = Object.freeze({
+    WorkflowUpdates,
     WorkflowFiles: plugin('WorkflowFiles', ['begin', 'append', 'finish', 'abort', 'save', 'share', 'print', 'openLink', 'appInfo']),
     WorkflowImport: plugin('WorkflowImport', ['chooseFolder', 'read', 'release']),
     WorkflowIncoming: plugin('WorkflowIncoming', ['pending', 'read', 'acknowledge', 'history', 'restore', 'discardArchived']),
