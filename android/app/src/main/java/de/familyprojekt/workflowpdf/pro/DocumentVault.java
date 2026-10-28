@@ -440,7 +440,7 @@ final class DocumentVault {
     JSONObject state() throws Exception {
         JSONObject state = new JSONObject().put("configured", configured()).put("unlocked", false);
         if (!configured()) return state;
-        state.put("id", identity()).put("folder", prefs.getString("label",FOLDER).put("pfad", pfad()).put("speicher", speicher());
+        state.put("id", identity()).put("folder", prefs.getString("label",FOLDER)).put("pfad", pfad()).put("speicher", speicher());
         try { Place p = require(); state.put("unlocked", true).put("reachable", true).put("id", p.id).put("folder", p.label).put("revision", p.revision).put("records", p.index.length()); }
         catch (IOException error) { state.put("problem", error.getMessage()); }
         return state;
