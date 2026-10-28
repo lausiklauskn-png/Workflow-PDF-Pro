@@ -1,5 +1,5 @@
 {
-  "commit": "f5a1d0b53ebb3a9c8ae6fd16241ce27df3274020",
+  "commit": "d21a308040d4f102984684e2a4e9faf47465023a",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
@@ -18,8 +18,8 @@
     },
     {
       "path": "CLAUDE.md",
-      "bytes": 102908,
-      "sha256": "2870926a690f8c87228f66a2d86f1849245822de3fe6be2f10c383c88f4774e7"
+      "bytes": 103469,
+      "sha256": "75297e5968866b1dbbe768bc52a55ecdfe24cd7f9521442ba78aab5224388657"
     },
     {
       "path": "LICENSE",
@@ -163,8 +163,8 @@
     },
     {
       "path": "assets/style.css",
-      "bytes": 50866,
-      "sha256": "ca91073ac16a7d738103dde89a3bf7a530e7ac66080cd4edce8f13d6edbcbb47"
+      "bytes": 51157,
+      "sha256": "13499f5518e9451fb8a65243cb4f22433b325ea07ecb19bb66d1e7d976a23f9c"
     },
     {
       "path": "assets/suche.js",
