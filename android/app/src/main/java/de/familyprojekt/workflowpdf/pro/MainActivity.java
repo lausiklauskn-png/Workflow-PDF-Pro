@@ -26,6 +26,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(ProChromePlugin.class);
         registerPlugin(ProSpeechPlugin.class);
         registerPlugin(ProTranslatePlugin.class);
+        registerPlugin(ProUpdatesPlugin.class);
         super.onCreate(state);
         if(bridge==null){if(!runtimeNotice)showRuntimeNotice();return;}
         bridge.setWebViewClient(new BridgeWebViewClient(bridge) {

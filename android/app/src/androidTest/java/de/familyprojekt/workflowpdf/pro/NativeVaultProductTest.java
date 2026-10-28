@@ -50,7 +50,7 @@ public final class NativeVaultProductTest {
                 eval(scenario,"window.__rec=null;Capacitor.Plugins.WorkflowVault.recoveryInfo({location:"+JSONObject.quote(location)+"}).then(r=>window.__rec=String(r.exists),e=>window.__rec='error:'+e.message);true");
                 until(scenario,"window.__rec!==null");assertEquals("\"false\"",eval(scenario,"window.__rec"));
                 eval(scenario,"WFPNativeVault.manage();true");
-                until(scenario,"/Noch keine Ersatzschlüssel|No recovery keys yet/.test(document.getElementById('nativeVaultRecovery')?.textContent||'') && [...document.querySelectorAll('.native-vault-dialog button')].some(b=>/Ersatzschlüssel erzeugen|Create recovery keys/.test(b.textContent))");
+                until(scenario,"/Noch keine Ersatzschlüssel|No recovery keys yet/.test(document.getElementById('nativeVaultRecovery')?.textContent||'') && [...document.querySelectorAll('.native-vault-dialog button')].some(b=>/Ersatzschlüssel für die Ablage erzeugen|Create recovery keys/.test(b.textContent))");
                 eval(scenario,"[...document.querySelectorAll('.native-vault-dialog button')].find(b=>b.textContent==='Schließen'||b.textContent==='Close').click();true");
                 scenario.recreate();until(scenario,"Boolean(window.WFPNativeVault && !WFPNativeVault.gate.blocked && window.__wfpdf)");
                 eval(scenario,"window.__jobProof=null;WFP.DB.get('files','ue:'+"+id+"+':de-ru').then(v=>window.__jobProof=v.job.page);true");until(scenario,"window.__jobProof!==null");assertEquals("7",eval(scenario,"__jobProof"));

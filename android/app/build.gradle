@@ -42,6 +42,7 @@ dependencies {
     implementation project(':capacitor-android')
     implementation 'com.google.mlkit:translate:17.0.3'
     testImplementation "junit:junit:$junitVersion"
+    testImplementation "org.json:json:20240303"   // echtes org.json für UpdateRegelTest (Android-Stummel werfen in JVM-Proben)
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')

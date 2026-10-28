@@ -91,7 +91,9 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
       await page.waitForFunction(id=>WFP.DB.get('texte',id).then(r=>!!r),id);
       await oeffnen();
       assert.equal(await page.getAttribute('#nativeTresorordner','data-zustand'),'neu');
-      assert.match(await page.textContent('#nativeTresorordnerZeile'),/Kopie davon.*„Workflow PDF Pro“ bleibt, wie es ist/);
+      // Die lange Erklärung steht hinter ⓘ (zugeklappt, Leitfaden § 1.2); die Zeile sagt kurz, wo es steht.
+      assert.match(await page.textContent('#nativeTresorordnerZeile'),/noch nicht im Tresor/);
+      assert.match(await page.textContent('#nativeTresorordnerInfo'),/Kopie davon.*„Workflow PDF Pro“ bleibt, wie es ist/);
       assert.equal(await knopf(page,'In den Tresorordner einziehen').count(),1);
       assert.equal(await page.locator('.native-vault-dialog input').count(),0);
     });

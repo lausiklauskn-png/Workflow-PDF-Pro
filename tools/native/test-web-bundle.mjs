@@ -24,12 +24,15 @@ test('bundle contains the complete public runtime and unchanged protected files'
   // Versionsnummer: in der App nie die Nummer der Webversion, bis die App ihre eigene setzt
   assert.equal((html.match(/<meta name="wfp-version" content=""/g) || []).length, 1);
   assert.ok(html.indexOf('native/native-bootstrap.js') < html.indexOf('assets/app.js'));
-  for (const name of ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js',...vaultFiles,'native.css']) {
+  for (const name of ['native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js',...vaultFiles,'native.css','pro-bedienung.js','pro-bedienung.css','native-ohne-web.js','native-updates.js']) {
     assert.ok(html.includes('native/' + name + '?v=' + digest(await readFile(join(root,'www/native',name)))));
   }
   assert.ok(html.indexOf('assets/db.js')<html.indexOf('native/native-vault.js'));
   assert.ok(html.indexOf('native/vault-gate.js')<html.indexOf('native/native-vault.js'));
   assert.ok(html.indexOf('native/native-vault.js')<html.indexOf('assets/app.js'));
+  // Gemeinsame Bedien-Bausteine vor dem Kasten „Tresor & Ablage“, die Web-Reste-Schicht nach der Sprache des Kerns.
+  assert.ok(html.indexOf('native/pro-bedienung.js')<html.indexOf('native/native-vault.js'));
+  assert.ok(html.indexOf('assets/sprache.js')<html.indexOf('native/native-ohne-web.js'));
 });
 test('bundle excludes development material, signing files and private data', async () => {
   async function walk(path, relative = '') {

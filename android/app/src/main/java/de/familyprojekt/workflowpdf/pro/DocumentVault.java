@@ -400,6 +400,12 @@ final class DocumentVault {
     }
     private void clearActive() { if (active != null && active.key != null) Arrays.fill(active.key, (byte) 0); active = null; }
     boolean configured() { return prefs.contains("tree"); }
+    /** Ganzer Pfad der Ablage im Speicher (Teil hinter „Speicher:“ der Dokument-Kennung), Leitfaden § 5. */
+    String pfad() { String r = prefs.getString("root", ""); return r.contains(":") ? r.substring(r.indexOf(':') + 1) : r; }
+    /** „primary“ = Gerätespeicher, sonst eine Karte/ein Stick (Kennung vor dem Doppelpunkt). */
+    String speicher() { String r = prefs.getString("root", ""); return r.startsWith("primary:") ? "geraet" : r.contains(":") ? "karte" : ""; }
+    /** Dokument-Adresse des Ablage-Ordners für „In Dateien öffnen“; null ohne Ordner. */
+    Uri ordnerUri() { return configured() ? DocumentsContract.buildDocumentUriUsingTree(Uri.parse(prefs.getString("tree", "")), prefs.getString("root", "")) : null; }
     /** Kopie des Datenschlüssels für den Einzug in den gemeinsamen Tresorordner (Schritt D1). Bleibt nativ, nie an die WebView. */
     byte[] tresorSchluessel() throws Exception { return require().key.clone(); }
     boolean transferring() { return !pending.isEmpty()||batch!=null; }
@@ -434,7 +440,7 @@ final class DocumentVault {
     JSONObject state() throws Exception {
         JSONObject state = new JSONObject().put("configured", configured()).put("unlocked", false);
         if (!configured()) return state;
-        state.put("id", identity()).put("folder", prefs.getString("label",FOLDER));
+        state.put("id", identity()).put("folder", prefs.getString("label",FOLDER)).put("pfad", pfad()).put("speicher", speicher());
         try { Place p = require(); state.put("unlocked", true).put("reachable", true).put("id", p.id).put("folder", p.label).put("revision", p.revision).put("records", p.index.length()); }
         catch (IOException error) { state.put("problem", error.getMessage()); }
         return state;

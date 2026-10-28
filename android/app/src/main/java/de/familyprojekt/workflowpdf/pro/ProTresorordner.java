@@ -43,6 +43,22 @@ final class ProTresorordner {
 
     private SharedPreferences prefs() { return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE); }
     boolean gewaehlt() { return prefs().contains("baum"); }
+    /** Ganzer Pfad des Tresorordners im Speicher (Leitfaden § 5). */
+    String pfad() {
+        String b = prefs().getString("baum", null); if (b == null) return "";
+        try { String id = android.provider.DocumentsContract.getTreeDocumentId(Uri.parse(b)); return id.contains(":") ? id.substring(id.indexOf(':') + 1) : id; }
+        catch (Exception e) { return ""; }
+    }
+    String speicher() {
+        String b = prefs().getString("baum", null); if (b == null) return "";
+        try { String id = android.provider.DocumentsContract.getTreeDocumentId(Uri.parse(b)); return id.startsWith("primary:") ? "geraet" : id.contains(":") ? "karte" : ""; }
+        catch (Exception e) { return ""; }
+    }
+    /** Dokument-Adresse des Tresorordners für „In Dateien öffnen“; null ohne gewählten Ordner. */
+    Uri ordnerUri() {
+        String b = prefs().getString("baum", null); if (b == null) return null;
+        Uri t = Uri.parse(b); return android.provider.DocumentsContract.buildDocumentUriUsingTree(t, android.provider.DocumentsContract.getTreeDocumentId(t));
+    }
     boolean istOffen() { return offen != null; }
     /** Der Nutzer will ausdrücklich entsperren oder einziehen: der gemerkte Schlüssel darf wieder öffnen. */
     void entsperrenGewuenscht() { vonHandGesperrt = false; }
@@ -119,7 +135,7 @@ final class ProTresorordner {
 
     JSONObject zustand(DocumentVault vault) throws Exception {
         SharedPreferences p = prefs();
-        JSONObject z = new JSONObject().put("gewaehlt", p.contains("baum")).put("ordner", p.getString("name", "")).put("gemerkt", p.contains("merken"));
+        JSONObject z = new JSONObject().put("gewaehlt", p.contains("baum")).put("ordner", p.getString("name", "")).put("pfad", pfad()).put("speicher", speicher()).put("gemerkt", p.contains("merken"));
         z.put("offen", offen != null).put("eingezogen", false);
         if (!p.contains("baum")) return z;
         try {
