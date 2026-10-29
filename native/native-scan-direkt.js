@@ -20,6 +20,11 @@
       if (document.querySelector('.scan')) return;
       history.replaceState(null, '', location.pathname + '?scan=1' + (von ? '&von=' + encodeURIComponent(von) : '') + location.hash);
       window.__wfpdf.scanDirektstart();
+      // Befund Tablet 2026-10-29: der Kern setzt „Durchsuchbar“ erst nach dem Zeichnen des Fensters — der Haken stand leer da,
+      // obwohl der Scan durchsuchbar wird. Der sichtbare Haken folgt jetzt dem Zustand (bis der Kern neu zeichnet).
+      const st = window.WFP?.Scanner?.zustand?.();
+      const haken = document.querySelector('.scan [data-durch]');
+      if (st && st.durchsuchbar && haken) haken.checked = true;
     } catch { /* ohne Anfrage nichts tun */ }
     finally { laeuft = false; }
   }

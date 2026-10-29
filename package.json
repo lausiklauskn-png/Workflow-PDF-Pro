@@ -1,6 +1,6 @@
 {
   "name": "workflow-pdf-pro",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "private": true,
   "type": "module",
   "description": "Workflow PDF Pro — lokal gebündelter unveränderter Workflow-PDF-Kern mit nativen Geräteadaptern",
