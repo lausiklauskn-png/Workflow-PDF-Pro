@@ -13,7 +13,7 @@ export const vaultFiles=['vault-codec.js','vault-records.js','vault-journal.js',
 export const bedienFiles = ['pro-bedienung.js', 'pro-bedienung.css', 'pro-hintergrund.js', 'pro-geraet.js'];
 // Scanner und Kamera unter Windows (Pro-Umbau 5): hier gepflegt, byte-gleich nach BookLedgerPro (Pin native/pro-scanner-herkunft.json).
 export const scannerFiles = ['pro-scanner.js', 'pro-scanner.css'];
-export const nativeFiles = [...bedienFiles, ...scannerFiles, 'native-ohne-web.js', 'native-updates.js', 'native-hintergrund.js', 'native-sicherung.js', 'native-bootstrap.js', 'native-files.js', 'native-import.js', 'native-incoming.js', 'native-chrome.js', 'native-speech.js', 'native-translate.js', 'chrome/helper.html', 'chrome/helper.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
+export const nativeFiles = [...bedienFiles, ...scannerFiles, 'native-ohne-web.js', 'native-updates.js', 'native-hintergrund.js', 'native-scan-direkt.js', 'native-sicherung.js', 'native-bootstrap.js', 'native-files.js', 'native-import.js', 'native-incoming.js', 'native-chrome.js', 'native-speech.js', 'native-translate.js', 'chrome/helper.html', 'chrome/helper.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
 export const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 
 // This allowlist is deliberately independent of a recursive checkout copy.
@@ -66,8 +66,8 @@ export async function prepareWeb(out = join(root, 'www')) {
   const versionMeta = html.match(/<meta name="wfp-version" content="[^"]*"/g) || [];
   if (versionMeta.length !== 1) throw new Error('Native injection anchor changed: wfp-version');
   html = html.replace(versionMeta[0], '<meta name="wfp-version" content=""');
-  html = replaceOnce(html, '<script defer src="assets/app.js?v=71"></script>',
-    ['pro-bedienung.js','pro-hintergrund.js','pro-geraet.js','native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles,'native-updates.js','native-hintergrund.js','native-sicherung.js','native-ohne-web.js','pro-scanner.js'].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=71"></script>');
+  html = replaceOnce(html, '<script defer src="assets/app.js?v=72"></script>',
+    ['pro-bedienung.js','pro-hintergrund.js','pro-geraet.js','native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles,'native-updates.js','native-hintergrund.js','native-scan-direkt.js','native-sicherung.js','native-ohne-web.js','pro-scanner.js'].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=72"></script>');
   await rm(out, { recursive: true, force: true });
   await mkdir(out, { recursive: true });
   const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding, adapter tags and empty wfp-version (filled by the app)'], files: [] };

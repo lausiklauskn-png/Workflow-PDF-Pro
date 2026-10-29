@@ -15,6 +15,10 @@
     de: [
       // Hilfe → Übersetzen: in der App öffnet sie selbst Chrome (native-chrome.js); kein „installiert im eigenen Fenster“.
       ['— die App zeigt den Text unten an, du tippst in Chrome ⋮ → „Übersetzen" (der Text geht an Google). Läuft die App installiert im eigenen Fenster und fehlt dort „Übersetzen": „🌐 In Chrome öffnen" — derselbe Übersetzer öffnet sich in Chrome mit denselben Dokumenten, das Ergebnis liegt danach auch in der App.', '— die App öffnet den bereinigten Text in Google Chrome, dort ⋮ → „Übersetzen" (der Text geht an Google); das Ergebnis wird in der App zum PDF.'],
+      // Seit Pro-Umbau 5 ersetzt der Kern das Welt-Emoji durch ein Strichsymbol (assets/strich.js): derselbe Satz steht dann in ZWEI Textknoten,
+      // getrennt am Symbol. Teil 1 bekommt den Ersatz, Teil 2 fällt weg (samt dem Symbol davor, textKnoten).
+      ['— die App zeigt den Text unten an, du tippst in Chrome ⋮ → „Übersetzen" (der Text geht an Google). Läuft die App installiert im eigenen Fenster und fehlt dort „Übersetzen": „', '— die App öffnet den bereinigten Text in Google Chrome, dort ⋮ → „Übersetzen" (der Text geht an Google); das Ergebnis wird in der App zum PDF.'],
+      [' In Chrome öffnen" — derselbe Übersetzer öffnet sich in Chrome mit denselben Dokumenten, das Ergebnis liegt danach auch in der App.', ''],
       ['Der Schlüssel liegt unverschlüsselt im Speicher dieses Browsers (localStorage) und wird nur an den gewählten Anbieter geschickt.', 'Der Schlüssel liegt unverschlüsselt im Speicher dieser App auf dem Gerät und wird nur an den gewählten Anbieter geschickt.'],
       ['Der Browserspeicher gilt nur für ', 'Der App-Speicher gilt nur für '],
       ['Alles bleibt in diesem Browser (DeX-Chrome und Tablet-Chrome sind zwei getrennte Browser).', 'Alles bleibt in dieser App auf dem Gerät.'],
@@ -40,6 +44,8 @@
     ],
     en: [
       ['— the app shows the text below, you tap ⋮ → "Translate" in Chrome (the text goes to Google). If the app runs installed in its own window and "Translate" is missing there: "🌐 Open in Chrome" — the same translator opens in Chrome with the same documents, and the result then shows up in the app too.', '— the app opens the cleaned text in Google Chrome, there ⋮ → "Translate" (the text goes to Google); the app turns the result into a PDF.'],
+      ['— the app shows the text below, you tap ⋮ → "Translate" in Chrome (the text goes to Google). If the app runs installed in its own window and "Translate" is missing there: "', '— the app opens the cleaned text in Google Chrome, there ⋮ → "Translate" (the text goes to Google); the app turns the result into a PDF.'],
+      [' Open in Chrome" — the same translator opens in Chrome with the same documents, and the result then shows up in the app too.', ''],
       ["The API key is stored unencrypted in this browser's storage (localStorage) and is only sent to the chosen provider.", "The API key is stored unencrypted in this app's storage on the device and is only sent to the chosen provider."],
       ['Browser storage only applies to ', 'App storage only applies to '],
       ['Everything stays in this browser (DeX Chrome and tablet Chrome are two separate browsers).', 'Everything stays in this app on the device.'],
@@ -75,7 +81,9 @@
   const ausgenommen = e => !e || Boolean(e.closest(NIE)) || diagnose(e);
   // Die Diagnose (Hilfe → Diagnose) nennt Browser und Übersetzer ehrlich beim Namen: ihr Fenster bleibt, wie es ist.
   const diagnose = e => { const d = e.closest('.dlg, dialog'); return Boolean(d && /Diagnose|Diagnostics|Диагностика|تشخيص/.test(d.querySelector('h2')?.textContent || '')); };
-  const textKnoten = n => { const e = n.parentElement; if (ausgenommen(e)) return; const neu = tausch(n.nodeValue); if (neu !== n.nodeValue) n.nodeValue = neu; };
+  const textKnoten = n => { const e = n.parentElement; if (ausgenommen(e)) return; const neu = tausch(n.nodeValue); if (neu === n.nodeValue) return; n.nodeValue = neu;
+    // Fällt ein Satzteil ganz weg, geht das Strichsymbol davor mit (sonst stünde ein Symbol ohne Text da).
+    const v = n.previousSibling; if (!neu.trim() && v && v.nodeType === 1 && v.hasAttribute('data-strich')) v.remove(); };
   // Platzhalter und Titel auch an Eingabefeldern (nur der Wert eines Feldes bleibt unberührt).
   const attribute = e => { if (!e || e.closest(NIE_ATTR) || diagnose(e)) return; for (const a of ['title', 'placeholder', 'aria-label']) { const v = e.getAttribute(a); if (v) { const neu = tausch(v); if (neu !== v) e.setAttribute(a, neu); } } };
   function ausblenden() {

@@ -6,6 +6,7 @@ import {resolve,join,extname} from 'node:path';
 import {createHash,randomUUID} from 'node:crypto';
 import {chromium} from 'playwright-core';
 import {root} from './prepare-web.mjs';
+import {PDFDocument,StandardFonts} from 'pdf-lib';
 
 test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis aus der echten Bibliothek',async t=>{
   const base=join(root,'www');
@@ -15,7 +16,7 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
     res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.wasm':'application/wasm'})[extname(file)]||'application/octet-stream');res.end(await readFile(file));
   }catch{res.statusCode=404;res.end();}});
   await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;
-  const fixture={log:[],zeilen:null,einzugFehler:null,tresor:{gewaehlt:false,ordner:'',gemerkt:false,offen:false,eingezogen:false},records:new Map(),batch:null,primary:null,migration:null,unlocked:true,failRead:false,tickets:new Map()};
+  const fixture={eingang:[],marken:[],eingangDaten:new Map(),eingangTickets:new Map(),log:[],zeilen:null,einzugFehler:null,tresor:{gewaehlt:false,ordner:'',gemerkt:false,offen:false,eingezogen:false},records:new Map(),batch:null,primary:null,migration:null,unlocked:true,failRead:false,tickets:new Map()};
   const key=(store,id)=>JSON.stringify([store,id]);
   const state=()=>fixture.primary?{configured:true,location:'target',id:'vault',folder:'Internal chosen folder',unlocked:fixture.unlocked,reachable:true,problem:'VAULT_LOCKED'}:{configured:false,internal:true};
   const candidate=()=>({configured:true,location:'target',id:'vault',folder:'Internal chosen folder',unlocked:fixture.unlocked,reachable:true,problem:'VAULT_LOCKED'});
@@ -45,9 +46,14 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
       fixture.tresor={gewaehlt:true,ordner:'Tresor-Probe',gemerkt:true,offen:true,eingezogen:true,erreichbar:true,vorhanden:true,pruefung:'PASST',eintraege:0};return {...fixture.tresor,eingezogenJetzt:true,angelegt:true};}
     if(method==='tresorVerzeichnis'){fixture.log.push(['tresorVerzeichnis',a]);const neu=JSON.stringify(a.zeilen)!==JSON.stringify(fixture.zeilen);fixture.zeilen=a.zeilen;fixture.tresor.eintraege=a.zeilen.length;return {geschrieben:neu,eintraege:a.zeilen.length};}
     if(method==='tresorSperren'){fixture.log.push(['tresorSperren',a]);fixture.tresor={...fixture.tresor,offen:false,eingezogen:false};return {...fixture.tresor};}
+    // Übergabefach „Eingang-WorkflowPDF“ (Pro-Umbau 5), Stücke zu 500 Byte (Java: 192 KB) — so wird mehrfach gelesen
+    if(method==='tresorEingang'){fixture.log.push(['tresorEingang',a]);return {ordner:'Eingang-WorkflowPDF',eintraege:fixture.eingang,marken:fixture.marken};}
+    if(method==='tresorEingangOeffnen'){fixture.log.push(['tresorEingangOeffnen',a]);const e=fixture.eingang.find(x=>x.id===a.id);if(!e)throw Error('TRESOR_EINTRAG_FEHLT');const ticket=randomUUID();fixture.eingangTickets.set(ticket,{data:fixture.eingangDaten.get(a.id),pos:0});return {ticket,groesse:e.groesse,name:e.name,art:e.art};}
+    if(method==='tresorEingangTeil'){const tk=fixture.eingangTickets.get(a.ticket);const teil=tk.data.subarray(tk.pos,tk.pos+500);tk.pos+=teil.length;fixture.log.push(['tresorEingangTeil',teil.length]);const fertig=teil.length<500;if(fertig)fixture.eingangTickets.delete(a.ticket);return {data:teil.toString('base64'),fertig};}
+    if(method==='tresorEingangMarkieren'){fixture.log.push(['tresorEingangMarkieren',a]);fixture.marken.push(a.id);return {markiert:true};}
     throw Error('Unknown bridge method '+method);
   }
-  const tresorMethoden=['tresorZustand','tresorEinziehen','tresorVerzeichnis','tresorSperren'];
+  const tresorMethoden=['tresorZustand','tresorEinziehen','tresorVerzeichnis','tresorSperren','tresorEingang','tresorEingangOeffnen','tresorEingangTeil','tresorEingangMarkieren'];
   const methoden=['state','migration','choose','unlock','lock','prepareMigration','completeMigration','cancelMigration','beginBatch','abortBatch','commitBatch','begin','append','finish','abort','info','read','list','remove'];
   async function seite(mitTresor){
     const page=await browser.newPage();await page.exposeFunction('__vaultCall',call);
@@ -121,6 +127,36 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
       assert.match(await page.textContent('#nativeTresorordnerHinweis'),/Eingezogen/);
       assert.match(await page.textContent('#nativeTresorordnerZeile'),/verbunden: Tresor-Probe · Einträge im Inhaltsverzeichnis: 1/);
     });
+    await t.test('Eingang-WorkflowPDF: neue Datei anderer Pro-Apps steht da, „Übernehmen“ liest sie ein und markiert erst danach',async()=>{
+      const pdf=await PDFDocument.create();const f=await pdf.embedFont(StandardFonts.Helvetica);
+      for(let i=0;i<3;i++)pdf.addPage([400,500]).drawText('Beleg 4711 von BookLedgerPro, Seite '+(i+1),{x:20,y:400,size:12,font:f});
+      const bytes=Buffer.from(await pdf.save());
+      fixture.eingang=[{id:'e-4711',name:'Beleg 4711.pdf',art:'application/pdf',datum:Date.now(),groesse:bytes.length,schreiber:'bookledgerpro'},{id:'e-alt',name:'Schon da.pdf',art:'application/pdf',datum:1,groesse:10,schreiber:'bookledgerpro'}];
+      fixture.marken=['e-alt'];fixture.eingangDaten.set('e-4711',bytes);fixture.log.length=0;
+      await page.evaluate(()=>WFPTresorordner.eingangHinweis());
+      await page.waitForSelector('#nativeEingangHinweis');
+      assert.match(await page.textContent('#nativeEingangHinweis'),/Neu im Eingang: 1/);
+      await page.evaluate(()=>document.querySelectorAll('.dlg-grund').forEach(g=>g.remove()));
+      await oeffnen();
+      await page.waitForSelector('#nativeTresorEingang [data-eingang-zeile]');
+      assert.match(await page.textContent('#nativeTresorEingang'),/Neu im Eingang: 1/);
+      assert.equal(await page.locator('#nativeTresorEingang [data-eingang-eintrag]').count(),1,'schon übernommene Einträge stehen nicht da');
+      assert.match(await page.textContent('#nativeTresorEingang [data-eingang-eintrag]'),/Beleg 4711\.pdf/);
+      assert.equal(await page.locator('#nativeTresorEingang [data-eingang-uebernehmen]').count(),1);
+      await page.click('#nativeTresorEingang [data-eingang-uebernehmen]');
+      await page.waitForFunction(()=>__wfpdf.S.docs.some(d=>d.name==='Beleg 4711'),null,{timeout:30000});
+      await page.waitForFunction(()=>/Übernommen: 1/.test(document.querySelector('#nativeTresorEingang [data-eingang-zeile]')?.textContent||''));
+      const reihe=fixture.log.map(([m])=>m);
+      assert.ok(reihe.filter(m=>m==='tresorEingangTeil').length>1,'in Stücken gelesen');
+      assert.ok(reihe.lastIndexOf('tresorEingangTeil')<reihe.indexOf('tresorEingangMarkieren'),'erst gelesen, dann markiert');
+      assert.deepEqual(fixture.marken,['e-alt','e-4711']);
+      const doc=await page.evaluate(()=>{const d=__wfpdf.S.docs.find(x=>x.name==='Beleg 4711');return {seiten:d.pages.length,quelle:d.quelle,pruefung:!!d.pruefung};});
+      assert.deepEqual(doc,{seiten:3,quelle:'pdf',pruefung:false},'wie eine eingelesene Datei: ungeprüft, Prüfen auf Knopfdruck');
+      await page.evaluate(()=>WFPTresorordner.eingangHinweis());
+      await page.waitForFunction(()=>!document.getElementById('nativeEingangHinweis'));
+      // Das übernommene Dokument gehört jetzt zur Bibliothek: Inhaltsverzeichnis nachziehen (die nächste Probe erwartet „aktuell“)
+      await page.evaluate(()=>WFPTresorordner.aktualisieren(true));
+    });
     await t.test('„jetzt schreiben“ ohne Änderung meldet aktuell; Sperren zeigt gesperrt',async()=>{
       await knopf(page,'Inhaltsverzeichnis jetzt schreiben').click();
       await page.waitForFunction(()=>/aktuell/.test(document.querySelector('#nativeTresorordnerHinweis')?.textContent||''));
@@ -160,5 +196,7 @@ test('Sperren von Hand bleibt gesperrt: zustand() und Inhaltsverzeichnis öffnen
   assert.match(java,/void sperren\(boolean vergessen\) \{\s*schliessen\(\);\s*vonHandGesperrt = true;/,'sperren() merkt sich das');
   assert.match(java,/schliessen\(\);\s*vonHandGesperrt = false;\s*offen = t;/,'Passwort öffnet wieder');
   assert.match(plugin,/tresorWeiter\(PluginCall call,DocumentVault v\)throws Exception\{\s*tresor\.entsperrenGewuenscht\(\);/,'„Entsperren“ von Hand darf den gemerkten Schlüssel nehmen');
-  assert.equal((java.match(/gemerktEntsperren\(\)/g)||[]).length,3,'keine weitere Stelle, die still entsperrt');
+  // Pro-Umbau 5: das Eingangsfach liest über offenOderGemerkt() — dieselbe Regel wie das Inhaltsverzeichnis
+  assert.match(java,/private TresorOrdner offenOderGemerkt\(\) throws IOException \{\s*if \(offen == null && \(vonHandGesperrt \|\| !gemerktEntsperren\(\)\)\) throw new IOException\("TRESOR_GESPERRT"\);/,'Eingang öffnet nach Sperren nicht wieder');
+  assert.equal((java.match(/gemerktEntsperren\(\)/g)||[]).length,4,'keine weitere Stelle, die still entsperrt');
 });
