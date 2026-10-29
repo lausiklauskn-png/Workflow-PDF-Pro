@@ -14,6 +14,11 @@ Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 Scanner-Direktstart per Intent `de.familyprojekt.workflowpdf.pro.SCANNEN` (BookLedgerPro 0.1.2 ruft ihn), Fach `Eingang-WorkflowPDF`. Versuch 1 scheiterte in der
 Emulator-Probe (nach Enter im Ordner-Dialog stand der Startbildschirm da, Ursache offen; im Browser nachgespielt fehlerfrei). Nicht erneut auslösen. ⚠ Am Tablet nicht gemessen.
 
+**1.0.9 veröffentlicht 2026-10-29 (nur Android, Klaus: „die Downloads für die aktuellen Versionen bereitstellen“):** [Android-APK](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.9/Workflow-PDF-Pro-1.0.9.apk)
+(Lauf 40840592772, Versuch 1; Tag `v1.0.9`, Quelle `3ff194c` = #43, Buildnummer 10, 83.242.447 B, SHA-256 `c1abd2dd7171176364fae582a01ee313f19b0c846ff9e17995bfa8fee599474f`,
+unabhängig geladen und gleich). Neu nach Klaus' Tablet-Befund: Arbeitsstand im Tresor **gesammelt** geschrieben (`vault-db` mit `sammeln`: 10 s Ruhe, Speichern,
+Schließen, Hintergrund, Sperren; Meldung nur bei > 1,2 s), Haken „Durchsuchbar“ beim Direktstart sichtbar. Nicht erneut auslösen. ⚠ Am Tablet nicht gemessen.
+
 **Gemeinsamer Tresorordner (27.10.2026, Klaus: Paket wird hier gepflegt):** `android/app/src/main/java/de/familyprojekt/tresor/`
 ist die Quelle für alle Pro-Apps (BookLedgerPro, Private Brain Pro kopieren byte-gleich). Nach jeder Änderung
 `node tools/tresor/pins.mjs --schreiben`, dann in den anderen Repos nachziehen. Format und Regeln: [docs/TRESORORDNER.md](docs/TRESORORDNER.md).
