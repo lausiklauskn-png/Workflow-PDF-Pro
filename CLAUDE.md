@@ -8,6 +8,12 @@ Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 [Produktstand](docs/PRODUKTSTAND.md). Unterlagen der Sitzung im Pro-Repo:
 [ABSCHLUSS-SITZUNG-04](https://github.com/lausiklauskn-png/Privat-Brain-Pro/blob/main/docs/design/aenderungen-2026-10-26/ABSCHLUSS-SITZUNG-04.md).
 
+**1.0.8 veröffentlicht 2026-10-29 (nur Android, Klaus: APK zur Gegenprobe; Windows später):** [Android-APK](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.8/Workflow-PDF-Pro-1.0.8.apk)
+(Lauf 40794715829, Versuch 2; Tag `v1.0.8`, Quelle `f614e4adb07f3698fb891dac655c56b607a46080` = #41, Buildnummer 9, 83.238.351 B, SHA-256
+`dabab89ec3623d118b88fa0cd482e7472433b9e2e7eb8eb9494a4b87c825f4b6`, Zertifikat `0da805c9…`, unabhängig geladen und gleich). Enthält Kern 1.1.4,
+Scanner-Direktstart per Intent `de.familyprojekt.workflowpdf.pro.SCANNEN` (BookLedgerPro 0.1.2 ruft ihn), Fach `Eingang-WorkflowPDF`. Versuch 1 scheiterte in der
+Emulator-Probe (nach Enter im Ordner-Dialog stand der Startbildschirm da, Ursache offen; im Browser nachgespielt fehlerfrei). Nicht erneut auslösen. ⚠ Am Tablet nicht gemessen.
+
 **Gemeinsamer Tresorordner (27.10.2026, Klaus: Paket wird hier gepflegt):** `android/app/src/main/java/de/familyprojekt/tresor/`
 ist die Quelle für alle Pro-Apps (BookLedgerPro, Private Brain Pro kopieren byte-gleich). Nach jeder Änderung
 `node tools/tresor/pins.mjs --schreiben`, dann in den anderen Repos nachziehen. Format und Regeln: [docs/TRESORORDNER.md](docs/TRESORORDNER.md).
