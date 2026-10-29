@@ -37,12 +37,21 @@
   };
   const t=key=>words[key][Math.max(0,['de','en','ru','ar'].indexOf(document.documentElement.lang))];
   const language=()=>document.documentElement.lang||'de';
-  let active=null,needed=null,panel=null,operation=false,banner;
+  let active=null,needed=null,panel=null,operation=false,banner,gebunden=null;
+  // Klaus 2026-10-29: die Meldung stand bei jedem Klick da. Jetzt: „Wird verschlüsselt gespeichert …“ erst, wenn das Schreiben
+  // länger als 1,2 s dauert, „gespeichert und geprüft“ nur danach; Fehler sofort. Kurze Schreibvorgänge laufen still.
   function status(kind){
-    if(!banner){banner=document.createElement('p');banner.id='nativeVaultStatus';banner.dataset.keinUe='';banner.setAttribute('role','status');document.body.append(banner);}
-    banner.textContent=t(kind==='error'?'blocked':kind==='saved'?'saved':'writing');banner.hidden=false;
-    clearTimeout(status.timer);if(kind==='saved')status.timer=setTimeout(()=>banner.hidden=true,2500);
+    if(!banner){banner=document.createElement('p');banner.id='nativeVaultStatus';banner.dataset.keinUe='';banner.setAttribute('role','status');banner.hidden=true;document.body.append(banner);}
+    const zeigen=text=>{banner.textContent=text;banner.hidden=false;};
+    clearTimeout(status.timer);
+    if(kind==='error'){clearTimeout(status.spaet);status.sichtbar=true;zeigen(t('blocked'));return;}
+    if(kind==='saved'){clearTimeout(status.spaet);status.spaet=null;
+      if(status.sichtbar){zeigen(t('saved'));status.timer=setTimeout(()=>{banner.hidden=true;status.sichtbar=false;},2000);}
+      return;}
+    if(!status.spaet&&!status.sichtbar)status.spaet=setTimeout(()=>{status.spaet=null;status.sichtbar=true;zeigen(t('writing'));},1200);
+    else if(status.sichtbar)zeigen(t('writing'));
   }
+  window.__wppVaultStatus=status;   // Probe
   const gate=new WFPVaultGate(error=>{status('error');void manage(true,error);});
   WFP.DB=gate.db;
   const localReady=WFPVaultDB.localIndex(original);
@@ -79,8 +88,16 @@
       }
     }
     await local.commit(changes);
-    return WFPVaultDB.create({journal,local,records});
+    gebunden=WFPVaultDB.create({journal,local,records,sammeln:{ruheMs:10000,fehler:error=>{gate.fault=true;gate.blocked=true;gate.generation++;status('error');void manage(true,error);}}});
+    return gebunden;
   }
+  // Gesammelter Arbeitsstand geht vor jedem Sperren/Wechseln, auf „Speichern“, beim Schließen des Dokuments und wenn die App in den
+  // Hintergrund geht in den Tresor (Android beendet eine App im Hintergrund ohne Vorwarnung).
+  async function pause(){try{await gebunden?.schreibeJetzt();}catch{/* Fehler meldet das Journal */}await gate.pause();}
+  const jetztSchreiben=()=>{void gebunden?.schreibeJetzt().catch(()=>{});};
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')jetztSchreiben();});
+  window.addEventListener('pagehide',jetztSchreiben);
+  document.addEventListener('click',event=>{if(event.target?.closest?.('#edSpeichern,#edZurueck'))setTimeout(jetztSchreiben,80);},true);
   async function sourceState(){
     // A migration can stop after the atomic index transaction but before the
     // native primary pointer. References resolve that interval without guessing.
@@ -91,7 +108,7 @@
     return usable();
   }
   async function boot(){
-    await gate.pause();active=null;needed=null;
+    await pause();active=null;needed=null;
     const state=await sourceState(), source=await attach(state);
     let selected=state,bound=source;
     const migration=await api.migration();
@@ -142,7 +159,7 @@
       actions.replaceChildren();const cancel=button(actions,'cancel',async()=>{controller.abort();cancel.disabled=true;});
       panel.oncancel=event=>{event.preventDefault();controller.abort();cancel.disabled=true;};
       try{
-        document.activeElement?.blur();await Promise.resolve();await gate.pause();
+        document.activeElement?.blur();await Promise.resolve();await pause();
         const source=old||original;
         const prefInfo=await api.info({location:state.location,store:'settings',id:'workflow-preferences-v1'});
         const hasDocs=(await source.keys('docs')).length>0;
@@ -151,7 +168,7 @@
           preferences:restorePreferences?undefined:WFPVaultPreferences.snapshot(),
           progress:(done,total,finishing)=>{text.textContent=t('writing')+' '+done+' / '+total;lauf?.schritt(done,total);if(finishing)cancel.disabled=true;}});
         if(restorePreferences)WFPVaultPreferences.restore((await records.load(state.location,'settings','workflow-preferences-v1')).record);
-        gate.resume(await attach(state));await Promise.resolve();await gate.pause();
+        gate.resume(await attach(state));await Promise.resolve();await pause();
         // User-visible state is rebuilt only after durable data and queued writes.
         location.reload();
       }catch(error){
@@ -212,7 +229,7 @@
         button(actions,'recovery',async()=>{const answer=await api.createRecovery({location:active.state.location,language:language()});if(answer?.created)show({exists:true,createdAt:answer.createdAt});});
       }
       // Sperren nur, wenn die Ablage offen ist (Leitfaden § 1.4: Unnötiges verschwindet).
-      if(active)button(actions,'lock',async()=>{document.activeElement?.blur();await gate.pause();await active.journal.tail;await api.lock();await boot();});
+      if(active)button(actions,'lock',async()=>{document.activeElement?.blur();await pause();await active.journal.tail;await api.lock();await boot();});
       const fuss=document.createElement('div');fuss.className='pro-knoepfe';panel.append(fuss);
       // Gemeinsamer Tresorordner (Schritt D1): eigener Abschnitt „Tresor (alle Pro-Apps)“, nur bei entsperrter Ablage.
       if(active&&window.WFPTresorordner)void WFPTresorordner.abschnitt(panel,fuss,active.state).catch(()=>{});

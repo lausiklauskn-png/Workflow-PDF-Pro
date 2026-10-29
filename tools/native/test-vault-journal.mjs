@@ -127,3 +127,40 @@ test('interrupted deletion cannot resurrect an original photo or stale search bl
     assert.equal((await b.db.get('files','ue:d:de-ru')).job.page,7);
   });
 });
+
+// Klaus 2026-10-29: Arbeitsstand ('docs') nicht bei jedem Klick verschlüsselt schreiben, sondern gesammelt.
+function gesammelt(f, ruheMs = 60000, fehler = () => {}) {
+  const journal = new WFPVaultJournal({ bridge: f.bridge, records: f.records, local: f.local, location: 'selected', vaultId: 'own-vault', status: s => f.statuses.push(s) });
+  return { journal, db: WFPVaultDB.create({ journal, local: f.local, records: f.records, sammeln: { ruheMs, fehler } }) };
+}
+test('sammeln: zehn Klicks am selben Dokument = ein Schreibvorgang, Lesen sieht den neuesten Stand', async () => {
+  const f = fixture(), a = gesammelt(f); await a.journal.recover(); f.statuses.length = 0;
+  for (let i = 0; i < 10; i++) assert.equal(await a.db.put('docs', { id: 'd', fields: [{ value: 'v' + i }] }), 'd');
+  assert.deepEqual(f.statuses, []); assert.equal(f.stores.get('docs').size, 0); assert.equal(a.db.offen(), 1);
+  assert.equal((await a.db.get('docs', 'd')).fields[0].value, 'v9');
+  assert.deepEqual((await a.db.all('docs')).map(r => r.fields[0].value), ['v9']); assert.deepEqual(await a.db.keys('docs'), ['d']);
+  await a.db.schreibeJetzt();
+  assert.deepEqual(f.statuses, ['writing', 'saved']); assert.equal(f.stores.get('docs').get('d').fields[0].value, 'v9'); assert.equal(a.db.offen(), 0);
+  const b = gesammelt(f); await b.journal.recover(); assert.equal((await b.db.get('docs', 'd')).fields[0].value, 'v9');
+});
+test('sammeln: jedes andere Schreiben nimmt den gesammelten Stand zuerst mit (Reihenfolge bleibt)', async () => {
+  const f = fixture(), a = gesammelt(f); await a.journal.recover();
+  await a.db.put('docs', { id: 'd', name: 'neu' });
+  await a.db.putFile('d', new Uint8Array([1, 2]));
+  assert.equal(f.stores.get('docs').get('d').name, 'neu'); assert.equal(a.db.offen(), 0);
+  await a.db.put('docs', { id: 'e', name: 'weg' }); await a.db.del('docs', 'e');
+  assert.equal(a.db.offen(), 0); assert.equal(f.stores.get('docs').has('e'), false);
+});
+test('sammeln: nach der Ruhezeit von selbst geschrieben; Fehler werden gemeldet, nicht verschluckt', async () => {
+  const f = fixture(), a = gesammelt(f, 30); await a.journal.recover();
+  await a.db.put('docs', { id: 'd', name: 'x' }); await new Promise(r => setTimeout(r, 120));
+  assert.equal(f.stores.get('docs').get('d').name, 'x');
+  const fehler = []; const g2 = fixture(), b = gesammelt(g2, 60000, e => fehler.push(e.message)); await b.journal.recover();
+  g2.failCommit = true; await b.db.put('docs', { id: 'd', name: 'y' });
+  await assert.rejects(b.db.schreibeJetzt(), /INDEX_QUOTA/); await new Promise(r => setTimeout(r, 0));
+  assert.deepEqual(fehler, ['INDEX_QUOTA']);
+});
+test('ohne sammeln bleibt alles sofort (Bestand)', async () => {
+  const f = fixture(), a = f.restart(); await a.journal.recover();
+  await a.db.put('docs', { id: 'd', name: 'z' }); assert.equal(f.stores.get('docs').get('d').name, 'z');
+});

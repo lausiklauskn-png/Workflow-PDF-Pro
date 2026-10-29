@@ -53,6 +53,7 @@ test('Scanner geht auf: Kaltstart und laufende App, „Durchsuchbar“ vorbelegt
    await page.waitForSelector('.scan',{timeout:15000});
    const d=await page.evaluate(()=>({d:window.__wfpdfDirektstart,s:WFP.Scanner.zustand().durchsuchbar,url:location.search,toast:document.getElementById('toast').textContent}));
    assert.equal(d.d.von,'BookLedgerPro');assert.equal(d.s,true,'„Durchsuchbar“ für diesen Scan');
+   assert.equal(await page.evaluate(()=>document.querySelector('.scan [data-durch]')?.checked),true,'Haken „Durchsuchbar“ sichtbar gesetzt (Befund Tablet 2026-10-29)');
    assert.equal(d.url,'','Adresse geputzt');assert.match(d.toast,/BookLedgerPro/);assert.match(d.toast,/Teilen/);
    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('wfpdf_scan_v1')).durchsuchbar),false,'gemerkte Wahl bleibt');
    // zweiter Intent, während der Scanner offen ist: kein zweiter Scanner darüber
