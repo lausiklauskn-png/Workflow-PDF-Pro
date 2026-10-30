@@ -31,6 +31,9 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(de.familyprojekt.hintergrund.ProHintergrundPlugin.class);
         super.onCreate(state);
         if(bridge==null){if(!runtimeNotice)showRuntimeNotice();return;}
+        // Leitfaden § 1.8 (Klaus 2026-10-29, wie BookLedgerPro): die WebView übernimmt sonst Androids Systemschrift (textZoom) und startet
+        // größer als die PWA. Die App startet bei 100 %; größer macht man sie mit „A··A“ im Kopf (nur die Schrift wächst).
+        bridge.getWebView().getSettings().setTextZoom(100);
         bridge.setWebViewClient(new BridgeWebViewClient(bridge) {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 android.net.Uri uri = request.getUrl();

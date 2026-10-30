@@ -1,12 +1,12 @@
 /* Gemeinsame Bedien-Bausteine aller Pro-Apps (Leitfaden „Bedienung und Einstellungen der Pro-Apps“, Klaus 2026-10-28).
    Quelle: Private Brain Pro (native/pro-bedienung.js). Byte-gleich kopiert nach Workflow PDF Pro und BookLedgerPro
    (und jede künftige Pro-App) — nur hier ändern, dann dort nachziehen und den Pin erneuern.
-   Keine Abhängigkeiten, kein Netz, kein Speicher außer dem Merken der ⓘ-Klapper (localStorage, nur Schlüssel → offen/zu).
+   Keine Abhängigkeiten, kein Netz, kein Speicher außer dem Merken der ⓘ-Klapper (localStorage, nur Schlüssel → offen/zu) und der Schriftgröße.
    Inhalte (Texte der Fenster) bleiben app-eigen; hier stehen nur Form und die wenigen gemeinsamen Wörter. */
 (() => {
   'use strict';
   if (window.ProBedienung) return;
-  const FASSUNG = 3;
+  const FASSUNG = 4;
   const root = document.documentElement;
   // de en ru pl ar — jede App nutzt die Sprachen, die sie kennt; fehlt eine, gilt Deutsch.
   const WORTE = {
@@ -23,7 +23,9 @@
     oeffnen:    ['In Dateien öffnen', 'Open in Files', 'Открыть в «Файлах»', 'Otwórz w Plikach', 'فتح في الملفات'],
     aktuell:    ['Du verwendest die aktuelle Version {v}.', 'You are using the current version {v}.', 'Используется актуальная версия {v}.', 'Używasz aktualnej wersji {v}.', 'أنت تستخدم الإصدار الحالي {v}.'],
     neu:        ['Neu: {n} (du hast {v})', 'New: {n} (you have {v})', 'Новая: {n} (у вас {v})', 'Nowa: {n} (masz {v})', 'جديد: {n} (لديك {v})'],
-    version:    ['Version {v}', 'Version {v}', 'Версия {v}', 'Wersja {v}', 'الإصدار {v}']
+    version:    ['Version {v}', 'Version {v}', 'Версия {v}', 'Wersja {v}', 'الإصدار {v}'],
+    schrift:    ['Schriftgröße', 'Text size', 'Размер шрифта', 'Rozmiar tekstu', 'حجم الخط'],
+    schrift100: ['Zurück auf 100 %', 'Back to 100 %', 'Вернуть 100 %', 'Wróć do 100 %', 'العودة إلى 100 %']
   };
   const SPRACHEN = ['de', 'en', 'ru', 'pl', 'ar'];
   const sprache = () => Math.max(0, SPRACHEN.indexOf(String(root.lang || 'de').slice(0, 2).toLowerCase()));
@@ -120,6 +122,39 @@
     };
   }
 
+  // ---------- Schriftgröße „A··A“ (Leitfaden § 1.8, Klaus 2026-10-29): 85–150 %, gemerkt, nur die Schrift wächst ----------
+  // Die Apps setzen ihre Schriften in rem; Knöpfe haben feste Höhen in px und bleiben. Wirkt sofort beim Laden dieser Datei.
+  const SCHRIFT = 'pro_schrift_v1', SCHRIFT_MIN = 85, SCHRIFT_MAX = 150;
+  const schriftNormal = v => { const n = Math.round(Number(v) / 5) * 5; return Number.isFinite(n) && n ? Math.max(SCHRIFT_MIN, Math.min(SCHRIFT_MAX, n)) : 100; };
+  function schriftSetzen(v, { merken: m = true } = {}) {
+    const p = schriftNormal(v);
+    root.style.fontSize = p === 100 ? '' : p + '%'; root.dataset.proSchrift = String(p);
+    if (m) try { localStorage.setItem(SCHRIFT, String(p)); } catch { /* nur für diese Sitzung */ }
+    return p;
+  }
+  let schriftJetzt = 100;
+  try { schriftJetzt = schriftNormal(localStorage.getItem(SCHRIFT) || 100); } catch { /* Vorgabe */ }
+  if (schriftJetzt !== 100) schriftSetzen(schriftJetzt, { merken: false });
+  function schriftKnopf() {
+    const huelle = el('span', 'pro-schrift'); huelle.dataset.proSchriftHuelle = '';
+    const b = el('button', 'pro-schrift-knopf', 'A··A'); b.type = 'button'; b.dataset.proSchriftKnopf = '';
+    b.title = wort('schrift'); b.setAttribute('aria-label', wort('schrift')); b.setAttribute('aria-expanded', 'false');
+    const feld = el('div', 'pro-schrift-feld'); feld.hidden = true; feld.setAttribute('role', 'group'); feld.setAttribute('aria-label', wort('schrift'));
+    const regler = el('input'); regler.type = 'range'; regler.min = String(SCHRIFT_MIN); regler.max = String(SCHRIFT_MAX); regler.step = '5';
+    regler.setAttribute('aria-label', wort('schrift'));
+    const zahl = el('span', 'pro-schrift-zahl');
+    const zurueck = knopf(wort('schrift100'), { name: 'schrift-100' });
+    const zeigen = () => { const p = schriftNormal(root.dataset.proSchrift || 100); regler.value = String(p); zahl.textContent = p + ' %'; zurueck.disabled = p === 100; };
+    regler.addEventListener('input', () => { schriftSetzen(regler.value); zeigen(); });
+    zurueck.addEventListener('click', () => { schriftSetzen(100); zeigen(); });
+    const auf = offen => { feld.hidden = !offen; b.setAttribute('aria-expanded', String(offen)); if (offen) zeigen(); };
+    b.addEventListener('click', ev => { ev.stopPropagation(); auf(feld.hidden); });
+    document.addEventListener('click', ev => { if (!feld.hidden && !huelle.contains(ev.target)) auf(false); });
+    document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && !feld.hidden) { auf(false); b.focus(); } });
+    feld.append(regler, zahl, zurueck); huelle.append(b, feld);
+    return huelle;
+  }
+
   // ---------- Kleinigkeiten ----------
   const schritt = (i, n) => wort('schritt', { i, n });
   // Version bei „Über“ und „Auf Updates prüfen“ (Leitfaden § 6): ohne neue Version der Satz „aktuell“, sonst „Neu: …“.
@@ -130,5 +165,6 @@
     return /^[0-9a-f]{64}$/.test(t) && (!schluessel.length || schluessel.map(s => String(s).toLowerCase()).includes(t));
   };
 
-  window.ProBedienung = Object.freeze({ FASSUNG, wort, knopf, hauptSetzen, info, kasten, zustand, ordnerZeile, fortschritt, schritt, versionSatz, istOeffentlicherSchluessel });
+  window.ProBedienung = Object.freeze({ FASSUNG, wort, knopf, hauptSetzen, info, kasten, zustand, ordnerZeile, fortschritt, schritt, versionSatz, istOeffentlicherSchluessel,
+    schriftKnopf, schriftSetzen });
 })();

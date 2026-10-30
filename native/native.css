@@ -16,3 +16,10 @@ html[data-wfp-native] { overscroll-behavior: none; }
 html[data-wfp-vault-locked] body > :not(.native-vault-dialog):not(#nativeVaultStatus){visibility:hidden!important}
 .native-google-credit{display:block;flex:none;padding:.25rem .75rem;font:12px/1.5 system-ui,sans-serif;color:#555;text-decoration:none;background:#fff}.native-google-credit[hidden]{display:none}
 [data-google-model-notice]{display:block;margin-top:.5rem;font-size:.8rem;font-weight:400;line-height:1.4}
+
+/* Kopf (Pro-Umbau 12, Leitfaden § 1.7/1.8): Version klein neben dem Namen, Tipp prüft auf Updates; „A··A“ vor dem Zahnrad. */
+header.kopf .marke { display:flex;flex-wrap:wrap;align-items:baseline;column-gap:6px; }
+header.kopf .marke .marke-sub { flex-basis:100%; }
+.wpp-kopf-version { padding:0 4px;margin:0;border:0;border-radius:4px;background:none;color:inherit;opacity:.7;font:inherit;font-size:.72rem;line-height:1.4;cursor:pointer;white-space:nowrap; }
+.wpp-kopf-version:hover, .wpp-kopf-version:focus-visible { opacity:1;outline:1px solid currentColor;outline-offset:1px; }
+header.kopf .pro-schrift-knopf { height:32px; }
