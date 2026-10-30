@@ -11,7 +11,7 @@
 (() => {
   'use strict';
   if (window.ProUeberall) return;
-  const FASSUNG = 1;
+  const FASSUNG = 2;   // 2 (Pro-Umbau 13): eigene Gruppen der App (`gruppe`), Rückruf nachSuche
   const root = document.documentElement;
 
   // ---------- Wortsuche (wie BookLedgerPro belegsuche.js: UND über alle Wörter, Umlaute gefaltet, Daten als JJJJMMTT) ----------
@@ -151,7 +151,8 @@
 
   // ---------- Liste: nach Herkunft geordnet, je Gruppe gekappt ----------
   const JE_GRUPPE_MAX = 25;
-  const gruppenSchluessel = t => (t.herkunft === 'tresor' ? 'tresor:' + t.typ : t.herkunft);
+  // Eine App kann ihre Zeilen in eigene Gruppen teilen (z. B. BookLedgerPro: „Angebotsplaner“): Feld `gruppe` an der Zeile.
+  const gruppenSchluessel = t => (t.herkunft === 'tresor' ? 'tresor:' + t.typ : (t.herkunft === 'app' && t.gruppe ? 'app:' + String(t.gruppe) : t.herkunft));
   const REIHENFOLGE = ['app', ...FAECHER.map(f => 'tresor:' + f.fach), 'netz'];
   function gruppieren(treffer, max = JE_GRUPPE_MAX) {
     const g = new Map();
@@ -161,8 +162,8 @@
       if (!g.has(k)) g.set(k, []);
       const l = g.get(k); if (l.length < max) l.push(t);
     }
-    const rang = k => { const i = REIHENFOLGE.indexOf(k); return i < 0 ? REIHENFOLGE.indexOf('netz') - 0.5 : i; };
-    return [...g.entries()].sort((a, b) => rang(a[0]) - rang(b[0])).map(([schluessel, liste]) => ({ schluessel, herkunft: liste[0].herkunft, typ: liste[0].typ, liste }));
+    const rang = k => { const i = REIHENFOLGE.indexOf(k); if (i >= 0) return i; if (k.startsWith('app:')) return 0.5; return REIHENFOLGE.indexOf('netz') - 0.5; };
+    return [...g.entries()].sort((a, b) => rang(a[0]) - rang(b[0])).map(([schluessel, liste]) => ({ schluessel, herkunft: liste[0].herkunft, typ: liste[0].typ, gruppe: liste[0].gruppe || '', liste }));
   }
 
   // ---------- Wörter (de en ru pl ar; fehlt eine Sprache, gilt Deutsch) ----------
@@ -210,7 +211,7 @@
     return String(zeile[sprache()] || zeile[0]).replace(/\{(\w+)\}/g, (_, k) => (k in werte ? String(werte[k]) : ''));
   }
   function gruppenTitel(g, appName) {
-    if (g.herkunft === 'app') return appName || '';
+    if (g.herkunft === 'app') return g.gruppe ? String(g.gruppe) : (appName || '');
     if (g.herkunft === 'tresor') { const f = fachVon(g.typ); return wort('gTresor', { o: f ? f.ordner : g.typ }); }
     if (g.herkunft === 'netz') return wort('gNetz');
     return g.herkunft;
@@ -256,7 +257,8 @@
   /**
    * Baut den Kasten „Überall suchen“.
    * @param {{appName:string, appLabel?:string, frage?:()=>string, eigenesFeld?:boolean, app?:function, tresor?:()=>object|null,
-   *          tresorOhne?:string[], netz?:()=>object|null, mycelOeffnen?:()=>void, oeffnen?:(zeile:object)=>void, kannOeffnen?:(zeile:object)=>boolean}} o
+   *          tresorOhne?:string[], netz?:()=>object|null, mycelOeffnen?:()=>void, oeffnen?:(zeile:object)=>void, kannOeffnen?:(zeile:object)=>boolean,
+   *          nachSuche?:(erg:{treffer:object[], hinweise:string[], netz:object|null}, frage:string)=>void}} o  nachSuche: z. B. ein KI-Schalter unter der Liste
    */
   function kasten(o = {}) {
     const P = window.ProBedienung;
@@ -332,6 +334,7 @@
         if (erg.netz.zu && typeof o.mycelOeffnen === 'function') status.append(' ', P.knopf(wort('mycel'), { name: 'mycel-oeffnen', beiTipp: () => o.mycelOeffnen() }));
       }
       zeigen(erg);
+      if (typeof o.nachSuche === 'function') { try { o.nachSuche(erg, frage); } catch { /* fail-soft: die Liste steht */ } }
       return erg;
     }
     return { element: k.element, eingabe, suchen: los, zeigen };

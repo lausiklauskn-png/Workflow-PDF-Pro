@@ -18,3 +18,7 @@
 button.pro-ue-name { color:var(--pro-akzent);cursor:pointer;text-decoration:underline;text-underline-offset:2px; }
 button.pro-ue-name:focus-visible { outline:2px solid var(--pro-akzent);outline-offset:2px; }
 .pro-ue-stelle { color:var(--pro-leise);font-size:.85rem;overflow-wrap:anywhere; }
+/* Chefcode (pro-chefcode.js, Fassung 5): Zustandszeile darf umbrechen. */
+.pro-cc-lage { margin:0; }
+.pro-cc-lage .pro-zustand { white-space:normal;align-items:flex-start; }
+.pro-cc-lage .pro-punkt { margin-top:.35em; }

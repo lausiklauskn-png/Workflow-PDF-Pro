@@ -6,7 +6,7 @@
 (() => {
   'use strict';
   if (window.ProBedienung) return;
-  const FASSUNG = 4;
+  const FASSUNG = 5;
   const root = document.documentElement;
   // de en ru pl ar — jede App nutzt die Sprachen, die sie kennt; fehlt eine, gilt Deutsch.
   const WORTE = {
