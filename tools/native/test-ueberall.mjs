@@ -109,6 +109,24 @@ test('Überall suchen und Kopf in Workflow PDF Pro', async t => {
       assert.ok(/JSONObject fachLesen\(String slug\) throws Exception \{\s*TresorOrdner t = offenOderGemerkt\(\);\s*Fach\.nachSlug\(slug\);/.test(tr));
       assert.ok(/public void tresorFach\(PluginCall call\)\{work\(call,\(\)->tresor\.fachLesen\(call\.getString\("fach"\)\)\);\}/.test(pl));
     });
+    // Pro-Umbau 13: Chefcode (gemeinsamer Baustein pro-chefcode.js) in den Einstellungen, gegen das echte Modul 23 des Kerns.
+    await page.click('#btnEinst');
+    await page.waitForFunction(() => document.getElementById('wppChefcode') && typeof window.SbkimRendezvous?.saveNetwork === 'function', null, { timeout: 15000 });
+    await t.test('Chefcode steht in den Einstellungen unter Sicherung/Tresor, ab Werk öffentliches Netz', async () => {
+      const r = await page.evaluate(() => { const k = document.getElementById('wppChefcode'), s = document.getElementById('stSicherung');
+        return { nach: !!(s.compareDocumentPosition(k) & Node.DOCUMENT_POSITION_FOLLOWING), titel: k.querySelector('h3').textContent, lage: k.querySelector('[data-pro-cc-lage]').dataset.proCcLage,
+          feld: k.querySelector('[data-pro-cc-feld]').type }; });
+      assert.ok(r.nach && r.titel === 'Chefcode' && r.lage === 'oeffentlich' && r.feld === 'password', JSON.stringify(r));
+    });
+    await page.evaluate(() => { document.querySelector('[data-pro-cc-feld]').value = 'WERKSTATT-2026-XQ7'; document.querySelector('[data-pro-knopf="chefcode-uebernehmen"]').click(); });
+    await page.waitForFunction(() => document.querySelector('[data-pro-cc-lage]').dataset.proCcLage === 'eigen', null, { timeout: 20000 });
+    await t.test('Gültiger Code: Modul 23 im eigenen Netz, Code nicht mehr im Bild', async () => {
+      const r = await page.evaluate(() => ({ netz: SbkimRendezvous._meta.network, leer: document.querySelector('[data-pro-cc-feld]').value === '', sichtbar: /WERKSTATT-?2026/.test(document.body.innerHTML + document.body.innerText), felder: [...document.querySelectorAll('input')].filter(i => /WERKSTATT/i.test(i.value)).map(i => i.id || i.className).join() }));
+      assert.ok(r.netz === 'eigen' && r.leer && !r.sichtbar && !r.felder, JSON.stringify(r));
+    });
+    await page.evaluate(() => document.querySelector('[data-pro-knopf="chefcode-entfernen"]').click());
+    await page.waitForFunction(() => document.querySelector('[data-pro-cc-lage]').dataset.proCcLage === 'oeffentlich');
+    await t.test('Entfernen: zurück ins öffentliche Netz', async () => assert.equal(await page.evaluate(() => SbkimRendezvous._meta.network), 'oeffentlich'));
     await t.test('Keine Seitenfehler', async () => assert.deepEqual(fehler, []));
     await page.close();
     const B = await seite({ mitTresor: false, breite: 360 });

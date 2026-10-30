@@ -1,7 +1,7 @@
 {
-  "_": "Gemeinsame Bausteine aller Pro-Apps (Bedienung, Hintergrundaufgabe, Gerätecheck, Überall suchen). Quelle: Private Brain Pro. Nie von Hand ändern.",
+  "_": "Gemeinsame Bausteine aller Pro-Apps (Bedienung, Hintergrundaufgabe, Gerätecheck, Überall suchen, Chefcode). Quelle: Private Brain Pro. Nie von Hand ändern.",
   "quelle": "lausiklauskn-png/Privat-Brain-Pro",
-  "fassung": 4,
+  "fassung": 5,
   "pfade": [
     "native/pro-bedienung.js",
     "native/pro-bedienung.css",
@@ -9,19 +9,21 @@
     "native/pro-geraet.js",
     "native/pro-ueberall.js",
     "native/pro-ueberall.css",
+    "native/pro-chefcode.js",
     "android/app/src/main/java/de/familyprojekt/hintergrund/ProHintergrundPlugin.java",
     "android/app/src/main/java/de/familyprojekt/hintergrund/ProHintergrundDienst.java"
   ],
   "dateien": {
-    "pro-bedienung.js": "3a982781207e3ea6bc3707dfb60ab504bf1d87ee9237037961331670ae179b53",
+    "pro-bedienung.js": "55661bbf9d4b5874fd5e20adf33d39352f0d6838e08da0d1e5cbc78d7eb91df5",
     "pro-bedienung.css": "cd2b3e6307a3c68fdc828f59d5e950085268678463a027ced64562100e2b67d5",
     "pro-hintergrund.js": "64e2e803df220650e45dde1c6e403711ebb7b76a6f6786ad6422043fb84c9e62",
     "pro-geraet.js": "b18c26f8d0bd755c6a4fe5a8948e8457f7d9ed73b69dac938f8c9bab1326f710",
-    "pro-ueberall.js": "fba6210f5f09741488b6ec5e98317fa9fd1e1405eea515117f9f0bd019a7a6a7",
-    "pro-ueberall.css": "4b687cf55371822fa0c33b7ad95c20d6e5a96fae3912332cdcf9a8942dcca508",
+    "pro-ueberall.js": "e8e996a29160ac962eb606670a5404aea5d6fa78a59636014893123f892be96e",
+    "pro-ueberall.css": "524f0829ebb22b3c3af06c0cd368c2281bfe10bfa2eaab0d2c4b06a153215231",
+    "pro-chefcode.js": "38223788aa7d7a6a0a37d21db5900256031e15ad8c10dceee2ed4e00174055a8",
     "ProHintergrundPlugin.java": "551ae06d05e2b60d679930ef6c7bdee6794d3226f33398acee1403174aa9aa01",
     "ProHintergrundDienst.java": "b37268634112b206d2e07dd60e91866cb8285f68249c068ce4bf4d664a17b014"
   },
-  "commit": "0a4fa2768d34dd2c9514e407ebba848a19c750ef",
+  "commit": "2d39781a4bbf99aaa9687dcded31080e16e316af",
   "probe": "e885582f71c1f4f9582aa697811f594a521b029ecee34bcdcb9eb17ad1348180"
 }
