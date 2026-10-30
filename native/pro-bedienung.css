@@ -12,7 +12,7 @@
   --pro-gut: var(--success, var(--ok, #2e7d4f));
   --pro-warn: var(--warn-text, var(--rot, #b3261e));
 }
-.pro-knopf { display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:30px;height:auto;padding:4px 12px;margin:0;border:1px solid var(--pro-linie);border-radius:6px;background:var(--pro-flaeche);color:var(--pro-tinte);font:inherit;font-size:.92rem;line-height:1.2;box-shadow:none;cursor:pointer;max-width:100%;white-space:normal;text-align:center;overflow-wrap:anywhere; }
+.pro-knopf { display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:30px;height:auto;padding:2px 12px;margin:0;border:1px solid var(--pro-linie);border-radius:6px;background:var(--pro-flaeche);color:var(--pro-tinte);font:inherit;font-size:.92rem;line-height:1.15;box-shadow:none;cursor:pointer;max-width:100%;white-space:normal;text-align:center;overflow-wrap:anywhere; }
 .pro-knopf:hover { background:var(--pro-flaeche2); }
 .pro-knopf:focus-visible { outline:2px solid var(--pro-akzent);outline-offset:2px; }
 .pro-knopf[data-pro-haupt] { background:var(--pro-akzent);border-color:var(--pro-akzent);color:var(--pro-auf-akzent);font-weight:600; }
@@ -53,3 +53,13 @@
 @keyframes pro-drehen { to { transform:rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .pro-drehkreis { animation-duration:2.4s; } .pro-balken-fuell { transition:none; } }
 @media (pointer: coarse) { .pro-knopf { min-height:32px; } .pro-info { width:32px;height:32px; } }
+
+/* Schriftgröße „A··A“ (Leitfaden § 1.8): kleiner Knopf im Kopf, Regler darunter, ganz im Bild. */
+.pro-schrift { position:relative;display:inline-flex;flex:0 0 auto; }
+.pro-schrift-knopf { min-width:34px;height:30px;padding:0 6px;border:1px solid var(--pro-linie);border-radius:6px;background:var(--pro-flaeche);color:var(--pro-tinte);font:600 13px/1 system-ui,sans-serif;letter-spacing:-.02em;cursor:pointer;white-space:nowrap; }
+.pro-schrift-knopf:hover, .pro-schrift-knopf[aria-expanded="true"] { background:var(--pro-flaeche2); }
+.pro-schrift-knopf:focus-visible { outline:2px solid var(--pro-akzent);outline-offset:2px; }
+.pro-schrift-feld { position:absolute;top:calc(100% + 6px);inset-inline-end:0;z-index:1000;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:max-content;max-width:min(300px,calc(100vw - 24px));padding:10px 12px;border:1px solid var(--pro-linie);border-radius:8px;background:var(--pro-flaeche);color:var(--pro-tinte);box-shadow:0 6px 18px rgba(0,0,0,.18);font-size:14px; }
+.pro-schrift-feld[hidden] { display:none!important; }
+.pro-schrift-feld input[type=range] { flex:1 1 140px;min-width:120px;accent-color:var(--pro-akzent); }
+.pro-schrift-zahl { min-width:3.5em;font-variant-numeric:tabular-nums;color:var(--pro-leise); }

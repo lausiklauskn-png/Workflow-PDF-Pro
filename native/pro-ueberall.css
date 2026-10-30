@@ -1,0 +1,20 @@
+/* „Überall suchen“ — gemeinsamer Baustein aller Pro-Apps (Quelle: Private Brain Pro, byte-gleich kopiert; siehe pro-ueberall.js).
+   Nur die Farben aus pro-bedienung.css (--pro-*), die auf die Tokens der jeweiligen App zeigen: so trägt der Kasten das Design der App. */
+.pro-ue-kurz { margin:0;color:var(--pro-leise);font-size:.92rem; }
+.pro-ue-feld { display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-width:0; }
+.pro-ue-eingabe { flex:1 1 12em;min-width:0;min-height:30px;padding:4px 10px;border:1px solid var(--pro-linie);border-radius:6px;background:var(--pro-flaeche);color:var(--pro-tinte);font:inherit;font-size:.95rem; }
+.pro-ue-eingabe:focus-visible { outline:2px solid var(--pro-akzent);outline-offset:1px; }
+.pro-ue-quellen { display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.9rem;color:var(--pro-tinte); }
+.pro-ue-quelle { display:inline-flex;align-items:center;gap:6px;min-height:28px;cursor:pointer; }
+.pro-ue-quelle input { margin:0;accent-color:var(--pro-akzent); }
+.pro-ue-status { margin:0;color:var(--pro-leise);font-size:.88rem;min-height:1.2em;overflow-wrap:anywhere; }
+.pro-ue-status:empty { display:none; }
+.pro-ue-liste:empty { display:none; }
+.pro-ue-gruppe + .pro-ue-gruppe { margin-top:10px; }
+.pro-ue-gruppe-titel { margin:0 0 4px;font-size:.88rem;font-weight:600;color:var(--pro-leise);letter-spacing:.02em; }
+.pro-ue-ul { list-style:none;margin:0;padding:0;border-top:1px solid var(--pro-linie); }
+.pro-ue-zeile { display:flex;flex-direction:column;gap:2px;padding:6px 2px;border-bottom:1px solid var(--pro-linie);min-width:0; }
+.pro-ue-name { align-self:flex-start;max-width:100%;padding:0;margin:0;border:0;background:none;color:var(--pro-tinte);font:inherit;font-size:.95rem;text-align:start;overflow-wrap:anywhere; }
+button.pro-ue-name { color:var(--pro-akzent);cursor:pointer;text-decoration:underline;text-underline-offset:2px; }
+button.pro-ue-name:focus-visible { outline:2px solid var(--pro-akzent);outline-offset:2px; }
+.pro-ue-stelle { color:var(--pro-leise);font-size:.85rem;overflow-wrap:anywhere; }

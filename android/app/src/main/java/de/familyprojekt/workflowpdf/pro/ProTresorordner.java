@@ -197,6 +197,14 @@ final class ProTresorordner {
         if (offen == null && (vonHandGesperrt || !gemerktEntsperren())) throw new IOException("TRESOR_GESPERRT");
         return offen;
     }
+    /** Inhaltsverzeichnis eines Fachs lesen (Pro-Umbau 12, „Überall suchen“): nur die Zeilen (Name, Art, Datum, Kurzfassung), nie Dateien. */
+    JSONObject fachLesen(String slug) throws Exception {
+        TresorOrdner t = offenOderGemerkt();
+        Fach.nachSlug(slug); // unbekanntes Fach: IOException
+        JSONArray liste = new JSONArray();
+        for (Eintrag e : t.verzeichnis(slug)) liste.put(new JSONObject(e.alsMap()));
+        return new JSONObject().put("fach", slug).put("eintraege", liste);
+    }
     JSONObject eingang() throws Exception {
         TresorOrdner t = offenOderGemerkt();
         JSONArray liste = new JSONArray(), marken = new JSONArray();

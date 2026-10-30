@@ -294,6 +294,8 @@ public final class ProVaultPlugin extends Plugin {
     @PluginMethod public void tresorSperren(PluginCall call){work(call,()->{tresor.sperren(call.getBoolean("vergessen",false));return tresor.zustand(vaultOrNull(call));});}
     @PluginMethod public void tresorVerzeichnis(PluginCall call){work(call,()->{JSONArray zeilen=call.getData().optJSONArray("zeilen");if(zeilen==null)throw new java.io.IOException("TRESOR_EINTRAG_UNGUELTIG");return tresor.verzeichnis(zeilen,vault(call));});}
     // Übergabefach „Eingang-WorkflowPDF“ (Pro-Umbau 5): ansehen, Stück für Stück lesen, als übernommen markieren
+    /** „Überall suchen“: Inhaltsverzeichnis eines Fachs im Tresorordner (alle Pro-Apps) lesen. Nichts wird geschrieben. */
+    @PluginMethod public void tresorFach(PluginCall call){work(call,()->tresor.fachLesen(call.getString("fach")));}
     @PluginMethod public void tresorEingang(PluginCall call){work(call,()->tresor.eingang());}
     @PluginMethod public void tresorEingangOeffnen(PluginCall call){work(call,()->tresor.eingangOeffnen(call.getString("id")));}
     @PluginMethod public void tresorEingangTeil(PluginCall call){work(call,()->tresor.eingangTeil(call.getString("ticket")));}
