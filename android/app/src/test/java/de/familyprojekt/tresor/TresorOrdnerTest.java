@@ -83,6 +83,31 @@ public final class TresorOrdnerTest {
         return daten;
     }
 
+    @Test public void neueFaecherV3UndFamilienakteOhneUmbauAlterTresore() throws Exception {
+        // Klaus 2026-10-31: eigenes Fach für Private Brain V3, Fach und Eingang für die Familienakte.
+        File d = neuerOrdner(); DateiAblage a = new DateiAblage(d);
+        try (TresorOrdner blp = TresorOrdner.anlegen(a, Fach.BOOKLEDGER_APP, PW)) { blp.fachAnlegen("bookledgerpro"); }
+        try (TresorOrdner v3 = TresorOrdner.oeffnen(a, Fach.PRIVATE_BRAIN_V3_APP, PW)) {
+            assertEquals(8, v3.faecher().size());
+            assertFalse(v3.fachBekannt("private-brain-v3"));
+            v3.ablegen("private-brain-v3", null, "notiz.txt", "text/plain", 1L, new ByteArrayInputStream("V3".getBytes(StandardCharsets.UTF_8)), "Notiz");
+            assertTrue(new File(d, "Private Brain V3").isDirectory());
+            assertEquals("TRESOR_FACH_FREMD", code(() -> v3.ablegen("private-brain", null, "x", "text/plain", 0, new ByteArrayInputStream(new byte[1]), "")));
+            assertEquals("TRESOR_FACH_FREMD", code(() -> v3.ablegen("familienakte", null, "x", "text/plain", 0, new ByteArrayInputStream(new byte[1]), "")));
+            v3.ablegen("eingang-familienakte", null, "brief.pdf", "application/pdf", 2L, new ByteArrayInputStream("%PDF".getBytes(StandardCharsets.UTF_8)), "Brief");
+        }
+        try (TresorOrdner fa = TresorOrdner.oeffnen(a, Fach.FAMILIENAKTE_APP, PW)) {
+            assertEquals(1, fa.verzeichnis("eingang-familienakte").size());
+            assertEquals(1, fa.verzeichnis("private-brain-v3").size());
+            fa.ablegen("familienakte", null, "akte.json", "application/json", 3L, new ByteArrayInputStream("{}".getBytes(StandardCharsets.UTF_8)), "");
+        }
+        try (TresorOrdner pb = TresorOrdner.oeffnen(a, Fach.PRIVATE_BRAIN_APP, PW)) {
+            assertEquals(1, pb.verzeichnis("familienakte").size());
+            assertEquals("TRESOR_FACH_FREMD", code(() -> pb.ablegen("private-brain-v3", null, "x", "text/plain", 0, new ByteArrayInputStream(new byte[1]), "")));
+        }
+        assertTrue(new File(d, "Eingang-Familienakte").isDirectory());
+    }
+
     @Test public void falschesPasswortAendertNichtsUndRichtigesOeffnet() throws Exception {
         File d = neuerOrdner(); DateiAblage a = new DateiAblage(d);
         byte[] haupt;

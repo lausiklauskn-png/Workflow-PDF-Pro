@@ -36,6 +36,7 @@ import javax.crypto.spec.SecretKeySpec;
  *   Tresorordner/verzeichnis/&lt;fach&gt;/&lt;app&gt;/v-&lt;rev&gt;-&lt;uuid&gt;.fpt   Inhaltsverzeichnis, PBV1 mit dem Fach-Schlüssel
  *   Tresorordner/marken/&lt;app&gt;/&lt;fach&gt;--&lt;eintrag&gt;.json             „übernommen“-Marken
  *   Private Brain/ · Workflow PDF Pro/ · BookLedgerPro/ · Eingang-BookLedgerPro/ · Eingang-WorkflowPDF/
+ *   Private Brain V3/ · Familienakte/ · Eingang-Familienakte/ (seit 2026-10-31)
  * </pre>
  *
  * Vorhandene App-Tresore ziehen ein, indem nur ihr Datenschlüssel zusätzlich mit dem Hauptschlüssel
