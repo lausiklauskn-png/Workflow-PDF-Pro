@@ -311,4 +311,53 @@ public final class TresorOrdnerTest {
         String fpt = Ersatzschluessel.encode(s.get(0));
         assertEquals("TRESOR_ERSATZ_TYPO", code(() -> Ersatzschluessel.decode("WFP1" + fpt.substring(4))));
     }
+
+    /** Ort ändern (Klaus 2026-10-31, Antwort 3): kopieren → prüfen; alter Ort bleibt byte-gleich, neuer Ort öffnet mit demselben Passwort. */
+    @Test public void ortAendernKopiertPruefendUndLaesstDenAltenOrt() throws Exception {
+        File alt = neuerOrdner(), neu = neuerOrdner(); DateiAblage a = new DateiAblage(alt), n = new DateiAblage(neu);
+        String id;
+        try (TresorOrdner t = TresorOrdner.anlegen(a, Fach.BOOKLEDGER_APP, PW)) {
+            id = t.id(); t.fachAnlegen("bookledgerpro");
+            t.ablegen("bookledgerpro", "Belege", "a.pdf", "application/pdf", 1, new ByteArrayInputStream(new byte[] {1, 2, 3}), "Beleg");
+        }
+        Map<String, String> vorher = baum(alt, "");
+        Umzug.Bericht b = Umzug.kopieren(a, n, null);
+        assertEquals(id, b.id); assertEquals(b.dateien, b.kopiert); assertTrue(b.dateien >= 3);
+        assertEquals(vorher, baum(alt, ""));
+        assertEquals(vorher, baum(neu, ""));
+        try (TresorOrdner t = TresorOrdner.oeffnen(n, Fach.BOOKLEDGER_APP, PW)) { assertEquals(1, t.verzeichnis("bookledgerpro").size()); }
+        // Fortsetzen: ein zweiter Lauf findet alles byte-gleich vor und kopiert nichts.
+        assertEquals(0, Umzug.kopieren(a, n, null).kopiert);
+        // Vermerk am alten Ort: neue Datei unter Tresorordner/, sonst nichts geändert; danach kein zweiter Umzug von dort.
+        Umzug.vermerken(a, id, "Neuer Ort", 5);
+        Map<String, String> danach = baum(alt, ""); danach.remove(Umzug.VERMERK);
+        assertEquals(vorher, danach);
+        assertEquals(id, Umzug.vermerk(a).get("id"));
+        assertNull(Umzug.vermerk(n));
+        assertEquals("TRESOR_UMZUG_SCHON_UMGEZOGEN", code(() -> Umzug.kopieren(a, new DateiAblage(neuerOrdner()), null)));
+    }
+
+    /** Am neuen Ort wird nie überschrieben; ein fremder Tresorordner dort bricht ab, bevor etwas geschrieben wird. */
+    @Test public void ortAendernUeberschreibtNieUndNimmtKeinenFremdenTresor() throws Exception {
+        File alt = neuerOrdner(); DateiAblage a = new DateiAblage(alt);
+        try (TresorOrdner t = TresorOrdner.anlegen(a, Fach.BOOKLEDGER_APP, PW)) { t.fachAnlegen("bookledgerpro"); }
+        File konflikt = neuerOrdner(); DateiAblage k = new DateiAblage(konflikt);
+        String erste = Umzug.dateien(a).get(0);
+        try (OutputStream o = k.neu(erste)) { o.write(new byte[] {9, 9}); }
+        assertEquals("TRESOR_UMZUG_KONFLIKT", code(() -> Umzug.kopieren(a, k, null)));
+        assertArrayEquals(new byte[] {9, 9}, k.lesen(erste, 10));
+        assertFalse(k.gibtEs(TresorOrdner.KOPF));
+        File fremd = neuerOrdner(); DateiAblage f = new DateiAblage(fremd);
+        try (TresorOrdner t = TresorOrdner.anlegen(f, Fach.BOOKLEDGER_APP, PW2)) { t.fachAnlegen("bookledgerpro"); }
+        Map<String, String> fremdVorher = baum(fremd, "");
+        assertEquals("TRESOR_UMZUG_FREMDER_TRESOR", code(() -> Umzug.kopieren(a, f, null)));
+        assertEquals(fremdVorher, baum(fremd, ""));
+        // Abbruch vor der ersten Datei: am neuen Ort entsteht nichts, schon gar kein Kopf.
+        File leer = neuerOrdner(); DateiAblage l = new DateiAblage(leer);
+        assertEquals("TRESOR_UMZUG_ABGEBROCHEN", code(() -> Umzug.kopieren(a, l, (i, nn) -> true)));
+        assertFalse(l.gibtEs(TresorOrdner.KOPF));
+        // Der Kopf kommt zuletzt.
+        List<String> liste = Umzug.dateien(a);
+        assertEquals(TresorOrdner.KOPF, liste.get(liste.size() - 1));
+    }
 }

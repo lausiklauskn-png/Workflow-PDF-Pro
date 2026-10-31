@@ -6,7 +6,7 @@
 (() => {
   'use strict';
   if (window.ProBedienung) return;
-  const FASSUNG = 6;
+  const FASSUNG = 7;   // 7 (2026-10-31, Pro-Umbau 14 A3): pro-ueberall.js Fassung 3 kennt die Fächer V3, Familienakte, Eingang-Familienakte
   const root = document.documentElement;
   // de en ru pl ar — jede App nutzt die Sprachen, die sie kennt; fehlt eine, gilt Deutsch.
   const WORTE = {
