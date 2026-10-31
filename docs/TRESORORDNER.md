@@ -188,3 +188,21 @@ andere App rechnet ihre Vektoren selbst.
 | Private Brain Pro | Katalog-Inhaltsverzeichnis, Rechnungsmails in den Eingang von BookLedgerPro | Katalog-Vektoren, Mail-Konten, KI-Schlüssel, Chefcode |
 | Private Brain V3 | (noch nicht eingezogen) | wie Private Brain Pro |
 | Familienakte | (noch nicht eingezogen) | eigene Daten der Akte |
+
+## Ort ändern: der Kern (Klaus' Antwort 3, 2026-10-31)
+
+`de.familyprojekt.tresor.Umzug` (Quelle hier, reines Java, gleich für Android `SafAblage` und Windows `DateiAblage`):
+1. **Kopieren:** jede Datei des alten Orts an denselben Pfad am neuen Ort, der Kopf `tresorordner.json` zuletzt (ein halber Umzug ist kein
+   gültiger Tresorordner). Am neuen Ort wird **nie überschrieben**: eine Datei mit gleichem Pfad muss byte-gleich sein (dann gilt sie als schon
+   kopiert, so geht ein abgebrochener Umzug weiter), sonst Abbruch `TRESOR_UMZUG_KONFLIKT`. Ein fremder Tresorordner am neuen Ort:
+   `TRESOR_UMZUG_FREMDER_TRESOR`, nichts wird geschrieben.
+2. **Prüfen:** jede kopierte Datei wird am neuen Ort neu gelesen und per SHA-256 mit dem Original verglichen; am Ende muss der Kopf dieselbe Kennung tragen.
+3. **Umschalten** (Aufgabe der App, erst nach Erfolg): die App merkt sich den neuen Ort und legt am alten Ort die kleine Datei
+   `Tresorordner/umgezogen.json` an (Kennung, Anzeigename des neuen Orts, Zeit). Sonst ändert sich am alten Ort nichts; er bleibt, bis der Nutzer
+   ihn selbst löscht. Von einem Ort mit diesem Vermerk wird nicht noch einmal umgezogen (`TRESOR_UMZUG_SCHON_UMGEZOGEN`); die anderen Pro-Apps
+   lesen den Vermerk (`Umzug.vermerk`) und bitten, den neuen Ort zu wählen, statt still am alten weiterzuschreiben.
+
+Proben: `TresorOrdnerTest.ortAendernKopiertPruefendUndLaesstDenAltenOrt`, `…UeberschreibtNieUndNimmtKeinenFremdenTresor` (JUnit 12 grün);
+Gegenprobe `tools/tresor/gegenprobe.mjs` vier neue Fälle (überschreiben, fremder Tresor, Kopf zuerst, Vermerk übergangen) je gefangen.
+⚠ **Noch nicht gebaut:** der Knopf „Ort ändern …“ in den Apps (Android: Ordnerwahl, Umzug im Hintergrund, Umschalten; bei Workflow PDF Pro
+zusätzlich den Dokumenttresor auf „Workflow PDF Pro/“ am neuen Ort umstellen) und Windows. Nicht am Gerät gemessen.

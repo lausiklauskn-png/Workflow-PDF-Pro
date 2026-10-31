@@ -37,6 +37,13 @@ const faelle = [
     [' || Json.zahl(d, "revision") != rev) throw', ') throw']],
   ['Prüfwert im Kopf nicht geprüft', 'TresorOrdner.java',
     'if (!MessageDigest.isEqual(pruefwert(haupt, id), erwartet)) { Arrays.fill(haupt, (byte) 0); throw fehler("TRESOR_BESCHAEDIGT"); }', '', 'manipulationen'],
+  // Ort ändern (Umzug.java): nie überschreiben, jede Datei nachprüfen, Kopf zuletzt, kein Umzug in einen fremden Tresorordner.
+  ['Umzug überschreibt am neuen Ort', 'Umzug.java',
+    'if (neu.istOrdner(p) || !soll.equals(sha(neu, p))) throw TresorOrdner.fehler("TRESOR_UMZUG_KONFLIKT");', 'continue;', 'ortAendernUeberschreibtNie'],
+  ['Umzug nimmt einen fremden Tresorordner', 'Umzug.java',
+    'if (neu.gibtEs(TresorOrdner.KOPF) && !id.equals(TresorOrdner.kennung(neu))) throw TresorOrdner.fehler("TRESOR_UMZUG_FREMDER_TRESOR");', '', 'ortAendernUeberschreibtNie'],
+  ['Umzug schreibt den Kopf zuerst', 'Umzug.java', '        aus.remove(TresorOrdner.KOPF);\n        aus.add(TresorOrdner.KOPF);', '        aus.remove(TresorOrdner.KOPF);\n        aus.add(0, TresorOrdner.KOPF);', 'ortAendernUeberschreibtNie'],
+  ['Vermerk wird nicht beachtet', 'Umzug.java', 'if (alt.gibtEs(VERMERK)) throw TresorOrdner.fehler("TRESOR_UMZUG_SCHON_UMGEZOGEN");', '', 'ortAendernKopiert'],
   ['Übergabefach liest nur einen Schreiber', 'TresorOrdner.java',
     'for (String schreiber : Fach.APPS) if (ablage.istOrdner', 'for (String schreiber : java.util.Collections.singletonList(app)) if (ablage.istOrdner', 'uebergabefach'],
 ];
