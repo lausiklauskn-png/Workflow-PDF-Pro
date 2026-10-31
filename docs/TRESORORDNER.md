@@ -13,7 +13,7 @@ Windows-Java-Engine von Private Brain Pro. Einzige Android-Datei ist `SafAblage.
 |---|---|
 | `VaultCrypto.java` | das Schloss PBV1 — **bis auf die `package`-Zeile byte-gleich** mit Workflow PDF Pro und Private Brain Pro (Rumpf-SHA-256 `a12fb6d5…`, von `tools/tresor/pins.mjs` geprüft) |
 | `TresorOrdner.java` | Kopf, Hauptschlüssel, Passwort- und Ersatzplätze, Fach-Schlüssel, Dateien, Inhaltsverzeichnis, Marken |
-| `Fach.java` | die fünf Fächer und wer schreiben darf |
+| `Fach.java` | die acht Fächer und wer schreiben darf |
 | `Eintrag.java` | eine Zeile im Inhaltsverzeichnis (gleiches Format für alle Apps) |
 | `Ersatzschluessel.java` | Shamir 5/3, gleiche Rechnung wie `VaultRecovery`, Vorsilbe `FPT1-` |
 | `Ablage.java`, `DateiAblage.java`, `SafAblage.java` | der gewählte Ordner: Schnittstelle, java.io.File, Android-SAF |
@@ -30,6 +30,7 @@ Windows-Java-Engine von Private Brain Pro. Einzige Android-Datei ist `SafAblage.
   Tresorordner/verzeichnis/<fach>/<app>/v-<nummer>-<uuid>.fpt   Inhaltsverzeichnis (PBV1, Fach-Schlüssel), je Schreiber
   Tresorordner/marken/<app>/<fach>--<eintrag>.json             „übernommen“-Marken
   Private Brain/  Workflow PDF Pro/  BookLedgerPro/  Eingang-BookLedgerPro/  Eingang-WorkflowPDF/
+  Private Brain V3/  Familienakte/  Eingang-Familienakte/      (seit 2026-10-31)
 ```
 
 - Jede Verpackung ist an Kennung, Art und Teil gebunden (`familyprojekt-tresorordner|<id>|kennwort|<platz>|<runden>`,
@@ -162,3 +163,28 @@ Bisher zeigte Workflow PDF Pro es nicht an. Jetzt:
 - Probe: `tools/native/test-tresorordner.mjs` (Brücke gestellt: ein neuer und ein schon übernommener Eintrag, Hinweiszeile, Block, Übernehmen in
   mehreren Stücken, erst gelesen dann markiert, Dokument mit 3 Seiten ungeprüft in der Bibliothek, Hinweis danach weg).
 - ⚠ Nicht am Gerät; die Java-Seite ist nur in der CI gebaut (JVM-Proben, `assembleRelease`), nicht mit einem echten SAF-Ordner gefahren.
+
+## Neue Fächer: Private Brain V3, Familienakte, Eingang-Familienakte (Pro-Umbau 14 A3, Klaus 2026-10-31)
+
+Klaus' Antworten 1 und 2: V3 bekommt ein **eigenes** Fach („Private Brain V3“, App-Kennung `private-brain-v3`), die Familienakte ein eigenes
+(„Familienakte“, `familienakte`) und ein Übergabefach („Eingang-Familienakte“, jede App legt ab, die Familienakte liest). `Fach.java` hat damit
+acht Fächer und fünf Apps. Ein Fach entsteht erst beim ersten Ablegen; ein älterer Tresor bleibt ohne Umbau gültig, alte Apps lesen die neuen
+Fächer nur dann nicht, wenn sie sie nicht kennen (ihr `Fach.nachSlug` meldet `TRESOR_FACH_UNBEKANNT`, nichts wird verändert).
+Probe: `TresorOrdnerTest.neueFaecherV3UndFamilienakteOhneUmbauAlterTresore` (V3 schreibt nur ins eigene Fach und in den Eingang, die Familienakte
+liest beides, Private Brain Pro darf nicht in das V3-Fach). Gegenprobe ohne die Fächer: genau diese Probe rot.
+⚠ V3 und die Familienakte ziehen das Paket noch ein (eigene Schritte), bis dahin bleiben die Ordner leer.
+
+## Was im Tresor liegt und was nicht (Klaus' Antwort 6, 2026-10-31)
+
+Im Tresorordner liegen nur verschlüsselte Dateien, je Fach ein verschlüsseltes Inhaltsverzeichnis (Name, Art, Datum, Kurzfassung ≤ 1000 Zeichen)
+und die Marken „übernommen“. **Nie im Tresor:** Bedeutungs-Vektoren (Einordnung für die Suche nach Bedeutung), KI-Schlüssel, Mail-Zugänge,
+Chef-PIN und Chefcode, der gemerkte Hauptschlüssel (Android-Schlüsselspeicher bzw. Windows-DPAPI). Diese bleiben in der jeweiligen App; eine
+andere App rechnet ihre Vektoren selbst.
+
+| App | legt in den Tresor | bleibt in der App |
+|---|---|---|
+| Workflow PDF Pro | Bibliothek (Arbeitsstand gesammelt), Inhaltsverzeichnis mit Seitentext-Auszug | Vektoren, Bildbeschreibung-Modell, KI-Schlüssel, Chefcode |
+| BookLedgerPro | Sicherung des Bestands (`Sicherung/`), Beleg-Originale (`Belege/`) | Vektoren der Belege, Mistral-/Vision-Schlüssel, Chefcode |
+| Private Brain Pro | Katalog-Inhaltsverzeichnis, Rechnungsmails in den Eingang von BookLedgerPro | Katalog-Vektoren, Mail-Konten, KI-Schlüssel, Chefcode |
+| Private Brain V3 | (noch nicht eingezogen) | wie Private Brain Pro |
+| Familienakte | (noch nicht eingezogen) | eigene Daten der Akte |
