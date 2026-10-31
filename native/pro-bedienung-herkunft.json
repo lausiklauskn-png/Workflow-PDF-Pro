@@ -1,7 +1,7 @@
 {
   "_": "Gemeinsame Bausteine aller Pro-Apps (Bedienung, Hintergrundaufgabe, Gerätecheck, Überall suchen, Chefcode). Quelle: Private Brain Pro. Nie von Hand ändern.",
   "quelle": "lausiklauskn-png/Privat-Brain-Pro",
-  "fassung": 5,
+  "fassung": 6,
   "pfade": [
     "native/pro-bedienung.js",
     "native/pro-bedienung.css",
@@ -14,16 +14,16 @@
     "android/app/src/main/java/de/familyprojekt/hintergrund/ProHintergrundDienst.java"
   ],
   "dateien": {
-    "pro-bedienung.js": "55661bbf9d4b5874fd5e20adf33d39352f0d6838e08da0d1e5cbc78d7eb91df5",
+    "pro-bedienung.js": "63bddbcbcd19004d79845704cf6500c7dcd22dab2f92506be7a9dea11675994c",
     "pro-bedienung.css": "cd2b3e6307a3c68fdc828f59d5e950085268678463a027ced64562100e2b67d5",
     "pro-hintergrund.js": "64e2e803df220650e45dde1c6e403711ebb7b76a6f6786ad6422043fb84c9e62",
     "pro-geraet.js": "b18c26f8d0bd755c6a4fe5a8948e8457f7d9ed73b69dac938f8c9bab1326f710",
     "pro-ueberall.js": "e8e996a29160ac962eb606670a5404aea5d6fa78a59636014893123f892be96e",
     "pro-ueberall.css": "524f0829ebb22b3c3af06c0cd368c2281bfe10bfa2eaab0d2c4b06a153215231",
-    "pro-chefcode.js": "38223788aa7d7a6a0a37d21db5900256031e15ad8c10dceee2ed4e00174055a8",
+    "pro-chefcode.js": "9bbd9957581573b8c87eb403fa067a041cbead8ccbc1a96346199dda8cad4674",
     "ProHintergrundPlugin.java": "551ae06d05e2b60d679930ef6c7bdee6794d3226f33398acee1403174aa9aa01",
     "ProHintergrundDienst.java": "b37268634112b206d2e07dd60e91866cb8285f68249c068ce4bf4d664a17b014"
   },
-  "commit": "2d39781a4bbf99aaa9687dcded31080e16e316af",
+  "commit": "abf2e857103eb88e347b5743d927fc0a091699ea",
   "probe": "e885582f71c1f4f9582aa697811f594a521b029ecee34bcdcb9eb17ad1348180"
 }

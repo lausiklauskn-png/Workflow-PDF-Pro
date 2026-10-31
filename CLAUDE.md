@@ -2,6 +2,8 @@
 
 Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 
+**Pro-Umbau 14, Sitzung A (31.10.2026):** Chef getrennt — Bedien-Bausteine **Fassung 6** aus Private Brain Pro (`native/pro-chefcode.js` Fassung 2): Chef-PIN (6–12 Ziffern, nur Prüfwert gespeichert), gesperrt nur Zustand; Mitarbeiter treten mit dem Beitritts-Zettel `CHEF1-…` bei und ändern nur mit Chef-PIN. App **1.0.11**/12 (nicht veröffentlicht). Probe `test-ueberall` (Chef richtet ein, gesperrt ohne Code-Feld, entsperren → entfernen). Ausführlich: Private Brain Pro `docs/UEBERALL-SUCHEN.md`. Nicht am Gerät.
+
 **Pro-Umbau 13 (30.10.2026):** Chefcode (Klaus: „Ja, Schritt 1+2“, „Chef legt fest, alle 3“) — gemeinsamer Baustein `native/pro-chefcode.js` (Quelle Private Brain Pro, Bedien-Bausteine Fassung 5) in den Einstellungen unter Sicherung/Tresor (`native/native-chefcode.js`): gleicher Code = eigenes Netz über Modul 23 des Kerns, mindestens 12 Zeichen, Feld danach leer. App weiter **1.0.10**/11 (nicht veröffentlicht). `test:native-web` 72/0. Nicht am Gerät.
 
 **Pro-Umbau 12 (30.10.2026):** „Überall suchen“ unter der Bibliothekssuche (`native/native-ueberall.js`; Kasten = gemeinsamer Baustein `native/pro-ueberall.*` aus Private Brain Pro, Fassung 4): Bibliothek mit Seitentext, Tresorordner-Fächer der anderen Pro-Apps (`WorkflowVault.tresorFach`, nur Zeilen, nur offen), Netz über Modul 23 nur mit Haken. `native/native-kopf.js`: Schriftgröße „A··A“ vor dem Zahnrad, Version klein neben dem Namen (Tipp prüft auf Updates). Android `setTextZoom(100)`. App **1.0.10**/Buildnummer 11, nicht veröffentlicht. Proben `test:native-web` 69/0. Nicht am Gerät. Beschreibung: Private Brain Pro `docs/UEBERALL-SUCHEN.md`.
