@@ -182,6 +182,7 @@ try {
 
   // ---------- Überall suchen (pro-ueberall.js/.css, Fassung 4): Liste mit Herkunft aus App, Tresorordner und Netz ----------
   const ujs = readFileSync(resolve(dir, 'pro-ueberall.js'), 'utf8'), ucss = readFileSync(resolve(dir, 'pro-ueberall.css'), 'utf8');
+  ok('Überall suchen kennt alle acht Fächer des Tresor-Pakets (Pro-Umbau 14 A3)', ['private-brain', 'workflow-pdf-pro', 'bookledgerpro', 'eingang-bookledgerpro', 'eingang-workflowpdf', 'private-brain-v3', 'familienakte', 'eingang-familienakte'].every(f => ujs.includes("fach: '" + f + "'")));
   ok('Überall suchen: Fassung ≥ 4 pinnt beide Dateien', pin.fassung >= 4 && pin.dateien?.['pro-ueberall.js'] === sha(ujs) && pin.dateien?.['pro-ueberall.css'] === sha(ucss));
   ok('Überall suchen: kein eigenes Netz, kein fremder Speicher, keine Emojis, Text nur über textContent',
     !/fetch\(|XMLHttpRequest|WebSocket|indexedDB|innerHTML/.test(ujs) && (ujs.match(/localStorage\./g) || []).length === 2 && !/\p{Extended_Pictographic}/u.test(ujs + ucss));

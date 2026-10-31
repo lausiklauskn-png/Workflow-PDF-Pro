@@ -11,7 +11,7 @@
 (() => {
   'use strict';
   if (window.ProUeberall) return;
-  const FASSUNG = 2;   // 2 (Pro-Umbau 13): eigene Gruppen der App (`gruppe`), Rückruf nachSuche
+  const FASSUNG = 3;   // 2 (Pro-Umbau 13): eigene Gruppen der App (`gruppe`), Rückruf nachSuche · 3 (Pro-Umbau 14 A3): Fächer V3, Familienakte, Eingang-Familienakte
   const root = document.documentElement;
 
   // ---------- Wortsuche (wie BookLedgerPro belegsuche.js: UND über alle Wörter, Umlaute gefaltet, Daten als JJJJMMTT) ----------
@@ -74,7 +74,11 @@
     { fach: 'workflow-pdf-pro', ordner: 'Workflow PDF Pro', app: 'Workflow PDF Pro' },
     { fach: 'bookledgerpro', ordner: 'BookLedgerPro', app: 'BookLedgerPro' },
     { fach: 'eingang-bookledgerpro', ordner: 'Eingang-BookLedgerPro', app: 'BookLedgerPro' },
-    { fach: 'eingang-workflowpdf', ordner: 'Eingang-WorkflowPDF', app: 'Workflow PDF Pro' }
+    { fach: 'eingang-workflowpdf', ordner: 'Eingang-WorkflowPDF', app: 'Workflow PDF Pro' },
+    // Seit 2026-10-31 (Pro-Umbau 14 A3). Kennt das Tresor-Paket einer älteren App sie nicht, fällt das Fach still weg (tresorLesen).
+    { fach: 'private-brain-v3', ordner: 'Private Brain V3', app: 'Private Brain V3' },
+    { fach: 'familienakte', ordner: 'Familienakte', app: 'Meine Familienakte' },
+    { fach: 'eingang-familienakte', ordner: 'Eingang-Familienakte', app: 'Meine Familienakte' }
   ].map(Object.freeze));
   const fachVon = slug => FAECHER.find(f => f.fach === slug) || null;
   const eintragText = e => [e && e.name, e && e.auszug, e && e.art].filter(Boolean).join(' · ');
