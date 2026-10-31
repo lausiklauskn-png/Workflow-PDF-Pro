@@ -112,21 +112,31 @@ test('Überall suchen und Kopf in Workflow PDF Pro', async t => {
     // Pro-Umbau 13: Chefcode (gemeinsamer Baustein pro-chefcode.js) in den Einstellungen, gegen das echte Modul 23 des Kerns.
     await page.click('#btnEinst');
     await page.waitForFunction(() => document.getElementById('wppChefcode') && typeof window.SbkimRendezvous?.saveNetwork === 'function', null, { timeout: 15000 });
-    await t.test('Chefcode steht in den Einstellungen unter Sicherung/Tresor, ab Werk öffentliches Netz', async () => {
+    await t.test('Chefcode steht in den Einstellungen unter Sicherung/Tresor, ab Werk öffentliches Netz, ohne Code-Feld (Fassung 2)', async () => {
       const r = await page.evaluate(() => { const k = document.getElementById('wppChefcode'), s = document.getElementById('stSicherung');
         return { nach: !!(s.compareDocumentPosition(k) & Node.DOCUMENT_POSITION_FOLLOWING), titel: k.querySelector('h3').textContent, lage: k.querySelector('[data-pro-cc-lage]').dataset.proCcLage,
-          feld: k.querySelector('[data-pro-cc-feld]').type }; });
-      assert.ok(r.nach && r.titel === 'Chefcode' && r.lage === 'oeffentlich' && r.feld === 'password', JSON.stringify(r));
+          feld: !!k.querySelector('[data-pro-cc-feld]'), chef: !!k.querySelector('[data-pro-knopf="chefcode-chef"]'), zettel: !!k.querySelector('[data-pro-knopf="chefcode-zettel"]') }; });
+      assert.ok(r.nach && r.titel === 'Chefcode' && r.lage === 'oeffentlich' && !r.feld && r.chef && r.zettel, JSON.stringify(r));
     });
-    await page.evaluate(() => { document.querySelector('[data-pro-cc-feld]').value = 'WERKSTATT-2026-XQ7'; document.querySelector('[data-pro-knopf="chefcode-uebernehmen"]').click(); });
-    await page.waitForFunction(() => document.querySelector('[data-pro-cc-lage]').dataset.proCcLage === 'eigen', null, { timeout: 20000 });
-    await t.test('Gültiger Code: Modul 23 im eigenen Netz, Code nicht mehr im Bild', async () => {
-      const r = await page.evaluate(() => ({ netz: SbkimRendezvous._meta.network, leer: document.querySelector('[data-pro-cc-feld]').value === '', sichtbar: /WERKSTATT-?2026/.test(document.body.innerHTML + document.body.innerText), felder: [...document.querySelectorAll('input')].filter(i => /WERKSTATT/i.test(i.value)).map(i => i.id || i.className).join() }));
-      assert.ok(r.netz === 'eigen' && r.leer && !r.sichtbar && !r.felder, JSON.stringify(r));
+    const ccWert = (sel, v) => page.$eval('#wppChefcode ' + sel, (f, x) => { f.value = x; }, v);
+    const ccTipp = n => page.$eval(`#wppChefcode [data-pro-knopf="${n}"]`, b => b.click());
+    await ccTipp('chefcode-chef');
+    await page.waitForSelector('#wppChefcode [data-pro-cc-pin2]', { state: 'attached' });
+    await ccWert('[data-pro-cc-pin]', '583920'); await ccWert('[data-pro-cc-pin2]', '583920'); await ccWert('[data-pro-cc-feld]', 'WERKSTATT-2026-XQ7');
+    await ccTipp('chefcode-uebernehmen');
+    await page.waitForFunction(() => document.querySelector('[data-pro-cc-lage]').dataset.proCcLage === 'eigen', null, { timeout: 30000 });
+    await t.test('Chef richtet ein (PIN + Code): Modul 23 im eigenen Netz, weder Code noch PIN im Bild', async () => {
+      const r = await page.evaluate(() => ({ netz: SbkimRendezvous._meta.network, rolle: document.getElementById('wppChefcode').dataset.proCcRolle, sichtbar: /WERKSTATT-?2026|583920/.test(document.body.innerHTML + document.body.innerText), felder: [...document.querySelectorAll('input')].filter(i => /WERKSTATT|583920/i.test(i.value)).map(i => i.id || i.className).join() }));
+      assert.ok(r.netz === 'eigen' && r.rolle === 'chef' && !r.sichtbar && !r.felder, JSON.stringify(r));
     });
-    await page.evaluate(() => document.querySelector('[data-pro-knopf="chefcode-entfernen"]').click());
-    await page.waitForFunction(() => document.querySelector('[data-pro-cc-lage]').dataset.proCcLage === 'oeffentlich');
-    await t.test('Entfernen: zurück ins öffentliche Netz', async () => assert.equal(await page.evaluate(() => SbkimRendezvous._meta.network), 'oeffentlich'));
+    await ccTipp('chefcode-sperren');
+    await page.waitForFunction(() => document.getElementById('wppChefcode').dataset.proCcOffen === 'nein');
+    await t.test('Gesperrt: kein Code-Feld, kein Entfernen', async () => assert.ok(await page.evaluate(() => !document.querySelector('#wppChefcode [data-pro-cc-feld]') && !document.querySelector('#wppChefcode [data-pro-knopf="chefcode-entfernen"]'))));
+    await ccWert('[data-pro-cc-pin]', '583920'); await ccTipp('chefcode-entsperren');
+    await page.waitForFunction(() => document.getElementById('wppChefcode').dataset.proCcOffen === 'ja', null, { timeout: 30000 });
+    await ccTipp('chefcode-entfernen');
+    await page.waitForFunction(() => document.querySelector('[data-pro-cc-lage]').dataset.proCcLage === 'oeffentlich', null, { timeout: 30000 });
+    await t.test('Mit Chef-PIN entsperrt → Entfernen: zurück ins öffentliche Netz', async () => assert.equal(await page.evaluate(() => SbkimRendezvous._meta.network), 'oeffentlich'));
     await t.test('Keine Seitenfehler', async () => assert.deepEqual(fehler, []));
     await page.close();
     const B = await seite({ mitTresor: false, breite: 360 });
