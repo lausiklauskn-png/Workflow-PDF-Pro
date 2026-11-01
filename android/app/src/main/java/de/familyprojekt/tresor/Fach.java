@@ -29,8 +29,10 @@ public final class Fach {
     public static final Fach PRIVATE_BRAIN_V3 = new Fach("private-brain-v3", "Private Brain V3", PRIVATE_BRAIN_V3_APP, null);
     public static final Fach FAMILIENAKTE = new Fach("familienakte", "Familienakte", FAMILIENAKTE_APP, null);
     public static final Fach EINGANG_FAMILIENAKTE = new Fach("eingang-familienakte", "Eingang-Familienakte", null, FAMILIENAKTE_APP);
+    /** Kompatibler Rückweg zu Private Brain Pro; entsteht erst bei der ersten Ablage. */
+    public static final Fach EINGANG_PRIVATE_BRAIN = new Fach("eingang-private-brain", "Eingang-Private-Brain", null, PRIVATE_BRAIN_APP);
     public static final List<Fach> ALLE = Collections.unmodifiableList(Arrays.asList(PRIVATE_BRAIN, WORKFLOW_PDF, BOOKLEDGER, EINGANG_BOOKLEDGER, EINGANG_WORKFLOW_PDF,
-        PRIVATE_BRAIN_V3, FAMILIENAKTE, EINGANG_FAMILIENAKTE));
+        PRIVATE_BRAIN_V3, FAMILIENAKTE, EINGANG_FAMILIENAKTE, EINGANG_PRIVATE_BRAIN));
 
     /** Kurzname im Format (Dateinamen, gebundene Daten). */
     public final String slug;

@@ -5,7 +5,7 @@
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, dirname } from 'node:path';
+import { join, dirname, delimiter } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -16,6 +16,9 @@ if (!jars) { console.error('TRESOR_JARS fehlt'); process.exit(2); }
 const cp = [join(jars, 'junit-4.13.2.jar'), join(jars, 'hamcrest-core-1.3.jar')];
 
 const faelle = [
+  ['PB-Eingang: falscher Empfänger', 'Fach.java', '"Eingang-Private-Brain", null, PRIVATE_BRAIN_APP', '"Eingang-Private-Brain", null, PRIVATE_BRAIN_V3_APP', 'privateBrainEingangUndGeleseneEmpfaengermarken'],
+  ['PB-Eingang: Sendermarke gilt als Empfängerquittung', 'TresorOrdner.java', 'VERWALTUNG + "/marken/" + lesendeApp', 'VERWALTUNG + "/marken/" + app', 'privateBrainEingangUndGeleseneEmpfaengermarken'],
+  ['PB-Eingang: fremde Markenkennung ungeprüft', 'TresorOrdner.java', 'Fach.appPruefen(lesendeApp);', '', 'privateBrainEingangUndGeleseneEmpfaengermarken'],
   ['Falsches Passwort schreibt etwas', 'TresorOrdner.java',
     '        for (String name : a.liste(VERWALTUNG)) {\n            if (!name.matches("kennwort-"',
     '        try (OutputStream spur = a.neu("spur-" + UUID.randomUUID())) { }\n        for (String name : a.liste(VERWALTUNG)) {\n            if (!name.matches("kennwort-"', 'falschesPasswort'],
@@ -65,9 +68,9 @@ for (const [titel, datei, alt, neu, erwartet, zweiter] of faelle) {
     }
     writeFileSync(join(src, datei), geaendert);
     const cls = join(tmp, 'cls'); mkdirSync(cls);
-    execFileSync('javac', ['-nowarn', '-d', cls, '-cp', cp.join(':'), ...readdirSync(src).map(n => join(src, n))], { stdio: 'pipe' });
+    execFileSync('java', ['com.sun.tools.javac.Main', '-encoding', 'UTF-8', '-nowarn', '-d', cls, '-cp', cp.join(delimiter), ...readdirSync(src).map(n => join(src, n))], { stdio: 'pipe' });
     let ausgabe = '';
-    try { execFileSync('java', ['-cp', [cls, ...cp].join(':'), 'org.junit.runner.JUnitCore', 'de.familyprojekt.tresor.TresorOrdnerTest'], { stdio: 'pipe' }); }
+    try { execFileSync('java', ['-cp', [cls, ...cp].join(delimiter), 'org.junit.runner.JUnitCore', 'de.familyprojekt.tresor.TresorOrdnerTest'], { stdio: 'pipe' }); }
     catch (e) { ausgabe = String(e.stdout); }
     if (ausgabe && new RegExp(`\\) ${erwartet}`).test(ausgabe)) { console.log(`gefangen     ${titel}`); gefangen++; }
     else { console.log(`DURCHGERUTSCHT ${titel}${ausgabe ? ' (rot, aber nicht in ' + erwartet + ')' : ''}`); durch++; }

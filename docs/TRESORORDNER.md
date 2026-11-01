@@ -13,7 +13,7 @@ Windows-Java-Engine von Private Brain Pro. Einzige Android-Datei ist `SafAblage.
 |---|---|
 | `VaultCrypto.java` | das Schloss PBV1 — **bis auf die `package`-Zeile byte-gleich** mit Workflow PDF Pro und Private Brain Pro (Rumpf-SHA-256 `a12fb6d5…`, von `tools/tresor/pins.mjs` geprüft) |
 | `TresorOrdner.java` | Kopf, Hauptschlüssel, Passwort- und Ersatzplätze, Fach-Schlüssel, Dateien, Inhaltsverzeichnis, Marken |
-| `Fach.java` | die acht Fächer und wer schreiben darf |
+| `Fach.java` | die neun Fächer und wer schreiben darf |
 | `Eintrag.java` | eine Zeile im Inhaltsverzeichnis (gleiches Format für alle Apps) |
 | `Ersatzschluessel.java` | Shamir 5/3, gleiche Rechnung wie `VaultRecovery`, Vorsilbe `FPT1-` |
 | `Ablage.java`, `DateiAblage.java`, `SafAblage.java` | der gewählte Ordner: Schnittstelle, java.io.File, Android-SAF |
@@ -31,6 +31,7 @@ Windows-Java-Engine von Private Brain Pro. Einzige Android-Datei ist `SafAblage.
   Tresorordner/marken/<app>/<fach>--<eintrag>.json             „übernommen“-Marken
   Private Brain/  Workflow PDF Pro/  BookLedgerPro/  Eingang-BookLedgerPro/  Eingang-WorkflowPDF/
   Private Brain V3/  Familienakte/  Eingang-Familienakte/      (seit 2026-10-31)
+  Eingang-Private-Brain/                                      (seit 2026-11-01)
 ```
 
 - Jede Verpackung ist an Kennung, Art und Teil gebunden (`familyprojekt-tresorordner|<id>|kennwort|<platz>|<runden>`,
@@ -206,3 +207,21 @@ Proben: `TresorOrdnerTest.ortAendernKopiertPruefendUndLaesstDenAltenOrt`, `…Ue
 Gegenprobe `tools/tresor/gegenprobe.mjs` vier neue Fälle (überschreiben, fremder Tresor, Kopf zuerst, Vermerk übergangen) je gefangen.
 ⚠ **Noch nicht gebaut:** der Knopf „Ort ändern …“ in den Apps (Android: Ordnerwahl, Umzug im Hintergrund, Umschalten; bei Workflow PDF Pro
 zusätzlich den Dokumenttresor auf „Workflow PDF Pro/“ am neuen Ort umstellen) und Windows. Nicht am Gerät gemessen.
+
+
+## Ergänzung für Familienakte-Verbund (1. November 2026)
+
+`eingang-private-brain` ist der fehlende Rückweg zu **Private Brain Pro**, nicht zu V3.
+Der neue neunte Fachname wird erst bei der ersten Ablage angelegt. Format, Hauptschlüssel,
+bestehende Dateien und App-Kennungen bleiben unverändert; kein Umbau alter Tresore beim Öffnen.
+
+`marken(slug, app)` liest die bestehenden Marken einer ausdrücklich benannten App. Damit kann
+auch der Sender die Marke des tatsächlichen Empfängers lesen. `marken(slug)` behält sein Verhalten;
+Schreiben erfolgt weiterhin ausschließlich unter der eigenen App-Kennung. Eine eigene Sendermarke
+ist keine Empfängerquittung. Der aufnehmende App-Adapter muss zuerst Datei und Eingangsdatensatz
+dauerhaft bestätigen und darf erst danach die bestehende Marke setzen. Das Paket allein erledigt
+noch keinen App-Eingang. Empfänger/Größe/Prüfsumme sind beim Adapter zusätzlich zu prüfen.
+
+Lokal: vollständige kanonische JVM-Probe 13 Fälle grün; Private-Brain-Eingang, unverändertes
+Altformat, mehrere App-Kennungen und Originale sowie getrennte Sender-/Empfängermarken enthalten.
+Drei gezielte Gegenproben (falscher Empfänger, Sender- statt Empfängermarke, ungeprüfte App-Kennung) wurden gefangen. Android-SAF und reale Datenträger sind dadurch nicht als am Gerät geprüft ausgewiesen.

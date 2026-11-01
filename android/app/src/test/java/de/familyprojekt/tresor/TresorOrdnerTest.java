@@ -88,7 +88,7 @@ public final class TresorOrdnerTest {
         File d = neuerOrdner(); DateiAblage a = new DateiAblage(d);
         try (TresorOrdner blp = TresorOrdner.anlegen(a, Fach.BOOKLEDGER_APP, PW)) { blp.fachAnlegen("bookledgerpro"); }
         try (TresorOrdner v3 = TresorOrdner.oeffnen(a, Fach.PRIVATE_BRAIN_V3_APP, PW)) {
-            assertEquals(8, v3.faecher().size());
+            assertEquals(9, v3.faecher().size());
             assertFalse(v3.fachBekannt("private-brain-v3"));
             v3.ablegen("private-brain-v3", null, "notiz.txt", "text/plain", 1L, new ByteArrayInputStream("V3".getBytes(StandardCharsets.UTF_8)), "Notiz");
             assertTrue(new File(d, "Private Brain V3").isDirectory());
@@ -106,6 +106,36 @@ public final class TresorOrdnerTest {
             assertEquals("TRESOR_FACH_FREMD", code(() -> pb.ablegen("private-brain-v3", null, "x", "text/plain", 0, new ByteArrayInputStream(new byte[1]), "")));
         }
         assertTrue(new File(d, "Eingang-Familienakte").isDirectory());
+    }
+
+    @Test public void privateBrainEingangUndGeleseneEmpfaengermarkenOhneFormatwechsel() throws Exception {
+        File d = neuerOrdner(); DateiAblage a = new DateiAblage(d);
+        String id; Eintrag eintrag;
+        try (TresorOrdner t = TresorOrdner.anlegen(a, Fach.BOOKLEDGER_APP, PW)) { id=t.id(); }
+        Map<String,String> vorher = baum(d, "");
+        try (TresorOrdner t = TresorOrdner.oeffnen(a, Fach.FAMILIENAKTE_APP, PW)) {
+            assertEquals(1, TresorOrdner.VERSION);
+            assertFalse(t.fachBekannt(Fach.EINGANG_PRIVATE_BRAIN.slug));
+            assertEquals(vorher, baum(d, ""));
+            assertEquals(Fach.PRIVATE_BRAIN_APP, Fach.EINGANG_PRIVATE_BRAIN.empfaenger);
+            eintrag=t.ablegen(Fach.EINGANG_PRIVATE_BRAIN.slug, null, "erfundener-brief.txt", "text/plain", 0, new ByteArrayInputStream(new byte[]{3,7,9}), "");
+            assertFalse(t.marken(Fach.EINGANG_PRIVATE_BRAIN.slug, Fach.PRIVATE_BRAIN_APP).contains(eintrag.id));
+            // Eine eigene Marke ist keine Empfängerquittung.
+            t.markeSetzen(Fach.EINGANG_PRIVATE_BRAIN.slug, eintrag.id);
+            assertFalse(t.marken(Fach.EINGANG_PRIVATE_BRAIN.slug, Fach.PRIVATE_BRAIN_APP).contains(eintrag.id));
+            assertEquals("TRESOR_APP_UNBEKANNT", code(() -> t.marken(Fach.EINGANG_PRIVATE_BRAIN.slug, "../fremd")));
+        }
+        Map<String,String> original = baum(d, Fach.EINGANG_PRIVATE_BRAIN.ordner);
+        try (TresorOrdner t = TresorOrdner.oeffnen(a, Fach.PRIVATE_BRAIN_APP, PW)) {
+            assertEquals(id,t.id());
+            assertArrayEquals(new byte[]{3,7,9},alles(t.oeffnen(Fach.EINGANG_PRIVATE_BRAIN.slug,eintrag)));
+            t.markeSetzen(Fach.EINGANG_PRIVATE_BRAIN.slug,eintrag.id);
+            t.markeSetzen(Fach.EINGANG_PRIVATE_BRAIN.slug,eintrag.id);
+        }
+        try (TresorOrdner t = TresorOrdner.oeffnen(a, Fach.FAMILIENAKTE_APP, PW)) {
+            assertTrue(t.marken(Fach.EINGANG_PRIVATE_BRAIN.slug,Fach.PRIVATE_BRAIN_APP).contains(eintrag.id));
+            assertEquals(original,baum(d,Fach.EINGANG_PRIVATE_BRAIN.ordner));
+        }
     }
 
     @Test public void falschesPasswortAendertNichtsUndRichtigesOeffnet() throws Exception {
