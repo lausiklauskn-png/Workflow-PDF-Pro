@@ -138,6 +138,67 @@ public final class TresorOrdnerTest {
         }
     }
 
+    @Test public void ausgewählteUebergabenHinUndZurueckIdempotentUndErstNachQuittung() throws Exception {
+        File d=neuerOrdner(); DateiAblage a=new DateiAblage(d);
+        try(TresorOrdner t=TresorOrdner.anlegen(a,Fach.FAMILIENAKTE_APP,PW)) { }
+        byte[] bytes="Erfundener Brief 71".getBytes(StandardCharsets.UTF_8);
+        String[] ziele={Fach.WORKFLOW_PDF_APP,Fach.PRIVATE_BRAIN_APP,Fach.BOOKLEDGER_APP};
+        for(String ziel:ziele) {
+            String hinId, rueckId;
+            try(TresorOrdner t=TresorOrdner.oeffnen(a,Fach.FAMILIENAKTE_APP,PW)) {
+                Uebergaben u=new Uebergaben(t);
+                Eintrag hin=u.senden(ziel,"hin-"+ziel,"dok-71",null,"Brief.txt","text/plain",new ByteArrayInputStream(bytes)); hinId=hin.id;
+                assertEquals(hinId,u.senden(ziel,"hin-"+ziel,"dok-71",null,"Brief.txt","text/plain",new ByteArrayInputStream(bytes)).id);
+                assertFalse(u.bestaetigt(ziel,hinId));
+                assertEquals("TRESOR_UEBERGABE_KONFLIKT",code(() -> u.senden(ziel,"hin-"+ziel,"dok-71",null,"Brief.txt","text/plain",new ByteArrayInputStream(new byte[]{7}))));
+                assertEquals("TRESOR_UEBERGABE_ZIEL_UNBEKANNT",code(() -> u.senden(Fach.PRIVATE_BRAIN_V3_APP,"x","dok-71",null,"Brief.txt","text/plain",new ByteArrayInputStream(bytes))));
+            }
+            Map<String,String> original=baum(d,Uebergaben.eingang(ziel).ordner);
+            try(TresorOrdner t=TresorOrdner.oeffnen(a,ziel,PW)) {
+                Uebergaben u=new Uebergaben(t); assertEquals(1,u.offen().size());
+                assertEquals(Fach.FAMILIENAKTE_APP,u.beschreibung(hinId).get("quelle"));
+                assertArrayEquals(bytes,u.lesen(hinId));
+                assertEquals("TRESOR_UEBERGABE_PRUEFSUMME",code(() -> u.quittieren(hinId,"0".repeat(64))));
+                assertEquals(1,u.offen().size());
+                // Hier steht stellvertretend die dauerhafte Transaktion des Zieladapters, noch kein Gerätetest.
+                u.quittieren(hinId,(String)u.beschreibung(hinId).get("sha256")); assertEquals(0,u.offen().size());
+                Eintrag rueck=u.senden(Fach.FAMILIENAKTE_APP,"rueck-"+ziel,"dok-71","hin-"+ziel,"Antwort.txt","text/plain",new ByteArrayInputStream(bytes)); rueckId=rueck.id;
+                assertFalse(u.bestaetigt(Fach.FAMILIENAKTE_APP,rueckId));
+            }
+            assertEquals(original,baum(d,Uebergaben.eingang(ziel).ordner));
+            try(TresorOrdner t=TresorOrdner.oeffnen(a,Fach.FAMILIENAKTE_APP,PW)) {
+                Uebergaben u=new Uebergaben(t); assertTrue(u.bestaetigt(ziel,hinId));
+                assertArrayEquals(bytes,u.lesen(rueckId));
+                assertEquals("hin-"+ziel,u.beschreibung(rueckId).get("bezug"));
+                u.quittieren(rueckId,(String)u.beschreibung(rueckId).get("sha256"));
+                assertEquals(0,u.offen().size());
+            }
+            try(TresorOrdner t=TresorOrdner.oeffnen(a,ziel,PW)) { assertTrue(new Uebergaben(t).bestaetigt(Fach.FAMILIENAKTE_APP,rueckId)); }
+        }
+    }
+
+    @Test public void uebergabeGroessenGrenzeUndUnpassendePruefsummeBleibenUnquittiert() throws Exception {
+        File d=neuerOrdner(); DateiAblage a=new DateiAblage(d); String eintragId;
+        try(TresorOrdner t=TresorOrdner.anlegen(a,Fach.FAMILIENAKTE_APP,PW)) {
+            Uebergaben u=new Uebergaben(t);
+            InputStream zuGross=new InputStream() {
+                int rest=Uebergaben.MAX_BYTES+1;
+                public int read() { return rest-- > 0 ? 0 : -1; }
+                public int read(byte[] b,int off,int len) { if(rest==0)return -1; int n=Math.min(rest,len); java.util.Arrays.fill(b,off,off+n,(byte)0); rest-=n; return n; }
+            };
+            assertEquals("TRESOR_UEBERGABE_ZU_GROSS",code(() -> u.senden(Fach.PRIVATE_BRAIN_APP,"gross","dok",null,"Gross.pdf","application/pdf",zuGross)));
+            assertEquals(0,t.verzeichnis(Fach.EINGANG_PRIVATE_BRAIN.slug).size());
+            Eintrag e=u.senden(Fach.PRIVATE_BRAIN_APP,"klein","dok",null,"Brief.txt","text/plain",new ByteArrayInputStream(new byte[]{3,9}));eintragId=e.id;
+            e.sha256="0".repeat(64);t.verzeichnisSchreiben(Fach.EINGANG_PRIVATE_BRAIN.slug,List.of(e));
+        }
+        try(TresorOrdner t=TresorOrdner.oeffnen(a,Fach.PRIVATE_BRAIN_APP,PW)) {
+            Uebergaben u=new Uebergaben(t);
+            assertEquals("TRESOR_UEBERGABE_PRUEFSUMME",code(() -> u.lesen(eintragId)));
+            assertEquals("TRESOR_UEBERGABE_PRUEFSUMME",code(() -> u.quittieren(eintragId,"0".repeat(64))));
+            assertFalse(t.marken(Fach.EINGANG_PRIVATE_BRAIN.slug).contains(eintragId));
+        }
+    }
+
     @Test public void falschesPasswortAendertNichtsUndRichtigesOeffnet() throws Exception {
         File d = neuerOrdner(); DateiAblage a = new DateiAblage(d);
         byte[] haupt;

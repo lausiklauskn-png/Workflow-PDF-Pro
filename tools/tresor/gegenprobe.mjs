@@ -16,6 +16,9 @@ if (!jars) { console.error('TRESOR_JARS fehlt'); process.exit(2); }
 const cp = [join(jars, 'junit-4.13.2.jar'), join(jars, 'hamcrest-core-1.3.jar')];
 
 const faelle = [
+  ['Verbund: anderer Inhalt mit derselben Kennung erlaubt', 'Uebergaben.java', 'throw new IOException("TRESOR_UEBERGABE_KONFLIKT");', 'return e;', 'ausgewählteUebergabenHinUndZurueck'],
+  ['Verbund: Weitergabe gilt bereits als Empfang', 'Uebergaben.java', 'return tresor.marken(fach.slug,ziel).contains(e.id);', 'return true;', 'ausgewählteUebergabenHinUndZurueck'],
+  ['Verbund: Original-Prüfsumme nicht kontrolliert', 'Uebergaben.java', 'if(bytes.length!=e.groesse || !sha(bytes).equals(e.sha256))', 'if(bytes.length!=e.groesse)', 'uebergabeGroessenGrenzeUndUnpassendePruefsumme'],
   ['PB-Eingang: falscher Empfänger', 'Fach.java', '"Eingang-Private-Brain", null, PRIVATE_BRAIN_APP', '"Eingang-Private-Brain", null, PRIVATE_BRAIN_V3_APP', 'privateBrainEingangUndGeleseneEmpfaengermarken'],
   ['PB-Eingang: Sendermarke gilt als Empfängerquittung', 'TresorOrdner.java', 'VERWALTUNG + "/marken/" + lesendeApp', 'VERWALTUNG + "/marken/" + app', 'privateBrainEingangUndGeleseneEmpfaengermarken'],
   ['PB-Eingang: fremde Markenkennung ungeprüft', 'TresorOrdner.java', 'Fach.appPruefen(lesendeApp);', '', 'privateBrainEingangUndGeleseneEmpfaengermarken'],

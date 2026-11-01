@@ -225,3 +225,24 @@ noch keinen App-Eingang. Empfänger/Größe/Prüfsumme sind beim Adapter zusätz
 Lokal: vollständige kanonische JVM-Probe 13 Fälle grün; Private-Brain-Eingang, unverändertes
 Altformat, mehrere App-Kennungen und Originale sowie getrennte Sender-/Empfängermarken enthalten.
 Drei gezielte Gegenproben (falscher Empfänger, Sender- statt Empfängermarke, ungeprüfte App-Kennung) wurden gefangen. Android-SAF und reale Datenträger sind dadurch nicht als am Gerät geprüft ausgewiesen.
+
+### Gemeinsamer Baustein `Uebergaben`
+
+Die Auswahlwege verwenden denselben kleinen Java-Baustein: Originale bleiben FPT1-Dateien im
+bekannten Übergabefach. Ein JSON-Kopf im bestehenden verschlüsselten Auszug nennt Vertrag,
+stabile Übergabe-/Quelldokumentkennung, Quell-/Ziel-App und optionalen Bezug zur vorherigen
+Fassung. Dateiname, Typ, Größe und SHA-256 bleiben im vorhandenen Eintrag. Keine neue
+Verschlüsselung und kein Wechsel der Formatversion.
+
+Wiederholung derselben Kennung/Fassung liefert denselben geprüften Eintrag. Anderer Inhalt mit
+identischer Kennung ist ein Konflikt. Eingangslisten lesen keine Sammlung aller Originalbytes.
+Lesen und Quittieren prüfen Ziel, Herkunft, Grenze von 20 MiB und tatsächliche Originalbytes.
+`quittieren` darf der Geräteadapter erst nach seiner bestätigten dauerhaften Eingangs-Transaktion
+aufrufen. `bestaetigt` liest die Marke der Ziel-App; Ablage im gemeinsamen Fach alleine ist noch
+kein erfolgreicher Ziel-Eingang. Die Originale im Übergabefach werden nicht gelöscht.
+
+JVM-Suite jetzt **15/15**: Familienakte ↔ alle drei Ziel-Apps (sechs Wege), Rückbezug,
+Wiederholung, Konflikt, falsche Prüfsumme, Überschreitung der Größe und Originalerhalt.
+Drei weitere Gegenproben gefangen (Konfliktprüfung, früher Erfolg, Original-Prüfsumme).
+Dies ist der gemeinsame Baustein, noch kein Nachweis seiner vollständigen Verdrahtung in
+Android, Windows oder den eigenständigen Oberflächen. V3 bleibt eine getrennte Variante.
