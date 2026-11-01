@@ -581,12 +581,16 @@ public final class TresorOrdner implements Closeable {
     }
 
     /** Eintrags-Kennungen, die diese App in einem Fach als übernommen markiert hat. */
-    public Set<String> marken(String slug) throws IOException {
+    public Set<String> marken(String slug) throws IOException { return marken(slug, app); }
+
+    /** Rückkanal: Marken einer bestimmten App nur lesen. Schreiben bleibt unter der eigenen App-Kennung. */
+    public Set<String> marken(String slug, String lesendeApp) throws IOException {
         offen();
+        Fach.appPruefen(lesendeApp);
         Fach f = Fach.nachSlug(slug);
         Set<String> aus = new HashSet<>();
         String vorsilbe = f.slug + "--";
-        for (String n : ablage.liste(markenOrdner()))
+        for (String n : ablage.liste(VERWALTUNG + "/marken/" + lesendeApp))
             if (n.startsWith(vorsilbe) && n.endsWith(".json")) aus.add(n.substring(vorsilbe.length(), n.length() - 5));
         return aus;
     }
