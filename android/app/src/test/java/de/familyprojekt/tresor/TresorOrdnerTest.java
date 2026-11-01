@@ -147,10 +147,10 @@ public final class TresorOrdnerTest {
             String hinId, rueckId;
             try(TresorOrdner t=TresorOrdner.oeffnen(a,Fach.FAMILIENAKTE_APP,PW)) {
                 Uebergaben u=new Uebergaben(t);
-                Eintrag hin=u.senden(ziel,"hin-"+ziel,"dok-71",null,"Brief.txt","text/plain",new ByteArrayInputStream(bytes)); hinId=hin.id;
-                assertEquals(hinId,u.senden(ziel,"hin-"+ziel,"dok-71",null,"Brief.txt","text/plain",new ByteArrayInputStream(bytes)).id);
+                Eintrag hin=u.senden(ziel,"hin-"+ziel,"beleg:71:original",null,"Brief.txt","text/plain",new ByteArrayInputStream(bytes)); hinId=hin.id;
+                assertEquals(hinId,u.senden(ziel,"hin-"+ziel,"beleg:71:original",null,"Brief.txt","text/plain",new ByteArrayInputStream(bytes)).id);
                 assertFalse(u.bestaetigt(ziel,hinId));
-                assertEquals("TRESOR_UEBERGABE_KONFLIKT",code(() -> u.senden(ziel,"hin-"+ziel,"dok-71",null,"Brief.txt","text/plain",new ByteArrayInputStream(new byte[]{7}))));
+                assertEquals("TRESOR_UEBERGABE_KONFLIKT",code(() -> u.senden(ziel,"hin-"+ziel,"beleg:71:original",null,"Brief.txt","text/plain",new ByteArrayInputStream(new byte[]{7}))));
                 assertEquals("TRESOR_UEBERGABE_ZIEL_UNBEKANNT",code(() -> u.senden(Fach.PRIVATE_BRAIN_V3_APP,"x","dok-71",null,"Brief.txt","text/plain",new ByteArrayInputStream(bytes))));
             }
             Map<String,String> original=baum(d,Uebergaben.eingang(ziel).ordner);

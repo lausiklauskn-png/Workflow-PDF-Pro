@@ -27,6 +27,10 @@ public final class Uebergaben {
     private static void kennung(String id) throws IOException {
         if (id == null || !id.matches("[A-Za-z0-9_.-]{1,160}") || id.equals(".") || id.equals("..")) throw new IOException("TRESOR_UEBERGABE_KENNUNG");
     }
+    private static void dokumentKennung(String id) throws IOException {
+        // BookLedgerPro benutzt z. B. beleg:datum:kennung. Dies ist Metadatum, kein Dateipfad.
+        if(id==null || !id.matches("[A-Za-z0-9_.:-]{1,200}")) throw new IOException("TRESOR_UEBERGABE_KENNUNG");
+    }
     private static String sha(byte[] bytes) throws IOException {
         try { return VaultCrypto.hex(MessageDigest.getInstance("SHA-256").digest(bytes)); }
         catch (java.security.NoSuchAlgorithmException e) { throw new IOException(e); }
@@ -40,7 +44,7 @@ public final class Uebergaben {
         }
     }
     private Map<String,Object> metadaten(String ziel, String id, String dokumentId, String bezug) throws IOException {
-        kennung(id); kennung(dokumentId); if(bezug!=null&&!bezug.isEmpty()) kennung(bezug);
+        kennung(id); dokumentKennung(dokumentId); if(bezug!=null&&!bezug.isEmpty()) kennung(bezug);
         Map<String,Object> m=new LinkedHashMap<>(); m.put("vertrag",VERTRAG); m.put("id",id); m.put("quelle",tresor.app()); m.put("ziel",ziel); m.put("dokumentId",dokumentId);
         if(bezug!=null&&!bezug.isEmpty()) m.put("bezug",bezug);
         return m;
@@ -49,7 +53,7 @@ public final class Uebergaben {
         Map<String,Object> m;
         try { m=Json.objekt(e.auszug); }
         catch(Exception kaputt) { throw new IOException("TRESOR_UEBERGABE_VERTRAG"); }
-        kennung(Json.text(m,"id")); kennung(Json.text(m,"dokumentId"));
+        kennung(Json.text(m,"id")); dokumentKennung(Json.text(m,"dokumentId"));
         if(!VERTRAG.equals(Json.text(m,"vertrag")) || !e.schreiber.equals(Json.text(m,"quelle")) || !fach.empfaenger.equals(Json.text(m,"ziel")) || !"fpt1".equals(e.verschluesselung)) throw new IOException("TRESOR_UEBERGABE_VERTRAG");
         Map<String,Object> aus=new LinkedHashMap<>(m);
         aus.put("name",e.name); aus.put("mime",e.art); aus.put("groesse",e.groesse); aus.put("sha256",e.sha256);
