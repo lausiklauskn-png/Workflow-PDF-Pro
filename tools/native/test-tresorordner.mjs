@@ -193,10 +193,12 @@ test('Sperren von Hand bleibt gesperrt: zustand() und Inhaltsverzeichnis öffnen
   const plugin=await readFile(join(root,'android/app/src/main/java/de/familyprojekt/workflowpdf/pro/ProVaultPlugin.java'),'utf8');
   assert.match(java,/if \(!vonHandGesperrt\) gemerktEntsperren\(\);/,'zustand() öffnet nach Sperren nicht wieder');
   assert.match(java,/offen == null && \(vonHandGesperrt \|\| !gemerktEntsperren\(\)\)\) throw new IOException\("TRESOR_GESPERRT"\)/,'Hintergrund-Verzeichnis öffnet nicht wieder');
-  assert.match(java,/void sperren\(boolean vergessen\) \{\s*schliessen\(\);\s*vonHandGesperrt = true;/,'sperren() merkt sich das');
+  assert.match(java,/void sperren\(boolean vergessen\) throws IOException \{\s*schliessen\(\);\s*vonHandGesperrt = true;/,'sperren() merkt sich das');
+  assert.match(java,/vergessen&&!prefs\(\)\.edit\(\)\.remove\("merken"\)\.remove\("kennung"\)\.commit\(\)\)throw new IOException\("TRESOR_NICHT_VERFUEGBAR"\)/,'fehlgeschlagenes Vergessen wird gemeldet');
   assert.match(java,/schliessen\(\);\s*vonHandGesperrt = false;\s*offen = t;/,'Passwort öffnet wieder');
   assert.match(plugin,/tresorWeiter\(PluginCall call,DocumentVault v\)throws Exception\{\s*tresor\.entsperrenGewuenscht\(\);/,'„Entsperren“ von Hand darf den gemerkten Schlüssel nehmen');
   // Pro-Umbau 5: das Eingangsfach liest über offenOderGemerkt() — dieselbe Regel wie das Inhaltsverzeichnis
-  assert.match(java,/private TresorOrdner offenOderGemerkt\(\) throws IOException \{\s*if \(offen == null && \(vonHandGesperrt \|\| !gemerktEntsperren\(\)\)\) throw new IOException\("TRESOR_GESPERRT"\);/,'Eingang öffnet nach Sperren nicht wieder');
-  assert.equal((java.match(/gemerktEntsperren\(\)/g)||[]).length,4,'keine weitere Stelle, die still entsperrt');
+  assert.match(java,/private TresorOrdner offenOderGemerkt\(\) throws IOException \{\s*try \{pruefeKennung\(\);\}catch\(IOException error\)\{schliessen\(\);throw error;\}\s*if \(offen == null && \(vonHandGesperrt \|\| !gemerktEntsperren\(\)\)\) throw new IOException\("TRESOR_GESPERRT"\);/,'Eingang prüft die Ordnerkennung und öffnet nach Sperren nicht wieder');
+  assert.match(java,/JSONObject verzeichnis\(JSONArray zeilen, DocumentVault vault\) throws Exception \{\s*offenOderGemerkt\(\);/,'Verzeichnis verwendet denselben geprüften Zugang');
+  assert.equal((java.match(/gemerktEntsperren\(\)/g)||[]).length,3,'alle Fachzugriffe bündeln ihre Sperrprüfung im gemeinsamen Zugang');
 });

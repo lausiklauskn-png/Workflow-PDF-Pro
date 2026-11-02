@@ -77,12 +77,21 @@ final class ProTresorordner {
         return TresorEinzug.pruefen(new SafAblage(context.getContentResolver(), baum), tresorId);
     }
 
+    void pruefenVerbindung(Uri baum) throws IOException {
+        SafAblage a=new SafAblage(context.getContentResolver(),baum);
+        if(!TresorOrdner.vorhanden(a))throw new IOException("TRESOR_NICHT_VORHANDEN");
+        TresorOrdner.kennung(a);
+        if(a.gibtEs(de.familyprojekt.tresor.Umzug.VERMERK))throw new IOException("TRESOR_UMGEZOGEN");
+    }
+
     void baumSetzen(Uri baum) throws IOException {
         schliessen();
         String name = baum.getLastPathSegment() == null ? "" : baum.getLastPathSegment();
         if (name.contains(":")) name = name.substring(name.indexOf(':') + 1);
         // Ein anderer Ordner: ein gemerkter Schlüssel gehört zum alten und wird vergessen.
-        if (!prefs().edit().putString("baum", baum.toString()).putString("name", name).remove("merken").remove("kennung").commit()) throw new IOException("TRESOR_NICHT_VERFUEGBAR");
+        SafAblage a=new SafAblage(context.getContentResolver(),baum);
+        String id=TresorOrdner.vorhanden(a)?TresorOrdner.kennung(a):null;
+        if (!prefs().edit().putString("baum", baum.toString()).putString("name", name).putString("ordnerKennung",id).remove("merken").remove("kennung").commit()) throw new IOException("TRESOR_NICHT_VERFUEGBAR");
         ablage = null;
     }
 
@@ -93,11 +102,13 @@ final class ProTresorordner {
 
     /** Gemerkten Hauptschlüssel benutzen, falls vorhanden und passend. */
     boolean gemerktEntsperren() {
+        if(vonHandGesperrt)return false;
         if (offen != null) return true;
         if (!prefs().contains("merken")) return false;
         byte[] haupt = null;
         try {
             SafAblage a = ablage();
+            pruefeKennung();
             String id = TresorOrdner.kennung(a);
             if (!id.equals(prefs().getString("kennung", ""))) return false;
             byte[] wert = Base64.decode(prefs().getString("merken", ""), Base64.NO_WRAP);
@@ -117,18 +128,24 @@ final class ProTresorordner {
 
     /** Mit Passwort anlegen oder öffnen, dann den App-Tresor einziehen. */
     void mitPasswort(CharSequence passwort, boolean anlegen, boolean merken, DocumentVault vault) throws Exception {
-        if (!"PASST".equals(pruefung(vault.identity()))) throw new IOException("TRESOR_ORDNER_PASST_NICHT");
+        mitPasswort(passwort,anlegen,merken,vault,false);
+    }
+    void mitPasswort(CharSequence passwort, boolean anlegen, boolean merken, DocumentVault vault,boolean nurVerbinden) throws Exception {
+        if(nurVerbinden){if(anlegen)throw new IOException("TRESOR_NICHT_VORHANDEN");pruefeKennung();}
+        else if (!"PASST".equals(pruefung(vault.identity()))) throw new IOException("TRESOR_ORDNER_PASST_NICHT");
         TresorOrdner t = anlegen ? TresorOrdner.anlegen(ablage(), TresorEinzug.APP, passwort) : TresorOrdner.oeffnen(ablage(), TresorEinzug.APP, passwort);
+        if(!prefs().edit().putString("ordnerKennung",t.id()).commit()){t.close();throw new IOException("TRESOR_NICHT_VERFUEGBAR");}
         schliessen();
         vonHandGesperrt = false;
         offen = t;
         if (merken) merken(t);
-        einziehen(vault);
+        else if(!prefs().edit().remove("merken").remove("kennung").commit())throw new IOException("TRESOR_NICHT_VERFUEGBAR");
+        if(!nurVerbinden)einziehen(vault);
     }
 
     /** Einzug bei offenem Tresorordner (wiederholt ist kein Fehler; fremder Schlüssel im Fach: TRESOR_FACH_BELEGT). */
     void einziehen(DocumentVault vault) throws Exception {
-        if (offen == null) throw new IOException("TRESOR_GESPERRT");
+        offenOderGemerkt();
         if (!"PASST".equals(pruefung(vault.identity()))) throw new IOException("TRESOR_ORDNER_PASST_NICHT");
         byte[] k = vault.tresorSchluessel();
         try { TresorEinzug.einziehen(offen, k); } finally { Arrays.fill(k, (byte) 0); }
@@ -137,26 +154,27 @@ final class ProTresorordner {
     JSONObject zustand(DocumentVault vault) throws Exception {
         SharedPreferences p = prefs();
         JSONObject z = new JSONObject().put("gewaehlt", p.contains("baum")).put("ordner", p.getString("name", "")).put("pfad", pfad()).put("speicher", speicher()).put("gemerkt", p.contains("merken"));
-        z.put("offen", offen != null).put("eingezogen", false);
+        z.put("offen", offen != null).put("eingezogen", false).put("uebergaben",true);
         if (!p.contains("baum")) return z;
         try {
             SafAblage a = ablage();
             boolean da = TresorOrdner.vorhanden(a);
             z.put("erreichbar", true).put("vorhanden", da);
             if (vault != null && vault.configured()) z.put("pruefung", TresorEinzug.pruefen(a, vault.identity()));
-            if (da) { z.put("kennung", TresorOrdner.kennung(a)); if (!vonHandGesperrt) gemerktEntsperren(); }
+            if (da) { pruefeKennung();z.put("kennung", TresorOrdner.kennung(a)); if (!vonHandGesperrt) gemerktEntsperren(); }
+            else schliessen();
             z.put("offen", offen != null);
             if (offen != null) {
                 z.put("eingezogen", TresorEinzug.eingezogen(offen));
                 z.put("eintraege", TresorEinzug.eingezogen(offen) ? offen.eigenesVerzeichnis(TresorEinzug.FACH).size() : 0);
             }
-        } catch (IOException e) { z.put("erreichbar", false).put("problem", e.getMessage()); }
+        } catch (IOException e) { schliessen();z.put("offen",false).put("erreichbar", false).put("problem", e.getMessage()); }
         return z;
     }
 
     /** Inhaltsverzeichnis des eigenen Fachs aus den Zeilen der Bibliothek (nur bei Änderung neu). */
     JSONObject verzeichnis(JSONArray zeilen, DocumentVault vault) throws Exception {
-        if (offen == null && (vonHandGesperrt || !gemerktEntsperren())) throw new IOException("TRESOR_GESPERRT");
+        offenOderGemerkt();
         if (!TresorEinzug.eingezogen(offen)) throw new IOException("TRESOR_FACH_FEHLT");
         if (vault != null && !"PASST".equals(pruefung(vault.identity()))) throw new IOException("TRESOR_ORDNER_PASST_NICHT");
         List<Map<String, Object>> roh = new ArrayList<>();
@@ -176,10 +194,10 @@ final class ProTresorordner {
         return m;
     }
 
-    void sperren(boolean vergessen) {
+    void sperren(boolean vergessen) throws IOException {
         schliessen();
         vonHandGesperrt = true;
-        if (vergessen) prefs().edit().remove("merken").remove("kennung").commit();
+        if (vergessen&&!prefs().edit().remove("merken").remove("kennung").commit())throw new IOException("TRESOR_NICHT_VERFUEGBAR");
     }
 
     void schliessen() {
@@ -194,8 +212,18 @@ final class ProTresorordner {
     private static final int TEIL = 192 * 1024;
     private final Map<String, java.io.InputStream> lesen = new LinkedHashMap<>();
     private TresorOrdner offenOderGemerkt() throws IOException {
+        try {pruefeKennung();}catch(IOException error){schliessen();throw error;}
         if (offen == null && (vonHandGesperrt || !gemerktEntsperren())) throw new IOException("TRESOR_GESPERRT");
         return offen;
+    }
+    private void pruefeKennung()throws IOException {
+        String actual=TresorOrdner.kennung(ablage());
+        String expected=prefs().getString("ordnerKennung",prefs().getString("kennung",null));
+        if(expected!=null&&!expected.equals(actual)||offen!=null&&!offen.id().equals(actual))throw new IOException("TRESOR_FREMDE_KENNUNG");
+        if(ablage().gibtEs(de.familyprojekt.tresor.Umzug.VERMERK))throw new IOException("TRESOR_UMGEZOGEN");
+    }
+    JSONObject uebergabe(JSONObject args)throws Exception {
+        return new JSONObject(de.familyprojekt.tresor.Json.schreiben(ProVerbund.call(offenOderGemerkt(),de.familyprojekt.tresor.Json.objekt(args.toString()))));
     }
     /** Inhaltsverzeichnis eines Fachs lesen (Pro-Umbau 12, „Überall suchen“): nur die Zeilen (Name, Art, Datum, Kurzfassung), nie Dateien. */
     JSONObject fachLesen(String slug) throws Exception {

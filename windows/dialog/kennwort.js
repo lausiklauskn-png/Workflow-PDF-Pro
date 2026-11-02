@@ -29,6 +29,7 @@
   ];
   const RECOVERY = { VAULT_RECOVERY_TYPO: 18, VAULT_RECOVERY_INCOMPLETE: 19, VAULT_RECOVERY_MIXED: 19, VAULT_RECOVERY_DUPLICATE: 19, VAULT_RECOVERY_UNKNOWN: 20, VAULT_RECOVERY_INVALID: 20, VAULT_PASSWORD_SHORT: 21 };
   const query = new URLSearchParams(location.search);
+  const common = query.get('kontext') === 'pro-verbund';
   const mode = Number(query.get('modus')) || 0;
   const lang = Math.max(0, ['de', 'en', 'ru', 'ar'].indexOf(query.get('sprache')));
   const t = n => WORDS[n][lang];
@@ -38,6 +39,7 @@
   if (lang === 3) document.documentElement.dir = 'rtl';
   $('titel').textContent = t(mode === 0 ? 0 : 1);
   document.title = t(mode === 0 ? 0 : 1);
+  if (common) $('titel').textContent = document.title = ['Gemeinsamen Pro-Tresor öffnen', 'Open shared Pro vault', 'Открыть общий сейф Pro', 'فتح خزنة Pro المشتركة'][lang];
   $('erstes').placeholder = t(2); $('zweites').placeholder = t(3);
   $('hinweisText').textContent = t(4); $('merkenText').textContent = t(5);
   $('abbrechen').textContent = t(6); $('weiter').textContent = t(7);
@@ -45,7 +47,7 @@
   for (const n of [1, 2, 3]) $('teil' + n).placeholder = t(14) + ' ' + n + ' (WFP1-…)';
   $('neu1').placeholder = t(15); $('neu2').placeholder = t(16);
   if (mode === 0) { $('zweites').hidden = false; $('hinweisZeile').hidden = false; }
-  else $('vergessenZeile').hidden = false;
+  else if (!common) $('vergessenZeile').hidden = false;
   const invoke = (action, fields) => window.__TAURI_INTERNALS__.invoke('wfp_dialog', { action, fields });
   let busy = false;
   const clear = () => { for (const id of ['erstes', 'zweites', 'teil1', 'teil2', 'teil3', 'neu1', 'neu2']) $(id).value = ''; };

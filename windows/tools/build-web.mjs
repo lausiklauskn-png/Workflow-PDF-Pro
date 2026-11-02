@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { prepareWeb, root } from '../../tools/native/prepare-web.mjs';
+await import('./build-pro-tresor.mjs');
 
 const here = fileURLToPath(new URL('..', import.meta.url));
 const dist = join(here, 'dist');

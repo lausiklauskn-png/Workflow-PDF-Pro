@@ -291,6 +291,9 @@ public final class ProVaultPlugin extends Plugin {
         });
     }
     @PluginMethod public void tresorZustand(PluginCall call){work(call,()->tresor.zustand(vaultOrNull(call)));}
+    @PluginMethod public void tresorUebergabe(PluginCall call){work(call,()->tresor.uebergabe(call.getData()));}
+    /** Freiwillige Verbindung ohne Einzug oder Änderung der eigenen Arbeitsablage. */
+    @PluginMethod public void tresorVerbinden(PluginCall call){call.getData().put("nurVerbinden",true);tresorEinziehen(call);}
     @PluginMethod public void tresorSperren(PluginCall call){work(call,()->{tresor.sperren(call.getBoolean("vergessen",false));return tresor.zustand(vaultOrNull(call));});}
     @PluginMethod public void tresorVerzeichnis(PluginCall call){work(call,()->{JSONArray zeilen=call.getData().optJSONArray("zeilen");if(zeilen==null)throw new java.io.IOException("TRESOR_EINTRAG_UNGUELTIG");return tresor.verzeichnis(zeilen,vault(call));});}
     // Übergabefach „Eingang-WorkflowPDF“ (Pro-Umbau 5): ansehen, Stück für Stück lesen, als übernommen markieren
@@ -305,9 +308,11 @@ public final class ProVaultPlugin extends Plugin {
         if(!choosing.compareAndSet(false,true)){call.reject("VAULT_BUSY","VAULT_BUSY");return;}
         worker.submit(call,()->{
             try{
-                DocumentVault v=vault(call);byte[] probe=v.tresorSchluessel();Arrays.fill(probe,(byte)0); // nur entsperrt
+                boolean nur=call.getBoolean("nurVerbinden",false);
+                DocumentVault v=nur?vaultOrNull(call):vault(call);
+                if(!nur){byte[] probe=v.tresorSchluessel();Arrays.fill(probe,(byte)0);} // Einzug nur entsperrt
                 boolean neu=call.getBoolean("neuWaehlen",false)||!tresor.gewaehlt();
-                if(!neu){try{neu=!"PASST".equals(tresor.pruefung(v.identity()));}catch(java.io.IOException unerreichbar){neu=true;}}
+                if(!neu&&!nur){try{neu=!"PASST".equals(tresor.pruefung(v.identity()));}catch(java.io.IOException unerreichbar){neu=true;}}
                 if(neu){getActivity().runOnUiThread(()->tresorOrdnerWaehlen(call));return;}
                 tresorWeiter(call,v);
             }catch(Exception error){choosing.set(false);String code=code(error);call.reject(code,code);}
@@ -327,7 +332,9 @@ public final class ProVaultPlugin extends Plugin {
             try{
                 if(!"content".equals(tree.getScheme())||(data.getFlags()&flags)!=flags)throw new SecurityException();
                 getContext().getContentResolver().takePersistableUriPermission(tree,flags);
-                DocumentVault v=vault(call);String pruefung=tresor.pruefen(tree,v.identity());
+                boolean nur=call.getBoolean("nurVerbinden",false);
+                DocumentVault v=nur?vaultOrNull(call):vault(call);String pruefung=nur?"PASST":tresor.pruefen(tree,v.identity());
+                if(nur)tresor.pruefenVerbindung(tree);
                 // Nichts übernehmen, wenn der Ordner nicht genau diesen Tresor enthält. Die Freigabe bleibt (sie kann die des Tresors selbst sein).
                 if(!"PASST".equals(pruefung))throw new java.io.IOException("TRESOR_ORDNER_"+pruefung);
                 tresor.baumSetzen(tree);
@@ -338,8 +345,12 @@ public final class ProVaultPlugin extends Plugin {
     /** Auf dem Arbeits-Thread: offen oder gemerkt → gleich einziehen, sonst Passwort-Dialog. */
     private void tresorWeiter(PluginCall call,DocumentVault v)throws Exception{
         tresor.entsperrenGewuenscht();
-        if(tresor.istOffen()||tresor.gemerktEntsperren()){tresor.einziehen(v);choosing.set(false);call.resolve(JSObject.fromJSONObject(tresor.zustand(v).put("eingezogenJetzt",true)));return;}
+        boolean nur=call.getBoolean("nurVerbinden",false);
+        // Zustand prüft auch einen zwischenzeitlich ersetzten oder entfernten Ordner.
+        tresor.zustand(v);
+        if(tresor.istOffen()||tresor.gemerktEntsperren()){if(!nur)tresor.einziehen(v);choosing.set(false);call.resolve(JSObject.fromJSONObject(tresor.zustand(v).put("eingezogenJetzt",!nur)));return;}
         boolean anlegen=!tresor.vorhanden();
+        if(nur&&anlegen)throw new java.io.IOException("TRESOR_NICHT_VORHANDEN");
         getActivity().runOnUiThread(()->tresorPasswort(call,v,anlegen));
     }
     private void tresorPasswort(PluginCall call,DocumentVault v,boolean anlegen){
@@ -365,8 +376,9 @@ public final class ProVaultPlugin extends Plugin {
             boolean keep=remember.isChecked();dialog.setCancelable(false);dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
             worker.submit(call,()->{
                 try{
-                    tresor.mitPasswort(p,anlegen,keep,v);
-                    JSObject state=JSObject.fromJSONObject(tresor.zustand(v).put("eingezogenJetzt",true).put("angelegt",anlegen));
+                    boolean nur=call.getBoolean("nurVerbinden",false);
+                    tresor.mitPasswort(p,anlegen,keep,v,nur);
+                    JSObject state=JSObject.fromJSONObject(tresor.zustand(v).put("eingezogenJetzt",!nur).put("angelegt",anlegen));
                     getActivity().runOnUiThread(()->{clear.run();dialog.dismiss();choosing.set(false);call.resolve(state);});
                 }catch(Exception error){
                     String code=code(error);

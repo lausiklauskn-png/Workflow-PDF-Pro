@@ -28,6 +28,15 @@ jobs:
           node windows/tools/test-update-feed.mjs
           node windows/tools/test-update-ui.mjs
           node windows/tools/test-github-updates.mjs
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Kanonischer Pro-Tresor, Neustart und gezielte Gegenproben
+        run: |
+          node windows/tools/build-pro-tresor.mjs --nur-jar
+          node windows/tools/test-pro-tresor.mjs
+          node windows/tools/gegenprobe-pro-tresor.mjs
       - name: Tresor, Empfang, Übergaben und Chrome-Sitzung (Rust)
         working-directory: windows/core
         run: cargo test --release
@@ -51,6 +60,10 @@ jobs:
         run: |
           npm ci
           npm run verify:upstream
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00
+        with:
+          distribution: temurin
+          java-version: '21'
       - name: Werkzeuge
         working-directory: windows
         run: npm ci
@@ -62,6 +75,8 @@ jobs:
       - name: Lokalen Webinhalt vor Rust-Tests erzeugen
         working-directory: windows
         run: node tools/build-web.mjs
+      - name: Pro-Tresor auf dem Windows-Dateisystem
+        run: node windows/tools/test-pro-tresor.mjs
       - name: Signier- und Veröffentlichungsskripte auf Syntax prüfen
         run: |
           Get-ChildItem windows/tools -Filter *.ps1 | ForEach-Object {
@@ -116,12 +131,19 @@ jobs:
           WFP_PRUEF_SPEICHERN: ${{ runner.temp }}\wfp-speichern
           WFP_PRUEF_IMPORT: ${{ runner.temp }}\wfp-import
           WFP_PRUEF_TRESOR: ${{ runner.temp }}\wfp-usb-stick
+          WFP_PRUEF_PRO_TRESOR: ${{ runner.temp }}\wfp-pro-verbund
         run: |
           $ErrorActionPreference = 'Stop'
           $appDir = Join-Path $env:LOCALAPPDATA 'Workflow PDF Pro'
           $exe = Join-Path $appDir 'workflow-pdf-pro.exe'
           $env:WFP_APP_EXE = $exe
           New-Item -ItemType Directory -Force $env:WFP_PRUEF_TRESOR | Out-Null
+          New-Item -ItemType Directory -Force $env:WFP_PRUEF_ARBEIT | Out-Null
+          $proClasses = (Resolve-Path 'work/pro-tresor-probe').Path
+          $proJar = (Resolve-Path 'windows/src-tauri/pro-tresor/workflow-pro-tresor.jar').Path
+          $proSeed = & "$env:JAVA_HOME/bin/java.exe" -cp "$proClasses;$proJar" de.familyprojekt.workflowpdf.pro.ProVerbundProbe seed $env:WFP_PRUEF_PRO_TRESOR
+          if ($LASTEXITCODE -ne 0) { throw 'Pro-Tresor-Probe konnte nicht angelegt werden.' }
+          $proSeed | Set-Content -Encoding utf8NoBOM (Join-Path $env:WFP_PRUEF_ARBEIT 'pro-tresor-probe.json')
           $rot = @()
           function Wait-Run($file, $arguments) {
             $p = Start-Process -FilePath $file -ArgumentList $arguments -PassThru
@@ -137,10 +159,23 @@ jobs:
             Stop-App
           }
           Wait-Run 'pruef-out/pruefbau-setup.exe' '/S'
+          $installedJava = Join-Path $appDir 'pro-tresor/runtime/bin/java.exe'
+          $installedJar = Join-Path $appDir 'pro-tresor/workflow-pro-tresor.jar'
+          Get-ChildItem (Join-Path $appDir 'pro-tresor') -Recurse -File | ForEach-Object {
+            "$($_.FullName.Substring($appDir.Length)) $($_.Length)"
+          } | Set-Content 'pruef-out/pro-runtime-files.txt'
+          & $installedJava -version 2>&1 | Tee-Object 'pruef-out/pro-runtime-version.txt'
+          '{"method":"tresorZustand","options":{}}' | & $installedJava -Xmx256m -cp $installedJar de.familyprojekt.workflowpdf.pro.ProTresorEngine (Join-Path $env:WFP_PRUEF_ARBEIT 'unused-engine-state.json') 2>&1 | Tee-Object 'pruef-out/pro-runtime-start.txt'
+          if ($LASTEXITCODE -ne 0) { throw 'Gebündelte installierte Java-Laufzeit startet nicht.' }
           $reg = Get-ItemProperty 'HKCU:\Software\Classes\.pdf\OpenWithProgids' -ErrorAction SilentlyContinue
           "Öffnen mit eingetragen: $($null -ne $reg.'WorkflowPDFPro.Dokument')" | Tee-Object -Append pruef-out/ablauf.txt
           $default = (Get-ItemProperty 'HKCU:\Software\Classes\.pdf' -ErrorAction SilentlyContinue).'(default)'
           "Standard-App für .pdf unverändert: $($default -ne 'WorkflowPDFPro.Dokument')" | Tee-Object -Append pruef-out/ablauf.txt
+          Phase proErst
+          Phase proNeustart
+          Rename-Item $env:WFP_PRUEF_PRO_TRESOR "$($env:WFP_PRUEF_PRO_TRESOR)-abgezogen"
+          Phase proAbgezogen
+          Rename-Item "$($env:WFP_PRUEF_PRO_TRESOR)-abgezogen" $env:WFP_PRUEF_PRO_TRESOR
           Phase erst
           Phase neustart
           Rename-Item $env:WFP_PRUEF_TRESOR "$($env:WFP_PRUEF_TRESOR)-abgezogen"
@@ -153,6 +188,7 @@ jobs:
           "Öffnen mit nach Deinstallation entfernt: $($null -eq $reg.'WorkflowPDFPro.Dokument')" | Tee-Object -Append pruef-out/ablauf.txt
           Wait-Run 'pruef-out/pruefbau-setup.exe' '/S'
           Phase neuinstallation
+          Phase proNeuinstallation
           Wait-Run (Join-Path $appDir 'uninstall.exe') '/S'
           # Der ausgelieferte Bau startet, öffnet aber keinen Prüfzugang.
           $setup = (Get-ChildItem auslieferung -Filter *-setup.exe).FullName
@@ -176,6 +212,12 @@ jobs:
             Write-Output "::notice title=Abnahme $($_.BaseName)::$t"
           }
           if (Test-Path pruef-out/ablauf.txt) { Write-Output "::notice title=Ablauf::$((Get-Content pruef-out/ablauf.txt) -join ' | ')" }
+          $engineLog = Join-Path '${{ runner.temp }}\wfp-arbeit' 'pro-tresor-engine.stderr.log'
+          if (Test-Path $engineLog) {
+            Copy-Item $engineLog 'pruef-out/pro-tresor-engine.stderr.log'
+            $tail = ((Get-Content $engineLog -Tail 25) -join ' | ')
+            Write-Output "::notice title=Start der Pro-Tresor-Engine::$tail"
+          }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -184,6 +226,8 @@ jobs:
             pruef-out/*.json
             pruef-out/*.png
             pruef-out/ablauf.txt
+            pruef-out/pro-runtime-*.txt
+            pruef-out/pro-tresor-engine.stderr.log
           retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

@@ -9,8 +9,8 @@
 import { chromium } from 'playwright-core';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { writeFile, readFile, readdir, mkdir } from 'node:fs/promises';
-import { spawn } from 'node:child_process';
-import { join } from 'node:path';
+import { spawn, execFileSync } from 'node:child_process';
+import { join, delimiter } from 'node:path';
 import { createHash } from 'node:crypto';
 
 const [phase = 'erst', out = 'abnahme.json'] = process.argv.slice(2);
@@ -115,6 +115,75 @@ await step('umgebung', () => page.evaluate(async () => ({
   serviceWorker: await Promise.race([navigator.serviceWorker.ready.then(() => 'aktiv'), new Promise(r => setTimeout(() => r('nicht bereit'), 15000))]),
   userAgent: navigator.userAgent
 })).then(v => { expect(v.plattform === 'windows' && v.host === 'windows' && !v.adapter.length, 'Brücke/Adapter fehlen'); return v; }));
+
+// Diese Phasen prüfen die native Brücke mit erfundenen Daten und einem kanonischen
+// Familienakte-Akteur. Der normale App-Import und zwei installierte Apps sind eigene Proben.
+const commonFile=()=>join(env('WFP_PRUEF_ARBEIT'),'pro-tresor-probe.json');
+if(phase==='proErst') {
+  await step('freiwilligeNativeVerbindungOhneEigeneAblage',async()=>{
+    const ownBefore=await vaultState();expect(!ownBefore.configured,'Probe verlangt noch keine eigene Workflow-Ablage');
+    const fixture=JSON.parse(await readFile(commonFile(),'utf8'));
+    await page.evaluate(()=>{window.__proConnect={};Capacitor.Plugins.WorkflowVault.tresorVerbinden({language:'de',neuWaehlen:true}).then(value=>{window.__proConnect={value};},error=>{window.__proConnect={error:String(error)};});});
+    await password('falsches Pro-Kennwort 2026',true);
+    await password('Erfundene Pro-Probe ä 2026');
+    await page.waitForFunction(()=>window.__proConnect?.value||window.__proConnect?.error);
+    const connected=await page.evaluate(()=>window.__proConnect);expect(!connected.error,connected.error);
+    expect(connected.value.offen&&connected.value.gemerkt&&!connected.value.eingezogen&&connected.value.kennung===fixture.vaultId,'Eigenständige Verbindung fehlt');
+    const result=await page.evaluate(async fixture=>{
+      const api=Capacitor.Plugins.WorkflowVault,base={vaultId:fixture.vaultId,entryId:fixture.entryId};
+      const inbox=await api.tresorUebergabe({...base,aktion:'eingang'});
+      const file=await api.tresorUebergabe({...base,aktion:'lesen'});
+      const afterRead=await api.tresorUebergabe({...base,aktion:'eingang'});
+      const wrong=await api.tresorUebergabe({...base,vaultId:'falscher-tresor',aktion:'lesen'}).then(()=>false,e=>String(e.code||e.message).includes('TRESOR_UEBERGABE_FREMD'));
+      const wrongHash=await api.tresorUebergabe({...base,aktion:'quittieren',sha256:'0'.repeat(64)}).then(()=>false,e=>String(e.code||e.message).includes('TRESOR_UEBERGABE_PRUEFSUMME'));
+      await api.tresorSperren({});const locked=await api.tresorZustand({});
+      const denied=await api.tresorUebergabe({...base,aktion:'lesen'}).then(()=>false,e=>String(e.code||e.message).includes('TRESOR_GESPERRT'));
+      const again=await api.tresorVerbinden({language:'de'});
+      const contract={vertrag:'familienakte-uebergabe/1',id:'windows-workflow-17',quelle:'workflow-pdf-pro',ziel:'familienakte',dokumentId:'native-probe-17',bezug:'windows-family-17',name:'Probe.txt',mime:'text/plain',groesse:fixture.size,sha256:fixture.sha256};
+      const send={vaultId:fixture.vaultId,aktion:'senden',vertrag:contract,dataBase64:file.dataBase64};
+      const first=await api.tresorUebergabe(send),repeat=await api.tresorUebergabe(send);
+      const waiting=await api.tresorUebergabe({...base,aktion:'stand',ziel:'familienakte',entryId:first.id});
+      // Explizite native Methodenprobe, keine Behauptung eines gewöhnlichen Workflow-Imports.
+      await api.tresorUebergabe({...base,aktion:'quittieren',sha256:fixture.sha256});
+      return {count:inbox.items.length,unmarked:afterRead.items.length,wrong,wrongHash,locked:!locked.offen,denied,again:again.offen,back:first.id,repeat:repeat.id,waiting:waiting.bestaetigt,data:file.dataBase64};
+    },fixture);
+    expect(result.count===1&&result.unmarked===1&&result.wrong&&result.wrongHash&&result.locked&&result.denied&&result.again,'Native Schutzregeln: '+JSON.stringify({...result,data:undefined}));
+    expect(sha(Buffer.from(result.data,'base64'))===fixture.sha256&&result.back===result.repeat&&!result.waiting,'Original/Idempotenz/Rückmeldung');
+    expect(!(await vaultState()).configured,'Verbindung hat eine eigene Ablage eingerichtet');
+    await writeFile(commonFile(),JSON.stringify({...fixture,back:result.back}));
+    return {ohneEigeneAblage:true,dialogUndDPAPI:true,manuellesSperren:true,originalGeprueft:true,rueckwegOffen:true};
+  });
+}
+if(phase==='proNeustart'||phase==='proNeuinstallation') {
+  await step('gemerkterProTresorNachNeustart',async()=>{
+    const fixture=JSON.parse(await readFile(commonFile(),'utf8'));
+    const state=await page.evaluate(()=>Capacitor.Plugins.WorkflowVault.tresorZustand({}));
+    expect(state.offen&&state.gemerkt&&state.kennung===fixture.vaultId,'DPAPI/Ordnerbindung nach Neustart fehlen');
+    const status=await page.evaluate(async fixture=>{
+      const api=Capacitor.Plugins.WorkflowVault;
+      return {inbox:await api.tresorUebergabe({aktion:'eingang',vaultId:fixture.vaultId}),back:await api.tresorUebergabe({aktion:'stand',vaultId:fixture.vaultId,ziel:'familienakte',entryId:fixture.back})};
+    },fixture);
+    expect(status.inbox.items.length===0,'Quittierter nativer Eingang wieder offen');
+    if(phase==='proNeustart') {
+      expect(!status.back.bestaetigt,'Senden wurde als Empfang ausgegeben');
+      const java=join(process.env.JAVA_HOME,'bin','java.exe');
+      const cp=[join(process.cwd(),'work/pro-tresor-probe'),join(process.cwd(),'windows/src-tauri/pro-tresor/workflow-pro-tresor.jar')].join(delimiter);
+      const received=JSON.parse(execFileSync(java,['-cp',cp,'de.familyprojekt.workflowpdf.pro.ProVerbundProbe','confirm',env('WFP_PRUEF_PRO_TRESOR')],{encoding:'utf8'}));
+      expect(received.confirmed,'Kanonischer Empfänger bestätigt nicht');
+    }
+    const confirmed=await page.evaluate(f=>Capacitor.Plugins.WorkflowVault.tresorUebergabe({aktion:'stand',vaultId:f.vaultId,ziel:'familienakte',entryId:f.back}),fixture);
+    expect(confirmed.bestaetigt,'Empfängermarke nicht sichtbar');
+    return {gemerkt:true,quittungDauerhaft:true,echteEmpfaengermarke:true,probenart:'native Brücke; Familienakte als kanonischer Java-Akteur'};
+  });
+}
+if(phase==='proAbgezogen') {
+  await step('entfernterProTresorBleibtUnerreichbar',async()=>{
+    const fixture=JSON.parse(await readFile(commonFile(),'utf8'));
+    const result=await page.evaluate(async f=>({state:await Capacitor.Plugins.WorkflowVault.tresorZustand({}),denied:await Capacitor.Plugins.WorkflowVault.tresorUebergabe({aktion:'eingang',vaultId:f.vaultId}).then(()=>false,()=>true)}),fixture);
+    expect(result.state.erreichbar===false&&!result.state.offen&&result.denied,'Entfernter Ordner wird weiter benutzt');
+    return result;
+  });
+}
 
 if (phase === 'erst') {
   await step('sicherheitUndUpdates', async () => {

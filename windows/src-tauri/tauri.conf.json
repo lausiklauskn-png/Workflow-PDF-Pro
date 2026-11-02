@@ -39,6 +39,7 @@
     }
   },
   "bundle": {
+    "resources": ["pro-tresor/workflow-pro-tresor.jar", "pro-tresor/runtime/**/*"],
     "active": true,
     "targets": [
       "nsis"
