@@ -7,8 +7,8 @@ Aktualisiert am 02.11.2026. Die Gleichstandsregel wurde von Klaus in der Sitzung
 
 | Produkt | Plattform | Stand | Öffentlich? |
 |---|---|---|---|
-| Workflow PDF (Web) | Browser/PWA | **1.1.7 auf main** (PR #140): gewöhnlicher Import mit optionaler nativer Reservierung; Seitenauslieferung getrennt prüfen | Quellstand öffentlich |
-| Workflow PDF Pro | Android (APK) | **1.0.9 veröffentlicht am 29.10.2026**: [v1.0.9](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.9); neuer Bau mit Kern 1.1.7 noch in Prüfung | ja (1.0.9) |
+| Workflow PDF (Web) | Browser/PWA | **1.1.8 auf main** (PR #141): gewöhnlicher Import mit optionaler nativer Reservierung und Herkunft der tatsächlich ausgegebenen Dateien; Seitenauslieferung getrennt prüfen | Quellstand öffentlich |
+| Workflow PDF Pro | Android (APK) | **1.0.9 veröffentlicht am 29.10.2026**: [v1.0.9](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.9); neuer Bau mit Kern 1.1.8 noch in Prüfung | ja (1.0.9) |
 | Workflow PDF Pro | Windows (Setup.exe, unsigniert) | **1.0.5 veröffentlicht 26.10.2026**: [windows-v1.0.5](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.5), 15.866.577 B, SHA-256 `7e4e9195…`, Lauf 40384462589 (Installer aus Windows-Bau 40383101175) | ja (1.0.5) |
 | Workflow PDF Pro | iOS (iPhone/iPad) | in Vorbereitung durch Codex, Zweig `codex/ios-native-host` | **nein, nur privat** |
 | Private Brain Pro | Android (APK) | **1.0.42 veröffentlicht am 28.10.2026**: [v1.0.42](https://github.com/lausiklauskn-png/Privat-Brain-Pro/releases/tag/v1.0.42); PR #124 mit Pro-Verbund auf main, noch kein neues Release | ja (1.0.42) |
@@ -21,9 +21,15 @@ Der Betriebssystem-Eingang verwendet in Android und Windows denselben dauerhafte
 Import mit Quittungen, Wiederanlauf, Sicherung und Ablagewechsel; siehe
 [PRO-EINGANG.md](PRO-EINGANG.md). Die Plattformprüfungen und der anschließende
 Hin-/Rückweg über den optionalen gemeinsamen Pro-Tresor werden noch abgeschlossen.
-Die unten benannte Windows-Lücke beim gemeinsamen Tresor besteht in diesem Abschnitt
-weiter. iOS ist weiterhin nur vorbereitet; die PWA hat den kanonischen Importhaken,
-aber keine native Tresorverbindung. Neue APK-/Windows-Downloads sind noch nicht veröffentlicht.
+Die native freiwillige Verbindung ist mit PR #53 auf Android und Windows geprüft:
+[Android](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/41435279416),
+[installiertes Windows](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/41435279156).
+Die [gemeinsame Bedienung](PRO-VERBUND-BEDIENUNG.md), dauerhafte Ausgänge und ihre
+gestreamte Sicherung kommen im anschließenden Baustein hinzu. Dessen volle Plattform-
+prüfung steht noch aus. Der bisherige Einzug der eigenen Ablage (D1) bleibt Android-
+spezifisch; die unabhängige Verbindung setzt einen Einzug nicht voraus. iOS bleibt
+vorbereitet; die PWA hat Importhaken und Ausgabeherkunft, aber keine native
+Tresorverbindung. Neue APK-/Windows-Downloads sind noch nicht veröffentlicht.
 
 ## Gleichstandsregel (Klaus, 22.10.2026, gilt immer)
 
@@ -37,7 +43,10 @@ bleibt zurück. Ziel: keine Lücken und keine Frage, welche Fassung was schon ha
   steht, welche Fassung noch fehlt und warum (zum Beispiel iOS: nur vorbereitet, nicht veröffentlicht).
 - Nach jeder Veröffentlichung die Übersicht oben aktualisieren.
 
-## Gemeinsamer Tresorordner (Schritt B, 27.10.2026)
+## Historischer Ausgangsstand des Tresorordners (27.10.2026)
+
+Der heutige optionale Zugang auf Android und Windows steht oben. Die folgenden
+Absätze beschreiben die früheren Schritte B und D1; der Windows-Einzug D1 bleibt offen.
 
 Paket `de.familyprojekt.tresor` wird **hier** gepflegt (Klaus' Wahl), byte-gleich in BookLedgerPro und Private Brain Pro.
 Stand: Java-Paket mit JVM-Proben, noch **nicht** in der Workflow-PDF-Pro-App verdrahtet (Schritt D) und **ohne** Rust-Zwilling

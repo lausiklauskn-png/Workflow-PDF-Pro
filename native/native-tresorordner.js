@@ -57,21 +57,37 @@
   async function eingangLesen(){
     const r=await api.tresorEingang({});
     const marken=new Set(r?.marken||[]);
-    return (r?.eintraege||[]).filter(e=>e&&typeof e.id==='string'&&!marken.has(e.id)).sort((a,b)=>(b.datum||0)-(a.datum||0));
+    return (r?.eintraege||[]).filter(e=>{
+      if(!e||typeof e.id!=='string'||marken.has(e.id))return false;
+      // Canonical contracts use the selected, durable Pro inbox controller.
+      try{if(JSON.parse(e.auszug||'{}').vertrag==='familienakte-uebergabe/1')return false;}catch{}
+      return true;
+    }).sort((a,b)=>(b.datum||0)-(a.datum||0));
   }
   const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-  /* Erst ALLE neuen Dateien lesen und einlesen, dann markieren (wie BookLedgerPro): bricht etwas ab, bleibt nichts halb markiert. */
+  /* Jede Datei dauerhaft speichern und nachlesen, erst danach einzeln markieren.
+     Ein Abbruch lässt bereits bestätigte Dateien stehen; Wiederholen verdoppelt sie nicht. */
   async function uebernehmen(neue,stand){
-    const dateien=[];
-    for(let i=0;i<neue.length;i++){
-      stand?.(t('liest',{i:i+1,n:neue.length}));
-      const o=await api.tresorEingangOeffnen({id:neue[i].id});const teile=[];
-      for(;;){const r=await api.tresorEingangTeil({ticket:o.ticket});if(r.data)teile.push(b64(r.data));if(r.fertig)break;}
-      dateien.push(new File(teile,String(o.name||neue[i].name||'Datei'),{type:String(o.art||neue[i].art||'application/octet-stream')}));
-    }
-    await window.__wfpdf.importDateien(dateien);
-    for(const e of neue)await api.tresorEingangMarkieren({id:e.id});
-    return dateien.length;
+    const store=window.WFPProTransferStore,C=window.WFPProContract,z=await api.tresorZustand({location:location()});
+    if(!z.offen||!C.entry(z.kennung))throw Error('TRESOR_GESPERRT');
+    return store.run(async ctx=>{
+      for(let i=0;i<neue.length;i++){
+        const e=neue[i];
+        if(!C.entry(e.id)||!C.APPS.includes(e.schreiber)||!Number.isSafeInteger(e.groesse)||e.groesse<=0||e.groesse>C.MAX||!/^[a-f0-9]{64}$/.test(e.sha256||''))throw Error('PRO_CONTRACT_INVALID');
+        const now=await api.tresorZustand({location:location()});if(!now.offen||now.kennung!==z.kennung)throw Error('PRO_VAULT_CHANGED');
+        stand?.(t('liest',{i:i+1,n:neue.length}));
+        const o=await api.tresorEingangOeffnen({id:e.id}),teile=[];let size=0;
+        try{
+          if(o.groesse!==e.groesse||o.name!==e.name||o.art!==e.art)throw Error('PRO_BYTES_CHANGED');
+          for(;;){const r=await api.tresorEingangTeil({ticket:o.ticket}),part=b64(r.data||'');size+=part.length;
+            if(size>e.groesse||!r.fertig&&!part.length)throw Error('PRO_BYTES_CHANGED');teile.push(part);if(r.fertig)break;}
+          const file=new File(teile,e.name,{type:e.art});
+          await WFPDurableImport.take(file,{kind:'pro',vaultId:z.kennung,source:e.schreiber,transfer:'legacy-'+e.id},{sha256:e.sha256,size:e.groesse},ctx);
+          const ack=await api.tresorEingangMarkieren({id:e.id,vaultId:z.kennung,sha256:e.sha256});if(ack?.markiert!==true)throw Error('PRO_RECEIPT_UNCONFIRMED');
+        }finally{if(api.tresorEingangAbbrechen)await api.tresorEingangAbbrechen({ticket:o.ticket}).catch(()=>{});}
+      }
+      return neue.length;
+    });
   }
   const groesse=n=>n>=1048576?(n/1048576).toFixed(1).replace('.',',')+' MB':Math.max(1,Math.round((n||0)/1024))+' KB';
   const datum=ms=>ms?new Date(ms).toLocaleDateString(document.documentElement.lang||'de'):'';

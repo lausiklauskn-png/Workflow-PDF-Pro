@@ -1,10 +1,10 @@
 {
-  "commit": "ee5547f5cca7c99b8c99397b7e6962948923951d",
+  "commit": "1ef7c6fddbb289893e83d54a5aeb2ada764792cb",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
-      "bytes": 896,
-      "sha256": "a797cda0caf37ddeae74281de22d9eb568f7ef8d648d28fc1c6f9141ba24594d"
+      "bytes": 952,
+      "sha256": "9680c49d43bbac363095925ef0e90bc468a0a298b670544f81351724ab479bbb"
     },
     {
       "path": ".gitignore",
@@ -18,8 +18,8 @@
     },
     {
       "path": "CLAUDE.md",
-      "bytes": 111805,
-      "sha256": "f12f5dda4068022b00d6932b79ef6ffc45687b2717e562603d372b1bc486151e"
+      "bytes": 112529,
+      "sha256": "7bbdeab91b6df5f4ecae601ff66beb325d41e7a0787feb9bd192986e97121e82"
     },
     {
       "path": "LICENSE",
@@ -43,8 +43,8 @@
     },
     {
       "path": "assets/app.js",
-      "bytes": 283202,
-      "sha256": "83572f1ff64eb01499b0a1120d297f8bebc88b71c559db8a804ce6489b5984d9"
+      "bytes": 283866,
+      "sha256": "1d6e5be1570f1220d66f6fa3d5b3e722777dbc342a3965999960d65cc96f8f7a"
     },
     {
       "path": "assets/bedeutung.js",
@@ -389,7 +389,7 @@
     {
       "path": "index.html",
       "bytes": 13243,
-      "sha256": "94d2203d1f57ef59fc71e38012ce0e44cf05dddf31f46f8a5683069f8e395df0"
+      "sha256": "5c36287d5820a37ec02037cfd197fcd305f919093b246c27c49508eaa7519d98"
     },
     {
       "path": "manifest.webmanifest",
@@ -399,12 +399,12 @@
     {
       "path": "package-lock.json",
       "bytes": 2973,
-      "sha256": "46be30b97abce1f503dbf56ac052b1bc2fe25e38254f2dbe81900277878e22c2"
+      "sha256": "895596b7c2cf7bdef6dc7885bfbc1391736aef996c0c9249cf3f9f09d7280e69"
     },
     {
       "path": "package.json",
-      "bytes": 1449,
-      "sha256": "55a669a4726898058ab69d8af170d95dd338cf16a8f3230358994f020337120f"
+      "bytes": 1484,
+      "sha256": "a0456e1158b3e84d37f08a0f3f93a68dbbe15ca842388f70c4e45325af150346"
     },
     {
       "path": "sbkim/01_storage.js",
@@ -469,12 +469,17 @@
     {
       "path": "sw.js",
       "bytes": 5384,
-      "sha256": "e25befe295d9491db6a07cf3b4cc51627fa31928e36dbce98fdc6801cdb2d04a"
+      "sha256": "3e427bc4c225bad11d772270a5589b7e4378ccbc3af07b014f720bdfc5bf18e5"
     },
     {
       "path": "tests/arbeit.mjs",
       "bytes": 29007,
       "sha256": "8bf812b2322e949c6bbbf78db0a51a6ab54e28c1406f277630c8163ea7ce01f1"
+    },
+    {
+      "path": "tests/ausgabe-herkunft.mjs",
+      "bytes": 6221,
+      "sha256": "c5a438b0b3541c832da56d424df8c5ab2d972f29d1f943cc5f72e111b151f460"
     },
     {
       "path": "tests/bedeutung.mjs",
@@ -575,6 +580,11 @@
       "path": "tests/gegenprobe_arbeit.mjs",
       "bytes": 6777,
       "sha256": "f6c2f3f0329d4c5214d8cc68e065e003f7b13a70cb6fb27f7180a36fba75d892"
+    },
+    {
+      "path": "tests/gegenprobe_ausgabe-herkunft.mjs",
+      "bytes": 2387,
+      "sha256": "f581c04f994905916fea15a78e1a774e57f5199a51cceb3326e764f2c35527ea"
     },
     {
       "path": "tests/gegenprobe_bedeutung.mjs",
@@ -679,7 +689,7 @@
     {
       "path": "tests/gegenprobe_version.mjs",
       "bytes": 4859,
-      "sha256": "d18df5493e65dc351893e80f29add800bcf509d94cd6f7ccccf237843bb6e6a8"
+      "sha256": "54020bc4fa6f61a51f06db16e849277f1213dbe0da5679e6610d9186b6795e00"
     },
     {
       "path": "tests/import-abschluss.mjs",

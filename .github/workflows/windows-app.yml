@@ -189,6 +189,8 @@ jobs:
           Wait-Run 'pruef-out/pruefbau-setup.exe' '/S'
           Phase neuinstallation
           Phase proNeuinstallation
+          Phase proBedienung
+          Phase proBedienungNeustart
           Wait-Run (Join-Path $appDir 'uninstall.exe') '/S'
           # Der ausgelieferte Bau startet, öffnet aber keinen Prüfzugang.
           $setup = (Get-ChildItem auslieferung -Filter *-setup.exe).FullName

@@ -8,13 +8,16 @@
      Öffnen auf; ein Schluss-Stück mit den Zahlen zeigt, dass die Datei vollständig ist.
    - Inhalt wie im Kern: Ordner, Dokumente (Felder, Einträge), PDF-Datei, Originalfoto ungeprüfter Dokumente.
    - Zurückholen fügt hinzu und überschreibt nie — über die Rechnung des Kerns (WFP.Sicherung.zusammenfuehren), je Dokument.
-   - Alte Sicherungen (eine JSON-Datei, Fassung 1) holt weiter der Kern zurück.
+   - Offene Pro-Ausgaben liegen als eigene Dateistücke bei; ihre Quittungen gelten erst nach dem geprüften Schluss.
+   - Alte Sicherungen (eine JSON-Datei, Fassung 1) holt weiter der Kern zurück; gestreamte Fassung 2 bleibt lesbar.
    Format „Fassung 2“: Zeile `WFPDF-SICHERUNG-2\n`, Kopfzeile (JSON) `\n`, dann Stücke [u32 Länge][12 B IV][Geheimtext].
-   Klartext je Stück: 1 Byte Art + Inhalt (1 Kopf · 2 Dokument · 3 Datei-Anfang · 4 Datei-Bytes · 5 Schluss). */
+   Klartext je Stück: 1 Byte Art + Inhalt (1 Kopf · 2 Dokument · 3 Datei-Anfang · 4 Datei-Bytes · 5 Schluss).
+   Fassung 3 verwendet `WFPDF-SICHERUNG-3\n` und zusätzlich Art 6 (ausstehende Pro-Ausgabe). */
 (function (welt) {
   'use strict';
   const MAGIE = 'WFPDF-SICHERUNG-2\n', ART = 'workfloh-pdf-sicherung', FASSUNG = 2, RUNDEN = 600000, STUECK = 196608, ORIGINAL = '~original';
-  const A = { KOPF: 1, DOK: 2, DATEI: 3, BYTES: 4, SCHLUSS: 5 };
+  const MAGIE3 = 'WFPDF-SICHERUNG-3\n';
+  const A = { KOPF: 1, DOK: 2, DATEI: 3, BYTES: 4, SCHLUSS: 5, AUSGANG: 6 };
   const enc = new TextEncoder(), dec = new TextDecoder();
   const subtle = () => welt.crypto.subtle;
   function b64(bytes) { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s); }
@@ -33,13 +36,24 @@
   }
   async function zusatz(kopfHash, n) { const a = new Uint8Array(kopfHash.length + 8); a.set(kopfHash); new DataView(a.buffer).setUint32(kopfHash.length + 4, n); return a; }
   const stopp = signal => { if (signal && signal.aborted) throw new Error('abgebrochen'); };
+  const sha = async bytes => Array.from(new Uint8Array(await subtle().digest('SHA-256', bytes)), n => n.toString(16).padStart(2,'0')).join('');
+  function ausgangMeta(value) {
+    if(!value||!/^[a-f0-9]{64}$/.test(value.sha256||'')||value.payloadId!=='pro-export-'+value.sha256||
+      !Number.isSafeInteger(value.groesse)||value.groesse<=0||value.groesse>20*1024*1024)throw Error('beschaedigt');
+    return {payloadId:value.payloadId,sha256:value.sha256,groesse:value.groesse};
+  }
 
   /* Schreiben: `schreib(bytes)` hängt Bytes an die Datei (await). `fort(fertig, gesamt, name)` meldet den Stand. */
-  async function verschliessen(pw, db, schreib, { fort = () => {}, signal = null, jetzt = new Date(), quittungen = [] } = {}) {
+  async function verschliessen(pw, db, schreib, { fort = () => {}, signal = null, jetzt = new Date(), quittungen = [], ausgaenge = [] } = {}) {
     if (String(pw || '').length < 8) throw new Error('passwort-kurz');
     const salz = welt.crypto.getRandomValues(new Uint8Array(16));
-    const kopf = JSON.stringify({ art: ART, fassung: FASSUNG, erstellt: jetzt.toISOString(), kdf: 'PBKDF2-SHA256', runden: RUNDEN, salz: b64(salz) });
-    const kopfBytes = enc.encode(MAGIE + kopf + '\n'), kopfHash = new Uint8Array(await subtle().digest('SHA-256', kopfBytes));
+    const payloads=ausgaenge.map(ausgangMeta);
+    if(new Set(payloads.map(p=>p.payloadId)).size!==payloads.length)throw Error('beschaedigt');
+    // Older readers do not know outgoing receipts or the return reference.
+    // A distinct format makes that limitation explicit before partial import.
+    const fassung=payloads.length||quittungen.some(r=>r.kind==='ausgang'||r.vertrag)?3:FASSUNG;
+    const kopf = JSON.stringify({ art: ART, fassung, erstellt: jetzt.toISOString(), kdf: 'PBKDF2-SHA256', runden: RUNDEN, salz: b64(salz) });
+    const kopfBytes = enc.encode((fassung===3?MAGIE3:MAGIE) + kopf + '\n'), kopfHash = new Uint8Array(await subtle().digest('SHA-256', kopfBytes));
     const key = await schluessel(pw, salz);
     let n = 0;
     async function stueck(art, inhalt) {
@@ -68,15 +82,24 @@
       if (ob) { await datei(d.id, 'original', welt.WFP?.Sicherung?.originalName ? welt.WFP.Sicherung.originalName(o.name) : o.name, ob); originale++; }
       await new Promise(r => setTimeout(r, 0));   // Atempause: die Oberfläche bleibt bedienbar
     }
+    for(const meta of payloads) {
+      stopp(signal);
+      const record=await db.get('files',meta.payloadId),bytes=await alsBytes(record?.bytes);
+      if(!bytes||bytes.length!==meta.groesse||await sha(bytes)!==meta.sha256)throw Error('beschaedigt');
+      await json(A.AUSGANG,meta);
+      for(let i=0;i<bytes.length;i+=STUECK)await stueck(A.BYTES,bytes.subarray(i,i+STUECK));
+    }
     fort(docs.length, docs.length, '');
-    await json(A.SCHLUSS, { docs: mitDatei, ordner: ordner.length, ohneDatei: ohne, originale, stuecke: n + 1 });
+    await json(A.SCHLUSS, { docs: mitDatei, ordner: ordner.length, ohneDatei: ohne, originale, stuecke: n + 1, ...(fassung===3?{ausgaenge:payloads.length}:{}) });
     return { erstellt: jetzt.toISOString(), docs: mitDatei, ordner: ordner.length, ohneDatei: ohne, originale };
   }
 
   /* Lesen: `lies(von, bis)` gibt Bytes der Datei (await). Je fertigem Dokument `beiDok({doc, bytes, original})`. */
   async function istFassung2(lies) { const a = await lies(0, MAGIE.length); return dec.decode(a) === MAGIE; }
-  async function oeffnen(pw, lies, groesse, beiDok, { beiKopf = () => {}, fort = () => {}, signal = null } = {}) {
-    if (!(await istFassung2(lies))) throw new Error('keine-sicherung');
+  async function istGestreamt(lies) { const text=dec.decode(await lies(0,MAGIE.length));return text===MAGIE||text===MAGIE3; }
+  async function oeffnen(pw, lies, groesse, beiDok, { beiKopf = () => {}, beiAusgang = null, fort = () => {}, signal = null } = {}) {
+    const magie=dec.decode(await lies(0,MAGIE.length)),fassung=magie===MAGIE?2:magie===MAGIE3?3:0;
+    if(!fassung)throw new Error('keine-sicherung');
     let pos = MAGIE.length, kopfText = '';
     { // Kopfzeile bis \n (höchstens 4 KB)
       const teil = dec.decode(await lies(pos, Math.min(groesse, pos + 4096)));
@@ -85,11 +108,16 @@
     }
     let kopf; try { kopf = JSON.parse(kopfText); } catch (_) { throw new Error('keine-sicherung'); }
     if (kopf.art !== ART) throw new Error('keine-sicherung');
-    if (kopf.fassung !== FASSUNG || kopf.runden !== RUNDEN) throw new Error('fassung');
-    const kopfHash = new Uint8Array(await subtle().digest('SHA-256', enc.encode(MAGIE + kopfText + '\n')));
+    if (kopf.fassung !== fassung || kopf.runden !== RUNDEN || fassung===3&&typeof beiAusgang!=='function') throw new Error('fassung');
+    const kopfHash = new Uint8Array(await subtle().digest('SHA-256', enc.encode(magie + kopfText + '\n')));
     const key = await schluessel(pw, vonB64(kopf.salz));
     let n = 0, ordner = null, dok = null, datei = null, offen = null, schluss = null, gesamt = 0, fertig = 0, proQuittungen = null;
-    const abschliessen = async () => { if (offen && offen.doc) { await beiDok(offen); fertig++; fort(fertig, gesamt); } offen = null; };
+    const ausgaenge=new Set();
+    const abschliessen = async () => {
+      if(offen?.ausgang){if(await sha(offen.bytes)!==offen.ausgang.sha256)throw Error('beschaedigt');await beiAusgang({...offen.ausgang,bytes:offen.bytes});}
+      else if (offen && offen.doc) { await beiDok(offen); fertig++; fort(fertig, gesamt); }
+      offen = null;
+    };
     while (pos < groesse) {
       stopp(signal);
       if (schluss) throw new Error('beschaedigt');
@@ -106,8 +134,13 @@
         await beiKopf({ ordner, erstellt: kopf.erstellt }); continue; }
       if (art !== A.BYTES && datei && datei.pos !== datei.bytes.length) throw new Error('beschaedigt');   // Datei unvollständig
       if (art === A.DOK) { await abschliessen(); offen = { doc: j(), bytes: null, original: null }; datei = null; }
+      else if(art===A.AUSGANG) {
+        if(fassung!==3)throw Error('beschaedigt');await abschliessen();
+        const meta=ausgangMeta(j());if(ausgaenge.has(meta.payloadId))throw Error('beschaedigt');ausgaenge.add(meta.payloadId);
+        const bytes=new Uint8Array(meta.groesse);offen={ausgang:meta,bytes};datei={bytes,pos:0};
+      }
       else if (art === A.DATEI) {
-        const d = j(); if (!offen || d.id !== offen.doc.id) throw new Error('beschaedigt');
+        const d = j(); if (!offen?.doc || d.id !== offen.doc.id) throw new Error('beschaedigt');
         datei = { art: d.art, name: d.name, bytes: new Uint8Array(d.groesse), pos: 0 };
         if (d.art === 'original') offen.original = { name: welt.WFP?.Sicherung?.originalName ? welt.WFP.Sicherung.originalName(d.name) : d.name, bytes: datei.bytes }; else offen.bytes = datei.bytes;
       } else if (art === A.BYTES) {
@@ -115,14 +148,14 @@
         datei.bytes.set(inhalt, datei.pos); datei.pos += inhalt.length;
       } else if (art === A.SCHLUSS) {
         await abschliessen(); schluss = j();
-        if (schluss.stuecke !== n) throw new Error('beschaedigt');
+        if (schluss.stuecke !== n || fassung===3&&schluss.ausgaenge!==ausgaenge.size) throw new Error('beschaedigt');
       } else throw new Error('beschaedigt');
     }
     if (!schluss) throw new Error('unvollstaendig');
     return { erstellt: kopf.erstellt, ordner, schluss, proQuittungen };
   }
 
-  const API = { MAGIE, ART, FASSUNG, RUNDEN, STUECK, verschliessen, oeffnen, istFassung2 };
+  const API = { MAGIE, MAGIE3, ART, FASSUNG, RUNDEN, STUECK, verschliessen, oeffnen, istFassung2, istGestreamt };
   welt.WFPSicherung2 = API;
   if (typeof document === 'undefined' || !welt.Capacitor?.isNativePlatform?.()) return;
   const files = welt.Capacitor.Plugins?.WorkflowFiles; if (typeof files?.begin !== 'function') return;
@@ -151,7 +184,6 @@
     fehlerZ: ['Zurückholen ging nicht: ', 'Restore failed: ', 'Восстановление не удалось: ', 'فشلت الاستعادة: ']
   };
   const t = (k, v = {}) => String(W[k][Math.max(0, ['de', 'en', 'ru', 'ar'].indexOf(document.documentElement.lang))] || W[k][0]).replace(/\{(\w+)\}/g, (_, x) => String(v[x] ?? ''));
-  const db = () => welt.WFP.DB;
   let laeuft = false, durchlassen = false;
   const zweistellig = z => String(z).padStart(2, '0');
   const dateiname = d => 'Workflow-PDF-Pro-Sicherung-' + d.getFullYear() + '-' + zweistellig(d.getMonth() + 1) + '-' + zweistellig(d.getDate()) + '-' + zweistellig(d.getHours()) + zweistellig(d.getMinutes()) + '.wfps';
@@ -193,10 +225,13 @@
     let id = null, offset = 0, gespeichert = false;
     try {
       ({ id } = await files.begin({ name, mime: 'application/octet-stream' }));
-      const quittungen=await welt.WFPProTransferStore?.snapshot()||[];
-      const r = await verschliessen(p1, db(), async bytes => {
-        for (let i = 0; i < bytes.length; i += 196608) { const s = bytes.subarray(i, i + 196608); await files.append({ id, offset, data: b64(s) }); offset += s.length; }
-      }, { signal: l.signal, jetzt, quittungen, fort: (i, n) => l.text(t('laeuft', { i: Math.min(i + 1, n), n }), i, n) });
+      const store=welt.WFPProTransferStore;
+      const r = await store.run(async ctx=>{
+        const quittungen=await store.snapshotIn(ctx),ausgaenge=store.pendingPayloads(quittungen);
+        return verschliessen(p1, ctx.db, async bytes => {
+          for (let i = 0; i < bytes.length; i += 196608) { const s = bytes.subarray(i, i + 196608); await files.append({ id, offset, data: b64(s) }); offset += s.length; }
+        }, { signal: l.signal, jetzt, quittungen, ausgaenge, fort: (i, n) => l.text(t('laeuft', { i: Math.min(i + 1, n), n }), i, n) });
+      });
       await files.finish({ id, size: offset });
       dlg.querySelector('#siPw1').value = dlg.querySelector('#siPw2').value = '';
       const s = await files.save({ id }); gespeichert = s && s.saved !== false;
@@ -220,14 +255,30 @@
     const lies = async (von, bis) => new Uint8Array(await f.slice(von, bis).arrayBuffer());
     let ordner = [], erst = true, dazu = 0, schonDa = 0, ordnerDazu = 0;
     try {
-      const restored=await oeffnen(pw, lies, f.size, async ({ doc, bytes, original }) => {
-        if (!bytes) return;
-        const r = await SI.zusammenfuehren(db(), { ordner: erst ? ordner : [], docs: [doc], dateien: new Map([[doc.id, bytes]]), originale: new Map(original ? [[doc.id, original]] : []) });
-        erst = false; dazu += r.dazu; schonDa += r.schonDa; ordnerDazu += r.ordnerDazu;
-      }, { signal: l.signal, beiKopf: k => { ordner = k.ordner; }, fort: (i, n) => l.text(t('holt', { i, n }), i, n) });
-      // A partial or unauthenticated backup must not create an accepted receipt.
-      if(restored.proQuittungen)await welt.WFPProTransferStore.restore(restored.proQuittungen);
-      if (erst && ordner.length) { const r = await SI.zusammenfuehren(db(), { ordner, docs: [], dateien: new Map(), originale: new Map() }); ordnerDazu += r.ordnerDazu; }
+      const store=welt.WFPProTransferStore;
+      await store.run(async ctx=>{
+        const added=[];
+        try {
+          const restored=await oeffnen(pw, lies, f.size, async ({ doc, bytes, original }) => {
+            if (!bytes) return;
+            const r = await SI.zusammenfuehren(ctx.db, { ordner: erst ? ordner : [], docs: [doc], dateien: new Map([[doc.id, bytes]]), originale: new Map(original ? [[doc.id, original]] : []) });
+            erst = false; dazu += r.dazu; schonDa += r.schonDa; ordnerDazu += r.ordnerDazu;
+          }, { signal: l.signal, beiKopf: k => { ordner = k.ordner; }, fort: (i, n) => l.text(t('holt', { i, n }), i, n),
+            beiAusgang:async value=>{if(await store.writePayload(ctx,value,value.bytes))added.push(value.payloadId);}
+          });
+          if (erst && ordner.length) { const r = await SI.zusammenfuehren(ctx.db, { ordner, docs: [], dateien: new Map(), originale: new Map() }); ordnerDazu += r.ordnerDazu; }
+          await ctx.flush();
+          // Only the authenticated end can commit receipts. No nested storage
+          // lease: a library change waits for the entire restore operation.
+          if(restored.proQuittungen)await store.restoreIn(restored.proQuittungen,ctx);
+        } finally {
+          // A cancelled/truncated backup may have staged output bytes already.
+          // Remove only newly staged files that no durable receipt references.
+          const used=new Set((await ctx.repo.all()).filter(r=>r.kind==='ausgang').map(r=>r.payloadId));
+          for(const id of added)if(!used.has(id))await ctx.db.del('files',id);
+          await ctx.flush();
+        }
+      });
       dlg.querySelector('#siPwZ').value = '';
       l.ende('fertig', t('zurueck', { d: dazu, s: schonDa, o: ordnerDazu ? t('ordnerDazu', { n: ordnerDazu }) : '' }) + (dazu || ordnerDazu ? t('neuLaden') : ''));
       if (dazu || ordnerDazu) setTimeout(() => location.reload(), 1500);
@@ -251,7 +302,7 @@
     if (!f) { durchlassen = true; try { b.click(); } finally { durchlassen = false; } return; }
     laeuft = true;
     void (async () => {
-      if (await istFassung2(async (von, bis) => new Uint8Array(await f.slice(von, bis).arrayBuffer()))) await zurueckholen(dlg, f);
+      if (await istGestreamt(async (von, bis) => new Uint8Array(await f.slice(von, bis).arrayBuffer()))) await zurueckholen(dlg, f);
       else { durchlassen = true; try { b.click(); } finally { durchlassen = false; } }   // alte JSON-Sicherung: der Kern
     })().finally(() => { laeuft = false; });
   }, true);

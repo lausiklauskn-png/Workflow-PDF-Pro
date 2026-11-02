@@ -9,3 +9,4 @@ const jar=join(root,'windows/src-tauri/pro-tresor/workflow-pro-tresor.jar');
 execFileSync(java,['-m','jdk.compiler/com.sun.tools.javac.Main','-encoding','UTF-8','-cp',jar,'-d',classes,
   'windows/java-tests/de/familyprojekt/workflowpdf/pro/ProVerbundProbe.java'],{cwd:root,stdio:'inherit'});
 execFileSync(java,['-Xmx256m','-cp',[classes,jar].join(delimiter),'de.familyprojekt.workflowpdf.pro.ProVerbundProbe'],{cwd:root,stdio:'inherit'});
+execFileSync(process.execPath,['windows/tools/test-pro-size.mjs'],{cwd:root,stdio:'inherit'});

@@ -234,6 +234,7 @@
       // Sperren nur, wenn die Ablage offen ist (Leitfaden § 1.4: Unnötiges verschwindet).
       if(active)button(actions,'lock',async()=>{document.activeElement?.blur();await pause();await active.journal.tail;await api.lock();await boot();});
       const fuss=document.createElement('div');fuss.className='pro-knoepfe';panel.append(fuss);
+      window.WFPProVerbund?.append(panel,fuss);
       // Gemeinsamer Tresorordner (Schritt D1): eigener Abschnitt „Tresor (alle Pro-Apps)“, nur bei entsperrter Ablage.
       if(active&&window.WFPTresorordner)void WFPTresorordner.abschnitt(panel,fuss,active.state).catch(()=>{});
       button(fuss,'close',async()=>{panel.close();panel.remove();panel=null;});

@@ -184,6 +184,61 @@ if(phase==='proAbgezogen') {
     return result;
   });
 }
+// Ordinary packaged Workflow UI plus native Java/DPAPI/real files. The partner
+// remains the explicitly labelled canonical Family actor, not an installed app.
+const commonUiFile=()=>join(env('WFP_PRUEF_ARBEIT'),'pro-ui-proof.json');
+function commonUiActor(action,file){
+  const java=join(process.env.JAVA_HOME,'bin','java.exe');
+  const cp=[join(process.cwd(),'work/pro-tresor-probe'),join(process.cwd(),'windows/src-tauri/pro-tresor/workflow-pro-tresor.jar')].join(delimiter);
+  return JSON.parse(execFileSync(java,['-cp',cp,'de.familyprojekt.workflowpdf.pro.ProVerbundProbe',action,env('WFP_PRUEF_PRO_TRESOR'),file],{encoding:'utf8'}));
+}
+if(phase==='proBedienung') {
+  await step('auswahlDauerhaftEinlesenUndNormalZurueckgeben',async()=>{
+    await page.waitForFunction(()=>window.WFPProVerbund&&!WFPNativeVault.gate.blocked);
+    const before=await docs(),input=await makePdf('Erfundener Pro-Verbund',true),path=join(env('WFP_PRUEF_ARBEIT'),'pro-ui-input.pdf');await writeFile(path,input);
+    const fixture=commonUiActor('ui-seed',path);
+    await page.evaluate(()=>WFPProVerbund.dialog());
+    await page.locator(`[data-pro-entry="${fixture.entryId}"] input`).check();await page.click('#nativeProVerbund [data-pro-action="receive"]');
+    await page.waitForFunction(()=>document.querySelector('#nativeProVerbund [data-pro-status]')?.textContent.includes('Auswahl gespeichert'));
+    expect(await docs()===before+1,'Auswahl wurde nicht genau einmal aufgenommen');
+    const received=await page.evaluate(async()=>{
+      const row=(await WFPProTransferStore.snapshot()).find(r=>r.kind==='eingang'&&r.source.transfer==='windows-family-ui');
+      const doc=await WFP.DB.get('docs',row.docId),original=await WFP.DB.get('files',row.docId+'~original');
+      return {id:doc.id,stand:row.stand,hash:await WFPProTransferStore.hash(original.bytes),pages:doc.pages.length,checked:!!doc.pruefung};
+    });
+    expect(received.stand==='gespeichert'&&received.hash===fixture.sha256&&received.pages===2&&!received.checked,'Original/Quittung/manueller Prüfstatus fehlen');
+    await page.click('#nativeProVerbund [data-pro-action="close"]');
+    const shareConsole=[];page.on('console',m=>{if(m.type()==='error')shareConsole.push(m.text());});
+    await page.evaluate(id=>{window.__proShare={};void __wfpdf.dlg.teilenDocs([id]).then(()=>window.__proShare.done=true,error=>window.__proShare.error=String(error));},received.id);
+    try {await page.click('#nativeProTarget [data-pro-action="familienakte"]');}
+    catch(error){
+      const detail=await page.evaluate(()=>({share:window.__proShare,output:window.__wfpdfTeilen,dialogs:[...document.querySelectorAll('dialog,.dlg')].map(d=>d.textContent.slice(0,1500)),toast:document.querySelector('#toast')?.textContent}));
+      await page.screenshot({path:out.replace(/\.json$/,'.png')});
+      throw Error(error.message+' '+JSON.stringify({detail,shareConsole}));
+    }
+    await page.waitForSelector('#nativeProTarget',{state:'detached'});
+    const rows=await page.evaluate(()=>WFPProTransfers.outbox());expect(rows.length===1&&rows[0].stand==='weitergegeben','Keine dauerhafte offene Ausgabe');
+    expect(rows[0].vertrag.dokumentId==='family-doc-ui'&&rows[0].vertrag.bezug==='windows-family-ui','Ausgabe der falschen Akte zugeordnet');
+    await writeFile(commonUiFile(),JSON.stringify({fixture,received,row:rows[0],docs:before+1}));
+    return {bibliothek:true,originalGeprueft:true,normalesTeilen:true,empfangNochOffen:true};
+  });
+}
+if(phase==='proBedienungNeustart') {
+  await step('ausgangNachNeustartUndTatsaechlicherEmpfang',async()=>{
+    await page.waitForFunction(()=>window.WFPProVerbund&&!WFPNativeVault.gate.blocked);
+    const saved=JSON.parse(await readFile(commonUiFile(),'utf8'));expect(await docs()===saved.docs,'Bibliothek nach Neustart verändert');
+    const retry=await page.evaluate(id=>WFPProTransfers.retry(id),saved.row.id);
+    expect(retry.entryId===saved.row.entryId&&retry.vertrag.sha256===saved.row.vertrag.sha256&&retry.stand==='weitergegeben','Wiederholung erzeugte andere Ausgabe oder falsche Quittung');
+    const output=join(env('WFP_PRUEF_ARBEIT'),'pro-ui-return.pdf'),receipt=commonUiActor('ui-confirm',output);
+    expect(receipt.confirmed&&receipt.workflowAccepted,'Der kanonische Partner sieht keinen dauerhaften Workflow-Empfang');
+    const bytes=await readFile(output);expect(sha(bytes)===saved.row.vertrag.sha256&&(await PDFDocument.load(bytes)).getPageCount()===2,'Gewählte PDF-Ausgabe ist verändert');
+    await page.evaluate(()=>WFPProVerbund.dialog());await page.click(`[data-pro-outgoing="${saved.row.id}"] [data-pro-action="confirm"]`);
+    await page.waitForFunction(()=>document.querySelector('#nativeProVerbund [data-pro-status]')?.textContent==='In der Ziel-App gespeichert');
+    const row=(await page.evaluate(()=>WFPProTransfers.outbox()))[0];expect(row.stand==='im-eingang','Empfängermarke wurde nicht dauerhaft gespeichert');
+    expect(await page.evaluate(id=>WFP.DB.get('files',id).then(Boolean),saved.row.payloadId)===false,'Bestätigte Arbeitskopie wurde nicht freigegeben');
+    return {neustart:true,identischeAusgabe:true,empfaengermarke:true,probenart:'installierte Workflow-App; Familienakte als kanonischer Java-Akteur'};
+  });
+}
 
 if (phase === 'erst') {
   await step('sicherheitUndUpdates', async () => {

@@ -91,21 +91,15 @@
   };
   window.addEventListener('mouseup', event => { if (event.button === 3) back(event); }, true);
   window.addEventListener('keydown', event => { if (event.altKey && event.key === 'ArrowLeft') back(event); }, true);
-  // Teilen: zuerst das Teilen-Fenster von Windows (Web Share der WebView2), sonst
-  // der Adapterweg (Datei im Explorer zeigen). Eine Zustellung wird nie bestätigt.
+  // Der gemeinsame Dateiadapter entscheidet zuerst über eine gewählte Pro-App.
+  // Erst sein ausdrücklich gewählter Betriebssystemweg ruft Web Share auf, sonst
+  // den Explorer. Keine zweite navigator.share-Hülle, die den Pro-Dialog umgeht.
   const systemShare = typeof navigator.share === 'function' ? navigator.share.bind(navigator) : null;
   const systemCanShare = typeof navigator.canShare === 'function' ? navigator.canShare.bind(navigator) : null;
-  document.addEventListener('DOMContentLoaded', () => {
-    document.documentElement.dataset.wfpHost = 'windows';
-    const adapterShare = navigator.share, adapterCanShare = navigator.canShare;
-    if (!systemShare || typeof adapterShare !== 'function') return;
-    Object.defineProperty(navigator, 'canShare', { configurable: true, value: data => Boolean(systemCanShare?.(data)) || Boolean(adapterCanShare?.(data)) });
-    Object.defineProperty(navigator, 'share', { configurable: true, value: async data => {
-      if (!systemCanShare || systemCanShare(data)) {
-        try { return await systemShare(data); }
-        catch (error) { if (error?.name === 'AbortError') throw error; }
-      }
-      return adapterShare(data);
-    } });
-  });
+  window.WFPWindowsShare = async data => {
+    if (!systemShare || systemCanShare && !systemCanShare(data)) return false;
+    try { await systemShare(data); return true; }
+    catch (error) { if (error?.name === 'AbortError') throw error; return false; }
+  };
+  document.addEventListener('DOMContentLoaded', () => { document.documentElement.dataset.wfpHost = 'windows'; });
 })();
