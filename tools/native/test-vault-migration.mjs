@@ -54,6 +54,12 @@ test('conflicting IDs never overwrite either library and do not start a destinat
   await assert.rejects(f.transfer(),/VAULT_MIGRATION_CONFLICT/);
   assert.equal(f.data.get('docs').get('d').name,'current');assert.equal((await f.records.load('target','docs','d')).record.name,'older');assert.equal(f.marker,null);
 });
+test('receipt metadata shares the committed destination generation and conflicts preserve both copies',async()=>{
+  const f=fixture(),row={id:'pro-transfer-'+ 'a'.repeat(64),kind:'eingang',stand:'gespeichert',sha256:'b'.repeat(64)};
+  await f.transfer({extraRecords:[row]});assert.deepEqual((await f.records.load('target','settings',row.id)).record,row);
+  await assert.rejects(f.transfer({extraRecords:[{...row,sha256:'c'.repeat(64)}]}),/VAULT_MIGRATION_CONFLICT/);
+  assert.deepEqual((await f.records.load('target','settings',row.id)).record,row);
+});
 test('cancel during staged copying leaves source and destination generations unchanged',async()=>{
   const f=fixture(),abort=new AbortController();
   f.data.get('files').set('one',{id:'one',bytes:new Uint8Array([1])});f.data.get('files').set('two',{id:'two',bytes:new Uint8Array([2])});

@@ -44,3 +44,19 @@ test('a mutation queued during a pause is cancelled if an older operation fails 
   gate.resume(target({put:async()=>{writes++;}}));
   await assert.rejects(queued,/VAULT_RECOVERY_REQUIRED/);assert.equal(writes,0);
 });
+test('an import lease keeps all ordinary writes in its original library while pause waits',async()=>{
+  const gate=new WFPVaultGate(),wait=deferred(),started=deferred(),calls=[];
+  gate.resume(target({put:async(s,r)=>{calls.push(r.id);}}));
+  const work=gate.stable(async()=>{await gate.db.put('docs',{id:'first'});started.resolve();await wait.promise;await gate.db.put('docs',{id:'second'});});
+  await started.promise;let paused=false;const pending=gate.pause().then(()=>paused=true);
+  await Promise.resolve();assert.equal(paused,false);assert.equal(gate.blocked,false);
+  await assert.rejects(gate.stable(async()=>{}),/VAULT_RECOVERY_REQUIRED/);
+  assert.throws(()=>gate.resume(target()),/VAULT_GATE_NOT_READY/);
+  wait.resolve();await work;await pending;assert.deepEqual(calls,['first','second']);assert.equal(gate.blocked,true);
+  gate.resume(target());assert.equal(await gate.stable(async()=>42),42);
+});
+test('failed import releases its lease and allows explicit storage recovery',async()=>{
+  const gate=new WFPVaultGate();gate.resume(target());
+  await assert.rejects(gate.stable(async()=>{throw Error('IMPORT_ABORTED');}),/IMPORT_ABORTED/);
+  await gate.pause();gate.resume(target());assert.equal(gate.leases,0);
+});

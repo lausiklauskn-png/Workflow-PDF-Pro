@@ -114,7 +114,8 @@
     const migration=await api.migration();
     if(migration.location){
       const target=await usable(migration.location);
-      await WFPVaultMigration.transfer({bridge:api,records,source,local:await localReady,location:target.location,vaultId:target.id,progress:()=>status('writing')});
+      const extraRecords=await window.WFPProTransferStore?.snapshotFor(state,records)||[];
+      await WFPVaultMigration.transfer({bridge:api,records,source,local:await localReady,location:target.location,vaultId:target.id,extraRecords,progress:()=>status('writing')});
       selected=target;bound=await attach(target);
     }
     // Never release startup readers in the small interval before a required
@@ -164,7 +165,9 @@
         const prefInfo=await api.info({location:state.location,store:'settings',id:'workflow-preferences-v1'});
         const hasDocs=(await source.keys('docs')).length>0;
         const restorePreferences=!hasDocs&&prefInfo.exists;
+        const extraRecords=await window.WFPProTransferStore?.snapshotFor(active?.state,records)||[];
         await WFPVaultMigration.transfer({bridge:api,records,source,local:await localReady,location:state.location,vaultId:state.id,signal:controller.signal,
+          extraRecords,
           preferences:restorePreferences?undefined:WFPVaultPreferences.snapshot(),
           progress:(done,total,finishing)=>{text.textContent=t('writing')+' '+done+' / '+total;lauf?.schritt(done,total);if(finishing)cancel.disabled=true;}});
         if(restorePreferences)WFPVaultPreferences.restore((await records.load(state.location,'settings','workflow-preferences-v1')).record);
@@ -263,6 +266,8 @@
     }
     return result;
   };
-  window.WFPNativeVault=Object.freeze({manage,boot,gate,selectLocation:confirmMove,aktiv:()=>active?.state||null});
+  const withStorage=work=>gate.stable(()=>work({db:gate.db,state:active?.state||null,
+    records,journal:active?.journal||null,flush:()=>gebunden?.schreibeJetzt()||Promise.resolve()}));
+  window.WFPNativeVault=Object.freeze({manage,boot,gate,selectLocation:confirmMove,aktiv:()=>active?.state||null,withStorage});
   void boot().catch(error=>{status('error');void manage(true,error);});
 })();

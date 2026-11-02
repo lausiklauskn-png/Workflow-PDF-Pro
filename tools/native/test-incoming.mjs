@@ -7,7 +7,7 @@ import { chromium } from 'playwright-core';
 import { root } from './prepare-web.mjs';
 
 test('native reception with real browser/core and a protocol fixture', async t => {
-  const base = join(root, 'www');
+  const base = process.env.WFP_TEST_BUNDLE || join(root, 'www');
   const server = createServer(async (req, res) => {
     try {
       const path = resolve(base, '.' + new URL(req.url, 'http://localhost').pathname);
@@ -29,12 +29,17 @@ test('native reception with real browser/core and a protocol fixture', async t =
           // Match the actual injected Capacitor.Plugins contract, not the newer
           // registerPlugin promise wrapper. This caught a real native startup gap.
           addListener(name, cb) { f.events.push(cb); return { remove(){} }; },
-          async pending() { return f.queue[0] || { empty:true }; },
+          async pending() {
+            const batch=f.queue[0];if(!batch)return {empty:true};
+            for(const item of batch.files||[])if(item.size===undefined){item.size=f.data[item.id].length;item.sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',f.data[item.id])),b=>b.toString(16).padStart(2,'0')).join('');}
+            return structuredClone(batch);
+          },
           async read({ batch, id, offset }) {
             f.reads.push([batch,id,offset]);
             if (f.mode === 'fail' && id === 'second') throw Error('revoked');
             if (f.mode === 'zero') return { data:'', done:false };
             const bytes=f.data[id].slice(offset,offset+262144);
+            if(f.mode==='corrupt'&&offset===0)bytes[0]^=1;
             let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
             return { data:btoa(binary), done:offset+bytes.length>=f.data[id].length };
           },
@@ -47,6 +52,16 @@ test('native reception with real browser/core and a protocol fixture', async t =
           async restore({id}){const index=f.archive.findIndex(r=>r.id===id);f.queue.push(f.archive.splice(index,1)[0]);},
           async discardArchived({id}){f.archive=f.archive.filter(r=>r.id!==id);}
         } } };
+        if(mode==='backup'){
+          let parts=[],size=0;
+          Capacitor.Plugins.WorkflowFiles={
+            async begin(){parts=[];size=0;return {id:'backup'};},
+            async append(a){if(a.offset!==size)throw Error('offset');const b=Uint8Array.from(atob(a.data),c=>c.charCodeAt(0));parts.push(b);size+=b.length;return {};},
+            async finish(a){if(a.size!==size)throw Error('size');return {};},
+            async save(){f.backupData=Array.from(new Uint8Array(await new Blob(parts).arrayBuffer()));return {saved:true};},
+            async abort(){parts=[];return {};},async share(){return {};},async print(){return {};},async openLink(){return {};},async appInfo(){return {version:'1.0.11'};}
+          };
+        }
       }, mode);
       await page.goto('http://127.0.0.1:' + server.address().port + '/');
       await page.waitForFunction(() => window.__wfpdf && window.WFPNativeIncoming && window.PDFLib);
@@ -67,28 +82,28 @@ test('native reception with real browser/core and a protocol fixture', async t =
       const page=await pageFor();
       assert.equal(await page.evaluate(() => fixture.changes),0);
       await page.locator('#nativeIncoming button').first().click();
-      await page.waitForFunction(() => window.__wfpdf.S.docs.length===2);
+      await page.waitForFunction(() => window.__wfpdf.S.docs.length===2&&!document.getElementById('nativeIncoming'));
       const result=await page.evaluate(async () => {
         const doc=(await WFP.DB.all('docs')).find(d=>d.name==='Мüller');
         return { bytes:Array.from(await WFP.DB.getFile(doc.id)),expected:Array.from(fixture.data.first),check:doc.pruefung||null,acks:fixture.acks,changes:fixture.changes,offsets:fixture.reads.filter(r=>r[1]==='first').map(r=>r[2]) };
       });
       assert.deepEqual(result.bytes,result.expected);assert.equal(result.check,null);
-      assert.deepEqual(result.acks,['batch-1']);assert.equal(result.changes,1);assert.deepEqual(result.offsets,[0,262144,524288]);
+      assert.deepEqual(result.acks,['batch-1']);assert.equal(result.changes,0);assert.deepEqual(result.offsets,[0,262144,524288]);
       await page.close();
     });
     await t.test('acknowledged copies can be offered again explicitly; discarding them preserves imported documents',async()=>{
       const page=await pageFor();await page.locator('#nativeIncoming button').first().click();await page.waitForFunction(()=>__wfpdf.S.docs.length===2&&!document.getElementById('nativeIncoming'));
       await page.evaluate(()=>WFPNativeIncoming.history());await page.waitForSelector('dialog.native-vault-dialog section button');
       await page.locator('dialog.native-vault-dialog section button').first().click();await page.waitForSelector('#nativeIncoming button');
-      assert.deepEqual(await page.evaluate(()=>[__wfpdf.S.docs.length,fixture.changes]),[2,1]);await page.locator('#nativeIncoming button').nth(1).click();
-      await page.waitForFunction(()=>!document.getElementById('nativeIncoming'));assert.deepEqual(await page.evaluate(()=>[__wfpdf.S.docs.length,fixture.changes,fixture.archive.length]),[2,1,0]);await page.close();
+      assert.deepEqual(await page.evaluate(()=>[__wfpdf.S.docs.length,fixture.changes]),[2,0]);await page.locator('#nativeIncoming button').nth(1).click();
+      await page.waitForFunction(()=>!document.getElementById('nativeIncoming'));assert.deepEqual(await page.evaluate(()=>[__wfpdf.S.docs.length,fixture.changes,fixture.archive.length]),[2,0,0]);await page.close();
     });
     await t.test('later read failure submits nothing, keeps batch and can retry', async () => {
       const page=await pageFor('fail');await page.locator('#nativeIncoming button').first().click();
       await page.waitForFunction(() => document.querySelector('#nativeIncoming p').textContent.includes('nicht vollständig'));
       assert.deepEqual(await page.evaluate(() => [fixture.changes,fixture.acks.length,__wfpdf.S.docs.length]),[0,0,0]);
       await page.evaluate(() => fixture.mode='ok');await page.locator('#nativeIncoming button').first().click();
-      await page.waitForFunction(() => __wfpdf.S.docs.length===2);assert.equal(await page.evaluate(() => fixture.changes),1);await page.close();
+      await page.waitForFunction(() => __wfpdf.S.docs.length===2&&!document.getElementById('nativeIncoming'));assert.equal(await page.evaluate(() => fixture.changes),0);await page.close();
     });
     await t.test('dismiss preserves library and exposes next warm batch without overwriting it', async () => {
       const page=await pageFor();
@@ -101,7 +116,102 @@ test('native reception with real browser/core and a protocol fixture', async t =
       const page=await pageFor('ackfail');await page.locator('#nativeIncoming button').first().click();
       await page.waitForFunction(() => document.querySelector('#nativeIncoming p').textContent.includes('Empfangsbestätigung'));
       await page.evaluate(() => fixture.events.forEach(cb=>cb()));
-      assert.equal(await page.evaluate(() => fixture.changes),1);assert.equal(await page.locator('#nativeIncoming button').first().isVisible(),false);await page.close();
+      assert.equal(await page.evaluate(() => fixture.changes),0);assert.equal(await page.locator('#nativeIncoming button').first().isVisible(),true);
+      const ids=await page.evaluate(()=>__wfpdf.S.docs.map(d=>d.id).sort());
+      await page.evaluate(()=>fixture.mode='ok');await page.locator('#nativeIncoming button').first().click();
+      await page.waitForFunction(()=>!document.getElementById('nativeIncoming'));
+      assert.deepEqual(await page.evaluate(()=>__wfpdf.S.docs.map(d=>d.id).sort()),ids);await page.close();
+    });
+    await t.test('acknowledgement waits for the ordinary document write to finish',async()=>{
+      const page=await pageFor();await page.evaluate(()=>{
+        const put=WFP.DB.put;let first=true;WFP.DB.put=async function(store,row){if(store==='docs'&&first){first=false;fixture.waiting=true;await new Promise(r=>fixture.finish=r);}return put.call(this,store,row);};
+      });
+      await page.locator('#nativeIncoming button').first().click();await page.waitForFunction(()=>fixture.waiting||fixture.acks.length);
+      assert.deepEqual(await page.evaluate(()=>[fixture.waiting===true,fixture.acks.length,fixture.queue.length]),[true,0,1]);
+      await page.evaluate(()=>fixture.finish());await page.waitForFunction(()=>!document.getElementById('nativeIncoming'));
+      assert.equal(await page.evaluate(()=>fixture.acks.length),1);await page.close();
+    });
+    await t.test('changed native bytes are rejected before any ordinary import or acknowledgement',async()=>{
+      const page=await pageFor('corrupt');await page.locator('#nativeIncoming button').first().click();
+      await page.waitForFunction(()=>document.querySelector('#nativeIncoming p')?.textContent.includes('nicht vollständig')||fixture.acks.length);
+      assert.deepEqual(await page.evaluate(()=>[fixture.acks.length,__wfpdf.S.docs.length,fixture.queue.length]),[0,0,1]);
+      await page.evaluate(()=>fixture.mode='ok');await page.locator('#nativeIncoming button').first().click();
+      await page.waitForFunction(()=>!document.getElementById('nativeIncoming'));assert.equal(await page.evaluate(()=>__wfpdf.S.docs.length),2);await page.close();
+    });
+    await t.test('fresh persisted PDF mismatch keeps the source and retries without a duplicate',async()=>{
+      const page=await pageFor();await page.evaluate(()=>{
+        fixture.getFile=WFP.DB.getFile;WFP.DB.getFile=async id=>{const bytes=await fixture.getFile(id);return bytes?new Uint8Array([0,1,2]):bytes;};
+      });
+      await page.locator('#nativeIncoming button').first().click();await page.waitForFunction(()=>document.querySelector('#nativeIncoming p')?.textContent.includes('nicht vollständig')||fixture.acks.length);
+      assert.deepEqual(await page.evaluate(()=>[fixture.acks.length,fixture.queue.length,__wfpdf.S.docs.length]),[0,1,1]);
+      const id=await page.evaluate(()=>{WFP.DB.getFile=fixture.getFile;return __wfpdf.S.docs[0].id;});
+      await page.locator('#nativeIncoming button').first().click();await page.waitForFunction(()=>!document.getElementById('nativeIncoming'));
+      assert.equal(await page.evaluate(id=>__wfpdf.S.docs.length===2&&__wfpdf.S.docs.some(d=>d.id===id),id),true);await page.close();
+    });
+    await t.test('receipt request success followed by transaction abort is never acknowledged',async()=>{
+      const page=await pageFor();await page.evaluate(()=>{
+        fixture.abortReceipt=true;const put=IDBObjectStore.prototype.put;
+        IDBObjectStore.prototype.put=function(row,...args){const request=put.call(this,row,...args);
+          if(this.name==='receipts'&&row.record?.stand==='gespeichert')request.addEventListener('success',()=>{if(fixture.abortReceipt)this.transaction.abort();});return request;};
+      });
+      await page.locator('#nativeIncoming button').first().click();await page.waitForFunction(()=>document.querySelector('#nativeIncoming p')?.textContent.includes('nicht vollständig')||fixture.acks.length);
+      assert.deepEqual(await page.evaluate(()=>[fixture.acks.length,fixture.queue.length,__wfpdf.S.docs.length]),[0,1,1]);
+      await page.evaluate(()=>fixture.abortReceipt=false);await page.locator('#nativeIncoming button').first().click();
+      await page.waitForFunction(()=>!document.getElementById('nativeIncoming'));assert.equal(await page.evaluate(()=>__wfpdf.S.docs.length),2);await page.close();
+    });
+    await t.test('a later document write failure keeps completed documents and resumes the same reservations',async()=>{
+      const page=await pageFor();await page.evaluate(()=>{
+        fixture.failSecond=true;const put=WFP.DB.put;WFP.DB.put=async function(store,row){if(fixture.failSecond&&store==='docs'&&row.name==='Teil 2')throw Error('synthetic-storage-full');return put.call(this,store,row);};
+      });
+      await page.locator('#nativeIncoming button').first().click();await page.waitForFunction(()=>document.querySelector('#nativeIncoming p')?.textContent.includes('nicht vollständig')||fixture.acks.length);
+      assert.deepEqual(await page.evaluate(()=>[fixture.acks.length,fixture.queue.length,__wfpdf.S.docs.length]),[0,1,1]);
+      const id=await page.evaluate(()=>__wfpdf.S.docs[0].id);await page.locator('.dlg [data-x]').click();
+      await page.evaluate(()=>fixture.failSecond=false);await page.locator('#nativeIncoming button').first().click();
+      await page.waitForFunction(()=>!document.getElementById('nativeIncoming'));
+      assert.equal(await page.evaluate(id=>__wfpdf.S.docs.length===2&&__wfpdf.S.docs.some(d=>d.id===id),id),true);await page.close();
+    });
+    await t.test('cold page restart after ack failure retains receipt and subsequent user edits',async()=>{
+      const page=await pageFor('ackfail');await page.locator('#nativeIncoming button').first().click();
+      await page.waitForFunction(()=>document.querySelector('#nativeIncoming p')?.textContent.includes('Empfangsbestätigung'));
+      const saved=await page.evaluate(async()=>{
+        const d=__wfpdf.S.docs[0];d.name='Edited after intake';await WFP.DB.put('docs',d);
+        return {id:d.id,queue:fixture.queue,data:Object.fromEntries(Object.entries(fixture.data).map(([k,v])=>[k,Array.from(v)]))};
+      });
+      await page.reload();await page.waitForFunction(()=>window.__wfpdf&&window.WFPNativeIncoming);
+      await page.evaluate(saved=>{fixture.queue=saved.queue;fixture.data=Object.fromEntries(Object.entries(saved.data).map(([k,v])=>[k,new Uint8Array(v)]));fixture.mode='ok';fixture.events.forEach(cb=>cb());},saved);
+      await page.locator('#nativeIncoming button').first().click();await page.waitForFunction(()=>!document.getElementById('nativeIncoming'));
+      assert.equal(await page.evaluate(id=>__wfpdf.S.docs.length===2&&__wfpdf.S.docs.find(d=>d.id===id)?.name==='Edited after intake',saved.id),true);await page.close();
+    });
+    await t.test('reused source identity with different valid bytes remains pending',async()=>{
+      const page=await pageFor('ackfail');await page.locator('#nativeIncoming button').first().click();
+      await page.waitForFunction(()=>document.querySelector('#nativeIncoming p')?.textContent.includes('Empfangsbestätigung'));
+      await page.evaluate(()=>{fixture.mode='ok';fixture.data.first[fixture.data.first.length-1]=10;delete fixture.queue[0].files[0].size;});
+      await page.locator('#nativeIncoming button').first().click();await page.waitForFunction(()=>document.querySelector('#nativeIncoming p')?.textContent.includes('nicht vollständig')||fixture.acks.length);
+      assert.deepEqual(await page.evaluate(()=>[fixture.acks.length,fixture.queue.length,__wfpdf.S.docs.length]),[0,1,2]);await page.close();
+    });
+    await t.test('native backup restores receipts only after complete authentication and does not duplicate an open intake',async()=>{
+      const page=await pageFor('backup');await page.setViewportSize({width:1100,height:900});await page.evaluate(()=>fixture.mode='ackfail');
+      await page.locator('#nativeIncoming button').first().click();await page.waitForFunction(()=>document.querySelector('#nativeIncoming p')?.textContent.includes('Empfangsbestätigung'));
+      const intake=await page.evaluate(()=>({queue:fixture.queue,data:Object.fromEntries(Object.entries(fixture.data).map(([k,v])=>[k,Array.from(v)]))}));
+      const rows=await page.evaluate(()=>WFPProTransferStore.snapshot());assert.equal(rows.length,2);
+      await page.evaluate(()=>__wfpdf.dlg.sicherungDialog());await page.fill('#siPw1','receipt-backup-2026');await page.fill('#siPw2','receipt-backup-2026');await page.click('#siErstellen');
+      await page.waitForSelector('[data-wfp-sicherung-lauf] [data-pro-fortschritt="fertig"]');
+      const backup=Buffer.from(await page.evaluate(()=>fixture.backupData));await page.close();
+      const corrupt=await pageFor('backup');await corrupt.setViewportSize({width:1100,height:900});await corrupt.evaluate(()=>__wfpdf.dlg.sicherungDialog());
+      const damaged=Buffer.from(backup);damaged[damaged.length-1]^=1;
+      await corrupt.setInputFiles('#siDatei',{name:'receipt.wfps',mimeType:'application/octet-stream',buffer:damaged});await corrupt.fill('#siPwZ','receipt-backup-2026');await corrupt.click('#siZurueck');
+      await corrupt.waitForSelector('[data-wfp-sicherung-lauf] [data-pro-fortschritt="fehler"]');
+      assert.deepEqual(await corrupt.evaluate(()=>WFPProTransferStore.snapshot()),[],'damaged trailer must not restore accepted receipts');await corrupt.close();
+      const target=await pageFor('backup');await target.setViewportSize({width:1100,height:900});await target.evaluate(()=>__wfpdf.dlg.sicherungDialog());
+      await target.setInputFiles('#siDatei',{name:'receipt.wfps',mimeType:'application/octet-stream',buffer:backup});await target.fill('#siPwZ','receipt-backup-2026');await target.click('#siZurueck');
+      await target.waitForSelector('[data-wfp-sicherung-lauf] [data-pro-fortschritt="fertig"]');
+      await target.waitForFunction(()=>window.__wfpdf&&__wfpdf.S.docs.length===2&&!document.querySelector('#siDatei'));
+      assert.deepEqual(await target.evaluate(()=>WFPProTransferStore.snapshot()),rows);
+      await target.evaluate(intake=>{fixture.queue=intake.queue;fixture.data=Object.fromEntries(Object.entries(intake.data).map(([k,v])=>[k,new Uint8Array(v)]));fixture.mode='ok';fixture.events.forEach(cb=>cb());},intake);
+      await target.locator('#nativeIncoming button').first().click();await target.waitForFunction(()=>!document.getElementById('nativeIncoming'));
+      assert.equal(await target.evaluate(()=>__wfpdf.S.docs.length),2);
+      const kept=await target.evaluate(async()=>{const rows=await WFPProTransferStore.snapshot();try{await WFPProTransferStore.restore([{...rows[0],sha256:'0'.repeat(64)}]);return false;}catch{return JSON.stringify(await WFPProTransferStore.snapshot())===JSON.stringify(rows);}});
+      assert.equal(kept,true,'conflicting restored receipt must preserve the committed one');await target.close();
     });
     await t.test('nonfinal empty chunk fails closed; Arabic reception panel fits narrow view', async () => {
       const page=await pageFor('zero');await page.locator('#nativeIncoming button').first().click();
@@ -125,9 +235,9 @@ test('native reception with real browser/core and a protocol fixture', async t =
         fixture.queue[0].files=[{id:'state',name:'Мüller.workfloh.json',mime:'application/json'}];
       });
       await page.locator('#nativeIncoming button').first().click();
-      await page.waitForFunction(() => __wfpdf.S.docs.some(d=>d.id==='received-working-state'));
-      const result=await page.evaluate(async () => ({doc:await WFP.DB.get('docs','received-working-state'),bytes:Array.from(await WFP.DB.getFile('received-working-state')),expected:Array.from(fixture.data.second)}));
-      assert.equal(result.doc.fields[0].value,'Мüller');assert.equal(result.doc.kiEntfernt[0].text,'synthetic');assert.equal(result.doc.pruefung,undefined);assert.deepEqual(result.bytes,result.expected);await page.close();
+      await page.waitForFunction(() => __wfpdf.S.docs.some(d=>d.proEingang?.source.item==='state')&&!document.getElementById('nativeIncoming'));
+      const result=await page.evaluate(async () => {const d=__wfpdf.S.docs.find(d=>d.proEingang?.source.item==='state');return {doc:await WFP.DB.get('docs',d.id),bytes:Array.from(await WFP.DB.getFile(d.id)),expected:Array.from(fixture.data.second),original:Array.from((await WFP.DB.get('files',d.id+'~original')).bytes),raw:Array.from(fixture.data.state)};});
+      assert.equal(result.doc.fields[0].value,'Мüller');assert.equal(result.doc.kiEntfernt[0].text,'synthetic');assert.equal(result.doc.pruefung,undefined);assert.deepEqual(result.bytes,result.expected);assert.deepEqual(result.original,result.raw);await page.close();
     });
     await t.test('received image keeps exact unexamined original beside generated PDF', async () => {
       const page=await pageFor();
@@ -139,7 +249,7 @@ test('native reception with real browser/core and a protocol fixture', async t =
         fixture.queue[0].files=[{id:'photo',name:'Original Мüller.png',mime:'image/png'}];
       });
       await page.locator('#nativeIncoming button').first().click();
-      await page.waitForFunction(() => __wfpdf.S.docs.length===1);
+      await page.waitForFunction(() => __wfpdf.S.docs.length===1&&!document.getElementById('nativeIncoming'));
       const result=await page.evaluate(async () => {
         const doc=__wfpdf.S.docs[0], original=await WFP.DB.get('files',doc.id+'~original');
         return {source:doc.quelle,check:doc.pruefung||null,original:Array.from(original.bytes),expected:Array.from(fixture.data.photo),name:original.name,pdf:Array.from((await WFP.DB.getFile(doc.id)).slice(0,5))};

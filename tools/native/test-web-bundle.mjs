@@ -33,6 +33,8 @@ test('bundle contains the complete public runtime and unchanged protected files'
   // Gemeinsame Bedien-Bausteine vor dem Kasten „Tresor & Ablage“, die Web-Reste-Schicht nach der Sprache des Kerns.
   assert.ok(html.indexOf('native/pro-bedienung.js')<html.indexOf('native/native-vault.js'));
   assert.ok(html.indexOf('assets/sprache.js')<html.indexOf('native/native-ohne-web.js'));
+  assert.doesNotMatch(html, /<script[^>]+src="assets\/netz\.js/, 'one native controller owns the opt-in');
+  assert.ok(html.includes('native/native-netz.js'));
 });
 test('bundle excludes development material, signing files and private data', async () => {
   async function walk(path, relative = '') {
@@ -67,6 +69,12 @@ test('generated bundle imports a real form, preserves its original and survives 
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     await page.goto('http://127.0.0.1:' + server.address().port + '/');
     await page.waitForFunction(() => window.__wfpdf && window.PDFLib);
+    await page.evaluate(()=>__wfpdf.dlg.einstellungen());
+    await page.waitForSelector('#wppNetz');
+    assert.equal(await page.locator('[data-netz-an]').count(),1,'one visible control for answering in Mycel');
+    assert.equal(await page.evaluate(()=>typeof WFPNetz), 'undefined');
+    assert.equal(await page.evaluate(()=>WPPNetz.stand().an),false);
+    await page.keyboard.press('Escape');
     const pdf = await PDFDocument.create(), font = await pdf.embedFont(StandardFonts.Helvetica);
     for (let i = 0; i < 2; i++) pdf.addPage([595, 842]).drawText('Workflow PDF Pro ' + (i + 1), { x: 45, y: 770, font });
     const form = pdf.getForm().createTextField('Name'); form.setText('Müller'); form.addToPage(pdf.getPage(0), { x: 50, y: 650, width: 220, height: 25 });

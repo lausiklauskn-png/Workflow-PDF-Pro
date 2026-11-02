@@ -168,7 +168,7 @@
      … nach Dateinamen geordnet oder nach Dateigröße"). Namen werden NATÜRLICH verglichen:
      „Teil 2" vor „Teil 10", „S. 41–80" vor „S. 321–360". Vorgabe ist der Name. Bei einer Suche
      ordnet weiter die Trefferstärke. Die Wahl liegt in den Einstellungen dieses Browsers. */
-  const SORTIERUNG = { name: 'Name (1, 2 … 10)', neu: 'Zuletzt geändert', erstellt: 'Erstellungsdatum', groesse: 'Dateigröße', seiten: 'Seitenzahl' };
+  const SORTIERUNG = { name: 'Name (1, 2 … 10)', neu: 'Zuletzt geändert', erstellt: 'Erstellungsdatum', groesse: 'Dateigröße', seiten: 'Seitenzahl', brief: 'Briefdatum, Absender' };
   /* Erstellungsdatum (Klaus 2026-09-27: „nach Datum suchen … nur das Dokument, nicht der Inhalt.
      Wann wurde das Datum erstellt?"). Gemeint ist der Tag, an dem das Dokument HIER angelegt wurde
      (createdAt) — nicht ein Datum im Text; das findet die gewöhnliche Suche. Der Tag wird in der
@@ -193,6 +193,8 @@
       if (fehlt.length && !sortiere._laeuft) { sortiere._laeuft = true; Promise.all(fehlt.map(d => dateiGroesse(d.id).catch(() => 0))).finally(() => { sortiere._laeuft = false; zeichneBibliothek(); }); }
       return liste.sort((a, b) => (_groesse.get(b.id) || 0) - (_groesse.get(a.id) || 0) || namensVergleich(a, b));
     }
+    // Briefkopf (Pro-Umbau 14 D): Briefdatum (sonst Eingang) → Absender → Kundennummer → Wichtigkeit; fehlende werden nachgelesen
+    if (art === 'brief' && BKA()) { if (S.docs.some(d => !d.briefkopf)) BKA().nachholen(); return liste.sort(WFP.Briefkopf.vergleich); }
     if (art === 'seiten') return liste.sort((a, b) => b.pages.length - a.pages.length || namensVergleich(a, b));
     if (art === 'neu') return liste.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
     if (art === 'erstellt') return liste.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '') || namensVergleich(a, b));
@@ -230,7 +232,8 @@
     S.fund = FUND;
     // Schalter „Bildbeschreibung" an: nur Fotos, die eine Beschreibung haben (eigene Worte oder vom Modell)
     const bildFilter = d => !bildFilterAn() || (WFP.Bild && WFP.Bild.beschrieben(d));
-    const sicht = S.sicht = S.docs.filter(d => imOrdner(d) && (!such.length || FUND.has(d.id)) && imZeitraum(d) && bildFilter(d));
+    const themaFilter = d => !BKA() || BKA().passtThema(d, S.thema);
+    const sicht = S.sicht = S.docs.filter(d => imOrdner(d) && (!such.length || FUND.has(d.id)) && imZeitraum(d) && themaFilter(d) && bildFilter(d));
     if (such.length) sicht.sort((a, b) => FUND.get(b.id).punkte - FUND.get(a.id).punkte);
     else sortiere(sicht);
     // EIN Kasten für Sortieren UND den Zeitraum (Klaus 2026-09-27: „nicht außerhalb des Containers, weil es
@@ -242,6 +245,7 @@
     const sortWahl = S.docs.length ? `<details class="sortier-box" data-sortbox${S.sortOffen ? ' open' : ''}><summary>⇅ Sortieren${zr ? ` <span class="zeitraum-kurz" data-zeitraumkurz>📅 ${h(zr)}</span>` : ''}</summary>`
       + `<div class="sortier-inhalt"><label class="sortier">Sortieren nach: <select data-sort>${Object.entries(SORTIERUNG).map(([k, v]) => `<option value="${k}"${k === EINST.sortierung ? ' selected' : ''}>${v}</option>`).join('')}</select></label>`
       + (such.length ? '<span class="hinweis klein">Bei einer Suche ordnet die Trefferzahl.</span>' : '')
+      + (BKA() && (EINST.sortierung === 'brief' || S.thema || BKA().themen(S.docs).length) ? `<label class="sortier">Thema: <select data-thema><option value="">alle</option>${BKA().themen(S.docs).map(t => `<option value="${h(t)}"${S.thema === t ? ' selected' : ''}>${h(t)}</option>`).join('')}<option value="-"${S.thema === '-' ? ' selected' : ''}>ohne Thema</option></select></label>` : '')
       + (zeitraumZeigen ? `<div class="zeitraum" data-zeitraum>📅 Erstellt von <input type="date" data-von value="${h(S.von || '')}"> bis <input type="date" data-bis value="${h(S.bis || '')}">${S.von || S.bis ? '<button class="knopf klein" data-datumweg title="Zeitraum wieder weglassen">✕ jedes Datum</button>' : ''}</div>` : '')
       + '</div></details>' : '';
     akt.innerHTML = sortWahl + (o && S.docs.some(d => d.folderId === o.id) ? `<button class="knopf" data-ausgabe>📤 Ordner ausgeben</button>` : '') + (sicht.length ? `<button class="knopf" data-ueb>🌐 Übersetzen${sicht.length > 1 ? ' — Dokumente wählen' : ''}</button><button class="knopf" data-erk>🤖 Felder erkennen${sicht.length > 1 ? ' — Dokumente wählen' : ''}</button>` : '')
@@ -253,6 +257,7 @@
     if (q('[data-sortbox]')) q('[data-sortbox]').ontoggle = kastenOffen;
     // „Erstellungsdatum" gewählt → der Zeitraum steht da (der Kasten ist offen, man hat ja darin gewählt),
     // und der Kalender für „von" geht gleich auf.
+    if (q('[data-thema]')) q('[data-thema]').onchange = e => { S.thema = e.target.value; kastenOffen(); zeichneBibliothek(); };
     if (q('[data-sort]')) q('[data-sort]').onchange = e => { EINST.sortierung = e.target.value; einstSpeichern(); kastenOffen(); zeichneBibliothek();
       if (e.target.value === 'erstellt') { const v = $('ordnerAktionen').querySelector('[data-von]'); if (v) { v.focus(); try { v.showPicker(); } catch (_) {} } } };
     // Widersprechen sich die Enden, gewinnt das gerade gewählte, und das andere rückt auf denselben Tag —
@@ -303,7 +308,7 @@
         <button class="dok-bild" data-auf style="background-image:url('${d.thumb || ''}')" title="Öffnen">
           <span class="marken">${v ? `<span class="marke-klein ki">🤖 ${v} zu prüfen</span>` : ''}${d.quelle === 'foto' ? '<span class="marke-klein">📷 Foto</span>' : ''}${d.uebersetzung ? `<span class="marke-klein">🌐 ${h((d.uebersetzung.von || '').toUpperCase())}→${h((d.uebersetzung.nach || '').toUpperCase())}${d.uebersetzung.gegenprobe ? ' Gegenprobe' : ''}</span>` : ''}${d.ausgefuellt ? `<span class="marke-klein">↩ ausgefüllt aus ${h((d.ausgefuellt.aus || '').toUpperCase())}</span>` : ''}</span></button>
         <div class="dok-info"><div class="dok-name" data-kein-ue title="${h(d.name)}">${nm(d.name)}</div>
-          <div class="dok-meta">${d.pages.length} Seite${d.pages.length === 1 ? '' : 'n'} · ${d.fields.length} Feld${d.fields.length === 1 ? '' : 'er'}${EINST.sortierung === 'groesse' && _groesse.has(d.id) ? ' · ' + mbText(_groesse.get(d.id)) : ''}${ord && S.aktOrdner === 'alle' ? ' · 🗂️ ' + nm(ord.name) : ''}</div>${(EINST.sortierung === 'erstellt' || S.von || S.bis) ? '<div class="dok-meta dok-erstellt" data-erstellt="' + tagVon(d.createdAt) + '">' + (d.createdAt ? h('erstellt ' + tagText(tagVon(d.createdAt))) : h('ohne Erstellungsdatum')) + '</div>' : ''}${pruefMarke(d)}${fund ? (fund.bedeutung ? bedeutungZeile(fund) : fundZeilen(fund)) : ''}</div>
+          <div class="dok-meta">${d.pages.length} Seite${d.pages.length === 1 ? '' : 'n'} · ${d.fields.length} Feld${d.fields.length === 1 ? '' : 'er'}${EINST.sortierung === 'groesse' && _groesse.has(d.id) ? ' · ' + mbText(_groesse.get(d.id)) : ''}${ord && S.aktOrdner === 'alle' ? ' · 🗂️ ' + nm(ord.name) : ''}</div>${(EINST.sortierung === 'erstellt' || S.von || S.bis) ? '<div class="dok-meta dok-erstellt" data-erstellt="' + tagVon(d.createdAt) + '">' + (d.createdAt ? h('erstellt ' + tagText(tagVon(d.createdAt))) : h('ohne Erstellungsdatum')) + '</div>' : ''}${(EINST.sortierung === 'brief' || S.thema) && BKA() ? BKA().meta(d) : ''}${pruefMarke(d)}${fund ? (fund.bedeutung ? bedeutungZeile(fund) : fundZeilen(fund)) : ''}</div>
         <div class="dok-akt"><button data-auf title="Öffnen">✏️</button><button data-verschieben title="In Ordner verschieben">🗂️</button><button data-kopie title="Duplizieren (z. B. als Vorlage)">⧉</button><button data-teilen title="Teilen mit … (E-Mail, Messenger …)">📤</button><button data-loeschen title="Löschen">🗑</button></div></div>`;
   }
   /* Pfeil nach oben (Klaus 2026-09-27: „neben dem Markierenpunkt noch ein Pfeil nach oben … komplett
@@ -325,6 +330,7 @@
       el.querySelector('[data-haken]').onclick = () => { WAHL_AN = true; wahlUmschalten(id); };
       el.querySelector('[data-hoch]').onclick = ganzNachOben;
       pruefKnopfBinden(el, id);
+      const bk = el.querySelector('[data-briefkopf-aendern]'); if (bk && BKA()) bk.onclick = e => { e.stopPropagation(); const dd = S.docs.find(x => x.id === id); if (dd) BKA().aendern(dd); };
       const tk = el.querySelector('[data-teilen]'); if (tk) tk.onclick = () => teilenDocs([id]);   // Platzhalter, kein Ausstieg
       ziehenBinden(el, id);
       el.querySelector('[data-verschieben]').onclick = () => verschieben(id);
@@ -703,7 +709,9 @@
     }
     return seiten;
   }
-  async function textAblegen(id, seiten) { try { await DB.put('texte', { id, v: 1, seiten }); TEXTE.set(id, SU.vorbereiten(seiten)); } catch (_) {} }
+  async function textAblegen(id, seiten) { try { await DB.put('texte', { id, v: 1, seiten }); TEXTE.set(id, SU.vorbereiten(seiten)); } catch (_) {}
+    if (BKA()) { try { await BKA().setzen(id, seiten); } catch (_) {} } }
+  const BKA = () => window.WFP && WFP.BriefkopfAnsicht && WFP.Briefkopf ? WFP.BriefkopfAnsicht : null;
   let _nachholen = null;
   function texteNachholen() {
     if (_nachholen) return _nachholen;
@@ -1013,12 +1021,16 @@
     }
     return out;
   }
-  async function neuesDok(name, bytes, quelle, folderId, original, pruefen) {
+  async function neuesDok(name, bytes, quelle, folderId, original, pruefen, vorSpeichern) {
     const pdf = await pdfjsLib.getDocument({ data: bytes.slice(0) }).promise;
     const d = { id: uid(), name, folderId: folderId || null, quelle, createdAt: jetzt(), updatedAt: jetzt(),
       pages: await seitenInfo(pdf), thumb: await vorschaubild(pdf), fields: await vorhandeneFelder(pdf) };
     const text = await seitenText(pdf);
     try { pdf.destroy(); } catch (_) {}
+    // Native Eingänge reservieren ihre Kennung vor dem Import. Der optionale Haken
+    // setzt sie und den Herkunftsvermerk am normalen Dokument, bevor irgendetwas
+    // davon gespeichert wird. Ein abgebrochener Haken schreibt keine Dokumentdaten.
+    if (typeof vorSpeichern === 'function') await vorSpeichern(d, { bytes, original });
     await DB.putFile(d.id, bytes); await DB.put('docs', d); await textAblegen(d.id, text);
     /* Geprüft wird nur auf Knopfdruck (Klaus 2026-10-14: „400 Seiten eines Buches … obwohl nicht
        notwendig, weil die Datei schon mehrfach geprüft wurde"). ⚠ Tafel-Evolution: bis dahin lief die
@@ -1309,7 +1321,7 @@
     const inhalt = JSON.stringify({ format: STAND_FORMAT, version: 1, gesichert: jetzt(), doc, pdf: zuB64(bytes) });
     return new File([inhalt], dateiName(doc.name) + '.workfloh.json', { type: 'application/json' });
   }
-  async function staendeEinlesen(dateien) {
+  async function staendeEinlesen(dateien, opt = {}) {
     const neu = [], fehler = [];
     for (const f of dateien) {
       try {
@@ -1324,14 +1336,16 @@
         } else if (vorhanden) hinweis = ' · Stand im Browser ersetzt';
         if (d.folderId && !S.ordner.some(o => o.id === d.folderId)) d.folderId = null;
         delete d.pruefung;                                  // ein Befund aus einer fremden Datei wird nicht geglaubt — geprüft wird auf Knopfdruck
+        if (typeof opt.vorSpeichern === 'function') await opt.vorSpeichern(d, { bytes, original: null });
         await DB.putFile(d.id, bytes); await DB.put('docs', d);
         neu.push({ d, hinweis });
       } catch (e) { fehler.push(f.name + ': ' + (e.message || e)); }
     }
     await ladeBibliothek();
     if (fehler.length) dialog(`<h2>Arbeitsstand nicht eingelesen</h2><ul>${fehler.map(x => '<li>' + h(x) + '</li>').join('')}</ul><div class="zeile"><button class="knopf rot" data-x>OK</button></div>`, (d, zu) => d.querySelector('[data-x]').onclick = zu);
-    if (neu.length === 1) { toast('📂 Arbeitsstand „' + neu[0].d.name + '" eingelesen' + neu[0].hinweis); oeffneDok(neu[0].d.id); }
+    if (neu.length === 1) { toast('📂 Arbeitsstand „' + neu[0].d.name + '“ eingelesen' + neu[0].hinweis); if (!opt.still) oeffneDok(neu[0].d.id); }
     else if (neu.length) toast('📂 ' + neu.length + ' Arbeitsstände eingelesen');
+    return neu.map(item => item.d);
   }
   async function speichernDialog() {
     await speichernJetzt();
@@ -1352,10 +1366,11 @@
   async function importDateien(dateien, ordnerName, opt) {
     opt = opt || {};
     const staende = Array.from(dateien || []).filter(istStand);
-    if (staende.length) { await staendeEinlesen(staende); dateien = Array.from(dateien).filter(f => !istStand(f)); if (!dateien.length) return []; }
+    const staendeNeu = staende.length ? await staendeEinlesen(staende, opt) : [];
+    if (staende.length) { dateien = Array.from(dateien).filter(f => !istStand(f)); if (!dateien.length) return staendeNeu; }
     const liste = Array.from(dateien || []).filter(f => istPdf(f) || istBild(f)).sort((a, b) => (a.webkitRelativePath || a.name).localeCompare(b.webkitRelativePath || b.name, 'de', { numeric: true }));
     const uebrig = (dateien ? dateien.length : 0) - liste.length;
-    if (!liste.length) { toast('Keine PDF- oder Bilddatei gefunden.'); return []; }
+    if (!liste.length) { toast('Keine PDF- oder Bilddatei gefunden.'); return staendeNeu; }
     if (!_persistGefragt) { _persistGefragt = true; DB.persist(); }
     let folderId = (S.ordner.some(o => o.id === S.aktOrdner)) ? S.aktOrdner : null;
     if (ordnerName) {
@@ -1364,14 +1379,14 @@
       folderId = o.id;
     }
     const fb = liste.length > 1 ? fortschritt('Dokumente einlesen') : null;
-    const neu = [], fehler = [];
+    const neu = [...staendeNeu], fehler = [];
     for (let i = 0; i < liste.length; i++) {
       const f = liste[i]; if (fb) fb.setze(i / liste.length, f.name);
       try {
         let bytes, quelle = 'pdf', original = null;
         if (istPdf(f)) bytes = new Uint8Array(await f.arrayBuffer());
         else { original = { name: f.name, bytes: new Uint8Array(await f.arrayBuffer()) }; const b = await bildNormalisieren(f); bytes = await EX.bilderZuPdf([b]); quelle = 'foto'; }
-        neu.push(await neuesDok(f.name.replace(/\.[^.]+$/, ''), bytes, quelle, folderId, original, opt.pruefen));
+        neu.push(await neuesDok(f.name.replace(/\.[^.]+$/, ''), bytes, quelle, folderId, original, opt.pruefen, opt.vorSpeichern));
       } catch (e) {
         console.error(e);
         fehler.push(f.name + ': ' + (/password/i.test(e && e.name + e.message) ? 'passwortgeschützt' : (e.message || e)));
@@ -1440,6 +1455,7 @@
     history.pushState({ ed: 1 }, '', '#dok');
     zeichneSeiten(); zeichneModus();
     if (window.WFP && WFP.Bild) WFP.Bild.editor(d);
+    if (BKA()) BKA().editor(d);
     if (fund && fund.bedeutung) {
       // Nach Bedeutung gefunden: kein Wort zum Suchen — markiert wird der Abschnitt, der am nächsten lag
       S.funde = fundMarken(fund); S.fundIdx = S.funde.length ? 0 : -1; funde_neu_zeichnen(); zeichneSuchZahl();
@@ -3027,6 +3043,7 @@
       <h3 style="margin:14px 0 0;font-size:1rem">Speicher</h3>
       <p class="hinweis" id="stSpeicher">…</p>
       <div class="zeile" style="justify-content:flex-start"><button class="knopf" id="stSicherung">🔐 Bibliothek sichern und zurückholen …</button></div>
+      ${window.WFPNetz ? WFPNetz.abschnittHtml() : ''}
       <p class="hinweis"><a href="impressum.html" target="_blank" rel="noopener">Impressum &amp; Datenschutz</a></p>
       ${$('btnInstall').hidden ? '' : '<div class="zeile" style="justify-content:flex-start" data-einst-install><button class="knopf rot" id="stInstall">📲 Als App installieren</button></div>'}
       <div class="zeile"><button class="knopf" data-x>Abbrechen</button><button class="knopf rot" data-ok>Speichern</button></div>
@@ -3042,6 +3059,7 @@
       zeige();
       d.querySelector('#stSprache').onclick = spracheWaehlen;
       d.querySelector('#stSicherung').onclick = () => { zu(); sicherungDialog(); };
+      if (window.WFPNetz) WFPNetz.binden(d);   // „Im Netz antworten“ (assets/netz.js): schaltet sofort, nicht erst mit „Speichern“
       /* Installieren auch hier (Klaus 2026-10-18: „unter Einstellungen … so wie bei meinem Rezeptbuch“).
          Derselbe Weg wie der Knopf oben; als App ist der obere verborgen und dieser fehlt. */
       const stInst = d.querySelector('#stInstall'); if (stInst) stInst.onclick = () => { zu(); $('btnInstall').click(); };
@@ -3308,6 +3326,7 @@
     bedeutungZeichnen();
     versionZeigen();
     // Bildbeschreibung (Sitzung 4): die Nähte der App hineinreichen; das Modell startet nur, wenn die Wahl gemerkt ist
+    if (BKA()) BKA().init({ S, DB, dialog, toast, neu: () => { if ($('sc-bib').classList.contains('on')) zeichneBibliothek(); }, texteNachholen });
     if (window.WFP && WFP.Bild) WFP.Bild.init({ S, EINST, einstSpeichern, DB, dialog, toast, neu: () => { if ($('sc-bib').classList.contains('on')) zeichneBibliothek(); }, sprechen: window.WFSprechen, micSprache: () => MIC_LANG[(WFP.Sprache && WFP.Sprache.lang) || 'de'] || 'de-DE' });
     ladeBibliothek().then(() => { if (EINST.bedeutung) bedeutungStarten({ einordnen: false }); if (window.WFP && WFP.Bild) WFP.Bild.start(); }).then(chromeTabRueckweg).then(geteiltUebernehmen).then(oeffnenMitEmpfangen).then(scanDirektstart).catch(e => toast('⚠️ Speicher nicht verfügbar: ' + (e.message || e)));
     window.__wfpdf = { bild: window.WFP && WFP.Bild, eingang: { PRUEF, pruefDialog, eingangPruefen, pruefungNachholen, ALLE, allePruefen, pruefenKnopf, pruefLeiste }, versionNummer, kiReiniger, beispieleLaden, S, EINST, suche: { TEXTE, texteNachholen, zeichneBibliothek }, bedeutung: { BED, bedeutungStarten, bedeutungAus, vektorenNachholen, bedeutungZeichnen, einordnenLauf, einordnenStopp, einordnenKnopf, offeneEinordnen }, typAusLabel, nummerOeffnen, erkenneDok, importDateien, oeffneDok, einstSpeichern, uebersetzeViele, ergebnisOrdner, geteiltUebernehmen, scanDirektstart,

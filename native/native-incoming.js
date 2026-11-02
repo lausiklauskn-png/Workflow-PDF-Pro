@@ -1,5 +1,5 @@
-/* Explicit native SEND/VIEW intake. The original inDatei handler owns document
-   parsing, working-state imports and manual security checks. No URI enters JS. */
+/* Explicit native SEND/VIEW intake. The ordinary core import owns parsing,
+   working states and manual checks. Durable readback precedes acknowledgement. */
 (() => {
   'use strict';
   if (!window.Capacitor?.isNativePlatform?.()) return;
@@ -12,8 +12,8 @@
     dismiss: ['Nicht einlesen', 'Dismiss', 'Не импортировать', 'تجاهل'],
     confirm: ['Empfang bestätigen', 'Acknowledge receipt', 'Подтвердить получение', 'تأكيد الاستلام'],
     retry: ['Erneut versuchen', 'Retry', 'Повторить', 'إعادة المحاولة'],
-    failed: ['Dateien konnten nicht vollständig gelesen werden. Es wurde nichts zum Import übergeben. Bitte erneut versuchen oder noch einmal teilen.', 'The files could not be read completely. Nothing was submitted for import. Retry or share them again.', 'Не удалось полностью прочитать файлы. Ничего не передано для импорта. Повторите попытку или отправьте файлы ещё раз.', 'تعذرت قراءة الملفات بالكامل. لم يُرسل أي ملف للاستيراد. أعد المحاولة أو شارك الملفات مجدداً.'],
-    uncertain: ['Dateien wurden zum Import übergeben. Die Empfangsbestätigung ist fehlgeschlagen. Bitte nicht erneut einlesen; eine Wiederholung kann Duplikate erzeugen.', 'Files were submitted for import, but acknowledgement failed. Do not import again; repeating may create duplicates.', 'Файлы переданы для импорта, но подтверждение не удалось. Не импортируйте повторно: возможны дубликаты.', 'تم إرسال الملفات للاستيراد، لكن تأكيد الاستلام فشل. لا تستوردها مجدداً فقد يؤدي ذلك إلى نسخ مكررة.'],
+    failed: ['Einlesen nicht vollständig abgeschlossen. Die Empfangskopien bleiben erhalten. Erneut versuchen setzt den Eingang fort.', 'Import did not complete. Intake copies are retained. Retry resumes this intake.', 'Импорт не завершён. Полученные копии сохранены. Повторите, чтобы продолжить.', 'لم يكتمل الاستيراد. تبقى نسخ الاستلام محفوظة. أعد المحاولة للمتابعة.'],
+    uncertain: ['Dateien gespeichert und geprüft. Die Empfangsbestätigung ist fehlgeschlagen. Erneut versuchen bestätigt denselben Eingang.', 'Files saved and verified. Acknowledgement failed. Retry acknowledges the same intake.', 'Файлы сохранены и проверены. Подтверждение не удалось. Повторите для того же входящего пакета.', 'حُفظت الملفات وتم التحقق منها. تعذر تأكيد الاستلام. أعد المحاولة لتأكيد الحزمة نفسها.'],
     history:['Empfangene Dateien wiederherstellen','Recover received files','Восстановить полученные файлы','استعادة الملفات المستلمة'],
     recovery:['Private Empfangskopien bleiben bis zum ausdrücklichen Löschen erhalten. Erneutes Einlesen kann Duplikate erzeugen. Bereits importierte Dokumente bleiben beim Löschen einer Empfangskopie erhalten.','Private intake copies remain until you explicitly delete them. Importing again can create duplicates. Deleting an intake copy preserves imported documents.','Частные копии полученных файлов хранятся до явного удаления. Повторный импорт может создать дубликаты. Удаление копии не удаляет импортированные документы.','تبقى النسخ الخاصة للملفات المستلمة حتى تحذفها صراحة. قد تنشأ نسخ مكررة عند الاستيراد مجدداً. حذف نسخة الاستلام يُبقي المستندات المستوردة.'],
     offer:['Erneut zum Einlesen anbieten','Offer for import again','Предложить импорт снова','إتاحة الاستيراد مجدداً'],
@@ -53,16 +53,18 @@
       let submitted=false;
       read.onclick = async () => {
         if (busy) return; busy = true; read.disabled = dismiss.disabled = true;
+        submitted=false;
         let dispatched = false;
         try {
           line.textContent = t('reading');
-          // Rewind all tickets on retry. A failed later file never produces a
-          // partial selection, and no batch is acknowledged before dispatch.
+          // Read and verify every source before importing any file. Persisted
+          // per-file reservations make a partial import safe to resume.
           const current = await api.pending();
           if (current.id !== batch.id || !Array.isArray(current.files) || !current.files.length) throw new Error('INCOMING_INVALID_TRANSFER');
-          const transfer = new DataTransfer();
+          const files = [];let total=0;
           for (const item of current.files) {
-            if (typeof item.id !== 'string' || typeof item.name !== 'string') throw new Error('INCOMING_INVALID_TRANSFER');
+            if (typeof item.id !== 'string' || typeof item.name !== 'string' || !Number.isSafeInteger(item.size) || item.size<=0 || item.size>200*1024*1024 || !/^[a-f0-9]{64}$/.test(item.sha256)) throw new Error('INCOMING_INVALID_TRANSFER');
+            total+=item.size;if(total>512*1024*1024)throw Error('INCOMING_INVALID_TRANSFER');
             const parts = []; let offset = 0;
             while (true) {
               const part = await api.read({ batch: batch.id, id: item.id, offset });
@@ -70,19 +72,21 @@
               const bytes = Uint8Array.from(atob(part.data), char => char.charCodeAt(0));
               if (bytes.length > 262144 || !bytes.length && !part.done) throw new Error('INCOMING_INVALID_TRANSFER');
               parts.push(bytes); offset += bytes.length;
+              if(offset>item.size||part.done&&offset!==item.size)throw new Error('INCOMING_INVALID_TRANSFER');
               if (part.done) break;
             }
-            transfer.items.add(new File(parts, item.name, { type: item.mime || '' }));
+            const file=new File(parts,item.name,{type:item.mime||''});
+            if(await WFPProTransferStore.hash(file)!==item.sha256)throw Error('INCOMING_INVALID_TRANSFER');
+            files.push({file,identity:{kind:'native',batch:batch.id,item:item.id},expected:{sha256:item.sha256,size:item.size}});
           }
-          const input = document.getElementById('inDatei');
-          input.files = transfer.files;
-          dispatched = true; submitted=true; input.dispatchEvent(new Event('change', { bubbles: true }));
+          await WFPDurableImport.takeMany(files);
+          dispatched = true; submitted=true;
           await api.acknowledge({ id: batch.id }); panel.remove(); panel = null;
         } catch {
           line.textContent = t(dispatched ? 'uncertain' : 'failed'); read.textContent = t('retry');
-          // After dispatch, the core handles its own per-file import outcomes.
-          // Never automatically submit the same batch twice on an ack failure.
-          if (dispatched) { read.hidden = true; dismiss.textContent = t('confirm'); }
+          // Retry uses the committed receipt and cannot duplicate an accepted
+          // file. A failed/partial import keeps the native source pending.
+          if (dispatched) dismiss.textContent = t('confirm');
         } finally { busy = false; read.disabled = dismiss.disabled = false; show(); }
       };
     }).catch(() => {

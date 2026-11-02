@@ -39,8 +39,9 @@ for (const name of ['updates.js', 'updates.css']) {
 }
 const indexPath = join(dist, 'index.html');
 let html = await readFile(indexPath, 'utf8');
-const anchor = '<script defer src="assets/app.js?v=72"></script>';
-if (html.split(anchor).length !== 2) throw Error('Windows update injection anchor changed');
+const appTags = html.match(/<script defer src="assets\/app\.js\?v=\d+"><\/script>/g);
+if (appTags?.length !== 1) throw Error('Windows update injection anchor changed');
+const anchor = appTags[0];
 let probe = '';
 if (process.env.WFP_WINDOWS_PROBE === '1') {
   const bytes = await readFile(join(here, 'pruefung', 'csp-probe.js'));

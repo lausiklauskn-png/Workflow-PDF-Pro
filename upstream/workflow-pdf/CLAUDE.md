@@ -1,9 +1,77 @@
+**🔬 Regel: Forschung nur in Kimhub (Klaus 2026-10-31: „einheitlich alles in Kimhub … in den einzelnen Repos soll keine Forschungseinträge sein“):** jeder Forschungseintrag (Sitzungs-Befunde, Messungen, Stunden-Auswertungen, Forschungsnotizen) kommt nach **Kimhub `forschung/messungen/`**; in diesem Repo werden keine Forschungseinträge geführt und keine Forschungsdateien angelegt. Öffentliche Forschungs**aufgaben** stehen in Sage-Protokol.
+
 # Workfloh PDF — Sitzungs-Anker
+
+## Importabschluss für native Eingänge
+
+`__wfpdf.importDateien(files, ordner, { still: true, vorSpeichern })` unterstützt einen optionalen
+asynchronen Haken. Er erhält das fertig gelesene Dokument und `{ bytes, original }`, bevor Dateien,
+Dokument oder Seitentext gespeichert werden. Ein nativer Adapter kann dort seine vorab reservierte
+Kennung und Herkunft setzen. Ein abgelehnter Haken erzeugt keinen erfolgreichen Dokumenteintrag.
+PDF-Lesen, Bildumwandlung, aufgehobenes Original und die manuelle Prüfung bleiben im normalen Import.
+Arbeitsstand-Dateien verwenden denselben Haken, erhalten ihre Felder und liefern ebenfalls die tatsächlich
+gespeicherten Dokumente zurück; `still` öffnet dabei keinen Editor. Fremde Prüfbefunde werden weiterhin verworfen.
+Der Aufrufer muss anschließend den dauerhaften Speicher zurücklesen und seine eigene Quittung sichern;
+der Haken selbst ist keine Empfangsbestätigung und keine atomare Datenbanktransaktion.
+
+Version **1.1.7**, Cache **v112**, `app.js?v=75`. Browserprobe `tests/import-abschluss.mjs` in `npm test`;
+Gegenprobe `node tests/gegenprobe_import-abschluss.mjs` verändert nur Wegwerfkopien.
 
 PWA für Formulare: einlesen (PDF, Foto, Ordner) → Felder erkennen oder setzen →
 ausfüllen → festes / ausfüllbares PDF / leere Vorlage. Kein Build-Schritt.
 Vorlage war der Originaldokument-Modus von Mein-WorkFloh (Felder in Prozent
 über der echten Seite, „bearbeiten" gegen „ausfüllen").
+
+## 🕸 Im Netz antworten (Klaus 2026-10-31, Punkt 5: „wie Workflow PDF Pro")
+
+⚙️ Einstellungen → **„Im Netz antworten"** (`[data-netz-antworten]`, `assets/netz.js` = `WFPNetz`, Vorlage Workflow-PDF-Pro
+`native/native-netz.js`, Regeln wie BookLedgerPro `src/sbkim/netz.js`/`ueberall.js`). **Ab Werk aus**; die Schalter wirken sofort
+(nicht erst mit „Speichern"), gemerkt wird nur an/aus in `wfpdf_netz_v1`, nach dem Neuladen schaltet es sich wieder ein, sobald Mycel
+und Sprachmodell da sind.
+- **Öffentlich:** Antwort und Vergleich nur mit dem Dateinamen (`Dokument · <Name>`, Vektor aus Modul 03, nur aus dem Namen).
+- **Eigenes Netz** (Netz-Box im Mycel-Fenster; geprüft wird `SbkimRendezvous._meta.network === 'eigen'` — die PWA hat keinen
+  Chefcode-Kasten) **und „Mit Ausschnitt"**: Abschnitte aus den gespeicherten Vektoren der Bedeutungssuche (Fach `vektoren`, nur
+  lückenlose Blöcke), Anfang + immer die letzten 3 (Briefende), ≤ 60 je Dokument, ≤ 4000 gesamt, eine Zeile je Dokument, Ausschnitt um
+  die Suchwörter, Zeile ≤ 200 Zeichen. Der Filter (`antwortFilter`, über `configure({ match })`) prüft bei **jeder** Frage, ob ein
+  eigenes Netz steht, sonst antwortet er nichts.
+- Korpus-Vektoren immer `Float32Array` (Modul 04 `validateCorpus`). Korpus ist eine **Funktion**, gesetzt **nach** `enableAnswering`
+  (Modul 23 legt dort einmal eine feste Liste ab) — neue Dokumente sind ohne Aus/An dabei.
+- Gelesen wird über `WFP.DB` (db.js, nur `all`); ohne db.js nur lesend und **ohne Versionsangabe** (Lehre V3 #34).
+- Braucht das geladene Sprachmodell (Suche nach Bedeutung); ohne Modell sagt der Abschnitt das, und Einschalten meldet den Grund.
+- Datenschutz: `impressum.html` Abschnitt 4f (Stand-Datum unverändert, `tests/schieber.mjs` pinnt es).
+- Proben: `tests/netz.mjs` (in `npm test`, **28 grün**; echtes Modul 04 + echte db.js, Embedder und Modul 23 gestellt; B in der echten App)
+  · `node tests/gegenprobe_netz.mjs` (6 Fälle: Float32Array weg · Filter nicht je Frage · Briefende fehlt · Korpus nicht live ·
+  öffentlich mit Seitentext · Abschnitt fehlt) **6 gefangen · 0 · 0 · 0**. Zuerst war Fall 1 „durchgerutscht": Modul 04 warf, die Probe
+  starb, statt zu melden — jetzt wird der Wurf eine eigene rote Zeile.
+- Version **1.1.5**, Cache **v110**, `app.js?v=73`, `netz.js?v=1`, `sprache-texte.js?v=50` (17 neue Sätze je EN/RU/AR).
+- ⚠ Nicht gemessen: echtes Relais, echtes Sprachmodell, Tablet; ob ein fremder Knoten die Antwort wirklich sieht.
+
+## Briefkopf lesen und danach sortieren (Pro-Umbau 14, Sitzung D, Klaus 2026-10-31)
+
+„Briefdatum, Absender, Empfänger, Kundennummer … danach sortieren“ · Nachtrag „ein Thema vorschlagen“. **Quelle des Bausteins ist dieses Repo**
+(Klaus' Frage 3 im Plan): `assets/briefkopf.js` (`WFP.Briefkopf`, rein, ohne DOM, in Node geprüft) wird byte-1:1 nach Workflow PDF Pro (über
+`upstream/`), in die WorkFlohs, BookLedgerPro, Private Brain Pro und die Familienakte kopiert — nur hier ändern.
+- `lesen(zeilen, { mail, namen, themen })` liefert Briefdatum (beschriftet „Datum:“ oder „Ort, den …“; sonst nur, wenn im Kopf genau EIN Datum
+  steht und die Zeile nicht nach Frist/Geburt/zahlbar klingt), Absender (Mail „Von“, „Absender:“, Rücksendezeile, sonst Kopf-/Fußzeile mit
+  Rechtsform oder Behördenwort; „Postfach …“ ist nie ein Absender), Empfänger (Anschriftfeld vor „PLZ Ort“, Abgleich mit `namen`), Nummern
+  (Kunden-, Rechnungs-, Auftrags-, Vertrags-, Versicherungsnummer, Aktenzeichen/Steuernummer, Unser/Ihr Zeichen; mit Ziffer, ≥ 3 Ziffern),
+  Betreff, Wichtigkeit 0–3 (Zahlungsziel · Frist/Mahnung · letzte Mahnung/Kündigung/Inkasso) und Thema (die 18 Lebensbereiche der Familienakte,
+  `lib/family-categories.ts` dort; Gleichstand → leer; eigene Liste über `themen`). Jede Angabe mit Fundstelle; unsicher → null, nie geraten.
+  `zeilenAusSeiten` setzt den Seitentext der Bibliothek nach Lage zu Zeilen zusammen (Seite 1 und die letzte Seite).
+- Klebstoff `assets/briefkopf-ansicht.js` (`WFP.BriefkopfAnsicht`, Nähte über `init()`): nach dem Seitentext (`textAblegen`) wird `d.briefkopf`
+  am Dokument gemerkt (IndexedDB, wie das Dokument); **von Hand geändert** (`hand: true`) wird nie überschrieben, „Neu lesen“ nimmt das bewusst
+  zurück. Sortieren → **„Briefdatum, Absender“** (`vergleich`: Briefdatum, sonst Eingangsdatum, neueste zuerst → Absender → Kundennummer →
+  Wichtigkeit); fehlende Briefköpfe werden aus dem gemerkten Seitentext nachgezogen, je Dokument einmal je Sitzung. **Thema** als Filter im
+  Sortieren-Kasten (`S.thema`, „ohne Thema“). An der Karte eine Zeile (`[data-briefkopf]`), ein Tipp öffnet „Briefkopf“ zum Ändern; im Editor
+  der Knopf `#edBrief`. 23 neue Sätze je EN/RU/AR; Themen bleiben Deutsch (`data-kein-ue`).
+- Version **1.1.6**, Cache **v111**, `app.js?v=74`, `sprache-texte.js?v=51`, `briefkopf.js?v=1`, `briefkopf-ansicht.js?v=1` (im Vorrat).
+- Proben: `tests/briefkopf.mjs` (in `npm test`; Teil A erfundene Briefe: DIN 5008, Behörde, Mahnung, Arztbrief, Mail, Stücke in falscher
+  Reihenfolge, ohne Kopf, Gleichstand, Datumsregeln, Sortieren — Teil B im Browser: drei erfundene PDFs einlesen, Briefkopf gemerkt, Sortieren,
+  Kartenzeile, Thema-Filter, von Hand ändern bleibt nach dem Neuladen) **56 grün** · `node tests/gegenprobe_briefkopf.mjs` (14 Fälle, Wegwerf-Kopie;
+  `NUR_ANKER=1`, `NUR_FALL`) **14 gefangen · 0 · 0 tote Anker**. Beim Bau: drei Wächter zuerst blind (Ort-den ohne zweites Datum, Stücke auf
+  gleicher Höhe, „Buchungsnummer“ ist keine bekannte Nummer) — geschärft; ein echter Fund (Postfach als Absender) behoben.
+- ⚠ Grenzen: Handschrift, schräge Scans (keine Textebene → nichts zu lesen, Texterkennung erst später), Briefe ohne Kopf, Absender ohne Rücksendezeile,
+  Rechtsform und Behördenwort; Themenliste für Betriebe offen (Klaus fragen). Am Tablet nicht gemessen, nur erfundene Briefe.
 
 ## Pro-Umbau 5: nichts startet von selbst · Prüfen/Einordnen für die Auswahl · Strichgrafiken · nur Vorschaubilder (Klaus 2026-10-28)
 
