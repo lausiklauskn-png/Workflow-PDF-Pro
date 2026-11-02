@@ -56,7 +56,10 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           script: |
-            python3 tools/native/webview-runtime.py install work/webview-runtime
+            # The unchanged APK and runtime were built for this exact source.
+            # The diagnostic workflow commit is different; keep the existing
+            # source/hash checks against the actual product build provenance.
+            GITHUB_SHA=e2c57b3f514c0c3f118c23f243bf5ee9fe756bb7 python3 tools/native/webview-runtime.py install work/webview-runtime
             adb logcat -c
             mkdir -p work/update-diagnostics
             bash -c 'set +e; python3 tools/native/verify-signed-install.py work/diagnostic.apk; probe_status=$?; adb logcat -d > work/update-diagnostics/full-logcat.txt; adb shell dumpsys activity activities > work/update-diagnostics/activity.txt; tail -n 100 work/update-diagnostics/full-logcat.txt; exit "$probe_status"'
