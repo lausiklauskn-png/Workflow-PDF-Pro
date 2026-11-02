@@ -74,7 +74,8 @@
     WorkflowIncoming: plugin('WorkflowIncoming', ['pending', 'read', 'acknowledge', 'history', 'restore', 'discardArchived']),
     WorkflowVault: plugin('WorkflowVault', ['state', 'locations', 'migration', 'prepareMigration', 'completeMigration', 'cancelMigration',
       'beginBatch', 'commitBatch', 'abortBatch', 'setPrimary', 'volumes', 'choose', 'unlock', 'lock', 'begin', 'append', 'finish', 'abort',
-      'info', 'read', 'list', 'remove', 'recoveryInfo', 'createRecovery']),
+      'info', 'read', 'list', 'remove', 'recoveryInfo', 'createRecovery',
+      'tresorZustand', 'tresorVerbinden', 'tresorSperren', 'tresorFach', 'tresorUebergabe']),
     WorkflowChrome: plugin('WorkflowChrome', ['begin', 'translate', 'close']),
     // Scanner über Windows-WIA (windows/scanner/scanner.rs, gemeinsamer Baustein der Pro-Hüllen).
     ProScanner: plugin('ProScanner', ['geraete', 'scannen'])

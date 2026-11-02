@@ -51,3 +51,9 @@ Datei-Ereignis. Der Kern ist bytegleich aus Workflow-PDF **1.1.7**, PR #140; zum
 `tools/onboarding/nachziehen.py` verwenden. Der native Einstieg lädt genau einen Netz-Antwortadapter.
 Verhalten und Grenzen: [docs/PRO-EINGANG.md](docs/PRO-EINGANG.md). Die gemeinsame Pro-Tresor-Verbindung
 und das neue Release folgen im übergreifenden Auftrag; die bestehende App-Nummer bleibt bis dahin gleich.
+
+Die native Grundlage der freiwilligen Verbindung ist nun auf Android und Windows vorhanden:
+`WorkflowVault.tresorVerbinden`, `tresorUebergabe` und `tresorFach`. Sie richtet keine eigene
+Arbeitsablage ein. Windows bündelt den kanonischen Java-Tresor mit minimaler Laufzeit und nutzt
+eigene Passwortdialoge sowie DPAPI. Bedienung und normaler Import-/Ausgabepfad werden im nächsten
+Baustein ergänzt; kein neuer Installer veröffentlicht. [Vertrag und Grenzen](docs/PRO-VERBUND-NATIV.md).

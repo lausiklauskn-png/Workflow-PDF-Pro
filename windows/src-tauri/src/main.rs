@@ -3,6 +3,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod host;
+mod pro_tresor;
 mod win;
 mod updates;
 #[path = "../../scanner/scanner.rs"]

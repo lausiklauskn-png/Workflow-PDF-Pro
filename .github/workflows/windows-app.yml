@@ -28,6 +28,15 @@ jobs:
           node windows/tools/test-update-feed.mjs
           node windows/tools/test-update-ui.mjs
           node windows/tools/test-github-updates.mjs
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Kanonischer Pro-Tresor, Neustart und gezielte Gegenproben
+        run: |
+          node windows/tools/build-pro-tresor.mjs --nur-jar
+          node windows/tools/test-pro-tresor.mjs
+          node windows/tools/gegenprobe-pro-tresor.mjs
       - name: Tresor, Empfang, Übergaben und Chrome-Sitzung (Rust)
         working-directory: windows/core
         run: cargo test --release
@@ -51,6 +60,10 @@ jobs:
         run: |
           npm ci
           npm run verify:upstream
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00
+        with:
+          distribution: temurin
+          java-version: '21'
       - name: Werkzeuge
         working-directory: windows
         run: npm ci
@@ -62,6 +75,8 @@ jobs:
       - name: Lokalen Webinhalt vor Rust-Tests erzeugen
         working-directory: windows
         run: node tools/build-web.mjs
+      - name: Pro-Tresor auf dem Windows-Dateisystem
+        run: node windows/tools/test-pro-tresor.mjs
       - name: Signier- und Veröffentlichungsskripte auf Syntax prüfen
         run: |
           Get-ChildItem windows/tools -Filter *.ps1 | ForEach-Object {
@@ -116,12 +131,19 @@ jobs:
           WFP_PRUEF_SPEICHERN: ${{ runner.temp }}\wfp-speichern
           WFP_PRUEF_IMPORT: ${{ runner.temp }}\wfp-import
           WFP_PRUEF_TRESOR: ${{ runner.temp }}\wfp-usb-stick
+          WFP_PRUEF_PRO_TRESOR: ${{ runner.temp }}\wfp-pro-verbund
         run: |
           $ErrorActionPreference = 'Stop'
           $appDir = Join-Path $env:LOCALAPPDATA 'Workflow PDF Pro'
           $exe = Join-Path $appDir 'workflow-pdf-pro.exe'
           $env:WFP_APP_EXE = $exe
           New-Item -ItemType Directory -Force $env:WFP_PRUEF_TRESOR | Out-Null
+          New-Item -ItemType Directory -Force $env:WFP_PRUEF_ARBEIT | Out-Null
+          $proClasses = (Resolve-Path 'work/pro-tresor-probe').Path
+          $proJar = (Resolve-Path 'windows/src-tauri/pro-tresor/workflow-pro-tresor.jar').Path
+          $proSeed = & "$env:JAVA_HOME/bin/java.exe" -cp "$proClasses;$proJar" de.familyprojekt.workflowpdf.pro.ProVerbundProbe seed $env:WFP_PRUEF_PRO_TRESOR
+          if ($LASTEXITCODE -ne 0) { throw 'Pro-Tresor-Probe konnte nicht angelegt werden.' }
+          $proSeed | Set-Content -Encoding utf8NoBOM (Join-Path $env:WFP_PRUEF_ARBEIT 'pro-tresor-probe.json')
           $rot = @()
           function Wait-Run($file, $arguments) {
             $p = Start-Process -FilePath $file -ArgumentList $arguments -PassThru
@@ -141,6 +163,11 @@ jobs:
           "Öffnen mit eingetragen: $($null -ne $reg.'WorkflowPDFPro.Dokument')" | Tee-Object -Append pruef-out/ablauf.txt
           $default = (Get-ItemProperty 'HKCU:\Software\Classes\.pdf' -ErrorAction SilentlyContinue).'(default)'
           "Standard-App für .pdf unverändert: $($default -ne 'WorkflowPDFPro.Dokument')" | Tee-Object -Append pruef-out/ablauf.txt
+          Phase proErst
+          Phase proNeustart
+          Rename-Item $env:WFP_PRUEF_PRO_TRESOR "$($env:WFP_PRUEF_PRO_TRESOR)-abgezogen"
+          Phase proAbgezogen
+          Rename-Item "$($env:WFP_PRUEF_PRO_TRESOR)-abgezogen" $env:WFP_PRUEF_PRO_TRESOR
           Phase erst
           Phase neustart
           Rename-Item $env:WFP_PRUEF_TRESOR "$($env:WFP_PRUEF_TRESOR)-abgezogen"
@@ -153,6 +180,7 @@ jobs:
           "Öffnen mit nach Deinstallation entfernt: $($null -eq $reg.'WorkflowPDFPro.Dokument')" | Tee-Object -Append pruef-out/ablauf.txt
           Wait-Run 'pruef-out/pruefbau-setup.exe' '/S'
           Phase neuinstallation
+          Phase proNeuinstallation
           Wait-Run (Join-Path $appDir 'uninstall.exe') '/S'
           # Der ausgelieferte Bau startet, öffnet aber keinen Prüfzugang.
           $setup = (Get-ChildItem auslieferung -Filter *-setup.exe).FullName

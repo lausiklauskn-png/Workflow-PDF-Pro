@@ -44,6 +44,7 @@ pub struct Host {
     importing: AtomicBool,
     inbox: Mutex<Option<Inbox>>,
     vault: Mutex<Option<VaultLocations>>,
+    pro_tresor: Mutex<Option<crate::pro_tresor::Engine>>,
     choosing: AtomicBool,
     pub dialog: Mutex<Option<Sender<DialogMessage>>>,
     /// Gerade angezeigte Ersatzschlüssel; nur das Ersatzschlüsselfenster darf sie lesen.
@@ -80,6 +81,86 @@ fn language_index(options: &Value) -> usize {
     ["de", "en", "ru", "ar"].iter().position(|l| Some(*l) == s(options, "language")).unwrap_or(0)
 }
 
+/// Dialoge gehören zum laufenden privaten Engine-Aufruf; keine Geheimnisse im Hauptfenster.
+struct CommonDialog<'a> {
+    host: &'a Arc<Host>,
+    receiver: Option<Receiver<DialogMessage>>,
+    answer: Option<Sender<Value>>,
+}
+impl Drop for CommonDialog<'_> {
+    fn drop(&mut self) {
+        if self.receiver.is_some() {
+            if let Some(answer) = self.answer.take() { let _ = answer.send(json!({"status": 9})); }
+            *self.host.dialog.lock().unwrap() = None;
+            if let Some(window) = self.host.app.get_webview_window("kennwort") { let _ = window.destroy(); }
+        }
+    }
+}
+impl CommonDialog<'_> {
+    fn call(&mut self, method: &str, args: &Value) -> Reply {
+        match method {
+            "folder" => {
+                let mut dialog = self.host.app.dialog().file();
+                if let Some(window) = self.host.app.get_webview_window("main") { dialog = dialog.set_parent(&window); }
+                let chosen = match test_override("WFP_PRUEF_PRO_TRESOR") {
+                    Some(path) => Some(path),
+                    None => dialog.blocking_pick_folder().map(|f| f.into_path().map_err(|_| "TRESOR_ORDNER_NICHT_ERREICHBAR")).transpose()?,
+                };
+                Ok(match chosen { Some(path) => json!({"path": path.to_string_lossy()}), None => json!({"cancelled": true}) })
+            }
+            "protect" | "unprotect" => {
+                use wfp_core::DeviceProtect;
+                let text = s(args, "data").ok_or("TRESOR_GESPERRT")?;
+                let binding = s(args, "binding").ok_or("TRESOR_GESPERRT")?;
+                if text.len() > 16384 || binding.len() > 256 || !binding.starts_with("familyprojekt-tresorordner|") || !binding.ends_with("|geraet|workflow-pdf-pro") {
+                    return Err("TRESOR_GESPERRT".into());
+                }
+                let bytes = zeroize::Zeroizing::new(B64.decode(text).map_err(|_| "TRESOR_GESPERRT")?);
+                let protected = if method == "protect" {
+                    if bytes.len() != 32 { return Err("TRESOR_GESPERRT".into()); }
+                    zeroize::Zeroizing::new(win::Dpapi.protect(&bytes, binding.as_bytes()).map_err(|_| "TRESOR_GESPERRT")?)
+                } else { win::Dpapi.unprotect(&bytes, binding.as_bytes()).map_err(|_| "TRESOR_GESPERRT")? };
+                Ok(json!({"data": B64.encode(&*protected)}))
+            }
+            "password" => {
+                if self.receiver.is_none() {
+                    let (sender, receiver) = channel();
+                    *self.host.dialog.lock().unwrap() = Some(sender);
+                    self.receiver = Some(receiver);
+                    let language = ["de", "en", "ru", "ar"][language_index(args)];
+                    self.host.open_dialog("kennwort", &format!("windows/kennwort.html?modus=1&sprache={language}&kontext=pro-verbund"), 460.0, 360.0)?;
+                }
+                if self.answer.is_some() { return Err("TRESOR_ENGINE_DIALOG".into()); }
+                loop {
+                    match self.receiver.as_ref().ok_or("TRESOR_ENGINE_DIALOG")?.recv() {
+                        Err(_) | Ok(DialogMessage::Cancel) => return Ok(json!({"cancelled": true})),
+                        Ok(DialogMessage::Submit { password, repeat, remember, answer, .. }) => {
+                            let password = zeroize::Zeroizing::new(password);
+                            let _repeat = zeroize::Zeroizing::new(repeat);
+                            if wfp_core::crypto::nfc_len(&password) < 10 { let _ = answer.send(json!({"status": 9})); continue; }
+                            self.answer = Some(answer);
+                            return Ok(json!({"password": *password, "remember": remember}));
+                        }
+                        Ok(DialogMessage::Recover { answer, password, repeat, keys, .. }) => {
+                            let _password = zeroize::Zeroizing::new(password);
+                            let _repeat = zeroize::Zeroizing::new(repeat);
+                            let _keys = zeroize::Zeroizing::new(keys);
+                            let _ = answer.send(json!({"code": "VAULT_RECOVERY_INVALID"}));
+                        }
+                    }
+                }
+            }
+            "passwordResult" => {
+                let answer = self.answer.take().ok_or("TRESOR_ENGINE_DIALOG")?;
+                let done = args.get("done").and_then(Value::as_bool).unwrap_or(false);
+                let _ = answer.send(if done { json!({"done": true}) } else { json!({"status": 9}) });
+                Ok(json!({}))
+            }
+            _ => Err("TRESOR_ENGINE_HOST".into()),
+        }
+    }
+}
+
 impl Host {
     pub fn new(app: AppHandle) -> Self {
         let data_dir = app.path().app_local_data_dir().unwrap_or_else(|_| std::env::temp_dir().join("workflow-pdf-pro"));
@@ -91,6 +172,7 @@ impl Host {
             importing: AtomicBool::new(false),
             inbox: Mutex::new(None),
             vault: Mutex::new(None),
+            pro_tresor: Mutex::new(None),
             choosing: AtomicBool::new(false),
             dialog: Mutex::new(None),
             shares: Mutex::new(None),
@@ -115,6 +197,7 @@ impl Host {
             "WorkflowFiles" => self.files(method, &options),
             "WorkflowImport" => self.import(method, &options),
             "WorkflowIncoming" => self.incoming(method, &options),
+            "WorkflowVault" if crate::pro_tresor::allowed(method) => self.common_vault(method, &options),
             "WorkflowVault" => self.vault(method, &options),
             "WorkflowChrome" => self.chrome(method, &options),
             "ProScanner" => crate::scanner::call(method, &options, &self.cache_dir.join("scanner-arbeit")),
@@ -310,6 +393,24 @@ impl Host {
     }
 
     // ---------- Dokumenttresor ----------
+    fn common_vault(self: &Arc<Self>, method: &str, options: &Value) -> Reply {
+        let mut slot = self.pro_tresor.try_lock().map_err(|_| "TRESOR_BELEGT")?;
+        let choosing = method == "tresorVerbinden";
+        if choosing && self.choosing.swap(true, Ordering::SeqCst) { return Err("VAULT_BUSY".into()); }
+        let mut dialog = CommonDialog { host: self, receiver: None, answer: None };
+        let result = (|| {
+            if slot.is_none() {
+                let resources = self.app.path().resource_dir().map_err(|_| "TRESOR_ENGINE_FEHLT")?;
+                *slot = Some(crate::pro_tresor::Engine::start(&resources, &self.data_dir.join("pro-tresor.json"))?);
+            }
+            slot.as_mut().ok_or("TRESOR_ENGINE_START")?.call(method, options, |method, args| dialog.call(method, args))
+        })();
+        if result.as_ref().err().is_some_and(|e: &String| e.starts_with("TRESOR_ENGINE_")) { *slot = None; }
+        drop(dialog);
+        if choosing { self.choosing.store(false, Ordering::SeqCst); }
+        result
+    }
+
     fn with_vault<T>(&self, f: impl FnOnce(&mut VaultLocations) -> wfp_core::Result<T>) -> std::result::Result<T, String> {
         let mut guard = self.vault.lock().unwrap();
         if guard.is_none() {

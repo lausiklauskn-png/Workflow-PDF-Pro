@@ -7,7 +7,7 @@
   'use strict';
   if(!window.Capacitor?.isNativePlatform?.())return;
   const api=Capacitor.Plugins.WorkflowVault;
-  if(!api||typeof api.tresorZustand!=='function')return;
+  if(!api||typeof api.tresorZustand!=='function'||typeof api.tresorEinziehen!=='function')return;
   const words={
     // Leitfaden § 2: „Tresor (alle Pro-Apps)“ – der gemeinsame Ordner über den Ablagen.
     title:['Tresor (alle Pro-Apps)','Vault (all Pro apps)','Сейф (все Pro-приложения)','الخزنة (كل تطبيقات Pro)'],
