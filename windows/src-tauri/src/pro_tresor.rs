@@ -13,12 +13,18 @@ pub struct Engine { child: Child, input: ChildStdin, output: BufReader<ChildStdo
 impl Drop for Engine { fn drop(&mut self) { let _ = self.child.kill(); let _ = self.child.wait(); } }
 impl Engine {
     pub fn start(resources: &Path, config: &Path) -> Result<Self, String> {
-        let root = resources.join("pro-tresor");
+        let root = resources.join("pro-tresor").canonicalize().map_err(|_| "TRESOR_ENGINE_FEHLT")?;
         let java = root.join("runtime/bin").join(if cfg!(windows) { "java.exe" } else { "java" });
         let jar = root.join("workflow-pro-tresor.jar");
         if !java.is_file() || !jar.is_file() { return Err("TRESOR_ENGINE_FEHLT".into()); }
         let mut command = Command::new(java);
-        command.arg("-Xmx256m").arg("-cp").arg(jar).arg("de.familyprojekt.workflowpdf.pro.ProTresorEngine").arg(config)
+        // Tauri can return a verbatim Windows path (\\?\C:\...). Java's
+        // class loader does not accept that prefix in a classpath entry.
+        // A relative entry also keeps semicolons in installation paths out
+        // of Java's classpath separator syntax. The executable stays absolute.
+        command.current_dir(&root);
+        command.env_remove("JAVA_TOOL_OPTIONS").env_remove("_JAVA_OPTIONS").env_remove("JDK_JAVA_OPTIONS");
+        command.arg("-Xmx256m").arg("-cp").arg("workflow-pro-tresor.jar").arg("de.familyprojekt.workflowpdf.pro.ProTresorEngine").arg(config)
             .stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::null());
         // Ausschließlich im nicht ausgelieferten Abnahmebau: JVM-Startfehler aufzeichnen.
         // Die Engine schreibt keine Passwörter oder Nutzdaten nach stderr.
@@ -76,7 +82,10 @@ mod tests {
     #[cfg(windows)]
     #[test] fn bundled_runtime_uses_private_pipe() {
         let config=std::env::temp_dir().join(format!("wfp-pipe-{}-{}.json",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
-        let mut engine=Engine::start(Path::new("."),&config).expect("gebündelte Laufzeit");
+        // canonicalize produces the same verbatim prefix as the installed
+        // Tauri host. A relative development path hid the former failure.
+        let resources=std::fs::canonicalize(".").unwrap();
+        let mut engine=Engine::start(&resources,&config).expect("gebündelte Laufzeit");
         let state=engine.call("tresorZustand",&json!({}),|_,_|panic!("keine Dialoge ohne Verbindung")).unwrap();
         assert_eq!(state,json!({"gewaehlt":false,"offen":false,"eingezogen":false,"uebergaben":true,"gemerkt":false}));
         assert!(!config.exists());
