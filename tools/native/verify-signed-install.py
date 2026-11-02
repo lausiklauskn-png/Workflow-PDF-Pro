@@ -13,6 +13,7 @@ package='de.familyprojekt.workflowpdf.pro'+('.debug' if development else '')
 # accessibility may omit the clipped end of a long label despite valid storage.
 marker='WF-Probe'
 launch_results=[]
+installation_results=[]
 def adb(*args):
     result=subprocess.run(['adb',*map(str,args)],text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=45)
     if result.returncode:raise RuntimeError('ADB '+str(args[:3])+': '+(result.stdout+result.stderr)[-3000:])
@@ -54,6 +55,17 @@ def launch():
     launch_results.append(result)
     if 'Status: ok' not in result:raise RuntimeError('Regular application did not launch')
 
+def install():
+    result=adb('install','-r',apk)
+    # Android 12 can return install Success before PACKAGE_REMOVED/REPLACED
+    # broadcasts finish. Starting then races the system's replacement force-stop
+    # (observed in release 41539647722). Drain that system work before the one
+    # ordinary launch; do not relaunch a killed activity or extend UI deadlines.
+    settled=adb('shell','am','wait-for-broadcast-idle')
+    installation_results.append({'install':result,'broadcasts':settled})
+    if 'All broadcast queues are idle!' not in settled:
+        raise RuntimeError('Android did not confirm completed installation broadcasts')
+
 def assert_running():
     # am start reports the system's activity launch, not settled app readiness
     # after replacement. Observe the existing visible UI first, then require a
@@ -64,6 +76,7 @@ def record_failure(error):
     directory=Path('work/acceptance/reinstall-diagnostics');directory.mkdir(parents=True,exist_ok=True)
     (directory/'failure.txt').write_text(str(error)+'\n')
     (directory/'activity-start.json').write_text(json.dumps(launch_results,indent=2)+'\n')
+    (directory/'installation.json').write_text(json.dumps(installation_results,indent=2)+'\n')
     for name,args in [
         ('activity.txt',('shell','dumpsys','activity','activities')),
         ('window.txt',('shell','dumpsys','window')),
@@ -91,7 +104,7 @@ try:
         # Remove only this emulator's synthetic debug-suite data. Never remove a
         # production installation, and retain all data for the following reinstall.
         adb('uninstall',package)
-    adb('install','-r',apk);launch()
+    install();launch()
     folder_button=lambda node:node.get('text','').strip() in ['＋ Ordner','+ Ordner','＋ Folder','+ Folder']
     for attempt in range(3):
         stable_tap(folder_button)
@@ -120,7 +133,7 @@ try:
     wait_node(lambda node:marker in node.get('text',''))
     assert_running()
     adb('shell','am','force-stop',package)
-    adb('install','-r',apk);launch()
+    install();launch()
     wait_node(lambda node:marker in node.get('text',''))
     assert_running()
     proof={'applicationId':package,'apkSha256':digest,'commit':receipt['commit'],'versionCode':receipt['versionCode'],'api':int(adb('shell','getprop','ro.build.version.sdk').strip()),'firstInstall':True,'reinstallPreservesData':True,'developmentProbe':development,'probe':'visible WebView UI; folder retained across signed APK reinstall; no debug JS access'}

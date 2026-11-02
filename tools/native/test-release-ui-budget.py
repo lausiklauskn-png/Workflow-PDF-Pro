@@ -49,13 +49,17 @@ def done(value='',code=0):
  p.write_text(json.dumps(s));print(value);raise SystemExit(code)
 if a[:3]==['shell','pm','list']:done('')
 if a[:1]==['install']:
- s.update(installs=s['installs']+1,running=False,dialog=False,text='');done('Success')
-if a[:3]==['shell','am','start']:done('Status: ok')
+ s.update(installs=s['installs']+1,running=False,dialog=False,text='',replacementPending=True);done('Success')
+if a[:3]==['shell','am','wait-for-broadcast-idle']:
+ if os.environ['WFP_PROBE_MODE']=='unconfirmed-barrier':done('Unknown command')
+ s['replacementPending']=False;done('All broadcast queues are idle!')
+if a[:3]==['shell','am','start']:
+ s['launchKilled']=s['installs']==2 and s['replacementPending'];done('Status: ok')
 if a[:3]==['shell','am','force-stop']:
  s['running']=False;done('')
 if a[:2]==['shell','pidof']:done('1234' if s['running'] else '',0 if s['running'] else 1)
 if a[:2]==['shell','uiautomator']:
- s['running']=not(os.environ['WFP_PROBE_MODE']=='stale-ui' and s['installs']==2);done('UI dumped')
+ s['running']=not(s.get('launchKilled') or (os.environ['WFP_PROBE_MODE']=='stale-ui' and s['installs']==2));done('UI dumped')
 if a[:2]==['exec-out','cat']:
  nodes='<node text="＋ Ordner" bounds="[0,0][100,50]"/>'
  if s['dialog']:nodes+='<node text="Neuer Ordner" bounds="[0,50][100,100]"/><node class="android.widget.EditText" focused="true" text="'+s['text']+'" bounds="[0,100][100,150]"/>'
@@ -92,3 +96,14 @@ assert mutant!=source,'post-reinstall process assertion anchor missing'
 result,proof=cli_probe(mutant,'stale-ui')
 assert result.returncode==0 and proof,'counterprobe did not expose the false receipt'
 print('PASS mock-ADB late-process readiness, stale-UI rejection and missing-process counterprobe')
+
+# The recorded Android 12 failure reports start success but a delayed package
+# replacement force-stop removes the activity. Only the installation barrier
+# prevents it; waiting for UI/PID afterwards cannot repair a removed activity.
+mutant=source.replace("    settled=adb('shell','am','wait-for-broadcast-idle')", "    settled='All broadcast queues are idle!' # counterprobe: skip system barrier")
+assert mutant!=source,'installation broadcast barrier anchor missing'
+result,proof=cli_probe(mutant,'late-process')
+assert result.returncode!=0 and not proof,'missing-barrier counterprobe must expose the replacement force-stop, never produce a receipt'
+result,proof=cli_probe(source,'unconfirmed-barrier')
+assert result.returncode!=0 and not proof and 'did not confirm' in result.stderr,'an unsupported or unconfirmed barrier must fail closed'
+print('PASS mock-ADB replacement force-stop counterprobe and unconfirmed-barrier rejection')
