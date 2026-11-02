@@ -6,6 +6,7 @@ import {join,resolve} from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {root} from './prepare-web.mjs';
 const cases=[
+ ['Windows system share bypasses Pro target','native-files.js',"if(await window.WFPProVerbund?.offer(data.files))return;", "if(await window.WFPWindowsShare?.(data))return;if(await window.WFPProVerbund?.offer(data.files))return;",'Windows system sharing cannot bypass the Pro target and preserves explicit OS fallback'],
  ['partially ready dialog exposes incoming controls','native-pro-verbund.js',"const content=el('div'),z=await T.state(),path=z.pfad||z.ordner||'';", "const content=body;content.replaceChildren();const z=await T.state(),path=z.pfad||z.ordner||'';",'incoming controls appear only when the whole dialog is ready'],
  ['ack before ordinary import','native-pro-transfers.js','const saved=await WFPDurableImport.take','const saved=WFPDurableImport.take','only selected incoming file is acknowledged after ordinary PDF and original are committed'],
  ['no durable outbox before native send','native-pro-transfers.js','await ctx.repo.put(row);return row;','return row;','normal prepared PDF retains its selected source when another editor document becomes current'],

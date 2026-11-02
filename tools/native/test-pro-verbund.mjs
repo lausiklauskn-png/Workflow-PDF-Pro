@@ -10,6 +10,7 @@ import {chromium} from 'playwright-core';
 import {PDFDocument} from 'pdf-lib';
 import {root} from './prepare-web.mjs';
 const sha=b=>createHash('sha256').update(b).digest('hex');
+const windowsBridge=await readFile(new URL('../../windows/bridge/capacitor-tauri.js',import.meta.url),'utf8');
 const pdf=await PDFDocument.create();pdf.addPage([300,400]);const pdfBytes=Buffer.from(await pdf.save());
 const seed=(id='family-a',data=pdfBytes,name='A.pdf',mime='application/pdf')=>({entryId:'entry-'+id,data,
   vertrag:{vertrag:'familienakte-uebergabe/1',id,quelle:'familienakte',ziel:'workflow-pdf-pro',dokumentId:'family-doc-'+id,name,mime,groesse:data.length,sha256:sha(data)}});
@@ -28,6 +29,11 @@ test('Pro collaboration with durable ordinary library and exact outgoing version
     const f={connected:true,open:true,root:'shared-vault',items:[seed()],marks:[],sent:new Map(),calls:[],ackChecks:[],sendChecks:[],mode:'ok',confirmed:false,os:0,saves:[],tickets:new Map(),...options};
     const page=await browser.newPage({viewport:{width:1100,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
     await page.route(/^https?:\/\/(?!127\.0\.0\.1)/,r=>r.abort());
+    if(options.windows)await page.route('https://tauri.localhost/**',async route=>{
+      const pathname=new URL(route.request().url()).pathname,file=pathname==='/'?'/index.html':pathname;
+      try {await route.fulfill({body:await readFile(join(base,file)),contentType:({'.html':'text/html','.js':'text/javascript','.css':'text/css','.wasm':'application/wasm'})[extname(file)]||'application/octet-stream'});}
+      catch {await route.fulfill({status:404,body:''});}
+    });
     const state=()=>({gewaehlt:f.connected,offen:f.open&&f.connected,kennung:f.root,pfad:'Erfundener Testordner',gemerkt:false,uebergaben:true});
     await page.exposeFunction('__proNative',async(method,a={},proof)=>{
       f.calls.push([method,a]);
@@ -68,7 +74,7 @@ test('Pro collaboration with durable ordinary library and exact outgoing version
       if(['print','openLink'].includes(method))return {};
       throw Error('Unknown native method '+method);
     });
-    await page.addInitScript(()=>{
+    await page.addInitScript(({windowsBridge})=>{
       // Inspect durable IDB state at the native boundary without entering the
       // adapter's operation lock again. The browser fixture never supplies ACK
       // evidence to the implementation; it only records assertions for the test.
@@ -90,8 +96,16 @@ test('Pro collaboration with durable ordinary library and exact outgoing version
       };
       const files={};for(const m of ['begin','append','finish','abort','save','share','print','openLink','appInfo'])files[m]=a=>__proNative(m,a);
       window.Capacitor={isNativePlatform:()=>true,Plugins:{WorkflowVault:vault,WorkflowFiles:files}};
-    });
-    await page.goto(address);await ready(page);
+      if(windowsBridge){
+        const fixture=window.Capacitor;delete window.Capacitor;
+        window.__systemShares=0;
+        Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>true});
+        Object.defineProperty(navigator,'share',{configurable:true,value:async()=>{window.__systemShares++;if(window.__systemFailure)throw Error('SYSTEM_SHARE_UNAVAILABLE');}});
+        window.__TAURI_INTERNALS__={invoke:async(command,args)=>{if(command!=='wfp_call')throw Error('UNKNOWN_COMMAND');return fixture.Plugins[args.plugin][args.method](args.options);}};
+        (0,eval)(windowsBridge);
+      }
+    },{windowsBridge:options.windows?windowsBridge:null});
+    await page.goto(options.windows?'https://tauri.localhost/':address);await ready(page);
     return {page,f,errors};
   }
   const ready=page=>page.waitForFunction(()=>window.__wfpdf&&window.WFPProVerbund&&!WFPNativeVault.gate.blocked);
@@ -152,6 +166,19 @@ test('Pro collaboration with durable ordinary library and exact outgoing version
     await page.waitForSelector('#nativeProTarget');await page.click('#nativeProTarget [data-pro-action="familienakte"]');
     await page.waitForSelector('#nativeProTarget',{state:'detached'});
     const rows=await outbox(page);assert.equal(rows.length,1);assert.equal(rows[0].vertrag.bezug,'family-a');assert.equal(f.sent.size,1);await page.close();
+  });
+  await t.test('Windows system sharing cannot bypass the Pro target and preserves explicit OS fallback',async()=>{
+    const {page,f,errors}=await setup({windows:true});const {id}=await receive(page);
+    await page.evaluate(id=>{void __wfpdf.dlg.teilenDocs([id]);},id);
+    await page.waitForFunction(()=>document.querySelector('#nativeProTarget')||window.__systemShares>0);
+    assert.equal(await page.locator('#nativeProTarget').count(),1,'Windows must show the Pro target before system sharing');
+    await page.click('#nativeProTarget [data-pro-action="familienakte"]');await page.waitForSelector('#nativeProTarget',{state:'detached'});
+    assert.equal(f.sent.size,1);assert.equal(await page.evaluate(()=>__systemShares),0);assert.equal((await outbox(page))[0].vertrag.bezug,'family-a');
+    await page.evaluate(id=>{void __wfpdf.dlg.teilenDocs([id]);},id);await page.click('#nativeProTarget [data-pro-action="os"]');
+    await page.waitForFunction(()=>__systemShares===1);assert.equal(f.os,0);assert.equal((await outbox(page))[0].stand,'weitergegeben');
+    await page.evaluate(id=>{window.__systemFailure=true;window.__osFallbackDone=false;void __wfpdf.dlg.teilenDocs([id]).then(()=>{window.__osFallbackDone=true;});},id);await page.click('#nativeProTarget [data-pro-action="os"]');
+    await page.waitForFunction(()=>window.__osFallbackDone);assert.equal(f.os,1);
+    assert.deepEqual(errors,[]);await page.close();
   });
   await t.test('failed acknowledgement and cold restart preserve later edits without duplicate intake',async()=>{
     const {page,f}=await setup({mode:'ackfail'});await assert.rejects(receive(page),/ACK_FAILED/);

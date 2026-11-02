@@ -19,7 +19,9 @@ BookLedgerPro und das Betriebssystem an. Die Pro-Übergabe nimmt bis 20 MiB pro
 Datei an; BookLedgerPro erhält PDF, Bilder oder E-Mail-Dateien. HTML und kleine
 Workflow-Arbeitsstände können an passende andere Ziele gehen. Ohne Verbindung
 bleibt der bisherige Betriebssystemweg erhalten. Eine Betriebssystemauswahl
-bestätigt keinen Empfang in der Ziel-App.
+bestätigt keinen Empfang in der Ziel-App. Unter Windows entscheidet derselbe
+Pro-Dialog vor dem WebView2-Teilen-Fenster; ist dieses nicht verfügbar, bleibt
+der bisherige Explorer-Weg erhalten.
 
 Die Herkunft gehört zum tatsächlich ausgegebenen File, nicht zum später offenen
 Editor. Eine einzelne bearbeitete Eingangsdatei erhält die ursprüngliche
@@ -56,6 +58,8 @@ zusätzlichen Pro-Daten nicht zuverlässig wiederherstellen.
 aber gestellte native Protokollmethoden. Die Gegenproben entfernen gezielt das
 Warten auf Speicherung, die Ausgangsquittung, die Herkunftsbindung, die echte
 Empfängermarke, Sicherungsdateien oder die Ablagebindung und müssen scheitern.
+Weitere Gegenproben zeigen, dass Eingangsaktionen erst nach vollständig geladenem
+Dialog erreichbar sind und Windows-Systemteilen die Pro-Auswahl nicht umgeht.
 Die bisherigen Eingangs-, Ablage-, Schutz- und großen Sicherungsproben bleiben aktiv.
 
 Die neuen Android- und Windows-Produktproben führen denselben Bedienweg in der

@@ -51,6 +51,7 @@
     sharing = true; const ids = []; let opened = false;
     try {
       if(await window.WFPProVerbund?.offer(data.files))return;
+      if(await window.WFPWindowsShare?.(data)){notify(t('shared'));return;}
       for (const file of data.files || []) ids.push(await transfer(file, file.name));
       const result = await api.share({ ids, title: data.title || '', text: data.text || '', url: data.url || '' });
       opened = result.opened === true;
