@@ -8,7 +8,7 @@
     const bytes = await g.WFPVaultCodec.encode(record).arrayBuffer();
     return [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(x => x.toString(16).padStart(2,'0')).join('');
   }
-  async function transfer({ bridge, records, source, local, location, vaultId, signal, progress = () => {}, preferences }) {
+  async function transfer({ bridge, records, source, local, location, vaultId, signal, progress = () => {}, preferences, extraRecords = [] }) {
     const check = () => { if (signal?.aborted) fail('VAULT_MIGRATION_CANCELLED'); };
     // Replay an existing destination journal without touching this device's index.
     // The destination is subsequently read in full before the index is installed.
@@ -28,6 +28,13 @@
         plan.push({ store, id, hash: digest, missing: !info.exists });
       }
     }
+    for(const record of extraRecords){
+      check();if(!record||!/^pro-transfer-[a-f0-9]{64}$/.test(record.id||''))fail('VAULT_SOURCE_DAMAGED');
+      const info=await bridge.info({location,store:'settings',id:record.id}),digest=await hash(record);
+      if(info.exists!==true&&info.exists!==false)fail('VAULT_RECORD_DAMAGED');
+      if(info.exists&&info.hash!==digest)fail('VAULT_MIGRATION_CONFLICT');
+      plan.push({store:'settings',id:record.id,hash:digest,missing:!info.exists,record:structuredClone(record)});
+    }
     check(); await bridge.prepareMigration({ location });
     let staged = false, committed = false;
     try {
@@ -35,7 +42,7 @@
       for (let i=0;i<plan.length;i++) {
         check(); const item=plan[i];progress(i,plan.length);
         if (item.missing) {
-          const record=await source.get(item.store,item.id);
+          const record=item.record||await source.get(item.store,item.id);
           if (await hash(record)!==item.hash) fail('VAULT_SOURCE_CHANGED');
           const info=await records.save(location,item.store,record);
           if (info.hash!==item.hash) fail('VAULT_WRITE_UNCONFIRMED');

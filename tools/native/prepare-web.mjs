@@ -13,7 +13,7 @@ export const vaultFiles=['vault-codec.js','vault-records.js','vault-journal.js',
 export const bedienFiles = ['pro-bedienung.js', 'pro-bedienung.css', 'pro-hintergrund.js', 'pro-geraet.js', 'pro-ueberall.js', 'pro-ueberall.css', 'pro-chefcode.js'];
 // Scanner und Kamera unter Windows (Pro-Umbau 5): hier gepflegt, byte-gleich nach BookLedgerPro (Pin native/pro-scanner-herkunft.json).
 export const scannerFiles = ['pro-scanner.js', 'pro-scanner.css'];
-export const nativeFiles = [...bedienFiles, ...scannerFiles, 'native-ohne-web.js', 'native-ueberall.js', 'native-chefcode.js', 'native-netz.js', 'native-kopf.js', 'native-updates.js', 'native-hintergrund.js', 'native-scan-direkt.js', 'native-sicherung.js', 'native-bootstrap.js', 'native-files.js', 'native-import.js', 'native-incoming.js', 'native-chrome.js', 'native-speech.js', 'native-translate.js', 'chrome/helper.html', 'chrome/helper.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
+export const nativeFiles = [...bedienFiles, ...scannerFiles, 'native-ohne-web.js', 'native-ueberall.js', 'native-chefcode.js', 'native-netz.js', 'native-kopf.js', 'native-updates.js', 'native-hintergrund.js', 'native-scan-direkt.js', 'native-sicherung.js', 'native-bootstrap.js', 'native-files.js', 'native-import.js', 'pro-transfer-store.js', 'native-durable-import.js', 'native-incoming.js', 'native-chrome.js', 'native-speech.js', 'native-translate.js', 'chrome/helper.html', 'chrome/helper.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
 export const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 
 // This allowlist is deliberately independent of a recursive checkout copy.
@@ -58,6 +58,11 @@ export async function prepareWeb(out = join(root, 'www')) {
   html = replaceOnce(html, '<title>Workfloh PDF —', '<title>Workflow PDF Pro —');
   html = replaceOnce(html, 'content="Workfloh PDF"', 'content="Workflow PDF Pro"');
   html = replaceOnce(html, 'Workfloh <b>PDF</b>', 'Workflow <b>PDF Pro</b>');
+  // The native adapter already owns this opt-in and its stored preference.
+  // Loading the newer web controller as well would create two independent
+  // switches controlling the same Mycel responder. Keep all source bytes; only
+  // the native entry page selects which existing adapter runs.
+  html = replaceOnce(html, '<script defer src="assets/netz.js?v=1"></script>', '');
   html = replaceOnce(html, '</head>', '<link rel="stylesheet" href="' + adapterUrl('pro-bedienung.css') + '">\n<link rel="stylesheet" href="' + adapterUrl('pro-ueberall.css') + '">\n<link rel="stylesheet" href="' + adapterUrl('pro-scanner.css') + '">\n<link rel="stylesheet" href="' + adapterUrl('native.css') + '">\n</head>');
   // Classic deferred scripts preserve source execution order. The source worker stays intact:
   // model caches and share receipt must remain functional in the native host as well.
@@ -66,11 +71,13 @@ export async function prepareWeb(out = join(root, 'www')) {
   const versionMeta = html.match(/<meta name="wfp-version" content="[^"]*"/g) || [];
   if (versionMeta.length !== 1) throw new Error('Native injection anchor changed: wfp-version');
   html = html.replace(versionMeta[0], '<meta name="wfp-version" content=""');
-  html = replaceOnce(html, '<script defer src="assets/app.js?v=72"></script>',
-    ['pro-bedienung.js','pro-hintergrund.js','pro-geraet.js','native-bootstrap.js','native-files.js','native-import.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles,'native-updates.js','native-hintergrund.js','native-scan-direkt.js','native-sicherung.js','native-ohne-web.js','pro-scanner.js','pro-ueberall.js','native-ueberall.js','pro-chefcode.js','native-chefcode.js','native-netz.js','native-kopf.js'].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n<script defer src="assets/app.js?v=72"></script>');
+  const appTag = html.match(/<script defer src="assets\/app\.js\?v=\d+"><\/script>/g);
+  if (appTag?.length !== 1) throw new Error('Native injection anchor changed: app.js');
+  html = replaceOnce(html, appTag[0],
+    ['pro-bedienung.js','pro-hintergrund.js','pro-geraet.js','native-bootstrap.js','native-files.js','native-import.js','pro-transfer-store.js','native-durable-import.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles,'native-updates.js','native-hintergrund.js','native-scan-direkt.js','native-sicherung.js','native-ohne-web.js','pro-scanner.js','pro-ueberall.js','native-ueberall.js','pro-chefcode.js','native-chefcode.js','native-netz.js','native-kopf.js'].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n'+appTag[0]);
   await rm(out, { recursive: true, force: true });
   await mkdir(out, { recursive: true });
-  const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding, adapter tags and empty wfp-version (filled by the app)'], files: [] };
+  const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding, adapter tags, native network controller instead of web network script tag, empty wfp-version (filled by the app)'], files: [] };
   for (const file of selected) {
     await mkdir(dirname(join(out, file.path)), { recursive: true });
     const bytes = file.path === 'index.html' ? Buffer.from(html) : contents.get(file.path);

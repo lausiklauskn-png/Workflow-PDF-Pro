@@ -42,3 +42,12 @@ ist die Quelle für alle Pro-Apps (BookLedgerPro, Private Brain Pro kopieren byt
 **Pro-Umbau 5, Schritt 4 (28.10.2026):** Kern **1.1.4** (Workflow-PDF #136) bytegleich in `upstream/` — nichts startet von selbst, „Prüfen“/„Einordnen“ für die Auswahl, Hintergrundaufgabe im Kern, Strichgrafiken, nur Vorschaubilder; die Umwege in `native/native-hintergrund.js` sind weg (nur der Tipp-Schutz bleibt). Neu: **Scanner-Direktstart per Intent** `de.familyprojekt.workflowpdf.pro.SCANNEN` (Extra `von`, `ScanDirekt.java`, `native/native-scan-direkt.js`) und **Fach „Eingang-WorkflowPDF“** in Tresor & Ablage und über den Karten (`ProTresorordner.eingang*`, Paket unverändert). App **1.0.8**/Buildnummer 9, nicht veröffentlicht: [docs/SICHERUNG-UND-HINTERGRUND.md](docs/SICHERUNG-UND-HINTERGRUND.md), [docs/TRESORORDNER.md](docs/TRESORORDNER.md) letzte Abschnitte. Nicht am Gerät.
 **Schritt D1 (27.10.2026):** Workflow PDF Pro zieht in den Tresorordner ein — Knopf im Tresor-Kasten der Einstellungen, Ordner über
 „Workflow PDF Pro“ (auch eine Kopie zur Probe, geprüft über die Kennung), Inhaltsverzeichnis aus der Bibliothek. Nicht am Gerät gemessen.
+# Dauerhafter Betriebssystem-Eingang (Pro-Verbund)
+
+`native/native-durable-import.js` verwendet den normalen Kernimport mit einer vorab reservierten Kennung,
+liest PDF und Original zurück und speichert erst dann die Quittung. `pro-transfer-store.js` bindet sie an
+die gewählte Ablage; Sicherung und Ablagewechsel nehmen sie mit. Kein Quittieren allein nach einem
+Datei-Ereignis. Der Kern ist bytegleich aus Workflow-PDF **1.1.7**, PR #140; zum Nachziehen nur
+`tools/onboarding/nachziehen.py` verwenden. Der native Einstieg lädt genau einen Netz-Antwortadapter.
+Verhalten und Grenzen: [docs/PRO-EINGANG.md](docs/PRO-EINGANG.md). Die gemeinsame Pro-Tresor-Verbindung
+und das neue Release folgen im übergreifenden Auftrag; die bestehende App-Nummer bleibt bis dahin gleich.

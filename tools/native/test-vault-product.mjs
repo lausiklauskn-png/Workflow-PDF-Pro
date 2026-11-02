@@ -55,7 +55,8 @@ test('product vault: real core and IndexedDB, native transport protocol fixture'
     await t.test('internal standard boots without SD, preserves source handler and injects storage control',async()=>{
       ({expected,id}=await page.evaluate(async()=>{
         const pdf=await PDFLib.PDFDocument.create();pdf.addPage();const bytes=await pdf.save();
-        const [doc]=await __wfpdf.importDateien([new File([bytes],'Portable.pdf',{type:'application/pdf'})],null,{still:true});
+        const receipt=await WFPDurableImport.take(new File([bytes],'Portable.pdf',{type:'application/pdf'}),{kind:'native',batch:'migration',item:'portable'});
+        const doc=await WFP.DB.get('docs',receipt.id);
         await WFP.DB.put('files',{id:doc.id+'~original',bytes:new Uint8Array([7,8]),name:'original.png'});
         await WFP.DB.put('files',{id:'ue:'+doc.id+':de-ru',job:{page:5,texte:['Имя']}});
         localStorage.setItem('wfpdf_einst_v1',JSON.stringify({schluessel:{mistral:'synthetic-device-secret'},kiOk:{mistral:true},ueVon:'de',ueNach:'ru'}));
@@ -78,6 +79,7 @@ test('product vault: real core and IndexedDB, native transport protocol fixture'
       const prefs=await page.evaluate(async()=> (await new WFPVaultRecords(Capacitor.Plugins.WorkflowVault).load('target','settings','workflow-preferences-v1')).record);
       assert.equal(JSON.stringify(prefs).includes('synthetic-device-secret'),false);
       assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('wfpdf_einst_v1')).schluessel.mistral),'synthetic-device-secret');
+      assert.equal(await page.evaluate(async()=>{const rows=await WFPProTransferStore.snapshot();return rows.length===1&&rows[0].stand==='gespeichert'&&rows[0].source.batch==='migration';}),true);
     });
     await t.test('locked restart holds library access until explicit unlock, never erases the real index',async()=>{
       fixture.unlocked=false;await page.reload();await page.waitForSelector('.native-vault-dialog');

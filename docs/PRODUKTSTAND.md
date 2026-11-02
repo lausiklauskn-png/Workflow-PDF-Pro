@@ -1,19 +1,29 @@
 # Produktstand: was es gibt und was veröffentlicht wird
 
-Stand 22.10.2026 abends. Festgelegt von Klaus in der Claude-Code-Sitzung
-`session_01HPcxRUAQ4njoMSMPSUhGae`. Diese Datei ist der Ort, an dem wir den Überblick halten.
+Aktualisiert am 02.11.2026. Die Gleichstandsregel wurde von Klaus in der Sitzung
+`session_01HPcxRUAQ4njoMSMPSUhGae` festgelegt. Veröffentlichte Versionen wurden gegen GitHub Releases abgeglichen.
 
 ## Übersicht
 
 | Produkt | Plattform | Stand | Öffentlich? |
 |---|---|---|---|
-| Workflow PDF (Web) | Browser/PWA | 1.1.2 live: <https://lausiklauskn-png.github.io/Workflow-PDF/>; **1.1.3 (Bildbeschreibung, 26.10.) auf main, Pages liefert aus** | ja (1.1.3) |
-| Workflow PDF Pro | Android (APK) | **1.0.5 veröffentlicht 26.10.2026** (Kern 1.1.3, Bildbeschreibung + Direktstart, Buildnummer 6): [v1.0.5](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.5), 83.147.148 B, SHA-256 `c9b8e67e…`, Lauf 40383096577 | ja (1.0.5) |
+| Workflow PDF (Web) | Browser/PWA | **1.1.7 auf main** (PR #140): gewöhnlicher Import mit optionaler nativer Reservierung; Seitenauslieferung getrennt prüfen | Quellstand öffentlich |
+| Workflow PDF Pro | Android (APK) | **1.0.9 veröffentlicht am 29.10.2026**: [v1.0.9](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.9); neuer Bau mit Kern 1.1.7 noch in Prüfung | ja (1.0.9) |
 | Workflow PDF Pro | Windows (Setup.exe, unsigniert) | **1.0.5 veröffentlicht 26.10.2026**: [windows-v1.0.5](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.5), 15.866.577 B, SHA-256 `7e4e9195…`, Lauf 40384462589 (Installer aus Windows-Bau 40383101175) | ja (1.0.5) |
 | Workflow PDF Pro | iOS (iPhone/iPad) | in Vorbereitung durch Codex, Zweig `codex/ios-native-host` | **nein, nur privat** |
-| Private Brain Pro | Android (APK) | 1.0.39 veröffentlicht 26.10.2026 (eigenes Repo) | ja |
-| Private Brain Pro | Windows | 1.0.39 veröffentlicht 26.10.2026 (eigenes Repo) | ja |
+| Private Brain Pro | Android (APK) | **1.0.42 veröffentlicht am 28.10.2026**: [v1.0.42](https://github.com/lausiklauskn-png/Privat-Brain-Pro/releases/tag/v1.0.42); PR #124 mit Pro-Verbund auf main, noch kein neues Release | ja (1.0.42) |
+| Private Brain Pro | Windows | **1.0.41 veröffentlicht am 27.10.2026**: [windows-v1.0.41](https://github.com/lausiklauskn-png/Privat-Brain-Pro/releases/tag/windows-v1.0.41); PR #124 mit Pro-Verbund auf main, noch kein neues Release | ja (1.0.41) |
 | Private Brain Pro | iOS | noch nicht begonnen | später: nur vorbereiten |
+
+## Laufender Pro-Verbund-Bau (02.11.2026)
+
+Der Betriebssystem-Eingang verwendet in Android und Windows denselben dauerhaften
+Import mit Quittungen, Wiederanlauf, Sicherung und Ablagewechsel; siehe
+[PRO-EINGANG.md](PRO-EINGANG.md). Die Plattformprüfungen und der anschließende
+Hin-/Rückweg über den optionalen gemeinsamen Pro-Tresor werden noch abgeschlossen.
+Die unten benannte Windows-Lücke beim gemeinsamen Tresor besteht in diesem Abschnitt
+weiter. iOS ist weiterhin nur vorbereitet; die PWA hat den kanonischen Importhaken,
+aber keine native Tresorverbindung. Neue APK-/Windows-Downloads sind noch nicht veröffentlicht.
 
 ## Gleichstandsregel (Klaus, 22.10.2026, gilt immer)
 

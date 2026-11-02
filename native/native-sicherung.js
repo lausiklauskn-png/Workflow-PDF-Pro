@@ -35,7 +35,7 @@
   const stopp = signal => { if (signal && signal.aborted) throw new Error('abgebrochen'); };
 
   /* Schreiben: `schreib(bytes)` hängt Bytes an die Datei (await). `fort(fertig, gesamt, name)` meldet den Stand. */
-  async function verschliessen(pw, db, schreib, { fort = () => {}, signal = null, jetzt = new Date() } = {}) {
+  async function verschliessen(pw, db, schreib, { fort = () => {}, signal = null, jetzt = new Date(), quittungen = [] } = {}) {
     if (String(pw || '').length < 8) throw new Error('passwort-kurz');
     const salz = welt.crypto.getRandomValues(new Uint8Array(16));
     const kopf = JSON.stringify({ art: ART, fassung: FASSUNG, erstellt: jetzt.toISOString(), kdf: 'PBKDF2-SHA256', runden: RUNDEN, salz: b64(salz) });
@@ -57,7 +57,7 @@
     }
     await schreib(kopfBytes);
     const ordner = await db.all('folders'), docs = await db.all('docs');
-    await json(A.KOPF, { ordner, docs: docs.length });
+    await json(A.KOPF, { ordner, docs: docs.length, ...(quittungen.length ? { proQuittungen: { version: 1, rows: quittungen } } : {}) });
     let mitDatei = 0, ohne = 0, originale = 0;
     for (let i = 0; i < docs.length; i++) {
       const d = docs[i]; fort(i, docs.length, d.name);
@@ -88,7 +88,7 @@
     if (kopf.fassung !== FASSUNG || kopf.runden !== RUNDEN) throw new Error('fassung');
     const kopfHash = new Uint8Array(await subtle().digest('SHA-256', enc.encode(MAGIE + kopfText + '\n')));
     const key = await schluessel(pw, vonB64(kopf.salz));
-    let n = 0, ordner = null, dok = null, datei = null, offen = null, schluss = null, gesamt = 0, fertig = 0;
+    let n = 0, ordner = null, dok = null, datei = null, offen = null, schluss = null, gesamt = 0, fertig = 0, proQuittungen = null;
     const abschliessen = async () => { if (offen && offen.doc) { await beiDok(offen); fertig++; fort(fertig, gesamt); } offen = null; };
     while (pos < groesse) {
       stopp(signal);
@@ -101,7 +101,9 @@
       catch (_) { throw new Error(n === 0 ? 'passwort' : 'beschaedigt'); }
       n++;
       const art = klar[0], inhalt = klar.subarray(1), j = () => JSON.parse(dec.decode(inhalt));
-      if (n === 1) { if (art !== A.KOPF) throw new Error('beschaedigt'); const k = j(); ordner = k.ordner || []; gesamt = k.docs || 0; await beiKopf({ ordner, erstellt: kopf.erstellt }); continue; }
+      if (n === 1) { if (art !== A.KOPF) throw new Error('beschaedigt'); const k = j(); ordner = k.ordner || []; gesamt = k.docs || 0;
+        if(k.proQuittungen!==undefined){if(k.proQuittungen?.version!==1||!Array.isArray(k.proQuittungen.rows))throw Error('beschaedigt');proQuittungen=k.proQuittungen.rows;}
+        await beiKopf({ ordner, erstellt: kopf.erstellt }); continue; }
       if (art !== A.BYTES && datei && datei.pos !== datei.bytes.length) throw new Error('beschaedigt');   // Datei unvollständig
       if (art === A.DOK) { await abschliessen(); offen = { doc: j(), bytes: null, original: null }; datei = null; }
       else if (art === A.DATEI) {
@@ -117,7 +119,7 @@
       } else throw new Error('beschaedigt');
     }
     if (!schluss) throw new Error('unvollstaendig');
-    return { erstellt: kopf.erstellt, ordner, schluss };
+    return { erstellt: kopf.erstellt, ordner, schluss, proQuittungen };
   }
 
   const API = { MAGIE, ART, FASSUNG, RUNDEN, STUECK, verschliessen, oeffnen, istFassung2 };
@@ -191,9 +193,10 @@
     let id = null, offset = 0, gespeichert = false;
     try {
       ({ id } = await files.begin({ name, mime: 'application/octet-stream' }));
+      const quittungen=await welt.WFPProTransferStore?.snapshot()||[];
       const r = await verschliessen(p1, db(), async bytes => {
         for (let i = 0; i < bytes.length; i += 196608) { const s = bytes.subarray(i, i + 196608); await files.append({ id, offset, data: b64(s) }); offset += s.length; }
-      }, { signal: l.signal, jetzt, fort: (i, n) => l.text(t('laeuft', { i: Math.min(i + 1, n), n }), i, n) });
+      }, { signal: l.signal, jetzt, quittungen, fort: (i, n) => l.text(t('laeuft', { i: Math.min(i + 1, n), n }), i, n) });
       await files.finish({ id, size: offset });
       dlg.querySelector('#siPw1').value = dlg.querySelector('#siPw2').value = '';
       const s = await files.save({ id }); gespeichert = s && s.saved !== false;
@@ -217,11 +220,13 @@
     const lies = async (von, bis) => new Uint8Array(await f.slice(von, bis).arrayBuffer());
     let ordner = [], erst = true, dazu = 0, schonDa = 0, ordnerDazu = 0;
     try {
-      await oeffnen(pw, lies, f.size, async ({ doc, bytes, original }) => {
+      const restored=await oeffnen(pw, lies, f.size, async ({ doc, bytes, original }) => {
         if (!bytes) return;
         const r = await SI.zusammenfuehren(db(), { ordner: erst ? ordner : [], docs: [doc], dateien: new Map([[doc.id, bytes]]), originale: new Map(original ? [[doc.id, original]] : []) });
         erst = false; dazu += r.dazu; schonDa += r.schonDa; ordnerDazu += r.ordnerDazu;
       }, { signal: l.signal, beiKopf: k => { ordner = k.ordner; }, fort: (i, n) => l.text(t('holt', { i, n }), i, n) });
+      // A partial or unauthenticated backup must not create an accepted receipt.
+      if(restored.proQuittungen)await welt.WFPProTransferStore.restore(restored.proQuittungen);
       if (erst && ordner.length) { const r = await SI.zusammenfuehren(db(), { ordner, docs: [], dateien: new Map(), originale: new Map() }); ordnerDazu += r.ordnerDazu; }
       dlg.querySelector('#siPwZ').value = '';
       l.ende('fertig', t('zurueck', { d: dazu, s: schonDa, o: ordnerDazu ? t('ordnerDazu', { n: ordnerDazu }) : '' }) + (dazu || ordnerDazu ? t('neuLaden') : ''));

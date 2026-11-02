@@ -8,6 +8,7 @@
     constructor(onError = () => {}) {
       this.onError = onError; this.active = 0; this.target = null;
       this.fault = false; this.generation = 0;
+      this.leases = 0; this.leaseWaiters = []; this.pausing = false;
       this.waiters = []; this.drainers = []; this.blocked = true;
       this.db = Object.freeze(Object.fromEntries(METHODS.map(method => [method, (...args) => {
         // Preserve arguments at invocation, even if unlock takes several minutes.
@@ -33,13 +34,23 @@
       }
     }
     async pause() {
+      // Imports must finish in the storage in which they started. Let their
+      // ordinary DB calls finish before closing the gate (otherwise deadlock).
+      this.pausing = true;
+      if (this.leases) await new Promise(resolve => this.leaseWaiters.push(resolve));
       this.blocked = true;
       if (this.active) await new Promise(resolve => this.drainers.push(resolve));
     }
+    async stable(work) {
+      if (this.pausing || this.blocked || this.fault || !this.target) throw new Error('VAULT_RECOVERY_REQUIRED');
+      this.leases++;
+      try { return await work(); }
+      finally { if (--this.leases === 0) for (const resolve of this.leaseWaiters.splice(0)) resolve(); }
+    }
     resume(target = this.target) {
-      if (this.active || !target || METHODS.some(method => typeof target[method] !== 'function'))
+      if (this.active || this.leases || !target || METHODS.some(method => typeof target[method] !== 'function'))
         throw new Error('VAULT_GATE_NOT_READY');
-      this.target = target; this.blocked = false; this.fault = false;
+      this.target = target; this.blocked = false; this.fault = false; this.pausing = false;
       for (const resolve of this.waiters.splice(0)) resolve();
     }
   }

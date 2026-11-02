@@ -49,7 +49,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 219,
+    "line": 221,
     "tag": "button",
     "attributes": "class=\"ordner-chip${S.aktOrdner === 'alle' ? ' on' : ''}\" data-o=\"alle\"",
     "text": "Alle ${anz('alle')} ${tz('alle')}",
@@ -57,7 +57,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 220,
+    "line": 222,
     "tag": "button",
     "attributes": "class=\"ordner-chip${S.aktOrdner === o.id ? ' on' : ''}\" data-o=\"${o.id}\"",
     "text": "${o.bereich === 'uebersetzung' ? '🌐 ' : '🗂️ '}${nm(o.name)} ${anz(o.id)} ${tz(o.id)}",
@@ -65,7 +65,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 221,
+    "line": 223,
     "tag": "button",
     "attributes": "class=\"ordner-chip${S.aktOrdner === 'ohne' ? ' on' : ''}\" data-o=\"ohne\"",
     "text": "Ohne Ordner ${anz('ohne')} ${tz('ohne')}",
@@ -73,7 +73,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 222,
+    "line": 224,
     "tag": "button",
     "attributes": "class=\"ordner-chip\" data-neu",
     "text": "＋ Ordner",
@@ -81,7 +81,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 242,
+    "line": 245,
     "tag": "summary",
     "attributes": "",
     "text": "⇅ Sortieren${zr ? ` 📅 ${h(zr)} ` : ''}",
@@ -89,7 +89,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 243,
+    "line": 246,
     "tag": "select",
     "attributes": "data-sort",
     "text": "${Object.entries(SORTIERUNG).map(([k, v]) => ` ${v} `).join('')}",
@@ -97,7 +97,15 @@
   },
   {
     "source": "assets/app.js",
-    "line": 245,
+    "line": 248,
+    "tag": "select",
+    "attributes": "data-thema",
+    "text": "alle ${BKA().themen(S.docs).map(t => ` ${h(t)} `).join('')} ohne Thema",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 249,
     "tag": "input",
     "attributes": "type=\"date\" data-von value=\"${h(S.von || '')}\"",
     "text": "",
@@ -105,7 +113,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 245,
+    "line": 249,
     "tag": "input",
     "attributes": "type=\"date\" data-bis value=\"${h(S.bis || '')}\"",
     "text": "",
@@ -113,7 +121,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 245,
+    "line": 249,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-datumweg title=\"Zeitraum wieder weglassen\"",
     "text": "✕ jedes Datum",
@@ -121,7 +129,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 247,
+    "line": 251,
     "tag": "button",
     "attributes": "class=\"knopf\" data-ausgabe",
     "text": "📤 Ordner ausgeben",
@@ -129,7 +137,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 247,
+    "line": 251,
     "tag": "button",
     "attributes": "class=\"knopf\" data-ueb",
     "text": "🌐 Übersetzen${sicht.length > 1 ? ' — Dokumente wählen' : ''}",
@@ -137,7 +145,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 247,
+    "line": 251,
     "tag": "button",
     "attributes": "class=\"knopf\" data-erk",
     "text": "🤖 Felder erkennen${sicht.length > 1 ? ' — Dokumente wählen' : ''}",
@@ -145,7 +153,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 248,
+    "line": 252,
     "tag": "button",
     "attributes": "class=\"knopf\" data-ren",
     "text": "✎ Ordner umbenennen",
@@ -153,7 +161,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 248,
+    "line": 252,
     "tag": "button",
     "attributes": "class=\"knopf gefahr\" data-del",
     "text": "🗑 Ordner löschen",
@@ -161,7 +169,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 281,
+    "line": 286,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-alleordner",
     "text": "In allen Ordnern suchen",
@@ -169,7 +177,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 284,
+    "line": 289,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-bildfilterweg",
     "text": "Schalter aus",
@@ -177,7 +185,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 285,
+    "line": 290,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-datumweg2",
     "text": "✕ jedes Datum",
@@ -185,7 +193,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 301,
+    "line": 306,
     "tag": "button",
     "attributes": "class=\"dok-hoch\" data-hoch title=\"Ganz nach oben\" aria-label=\"Ganz nach oben\"",
     "text": "↑",
@@ -193,7 +201,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 302,
+    "line": 307,
     "tag": "button",
     "attributes": "class=\"dok-haken\" data-haken title=\"Auswählen (mehrere teilen oder verschieben)\" aria-label=\"Auswählen\" aria-pressed=\"${WAHL.has(d.id)}\"",
     "text": "${WAHL.has(d.id) ? '✓' : ''}",
@@ -201,7 +209,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 303,
+    "line": 308,
     "tag": "button",
     "attributes": "class=\"dok-bild\" data-auf style=\"background-image:url('${d.thumb || ''}')\" title=\"Öffnen\"",
     "text": "${v ? ` 🤖 ${v} zu prüfen ` : ''}${d.quelle === 'foto' ? ' 📷 Foto ' : ''}${d.uebersetzung ? ` 🌐 ${h((d.uebersetzung.von || '').toUpperCase())}→${h((d.uebersetzung.nach || '').toUpperCase())}${d.uebersetzung.gegenprobe ? ' Gegenprobe' : ''} ` : ''}${d.ausgefuellt ? ` ↩ ausgefüllt aus ${h((d.ausgefuellt.aus || '').toUpperCase())} ` : ''}",
@@ -209,7 +217,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 307,
+    "line": 312,
     "tag": "button",
     "attributes": "data-auf title=\"Öffnen\"",
     "text": "✏️",
@@ -217,7 +225,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 307,
+    "line": 312,
     "tag": "button",
     "attributes": "data-verschieben title=\"In Ordner verschieben\"",
     "text": "🗂️",
@@ -225,7 +233,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 307,
+    "line": 312,
     "tag": "button",
     "attributes": "data-kopie title=\"Duplizieren (z. B. als Vorlage)\"",
     "text": "⧉",
@@ -233,7 +241,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 307,
+    "line": 312,
     "tag": "button",
     "attributes": "data-teilen title=\"Teilen mit … (E-Mail, Messenger …)\"",
     "text": "📤",
@@ -241,7 +249,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 307,
+    "line": 312,
     "tag": "button",
     "attributes": "data-loeschen title=\"Löschen\"",
     "text": "🗑",
@@ -249,7 +257,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 386,
+    "line": 392,
     "tag": "button",
     "attributes": "class=\"knopf klein\" type=\"button\" data-bed-an",
     "text": "🧠 Suche nach Bedeutung einschalten",
@@ -257,7 +265,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 402,
+    "line": 408,
     "tag": "button",
     "attributes": "class=\"knopf klein\" type=\"button\" data-bed-stopp",
     "text": "■ Abbrechen",
@@ -265,7 +273,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 408,
+    "line": 414,
     "tag": "button",
     "attributes": "class=\"knopf klein\" type=\"button\" data-bed-mehr title=\"Suche nach Bedeutung: Einstellungen\" aria-label=\"Suche nach Bedeutung: Einstellungen\"",
     "text": "⚙️",
@@ -273,7 +281,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 410,
+    "line": 416,
     "tag": "button",
     "attributes": "class=\"knopf klein\" type=\"button\" data-bed-nochmal",
     "text": "↻ Nochmal",
@@ -281,7 +289,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 410,
+    "line": 416,
     "tag": "button",
     "attributes": "class=\"knopf klein\" type=\"button\" data-bed-mehr",
     "text": "⚙️",
@@ -289,7 +297,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 428,
+    "line": 434,
     "tag": "button",
     "attributes": "class=\"knopf gefahr\" data-bed-aus",
     "text": "Ausschalten",
@@ -297,7 +305,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 428,
+    "line": 434,
     "tag": "button",
     "attributes": "class=\"knopf primaer\" data-bed-laden",
     "text": "⬇️ Modell laden",
@@ -305,7 +313,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 428,
+    "line": 434,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Schließen",
@@ -313,7 +321,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 740,
+    "line": 748,
     "tag": "button",
     "attributes": "class=\"wahl\" data-o=\"${o.id}\"",
     "text": "🗂️ ${nm(o.name)}",
@@ -321,7 +329,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 741,
+    "line": 749,
     "tag": "button",
     "attributes": "class=\"wahl\" data-o=\"\"",
     "text": "Ohne Ordner",
@@ -329,7 +337,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 741,
+    "line": 749,
     "tag": "button",
     "attributes": "class=\"wahl\" data-neu",
     "text": "＋ Neuer Ordner …",
@@ -337,7 +345,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 742,
+    "line": 750,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Abbrechen",
@@ -345,7 +353,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 780,
+    "line": 788,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-wahl-alle",
     "text": "Alle",
@@ -353,7 +361,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 781,
+    "line": 789,
     "tag": "button",
     "attributes": "class=\"knopf klein primaer\" data-wahl-teilen${n ? '' : ' disabled'}",
     "text": "📤 Teilen",
@@ -361,7 +369,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 782,
+    "line": 790,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-wahl-verschieben${n ? '' : ' disabled'}",
     "text": "🗂️ Verschieben",
@@ -369,7 +377,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 783,
+    "line": 791,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-wahl-loeschen${n ? '' : ' disabled'}",
     "text": "🗑 Löschen",
@@ -377,7 +385,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 784,
+    "line": 792,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-wahl-ende",
     "text": "✕ Fertig",
@@ -385,7 +393,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 915,
+    "line": 923,
     "tag": "button",
     "attributes": "class=\"knopf primaer\" data-teilen-jetzt",
     "text": "📤 Jetzt teilen …",
@@ -393,7 +401,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 915,
+    "line": 923,
     "tag": "button",
     "attributes": "class=\"knopf\" data-dl",
     "text": "⬇ ${dateien.length > 1 ? 'Als ZIP herunterladen' : 'Herunterladen'}",
@@ -401,7 +409,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 915,
+    "line": 923,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Schließen",
@@ -409,7 +417,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1141,
+    "line": 1153,
     "tag": "button",
     "attributes": "class=\"knopf klein${pz ? ' rot' : ''} pruef-alle-knopf\" type=\"button\" data-pruef-alle-los data-pruefen${laeuft || !pz ? ' disabled' : ''}",
     "text": "▶ ${wahl ? 'Prüfen (' + pz + ')' : 'Prüfen'}",
@@ -417,7 +425,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1142,
+    "line": 1154,
     "tag": "button",
     "attributes": "class=\"knopf klein${ez && !pz ? ' rot' : ''}\" type=\"button\" data-einordnen${laeuft || !ez ? ' disabled' : ''}",
     "text": "🧠 ${wahl ? 'Einordnen (' + ez + ')' : 'Einordnen'}",
@@ -425,7 +433,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1151,
+    "line": 1163,
     "tag": "button",
     "attributes": "class=\"knopf klein\" type=\"button\" data-pruef-alle-stopp",
     "text": "■ Abbrechen",
@@ -433,7 +441,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1157,
+    "line": 1169,
     "tag": "button",
     "attributes": "class=\"knopf klein\" type=\"button\" data-pruef-alle-zu title=\"Ausblenden\" aria-label=\"Ausblenden\"",
     "text": "✕",
@@ -441,7 +449,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1162,
+    "line": 1174,
     "tag": "button",
     "attributes": "class=\"knopf klein\" type=\"button\" data-einordnen-stopp",
     "text": "■ Abbrechen",
@@ -449,7 +457,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1220,
+    "line": 1232,
     "tag": "button",
     "attributes": "class=\"dok-pruefung offen\" data-pruef-nachholen data-pruefung=\"offen\"",
     "text": "○ Noch nicht geprüft · jetzt prüfen",
@@ -457,7 +465,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1221,
+    "line": 1233,
     "tag": "button",
     "attributes": "class=\"dok-pruefung warn\" data-pruef data-pruefung=\"warnung\"",
     "text": "⚠ Verdächtiger Inhalt — ansehen",
@@ -465,7 +473,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1222,
+    "line": 1234,
     "tag": "button",
     "attributes": "class=\"dok-pruefung\" data-pruef data-pruefung=\"ungeprueft\"",
     "text": "? Nicht ganz geprüft",
@@ -473,7 +481,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1224,
+    "line": 1236,
     "tag": "button",
     "attributes": "class=\"dok-pruefung info\" data-pruef data-pruefung=\"herkunft\"",
     "text": "ℹ Herkunft · Prüfbericht",
@@ -481,7 +489,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1227,
+    "line": 1239,
     "tag": "button",
     "attributes": "class=\"dok-pruefung ok\" data-pruef data-pruefung=\"sauber\"",
     "text": "✓ Geprüft · Prüfbericht",
@@ -489,7 +497,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1286,
+    "line": 1298,
     "tag": "summary",
     "attributes": "",
     "text": "Details anzeigen",
@@ -497,7 +505,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1289,
+    "line": 1301,
     "tag": "summary",
     "attributes": "",
     "text": "Was geprüft wurde",
@@ -505,7 +513,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1291,
+    "line": 1303,
     "tag": "button",
     "attributes": "class=\"knopf\" data-bericht-laden",
     "text": "⬇ Prüfbericht als Textdatei",
@@ -513,7 +521,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1291,
+    "line": 1303,
     "tag": "button",
     "attributes": "class=\"knopf\" data-markiert-laden",
     "text": "⬇ Markierte Kopie speichern",
@@ -521,7 +529,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1291,
+    "line": 1303,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-x",
     "text": "OK",
@@ -529,7 +537,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1332,
+    "line": 1345,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-x",
     "text": "OK",
@@ -537,7 +545,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1344,
+    "line": 1358,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Schließen",
@@ -545,7 +553,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1344,
+    "line": 1358,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-dl",
     "text": "⬇ Arbeitsstand als Datei sichern",
@@ -553,7 +561,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1349,
+    "line": 1363,
     "tag": "button",
     "attributes": "class=\"knopf\" data-teilen",
     "text": "📤 Teilen …",
@@ -561,7 +569,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1383,
+    "line": 1398,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-x",
     "text": "OK",
@@ -569,7 +577,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1667,
+    "line": 1683,
     "tag": "button",
     "attributes": "class=\"wahl\" data-dok=\"${d.id}\"",
     "text": "${nm(d.name)} ${d.id === (S.doc && S.doc.id) ? h(T('dieses Dokument')) : d.pages.length + ' ' + h(T('Seiten'))}",
@@ -577,7 +585,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1669,
+    "line": 1685,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "${h(T('Schließen'))}",
@@ -585,7 +593,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1726,
+    "line": 1742,
     "tag": "button",
     "attributes": "class=\"knopf\" data-alle",
     "text": "✓ Alle übernehmen",
@@ -593,106 +601,10 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1726,
+    "line": 1742,
     "tag": "button",
     "attributes": "class=\"knopf gefahr\" data-weg",
     "text": "✕ Alle verwerfen",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1737,
-    "tag": "input",
-    "attributes": "id=\"eigWert\" value=\"${h(f.value || '')}\"",
-    "text": "",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1742,
-    "tag": "button",
-    "attributes": "class=\"knopf${S.platzieren === k ? ' an' : ''}\" data-t=\"${k}\"",
-    "text": "${t.ico} ${t.name}",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1743,
-    "tag": "button",
-    "attributes": "class=\"knopf\" id=\"fussSeite\"",
-    "text": "＋ Seite",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1743,
-    "tag": "button",
-    "attributes": "class=\"knopf\" id=\"fussText\"",
-    "text": "📄 Erkannter Text",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1744,
-    "tag": "button",
-    "attributes": "class=\"knopf klein\" id=\"platzAbbr\"",
-    "text": "Abbrechen",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1747,
-    "tag": "button",
-    "attributes": "class=\"knopf klein blau\" id=\"eigOk\"",
-    "text": "✓ Passt",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1748,
-    "tag": "input",
-    "attributes": "id=\"eigLabel\" value=\"${h(f.label || '')}\"",
-    "text": "",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1749,
-    "tag": "select",
-    "attributes": "id=\"eigTyp\"",
-    "text": "${Object.entries(TYPEN).map(([k, t]) => ` ${t.name} `).join('')}",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1750,
-    "tag": "button",
-    "attributes": "class=\"knopf\" id=\"eigUnterschr\"",
-    "text": "✒️ ${f.value ? 'Neu unterschreiben' : 'Unterschreiben'}",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1750,
-    "tag": "button",
-    "attributes": "class=\"knopf\" id=\"eigUsWeg\"",
-    "text": "Unterschrift entfernen",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1751,
-    "tag": "input",
-    "attributes": "type=\"checkbox\" id=\"eigWertC\"${f.value ? ' checked' : ''}",
-    "text": "",
-    "native_evidence": "offen"
-  },
-  {
-    "source": "assets/app.js",
-    "line": 1752,
-    "tag": "input",
-    "attributes": "type=\"date\" id=\"eigWert\" value=\"${h(f.value || '')}\"",
-    "text": "",
     "native_evidence": "offen"
   },
   {
@@ -705,7 +617,103 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1754,
+    "line": 1758,
+    "tag": "button",
+    "attributes": "class=\"knopf${S.platzieren === k ? ' an' : ''}\" data-t=\"${k}\"",
+    "text": "${t.ico} ${t.name}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1759,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"fussSeite\"",
+    "text": "＋ Seite",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1759,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"fussText\"",
+    "text": "📄 Erkannter Text",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1760,
+    "tag": "button",
+    "attributes": "class=\"knopf klein\" id=\"platzAbbr\"",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1763,
+    "tag": "button",
+    "attributes": "class=\"knopf klein blau\" id=\"eigOk\"",
+    "text": "✓ Passt",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1764,
+    "tag": "input",
+    "attributes": "id=\"eigLabel\" value=\"${h(f.label || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1765,
+    "tag": "select",
+    "attributes": "id=\"eigTyp\"",
+    "text": "${Object.entries(TYPEN).map(([k, t]) => ` ${t.name} `).join('')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1766,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"eigUnterschr\"",
+    "text": "✒️ ${f.value ? 'Neu unterschreiben' : 'Unterschreiben'}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1766,
+    "tag": "button",
+    "attributes": "class=\"knopf\" id=\"eigUsWeg\"",
+    "text": "Unterschrift entfernen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1767,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" id=\"eigWertC\"${f.value ? ' checked' : ''}",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1768,
+    "tag": "input",
+    "attributes": "type=\"date\" id=\"eigWert\" value=\"${h(f.value || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1769,
+    "tag": "input",
+    "attributes": "id=\"eigWert\" value=\"${h(f.value || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/app.js",
+    "line": 1770,
     "tag": "input",
     "attributes": "type=\"checkbox\" id=\"eigMz\"${f.mehrzeilig ? ' checked' : ''}",
     "text": "",
@@ -713,7 +721,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1755,
+    "line": 1771,
     "tag": "button",
     "attributes": "class=\"knopf\" id=\"eigKopie\" title=\"Feld kopieren\"",
     "text": "⧉ Kopie",
@@ -721,7 +729,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1755,
+    "line": 1771,
     "tag": "button",
     "attributes": "class=\"knopf gefahr\" id=\"eigDel\"",
     "text": "🗑 Löschen",
@@ -729,7 +737,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1787,
+    "line": 1803,
     "tag": "button",
     "attributes": "class=\"knopf\" data-neu",
     "text": "Löschen",
@@ -737,7 +745,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1787,
+    "line": 1803,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Abbrechen",
@@ -745,7 +753,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1787,
+    "line": 1803,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-ok",
     "text": "✓ Übernehmen",
@@ -753,7 +761,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1832,
+    "line": 1848,
     "tag": "textarea",
     "attributes": "readonly",
     "text": "${h(t)}",
@@ -761,7 +769,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1833,
+    "line": 1849,
     "tag": "button",
     "attributes": "class=\"knopf\" data-k",
     "text": "Kopieren",
@@ -769,7 +777,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1833,
+    "line": 1849,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-x",
     "text": "Schließen",
@@ -777,7 +785,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1842,
+    "line": 1858,
     "tag": "button",
     "attributes": "class=\"wahl\" data-d",
     "text": "📄 PDF oder Bild wählen eine oder mehrere Dateien",
@@ -785,7 +793,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1843,
+    "line": 1859,
     "tag": "button",
     "attributes": "class=\"wahl\" data-k",
     "text": "📷 Seite fotografieren",
@@ -793,7 +801,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1844,
+    "line": 1860,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Abbrechen",
@@ -801,7 +809,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1932,
+    "line": 1948,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-alle",
     "text": "Alle",
@@ -809,7 +817,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1932,
+    "line": 1948,
     "tag": "input",
     "attributes": "type=\"checkbox\" data-dok=\"${h(id)}\"",
     "text": "",
@@ -817,7 +825,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1934,
+    "line": 1950,
     "tag": "button",
     "attributes": "class=\"wahl\" data-off",
     "text": "🔍 Ohne Internet erkennen Findet Linien, Eingabe-Rahmen, graue Eingabeflächen und Kästchen im Seitenbild. Bei digitalen PDFs kommt die Beschriftung aus dem Text daneben.",
@@ -825,7 +833,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1935,
+    "line": 1951,
     "tag": "button",
     "attributes": "class=\"wahl\" data-ki",
     "text": "🤖 Mit KI erkennen — ${h(a.label)} ${kiBereit() ? `Jede Seite wird als Bild an ${h(a.label)} geschickt, mit den offline gefundenen Stellen nummeriert markiert. Die KI benennt sie, sortiert Falsches aus und ergänzt Fehlendes. Die Positionen der markierten Stellen bleiben exakt.` : 'Noch kein Schlüssel eingetragen — tippen, um ihn in den Einstellungen einzutragen.'}",
@@ -833,7 +841,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1938,
+    "line": 1954,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Abbrechen",
@@ -841,7 +849,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1975,
+    "line": 1991,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-x",
     "text": "OK",
@@ -849,7 +857,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2161,
+    "line": 2177,
     "tag": "select",
     "attributes": "data-m",
     "text": "festes PDF (Einträge fest auf der Seite) ausfüllbares PDF leere ausfüllbare Vorlage Original, unverändert",
@@ -857,7 +865,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2162,
+    "line": 2178,
     "tag": "button",
     "attributes": "class=\"wahl\" data-weg=\"zip\"",
     "text": "🗜 Als ZIP-Datei (ein Ordner) Eine Datei mit allen PDFs darin, benannt wie der Ordner. Zum Verschicken, Ablegen, Sichern.",
@@ -865,7 +873,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2163,
+    "line": 2179,
     "tag": "button",
     "attributes": "class=\"wahl\" data-weg=\"teilen\"",
     "text": "📤 Alle Dateien teilen Alle PDFs auf einmal an eine App geben (Mail, Messenger, Drive …). Manche Apps nehmen nur eine Datei — dann die ZIP-Datei nehmen.",
@@ -873,7 +881,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2164,
+    "line": 2180,
     "tag": "button",
     "attributes": "class=\"wahl\" data-weg=\"eins\"",
     "text": "📚 Zu einem PDF zusammenfügen Alle Seiten hintereinander in EINEM PDF, in der Reihenfolge oben — z. B. die übersetzten Teile eines Handbuchs wieder als ein Buch. Ausfüllbare Felder werden dabei fest.",
@@ -881,7 +889,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2165,
+    "line": 2181,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Abbrechen",
@@ -889,7 +897,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2198,
+    "line": 2214,
     "tag": "button",
     "attributes": "class=\"knopf primaer\" data-teilen",
     "text": "📤 Jetzt teilen …",
@@ -897,7 +905,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2198,
+    "line": 2214,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Schließen",
@@ -905,7 +913,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2210,
+    "line": 2226,
     "tag": "button",
     "attributes": "class=\"wahl\" data-m=\"fest\"",
     "text": "📄 Festes PDF Die eingetragenen Inhalte werden Teil der Seite. Zum Verschicken, Ablegen, Drucken.",
@@ -913,7 +921,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2211,
+    "line": 2227,
     "tag": "button",
     "attributes": "class=\"wahl\" data-m=\"ausfuellbar\"",
     "text": "📝 Ausfüllbares PDF Echte PDF-Formularfelder, vorbelegt mit deinen Einträgen. Der Empfänger kann sie ändern und speichern. Ausfüllen geht in Adobe Acrobat Reader oder Chrome am Computer; die PDF-Anzeige von „Dateien\" oder Google Drive am Handy zeigt oft nur die Kästchen — dafür gibt es die HTML-Fassung.",
@@ -921,7 +929,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2212,
+    "line": 2228,
     "tag": "button",
     "attributes": "class=\"wahl\" data-m=\"vorlage\"",
     "text": "📝 Leere ausfüllbare Vorlage Echte Formularfelder, alle leer. Der Empfänger füllt selbst aus.",
@@ -929,7 +937,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2213,
+    "line": 2229,
     "tag": "button",
     "attributes": "class=\"wahl\" data-m=\"html\"",
     "text": "🌐 Zum Ausfüllen im Browser (HTML) Eine Datei, die sich in jedem Browser öffnet und dort ausfüllen lässt — auch wo die PDF-Anzeige keine Formularfelder kann. Danach im Browser „Als PDF speichern\".",
@@ -937,7 +945,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2214,
+    "line": 2230,
     "tag": "button",
     "attributes": "class=\"wahl\" data-m=\"druck\"",
     "text": "🖨 Ansehen / Drucken Öffnet das feste PDF in der PDF-Anzeige des Geräts.",
@@ -945,7 +953,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2215,
+    "line": 2231,
     "tag": "button",
     "attributes": "class=\"wahl\" data-rueckweg",
     "text": "↩ Einträge ins Original (${h((S.doc.uebersetzung.von || '').toUpperCase())}) Die Einträge zurückübersetzen und in eine Kopie des Originals „${h(S.doc.uebersetzung.von.toUpperCase())}\" an dieselben Stellen setzen.",
@@ -953,7 +961,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2218,
+    "line": 2234,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Schließen",
@@ -961,7 +969,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2229,
+    "line": 2245,
     "tag": "button",
     "attributes": "class=\"knopf\" data-teilen",
     "text": "📤 Teilen …",
@@ -969,7 +977,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2244,
+    "line": 2260,
     "tag": "button",
     "attributes": "class=\"knopf\" data-teilen",
     "text": "📤 Teilen …",
@@ -977,7 +985,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2262,
+    "line": 2278,
     "tag": "select",
     "attributes": "data-${name}",
     "text": "${Object.entries(UE.SPRACHEN).map(([k, v]) => ` ${h(v)} `).join('')}",
@@ -985,7 +993,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2294,
+    "line": 2310,
     "tag": "button",
     "attributes": "class=\"wahl\" data-uo",
     "text": "🗂️ Ordner vom Gerät übersetzen Alle PDFs eines Ordners, beliebig viele Seiten. Jede Seite wird einzeln übersetzt und sofort gespeichert.",
@@ -993,7 +1001,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2295,
+    "line": 2311,
     "tag": "button",
     "attributes": "class=\"wahl\" data-ud",
     "text": "📄 Einzelne PDFs oder Bilder übersetzen Eine oder mehrere PDF-Dateien oder Fotos (JPG, PNG) wählen. Bei Fotos wird das Blatt gesucht und auf A4 gerade gezogen.",
@@ -1001,7 +1009,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2296,
+    "line": 2312,
     "tag": "button",
     "attributes": "class=\"wahl\" data-ubsp",
     "text": "📘 Beispiele zum Ausprobieren Das Benutzerhandbuch dieser App (14 Seiten mit Bildern, Tabellen, Kästen, Querformat und einer gescannten Seite) und ein erfundenes Amtsformular. Übersetzen testen, ohne eigene Dokumente zu nehmen. Sie landen im Ordner „Beispiele\".",
@@ -1009,7 +1017,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2297,
+    "line": 2313,
     "tag": "button",
     "attributes": "class=\"wahl\" data-uk",
     "text": "📷 Brief fotografieren Papierbrief (z. B. vom Amt) Seite für Seite aufnehmen. Das Blatt wird auf A4 gerade gezogen — ausgedruckt wieder so groß wie das Papier. Die Texterkennung liest ihn auf dem Gerät.",
@@ -1017,7 +1025,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2298,
+    "line": 2314,
     "tag": "button",
     "attributes": "class=\"wahl\" data-o=\"${o.id}\"",
     "text": "${o.bereich === 'uebersetzung' ? '🌐 ' : '🗂️ '}${nm(o.name)} ${S.docs.filter(d => d.folderId === o.id && !d.uebersetzung).length} Dokumente",
@@ -1025,7 +1033,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2299,
+    "line": 2315,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Abbrechen",
@@ -1033,7 +1041,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2392,
+    "line": 2408,
     "tag": "input",
     "attributes": "readonly data-adr style=\"width:100%;font-size:12px;padding:6px;border:1px solid #bbb;border-radius:6px\"",
     "text": "",
@@ -1041,7 +1049,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2393,
+    "line": 2409,
     "tag": "button",
     "attributes": "class=\"knopf\" data-kopie",
     "text": "📋 Nochmal kopieren",
@@ -1049,7 +1057,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2393,
+    "line": 2409,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-hinok",
     "text": "OK",
@@ -1057,7 +1065,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2498,
+    "line": 2514,
     "tag": "input",
     "attributes": "type=\"number\" min=\"1\" max=\"${p.seiten}\" value=\"${p.jeTeil}\" data-jeteil style=\"width:5em\"",
     "text": "",
@@ -1065,7 +1073,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2499,
+    "line": 2515,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-teilen=\"${h(d.id)}\"",
     "text": "✂️ In ${p.teile.length} Teile aufteilen",
@@ -1073,7 +1081,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2563,
+    "line": 2579,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-alle",
     "text": "Alle",
@@ -1081,7 +1089,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2564,
+    "line": 2580,
     "tag": "input",
     "attributes": "type=\"checkbox\" data-dok=\"${h(d.id)}\"${(opt.gewaehlt ? opt.gewaehlt.includes(d.id) : !mehrere || (alleGewaehlt && !d.uebersetzung)) ? ' checked' : ''}",
     "text": "",
@@ -1089,7 +1097,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2564,
+    "line": 2580,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-feld=\"${h(d.id)}\" title=\"Rahmen zum Ausfüllen (Text, Datum, Kästchen, Unterschrift) im Original setzen — sie kommen dann übersetzt mit\"",
     "text": "✏️ erst Felder setzen",
@@ -1097,7 +1105,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2567,
+    "line": 2583,
     "tag": "input",
     "attributes": "type=\"checkbox\" data-rueck${EINST.ueRueck !== false ? ' checked' : ''}",
     "text": "",
@@ -1105,7 +1113,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2568,
+    "line": 2584,
     "tag": "input",
     "attributes": "type=\"checkbox\" data-bilder${EINST.ueBilder ? ' checked' : ''}",
     "text": "",
@@ -1113,7 +1121,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2571,
+    "line": 2587,
     "tag": "button",
     "attributes": "class=\"wahl\" data-weg=\"browser\"",
     "text": "📱 Übersetzer im Browser prüfe …",
@@ -1121,7 +1129,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2572,
+    "line": 2588,
     "tag": "button",
     "attributes": "class=\"wahl\" data-weg=\"chrome\"",
     "text": "🌐 Mit Chrome übersetzen (Google) Kostenlos, ohne Schlüssel und ohne Kontingent. Die App zeigt den Text jeder Seite unten an, du tippst einmal in Chrome ⋮ → „Übersetzen\" — danach läuft es Seite für Seite von selbst. Der Text geht dabei an Google.${matchMedia('(display-mode: standalone)').matches ? ' Die App läuft gerade im eigenen Fenster — dort fehlt „Übersetzen\" oft. Dann „' + chromeKnopf() + '\" (darunter)' + (teilenWeg() ? ': im Teilen-Fenster Chrome wählen, dort öffnet sich derselbe Übersetzer. Zurück in der App oben ⟳ tippen.' : ': derselbe Übersetzer öffnet sich in Chrome.') : ''}",
@@ -1129,7 +1137,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2574,
+    "line": 2590,
     "tag": "button",
     "attributes": "class=\"wahl\" data-weg=\"ki\"",
     "text": "🤖 Mit KI — ${h(a.label)} ${kiBereit() ? `Der Text jeder Seite (nicht das Bild) geht an ${h(a.label)}. Kostet je Seite, abgerechnet über deinen Schlüssel. Vor dem ersten Senden wird gefragt.` : 'Noch kein Schlüssel eingetragen — tippen, um ihn in den Einstellungen einzutragen.'}",
@@ -1137,7 +1145,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2575,
+    "line": 2591,
     "tag": "summary",
     "attributes": "",
     "text": "🔎 Messen: was kann dieses Gerät?",
@@ -1145,7 +1153,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2575,
+    "line": 2591,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-messen",
     "text": "Jetzt messen",
@@ -1153,7 +1161,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2576,
+    "line": 2592,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Abbrechen",
@@ -1161,7 +1169,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2683,
+    "line": 2699,
     "tag": "button",
     "attributes": "class=\"wahl\" data-weg=\"browser\"",
     "text": "📱 Übersetzer im Browser prüfe …",
@@ -1169,7 +1177,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2685,
+    "line": 2701,
     "tag": "button",
     "attributes": "class=\"wahl\" data-weg=\"chrome\"",
     "text": "🌐 Mit Chrome übersetzen (Google) Kostenlos. Die Einträge erscheinen unten, du tippst in Chrome ⋮ → „Übersetzen\" und wählst ${h(UE.NAME_DE[nach])}. Der Text geht dabei an Google.${fenster ? ' Die App läuft gerade im eigenen Fenster — dort gibt es ⋮ → „Übersetzen\" nicht. Dann „' + chromeKnopf() + '\" (darunter): dieselben Einträge öffnen sich in Chrome.' : ''}",
@@ -1177,7 +1185,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2687,
+    "line": 2703,
     "tag": "button",
     "attributes": "class=\"wahl\" data-weg=\"ki\"",
     "text": "🤖 Mit KI — ${h(a.label)} ${kiBereit() ? `Nur die Einträge (nicht die Seiten) gehen an ${h(a.label)}. Vor dem ersten Senden wird gefragt.` : 'Noch kein Schlüssel eingetragen — tippen, um ihn einzutragen.'}",
@@ -1185,7 +1193,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2688,
+    "line": 2704,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Abbrechen",
@@ -1193,7 +1201,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2861,
+    "line": 2877,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-oeffne=\"${h(z.neuId)}\"",
     "text": "${z.teil ? '👁 Teilübersetzung öffnen' : '✏️ Öffnen: Felder setzen / ausfüllen'}",
@@ -1201,7 +1209,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2864,
+    "line": 2880,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-x",
     "text": "OK",
@@ -1209,7 +1217,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2875,
+    "line": 2891,
     "tag": "button",
     "attributes": "class=\"wahl${x.code === SP.lang ? ' on' : ''}\" data-sp=\"${x.code}\" lang=\"${x.code}\"${x.rtl ? ' dir=\"rtl\"' : ''}",
     "text": "${h(x.name)}",
@@ -1217,7 +1225,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2876,
+    "line": 2892,
     "tag": "input",
     "attributes": "type=\"checkbox\" data-tipps${SP.tipps ? ' checked' : ''}",
     "text": "",
@@ -1225,7 +1233,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2877,
+    "line": 2893,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-x",
     "text": "Fertig",
@@ -1233,7 +1241,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2944,
+    "line": 2960,
     "tag": "button",
     "attributes": "class=\"knopf klein rot\" data-sich-jetzt",
     "text": "Jetzt sichern",
@@ -1241,7 +1249,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2944,
+    "line": 2960,
     "tag": "button",
     "attributes": "class=\"knopf klein\" data-sich-spaeter",
     "text": "Später",
@@ -1249,7 +1257,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2956,
+    "line": 2972,
     "tag": "input",
     "attributes": "type=\"password\" id=\"siPw1\" autocomplete=\"new-password\"",
     "text": "",
@@ -1257,7 +1265,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2957,
+    "line": 2973,
     "tag": "input",
     "attributes": "type=\"password\" id=\"siPw2\" autocomplete=\"new-password\"",
     "text": "",
@@ -1265,7 +1273,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2959,
+    "line": 2975,
     "tag": "button",
     "attributes": "class=\"knopf rot\" id=\"siErstellen\"",
     "text": "⬇ Sicherung erstellen",
@@ -1273,7 +1281,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2963,
+    "line": 2979,
     "tag": "input",
     "attributes": "type=\"file\" id=\"siDatei\" accept=\".json,application/json\"",
     "text": "",
@@ -1281,7 +1289,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2964,
+    "line": 2980,
     "tag": "input",
     "attributes": "type=\"password\" id=\"siPwZ\" autocomplete=\"off\"",
     "text": "",
@@ -1289,7 +1297,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2965,
+    "line": 2981,
     "tag": "button",
     "attributes": "class=\"knopf\" id=\"siZurueck\"",
     "text": "⬆ Zurückholen",
@@ -1297,7 +1305,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2969,
+    "line": 2985,
     "tag": "button",
     "attributes": "class=\"knopf\" id=\"siDauerKnopf\"",
     "text": "📌 Dauerhaft speichern lassen",
@@ -1305,7 +1313,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 2970,
+    "line": 2986,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Schließen",
@@ -1313,7 +1321,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3017,
+    "line": 3033,
     "tag": "select",
     "attributes": "id=\"stAnb\"",
     "text": "${opt}",
@@ -1321,7 +1329,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3018,
+    "line": 3034,
     "tag": "a",
     "attributes": "id=\"stKonsole\" target=\"_blank\" rel=\"noopener\" style=\"font-weight:400\"",
     "text": "— Schlüssel beim Anbieter holen ↗",
@@ -1329,7 +1337,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3018,
+    "line": 3034,
     "tag": "input",
     "attributes": "type=\"password\" id=\"stKey\" autocomplete=\"off\" placeholder=\"nur in diesem Browser gespeichert\"",
     "text": "",
@@ -1337,7 +1345,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3019,
+    "line": 3035,
     "tag": "input",
     "attributes": "type=\"text\" id=\"stMod\" placeholder=\"\" data-kein-ue",
     "text": "",
@@ -1345,7 +1353,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3020,
+    "line": 3036,
     "tag": "input",
     "attributes": "type=\"text\" id=\"stUebMod\" placeholder=\"\" data-kein-ue",
     "text": "",
@@ -1353,7 +1361,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3021,
+    "line": 3037,
     "tag": "button",
     "attributes": "class=\"knopf\" id=\"stTest\"",
     "text": "🔌 Verbindung testen",
@@ -1361,7 +1369,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3024,
+    "line": 3040,
     "tag": "button",
     "attributes": "class=\"knopf\" id=\"stSprache\"",
     "text": "🗣 Sprache und Hinweise …",
@@ -1369,7 +1377,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3026,
+    "line": 3042,
     "tag": "input",
     "attributes": "type=\"checkbox\" id=\"stLin\"${EINST.linien !== false ? ' checked' : ''}",
     "text": "",
@@ -1377,7 +1385,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3029,
+    "line": 3045,
     "tag": "button",
     "attributes": "class=\"knopf\" id=\"stSicherung\"",
     "text": "🔐 Bibliothek sichern und zurückholen …",
@@ -1385,7 +1393,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3030,
+    "line": 3047,
     "tag": "a",
     "attributes": "href=\"impressum.html\" target=\"_blank\" rel=\"noopener\"",
     "text": "Impressum &amp; Datenschutz",
@@ -1393,7 +1401,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3031,
+    "line": 3048,
     "tag": "button",
     "attributes": "class=\"knopf rot\" id=\"stInstall\"",
     "text": "📲 Als App installieren",
@@ -1401,7 +1409,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3032,
+    "line": 3049,
     "tag": "button",
     "attributes": "class=\"knopf\" data-x",
     "text": "Abbrechen",
@@ -1409,7 +1417,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3032,
+    "line": 3049,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-ok",
     "text": "Speichern",
@@ -1417,7 +1425,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3068,
+    "line": 3086,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-x",
     "text": "OK",
@@ -1425,7 +1433,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3102,
+    "line": 3120,
     "tag": "button",
     "attributes": "class=\"knopf\" data-teil=\"haupt\" aria-pressed=\"true\"",
     "text": "▶ Erklärvideo",
@@ -1433,7 +1441,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3102,
+    "line": 3120,
     "tag": "button",
     "attributes": "class=\"knopf\" data-teil=\"neu\" aria-pressed=\"false\"",
     "text": "▶ Neu: Versteckte Befehle",
@@ -1441,7 +1449,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3103,
+    "line": 3121,
     "tag": "button",
     "attributes": "class=\"knopf\" data-ab=\"${s}\"",
     "text": "${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')} ${n}",
@@ -1449,7 +1457,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3106,
+    "line": 3124,
     "tag": "a",
     "attributes": "href=\"${WEBSEITE}\" target=\"_blank\" rel=\"noopener\"",
     "text": "Alle Kapitel und das Video hochkant auf der Webseite",
@@ -1457,7 +1465,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3107,
+    "line": 3125,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-x",
     "text": "Schließen",
@@ -1465,7 +1473,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3182,
+    "line": 3200,
     "tag": "button",
     "attributes": "class=\"knopf\" data-hb",
     "text": "📘 Handbuch öffnen",
@@ -1473,7 +1481,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3182,
+    "line": 3200,
     "tag": "button",
     "attributes": "class=\"knopf\" data-bsp",
     "text": "📄 Beispiel-Formular",
@@ -1481,7 +1489,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3182,
+    "line": 3200,
     "tag": "button",
     "attributes": "class=\"knopf rot\" data-x",
     "text": "Verstanden",
@@ -1489,7 +1497,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3186,
+    "line": 3204,
     "tag": "button",
     "attributes": "class=\"knopf\" data-test-bild",
     "text": "🧪 Bild mit blasser Anweisung",
@@ -1497,7 +1505,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3186,
+    "line": 3204,
     "tag": "button",
     "attributes": "class=\"knopf\" data-test-pdf",
     "text": "🧪 PDF mit unsichtbarem Text",
@@ -1505,7 +1513,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3187,
+    "line": 3205,
     "tag": "a",
     "attributes": "data-test-laden href=\"beispiele/Testbild-versteckte-Anweisung.png\" download",
     "text": "⬇ Testbild",
@@ -1513,7 +1521,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3189,
+    "line": 3207,
     "tag": "button",
     "attributes": "class=\"knopf\" data-video",
     "text": "🎬 Erklärvideo",
@@ -1521,7 +1529,7 @@
   },
   {
     "source": "assets/app.js",
-    "line": 3190,
+    "line": 3208,
     "tag": "a",
     "attributes": "data-webseite href=\"${WEBSEITE}\" target=\"_blank\" rel=\"noopener\"",
     "text": "Alle Kapitel und das Video hochkant auf der Webseite",
@@ -1648,6 +1656,94 @@
     "native_evidence": "offen"
   },
   {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 64,
+    "tag": "button",
+    "attributes": "class=\"link-knopf\" data-briefkopf-aendern data-kein-ue title=\"Briefkopf ansehen und ändern\"",
+    "text": "${teile.join(' · ')}${w >= 2 ? ' · ' + h(STUFEN[w]) + ' ' : ''}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 78,
+    "tag": "input",
+    "attributes": "type=\"date\" data-bk=\"datum\" value=\"${h(k.datum && k.datum.wert || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 79,
+    "tag": "input",
+    "attributes": "type=\"text\" data-bk=\"absender\" value=\"${h(k.absender && k.absender.wert || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 80,
+    "tag": "input",
+    "attributes": "type=\"text\" data-bk=\"empfaenger\" value=\"${h(k.empfaenger && k.empfaenger.wert || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 81,
+    "tag": "input",
+    "attributes": "type=\"text\" data-bk=\"kundennummer\" value=\"${h(kdnr(k))}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 82,
+    "tag": "input",
+    "attributes": "type=\"text\" data-bk=\"betreff\" value=\"${h(k.betreff && k.betreff.wert || '')}\"",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 83,
+    "tag": "select",
+    "attributes": "data-bk=\"thema\" data-kein-ue",
+    "text": "ohne Thema ${themenListe.map(t => ` ${h(t)} `).join('')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 84,
+    "tag": "select",
+    "attributes": "data-bk=\"wichtigkeit\"",
+    "text": "${STUFEN.map((s, i) => ` ${h(s)} `).join('')}",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 85,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-bk-neu",
+    "text": "Neu lesen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 85,
+    "tag": "button",
+    "attributes": "class=\"knopf\" data-x",
+    "text": "Abbrechen",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/briefkopf-ansicht.js",
+    "line": 85,
+    "tag": "button",
+    "attributes": "class=\"knopf rot\" data-bk-speichern",
+    "text": "Speichern",
+    "native_evidence": "offen"
+  },
+  {
     "source": "assets/html-export.js",
     "line": 28,
     "tag": "input",
@@ -1685,6 +1781,22 @@
     "tag": "button",
     "attributes": "id=\"sichern\"",
     "text": "💾 Ausgefüllt speichern",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/netz.js",
+    "line": 221,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" data-netz-an",
+    "text": "",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "assets/netz.js",
+    "line": 222,
+    "tag": "input",
+    "attributes": "type=\"checkbox\" data-netz-ausschnitt",
+    "text": "",
     "native_evidence": "offen"
   },
   {
@@ -2169,7 +2281,7 @@
   },
   {
     "source": "assets/sprache-texte.js",
-    "line": 452,
+    "line": 493,
     "tag": "a",
     "attributes": "",
     "text": "Impressum & Datenschutz",
@@ -2177,7 +2289,7 @@
   },
   {
     "source": "assets/sprache-texte.js",
-    "line": 452,
+    "line": 493,
     "tag": "a",
     "attributes": "",
     "text": "Legal notice & privacy",
@@ -2185,7 +2297,7 @@
   },
   {
     "source": "assets/sprache-texte.js",
-    "line": 1499,
+    "line": 1581,
     "tag": "a",
     "attributes": "",
     "text": "Impressum & Datenschutz",
@@ -2193,7 +2305,7 @@
   },
   {
     "source": "assets/sprache-texte.js",
-    "line": 1499,
+    "line": 1581,
     "tag": "a",
     "attributes": "",
     "text": "Выходные данные и конфиденциальность",
@@ -2201,7 +2313,7 @@
   },
   {
     "source": "assets/sprache-texte.js",
-    "line": 2546,
+    "line": 2669,
     "tag": "a",
     "attributes": "",
     "text": "Impressum & Datenschutz",
@@ -2209,7 +2321,7 @@
   },
   {
     "source": "assets/sprache-texte.js",
-    "line": 2546,
+    "line": 2669,
     "tag": "a",
     "attributes": "",
     "text": "بيانات الناشر وحماية البيانات",
@@ -2435,13 +2547,21 @@
     "source": "index.html",
     "line": 120,
     "tag": "button",
+    "attributes": "id=\"edBrief\" class=\"ed-pruefung ed-brief\" type=\"button\" hidden",
+    "text": "Briefkopf",
+    "native_evidence": "offen"
+  },
+  {
+    "source": "index.html",
+    "line": 121,
+    "tag": "button",
     "attributes": "class=\"knopf klein\" id=\"zMinus\" title=\"Kleiner\"",
     "text": "−",
     "native_evidence": "offen"
   },
   {
     "source": "index.html",
-    "line": 120,
+    "line": 121,
     "tag": "button",
     "attributes": "class=\"knopf klein\" id=\"zPlus\" title=\"Größer\"",
     "text": "+",
@@ -2449,7 +2569,7 @@
   },
   {
     "source": "index.html",
-    "line": 121,
+    "line": 122,
     "tag": "button",
     "attributes": "class=\"knopf\" id=\"edSpeichern\" title=\"Speichern · Arbeitsstand als Datei sichern\"",
     "text": "💾 Speichern",
@@ -2457,7 +2577,7 @@
   },
   {
     "source": "index.html",
-    "line": 122,
+    "line": 123,
     "tag": "button",
     "attributes": "class=\"knopf\" id=\"edTeilen\" title=\"Teilen mit … (E-Mail, Messenger …)\"",
     "text": "📤 Teilen",
@@ -2465,7 +2585,7 @@
   },
   {
     "source": "index.html",
-    "line": 123,
+    "line": 124,
     "tag": "button",
     "attributes": "class=\"knopf rot\" id=\"edExport\"",
     "text": "⬇ PDF ausgeben",
@@ -2473,7 +2593,7 @@
   },
   {
     "source": "index.html",
-    "line": 128,
+    "line": 129,
     "tag": "input",
     "attributes": "class=\"bib-suche\" id=\"edSuche\" type=\"search\" enterkeyhint=\"search\" placeholder=\"🔎 Im Dokument suchen\" aria-label=\"Im Dokument suchen\"",
     "text": "",
@@ -2481,7 +2601,7 @@
   },
   {
     "source": "index.html",
-    "line": 130,
+    "line": 131,
     "tag": "button",
     "attributes": "class=\"knopf klein\" id=\"edSuchZurueck\" type=\"button\" title=\"Vorheriger Treffer\"",
     "text": "▲",
@@ -2489,7 +2609,7 @@
   },
   {
     "source": "index.html",
-    "line": 131,
+    "line": 132,
     "tag": "button",
     "attributes": "class=\"knopf klein\" id=\"edSuchWeiter\" type=\"submit\" title=\"Nächster Treffer\"",
     "text": "▼",
@@ -2497,7 +2617,7 @@
   },
   {
     "source": "index.html",
-    "line": 141,
+    "line": 142,
     "tag": "input",
     "attributes": "type=\"file\" id=\"inAnhang\" accept=\"application/pdf,image/*\" multiple hidden",
     "text": "",
@@ -2505,7 +2625,7 @@
   },
   {
     "source": "index.html",
-    "line": 142,
+    "line": 143,
     "tag": "input",
     "attributes": "type=\"file\" id=\"inUeOrdner\" webkitdirectory multiple hidden",
     "text": "",
@@ -2513,7 +2633,7 @@
   },
   {
     "source": "index.html",
-    "line": 143,
+    "line": 144,
     "tag": "input",
     "attributes": "type=\"file\" id=\"inUeDateien\" accept=\"application/pdf,image/*\" multiple hidden",
     "text": "",
