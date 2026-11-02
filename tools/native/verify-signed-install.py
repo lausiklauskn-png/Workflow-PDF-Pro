@@ -12,6 +12,7 @@ package='de.familyprojekt.workflowpdf.pro'+('.debug' if development else '')
 # Keep the synthetic folder fully visible in a narrow phone's horizontal bar;
 # accessibility may omit the clipped end of a long label despite valid storage.
 marker='WF-Probe'
+launch_results=[]
 def adb(*args):
     result=subprocess.run(['adb',*map(str,args)],text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=45)
     if result.returncode:raise RuntimeError('ADB '+str(args[:3])+': '+(result.stdout+result.stderr)[-3000:])
@@ -50,17 +51,24 @@ def stable_tap(predicate):
     raise RuntimeError('Visible control did not settle within its 30-second budget: '+str(last_error))
 def launch():
     result=adb('shell','am','start','-W','-n',package+'/de.familyprojekt.workflowpdf.pro.MainActivity')
+    launch_results.append(result)
     if 'Status: ok' not in result:raise RuntimeError('Regular application did not launch')
+
+def assert_running():
+    # am start reports the system's activity launch, not settled app readiness
+    # after replacement. Observe the existing visible UI first, then require a
+    # live process too. No relaunch, extra sleep or longer UI budget is used.
     if not adb('shell','pidof',package).strip():raise RuntimeError('Regular process is missing')
 
 def record_failure(error):
     directory=Path('work/acceptance/reinstall-diagnostics');directory.mkdir(parents=True,exist_ok=True)
     (directory/'failure.txt').write_text(str(error)+'\n')
+    (directory/'activity-start.json').write_text(json.dumps(launch_results,indent=2)+'\n')
     for name,args in [
         ('activity.txt',('shell','dumpsys','activity','activities')),
         ('window.txt',('shell','dumpsys','window')),
         ('hierarchy.xml',('exec-out','cat','/sdcard/workflow-release-probe.xml')),
-        ('logcat.txt',('logcat','-d','-t','400')),
+        ('logcat.txt',('logcat','-d')),
     ]:
         try:(directory/name).write_text(adb(*args))
         except Exception as diagnostic:(directory/(name+'.error')).write_text(str(diagnostic))
@@ -110,9 +118,11 @@ try:
     # focus in the verified field instead of relying on moving IME/touch bounds.
     adb('shell','input','keyevent','KEYCODE_ENTER')
     wait_node(lambda node:marker in node.get('text',''))
+    assert_running()
     adb('shell','am','force-stop',package)
     adb('install','-r',apk);launch()
     wait_node(lambda node:marker in node.get('text',''))
+    assert_running()
     proof={'applicationId':package,'apkSha256':digest,'commit':receipt['commit'],'versionCode':receipt['versionCode'],'api':int(adb('shell','getprop','ro.build.version.sdk').strip()),'firstInstall':True,'reinstallPreservesData':True,'developmentProbe':development,'probe':'visible WebView UI; folder retained across signed APK reinstall; no debug JS access'}
     Path(str(apk)+'.installation.json').write_text(json.dumps(proof,indent=2)+'\n')
     print(json.dumps(proof))

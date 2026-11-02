@@ -139,6 +139,14 @@ jobs:
           script: |
             python3 tools/native/webview-runtime.py install work/webview-runtime
             python3 tools/native/verify-signed-install.py "release-files/Workflow-PDF-Pro-${RELEASE_TAG#v}.apk"
+      - name: Fehlgeschlagene sichtbare Überinstallation nachvollziehbar sichern
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-reinstall-diagnostics
+          path: work/acceptance/reinstall-diagnostics/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Updatefolge prüfen und regulär bereitstellen
         env:
           GH_TOKEN: ${{ github.token }}

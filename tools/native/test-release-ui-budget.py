@@ -35,3 +35,60 @@ mutant=next(node for node in ast.parse(bad).body if isinstance(node,ast.Function
 taps,error,elapsed=run(mutant)
 assert not taps and error and elapsed==10,'counterprobe did not restore the former early-exit fault'
 print('PASS visible-control readiness, fixed 30-second budget, and early-exit counterprobe')
+
+# Exercise the whole CLI against Android's asynchronous start contract. These
+# are mock-ADB control-flow checks, not installed-app or signing evidence.
+import hashlib,json,os,subprocess,sys,tempfile
+fake_adb=r'''#!/usr/bin/env python3
+import json,os,sys
+from pathlib import Path
+p=Path(os.environ['WFP_PROBE_STATE'])
+s=json.loads(p.read_text()) if p.exists() else {'installs':0,'running':False,'dialog':False,'text':'','folder':False}
+a=sys.argv[1:]
+def done(value='',code=0):
+ p.write_text(json.dumps(s));print(value);raise SystemExit(code)
+if a[:3]==['shell','pm','list']:done('')
+if a[:1]==['install']:
+ s.update(installs=s['installs']+1,running=False,dialog=False,text='');done('Success')
+if a[:3]==['shell','am','start']:done('Status: ok')
+if a[:3]==['shell','am','force-stop']:
+ s['running']=False;done('')
+if a[:2]==['shell','pidof']:done('1234' if s['running'] else '',0 if s['running'] else 1)
+if a[:2]==['shell','uiautomator']:
+ s['running']=not(os.environ['WFP_PROBE_MODE']=='stale-ui' and s['installs']==2);done('UI dumped')
+if a[:2]==['exec-out','cat']:
+ nodes='<node text="＋ Ordner" bounds="[0,0][100,50]"/>'
+ if s['dialog']:nodes+='<node text="Neuer Ordner" bounds="[0,50][100,100]"/><node class="android.widget.EditText" focused="true" text="'+s['text']+'" bounds="[0,100][100,150]"/>'
+ if s['folder']:nodes+='<node text="WF-Probe" bounds="[0,150][100,200]"/>'
+ done('<hierarchy>'+nodes+'</hierarchy>')
+if a[:3]==['shell','input','tap']:
+ s['dialog']=True;done('')
+if a[:3]==['shell','input','text']:
+ s['text']=a[3];done('')
+if a[:3]==['shell','input','keyevent'] and a[3]=='KEYCODE_ENTER':
+ s.update(folder=True,dialog=False);done('')
+if a[:3]==['shell','getprop','ro.build.version.sdk']:done('31')
+done('')
+'''
+
+def cli_probe(script,mode):
+ with tempfile.TemporaryDirectory(prefix='wfp-release-readiness-') as directory:
+  root=Path(directory);binary=root/'adb';binary.write_text(fake_adb);binary.chmod(0o755)
+  apk=root/'fixture.apk';apk.write_bytes(b'control-flow fixture, not an APK')
+  Path(str(apk)+'.json').write_text(json.dumps({'apkSha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'applicationId':'de.familyprojekt.workflowpdf.pro','commit':'a'*40,'versionCode':12}))
+  tool=root/'probe.py';tool.write_text(script)
+  environment={**os.environ,'PATH':str(root)+os.pathsep+os.environ['PATH'],'WFP_PROBE_STATE':str(root/'state.json'),'WFP_PROBE_MODE':mode}
+  result=subprocess.run([sys.executable,str(tool),str(apk)],cwd=root,env=environment,text=True,capture_output=True,timeout=15)
+  return result,Path(str(apk)+'.installation.json').exists()
+
+result,proof=cli_probe(source,'late-process')
+assert result.returncode==0 and proof,'a system start report must be followed by the existing visible-readiness observation before the process check: '+result.stderr
+result,proof=cli_probe(source,'stale-ui')
+assert result.returncode!=0 and not proof,'a cached folder label without a running process must never produce an installation receipt'
+# Remove only the post-reinstall process assertion. The same stale-UI case must
+# expose a false receipt, proving the negative check can detect this regression.
+mutant=source.replace('    assert_running()\n    proof=', '    # counterprobe: missing process guard\n    proof=')
+assert mutant!=source,'post-reinstall process assertion anchor missing'
+result,proof=cli_probe(mutant,'stale-ui')
+assert result.returncode==0 and proof,'counterprobe did not expose the false receipt'
+print('PASS mock-ADB late-process readiness, stale-UI rejection and missing-process counterprobe')
