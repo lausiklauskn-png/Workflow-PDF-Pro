@@ -35,7 +35,7 @@ public final class NativeProVerbundProductTest {
     }
     private void ready(ActivityScenario<MainActivity> scenario)throws Exception {
         until(scenario,"Boolean(window.__wfpdf&&window.WFPProVerbund&&!WFPNativeVault.gate.blocked)");
-        eval(scenario,"document.documentElement.lang='de';true");
+        eval(scenario,"WFP.Sprache.setzen('de');true");
     }
     private JSONObject object(ActivityScenario<MainActivity> scenario,String js)throws Exception {
         return new JSONObject((String)new JSONTokener(eval(scenario,"JSON.stringify("+js+")")).nextValue());

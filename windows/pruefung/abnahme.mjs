@@ -208,8 +208,15 @@ if(phase==='proBedienung') {
     });
     expect(received.stand==='gespeichert'&&received.hash===fixture.sha256&&received.pages===2&&!received.checked,'Original/Quittung/manueller Prüfstatus fehlen');
     await page.click('#nativeProVerbund [data-pro-action="close"]');
-    await page.evaluate(id=>{void __wfpdf.dlg.teilenDocs([id]);},received.id);
-    await page.click('#nativeProTarget [data-pro-action="familienakte"]');await page.waitForSelector('#nativeProTarget',{state:'detached'});
+    const shareConsole=[];page.on('console',m=>{if(m.type()==='error')shareConsole.push(m.text());});
+    await page.evaluate(id=>{window.__proShare={};void __wfpdf.dlg.teilenDocs([id]).then(()=>window.__proShare.done=true,error=>window.__proShare.error=String(error));},received.id);
+    try {await page.click('#nativeProTarget [data-pro-action="familienakte"]');}
+    catch(error){
+      const detail=await page.evaluate(()=>({share:window.__proShare,output:window.__wfpdfTeilen,dialogs:[...document.querySelectorAll('dialog,.dlg')].map(d=>d.textContent.slice(0,1500)),toast:document.querySelector('#toast')?.textContent}));
+      await page.screenshot({path:out.replace(/\.json$/,'.png')});
+      throw Error(error.message+' '+JSON.stringify({detail,shareConsole}));
+    }
+    await page.waitForSelector('#nativeProTarget',{state:'detached'});
     const rows=await page.evaluate(()=>WFPProTransfers.outbox());expect(rows.length===1&&rows[0].stand==='weitergegeben','Keine dauerhafte offene Ausgabe');
     expect(rows[0].vertrag.dokumentId==='family-doc-ui'&&rows[0].vertrag.bezug==='windows-family-ui','Ausgabe der falschen Akte zugeordnet');
     await writeFile(commonUiFile(),JSON.stringify({fixture,received,row:rows[0],docs:before+1}));

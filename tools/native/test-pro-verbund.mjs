@@ -128,6 +128,31 @@ test('Pro collaboration with durable ordinary library and exact outgoing version
     const docs=await page.evaluate(()=>__wfpdf.S.docs.map(d=>({name:d.name,pages:d.pages.length,checked:!!d.pruefung})));
     assert.deepEqual(docs,[{name:'A',pages:1,checked:false}]);assert.deepEqual(errors,[]);await page.close();
   });
+  await t.test('incoming controls appear only when the whole dialog is ready',async()=>{
+    const {page,f}=await setup();
+    await page.evaluate(()=>{
+      const original=WFPProTransfers;let first=true;
+      window.WFPProTransfers={...original,outbox:()=>{if(!first)return original.outbox();first=false;return new Promise(resolve=>{window.__finishOutbox=()=>original.outbox().then(resolve);});}};
+    });
+    // Reload just the UI adapter to bind the delayed outgoing-store fixture.
+    await page.addScriptTag({url:address+'native/native-pro-verbund.js'});
+    await page.evaluate(()=>{window.__dialogReady=false;void WFPProVerbund.dialog().then(()=>window.__dialogReady=true);});
+    await page.waitForFunction(()=>typeof window.__finishOutbox==='function');
+    assert.equal(await page.locator('#nativeProVerbund [data-pro-entry]').count(),0);
+    await page.evaluate(()=>__finishOutbox());await page.waitForFunction(()=>__dialogReady);
+    await page.locator('[data-pro-entry="entry-family-a"] input').check();await page.click('#nativeProVerbund [data-pro-action="receive"]');
+    await page.waitForFunction(()=>document.querySelector('[data-pro-status]')?.textContent.includes('Auswahl gespeichert'));
+    assert.deepEqual(f.marks,['entry-family-a']);await page.close();
+  });
+  await t.test('ordinary library share opens the optional target with its stored source',async()=>{
+    const form=await PDFDocument.create();form.addPage([595,842]);form.addPage([595,842]);
+    const field=form.getForm().createTextField('Name');field.setText('Müller');field.addToPage(form.getPage(0),{x:50,y:650,width:220,height:25});
+    const {page,f}=await setup({items:[seed('family-a',Buffer.from(await form.save()))]});const {id}=await receive(page);
+    await page.evaluate(id=>{void __wfpdf.dlg.teilenDocs([id]);},id);
+    await page.waitForSelector('#nativeProTarget');await page.click('#nativeProTarget [data-pro-action="familienakte"]');
+    await page.waitForSelector('#nativeProTarget',{state:'detached'});
+    const rows=await outbox(page);assert.equal(rows.length,1);assert.equal(rows[0].vertrag.bezug,'family-a');assert.equal(f.sent.size,1);await page.close();
+  });
   await t.test('failed acknowledgement and cold restart preserve later edits without duplicate intake',async()=>{
     const {page,f}=await setup({mode:'ackfail'});await assert.rejects(receive(page),/ACK_FAILED/);
     const id=await page.evaluate(async()=>{const d=__wfpdf.S.docs[0];d.name='Danach bearbeitet';await WFP.DB.put('docs',d);return d.id;});

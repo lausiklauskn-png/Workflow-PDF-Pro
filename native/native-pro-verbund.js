@@ -67,9 +67,9 @@
     };
     p.oncancel=ev=>{if(busy)ev.preventDefault();};
     async function render(){
-      body.replaceChildren();const z=await T.state(),path=z.pfad||z.ordner||'';
-      body.append(el('p',(z.offen?t('connected'):z.gewaehlt?t('locked'):t('none'))+(path?' · '+path:'')));
-      const actions=el('div');body.append(actions);
+      const content=el('div'),z=await T.state(),path=z.pfad||z.ordner||'';
+      content.append(el('p',(z.offen?t('connected'):z.gewaehlt?t('locked'):t('none'))+(path?' · '+path:'')));
+      const actions=el('div');content.append(actions);
       if(!z.offen)button(actions,t(z.gewaehlt?'unlock':'connect'),()=>void act(()=>api.tresorVerbinden({language:lang()})),'connect');
       if(z.gewaehlt){
         button(actions,t('other'),()=>void act(()=>api.tresorVerbinden({language:lang(),neuWaehlen:true})),'choose');
@@ -77,9 +77,9 @@
         if(z.gemerkt)button(actions,t('forget'),()=>void act(()=>api.tresorSperren({vergessen:true})),'forget');
       }
       button(actions,t('reload'),()=>void act(async()=>{}),'refresh');
-      body.append(el('h3',t('inbox')));
+      content.append(el('h3',t('inbox')));
       if(z.offen){
-        const rows=await T.inbox(z.kennung),list=el('ul');list.className='native-pro-list';body.append(list);
+        const rows=await T.inbox(z.kennung),list=el('ul');list.className='native-pro-list';content.append(list);
         if(!rows.length)list.append(el('li',t('empty')));
         const chosen=new Map();
         for(const row of rows){
@@ -91,11 +91,11 @@
           }
           list.append(li);
         }
-        const take=button(body,t('receive'),()=>void act(async()=>{for(const row of chosen.values())await T.receive(z.kennung,row);return t('received');}),'receive');
+        const take=button(content,t('receive'),()=>void act(async()=>{for(const row of chosen.values())await T.receive(z.kennung,row);return t('received');}),'receive');
         take.disabled=true;take.dataset.proDisabled='true';
       }
-      body.append(el('h3',t('outbox')));
-      const rows=await T.outbox(),out=el('ul');out.className='native-pro-list';body.append(out);
+      content.append(el('h3',t('outbox')));
+      const rows=await T.outbox(),out=el('ul');out.className='native-pro-list';content.append(out);
       if(!rows.length)out.append(el('li',t('empty')));
       for(const row of rows.sort((a,b)=>b.at.localeCompare(a.at))){
         const li=el('li');li.dataset.proOutgoing=row.id;
@@ -108,6 +108,7 @@
         }
         out.append(li);
       }
+      body.replaceChildren(content);
     }
     await act(async()=>{});
   }
