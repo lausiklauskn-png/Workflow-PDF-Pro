@@ -159,6 +159,14 @@ jobs:
             Stop-App
           }
           Wait-Run 'pruef-out/pruefbau-setup.exe' '/S'
+          $installedJava = Join-Path $appDir 'pro-tresor/runtime/bin/java.exe'
+          $installedJar = Join-Path $appDir 'pro-tresor/workflow-pro-tresor.jar'
+          Get-ChildItem (Join-Path $appDir 'pro-tresor') -Recurse -File | ForEach-Object {
+            "$($_.FullName.Substring($appDir.Length)) $($_.Length)"
+          } | Set-Content 'pruef-out/pro-runtime-files.txt'
+          & $installedJava -version 2>&1 | Tee-Object 'pruef-out/pro-runtime-version.txt'
+          '{"method":"tresorZustand","options":{}}' | & $installedJava -Xmx256m -cp $installedJar de.familyprojekt.workflowpdf.pro.ProTresorEngine (Join-Path $env:WFP_PRUEF_ARBEIT 'unused-engine-state.json') 2>&1 | Tee-Object 'pruef-out/pro-runtime-start.txt'
+          if ($LASTEXITCODE -ne 0) { throw 'Gebündelte installierte Java-Laufzeit startet nicht.' }
           $reg = Get-ItemProperty 'HKCU:\Software\Classes\.pdf\OpenWithProgids' -ErrorAction SilentlyContinue
           "Öffnen mit eingetragen: $($null -ne $reg.'WorkflowPDFPro.Dokument')" | Tee-Object -Append pruef-out/ablauf.txt
           $default = (Get-ItemProperty 'HKCU:\Software\Classes\.pdf' -ErrorAction SilentlyContinue).'(default)'
@@ -204,6 +212,12 @@ jobs:
             Write-Output "::notice title=Abnahme $($_.BaseName)::$t"
           }
           if (Test-Path pruef-out/ablauf.txt) { Write-Output "::notice title=Ablauf::$((Get-Content pruef-out/ablauf.txt) -join ' | ')" }
+          $engineLog = Join-Path '${{ runner.temp }}\wfp-arbeit' 'pro-tresor-engine.stderr.log'
+          if (Test-Path $engineLog) {
+            Copy-Item $engineLog 'pruef-out/pro-tresor-engine.stderr.log'
+            $tail = ((Get-Content $engineLog -Tail 25) -join ' | ')
+            Write-Output "::notice title=Start der Pro-Tresor-Engine::$tail"
+          }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -212,6 +226,8 @@ jobs:
             pruef-out/*.json
             pruef-out/*.png
             pruef-out/ablauf.txt
+            pruef-out/pro-runtime-*.txt
+            pruef-out/pro-tresor-engine.stderr.log
           retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

@@ -20,6 +20,14 @@ impl Engine {
         let mut command = Command::new(java);
         command.arg("-Xmx256m").arg("-cp").arg(jar).arg("de.familyprojekt.workflowpdf.pro.ProTresorEngine").arg(config)
             .stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::null());
+        // Ausschließlich im nicht ausgelieferten Abnahmebau: JVM-Startfehler aufzeichnen.
+        // Die Engine schreibt keine Passwörter oder Nutzdaten nach stderr.
+        #[cfg(feature = "messprobe")]
+        if let Some(dir) = std::env::var_os("WFP_PRUEF_ARBEIT") {
+            if let Ok(file) = std::fs::OpenOptions::new().create(true).append(true).open(std::path::PathBuf::from(dir).join("pro-tresor-engine.stderr.log")) {
+                command.stderr(Stdio::from(file));
+            }
+        }
         #[cfg(windows)]
         { use std::os::windows::process::CommandExt; command.creation_flags(0x08000000); }
         let mut child = command.spawn().map_err(|_| "TRESOR_ENGINE_START")?;
