@@ -260,7 +260,23 @@ final class ProTresorordner {
             return new JSONObject().put("data", Base64.encodeToString(puffer, 0, n, Base64.NO_WRAP)).put("fertig", fertig);
         } catch (IOException e) { lesen.remove(ticket); try { in.close(); } catch (IOException ignoriert) { /* zu */ } throw e; }
     }
-    void eingangMarkieren(String id) throws Exception { offenOderGemerkt().markeSetzen(EINGANG, id); }
+    void eingangAbbrechen(String ticket)throws IOException {
+        java.io.InputStream in=lesen.remove(ticket);if(in!=null)in.close();
+    }
+    void eingangMarkieren(String id,String vaultId,String expectedHash) throws Exception {
+        TresorOrdner t=offenOderGemerkt();
+        if(!t.id().equals(vaultId))throw new IOException("TRESOR_UEBERGABE_FREMD");
+        Eintrag found=null;for(Eintrag e:t.verzeichnis(EINGANG))if(e.id.equals(id))found=e;
+        if(found==null||!found.sha256.equals(expectedHash))throw new IOException("TRESOR_UEBERGABE_PRUEFSUMME");
+        java.security.MessageDigest digest=java.security.MessageDigest.getInstance("SHA-256");long size=0;
+        try(java.io.InputStream in=t.oeffnen(EINGANG,found)){
+            byte[] part=new byte[65536];int n;
+            while((n=in.read(part))!=-1){size+=n;if(size>de.familyprojekt.tresor.Uebergaben.MAX_BYTES)throw new IOException("TRESOR_UEBERGABE_ZU_GROSS");digest.update(part,0,n);}
+        }
+        StringBuilder hash=new StringBuilder();for(byte b:digest.digest())hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
+        if(size!=found.groesse||!hash.toString().equals(expectedHash))throw new IOException("TRESOR_UEBERGABE_PRUEFSUMME");
+        t.markeSetzen(EINGANG,id);
+    }
 
     // ---------- Hauptschlüssel im Android-Schlüsselspeicher (wie BookLedgerPro, eigener Alias) ----------
     private SecretKey geraeteSchluessel(boolean anlegen) throws Exception {

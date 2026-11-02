@@ -39,13 +39,18 @@
     finally { await api.abort({ id }).catch(() => {}); }
   }
   let sharing = false;
-  const canShare = data => Boolean(data && (Array.isArray(data.files) ? data.files.length && data.files.every(file => file instanceof Blob) : data.url || data.text));
+  const canShare = data => {
+    const possible=Boolean(data && (Array.isArray(data.files) ? data.files.length && data.files.every(file => file instanceof Blob) : data.url || data.text));
+    if(possible&&data.files)window.WFPProTransfers?.capture(data.files);
+    return possible;
+  };
   Object.defineProperty(navigator, 'canShare', { configurable: true, value: canShare });
   Object.defineProperty(navigator, 'share', { configurable: true, value: async data => {
     if (!canShare(data)) throw new TypeError('Unsupported share data');
     if (sharing) throw new DOMException('Share already active', 'InvalidStateError');
     sharing = true; const ids = []; let opened = false;
     try {
+      if(await window.WFPProVerbund?.offer(data.files))return;
       for (const file of data.files || []) ids.push(await transfer(file, file.name));
       const result = await api.share({ ids, title: data.title || '', text: data.text || '', url: data.url || '' });
       opened = result.opened === true;

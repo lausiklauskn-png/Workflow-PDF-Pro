@@ -55,5 +55,13 @@ und das neue Release folgen im übergreifenden Auftrag; die bestehende App-Numme
 Die native Grundlage der freiwilligen Verbindung ist nun auf Android und Windows vorhanden:
 `WorkflowVault.tresorVerbinden`, `tresorUebergabe` und `tresorFach`. Sie richtet keine eigene
 Arbeitsablage ein. Windows bündelt den kanonischen Java-Tresor mit minimaler Laufzeit und nutzt
-eigene Passwortdialoge sowie DPAPI. Bedienung und normaler Import-/Ausgabepfad werden im nächsten
-Baustein ergänzt; kein neuer Installer veröffentlicht. [Vertrag und Grenzen](docs/PRO-VERBUND-NATIV.md).
+eigene Passwortdialoge sowie DPAPI. PR #53 ist nach vollständiger Android- und installierter
+Windows-Abnahme auf main; kein neuer Installer veröffentlicht. [Vertrag und Grenzen](docs/PRO-VERBUND-NATIV.md).
+
+Die anschließende Bedienung verwendet den bytegleichen Kern **1.1.8**, Workflow-PDF PR #141.
+`native-pro-transfers.js` bindet Quittungen, Ausgangsbytes und Herkunft an dieselbe Arbeitsablage;
+`native-pro-verbund.js` bietet die freiwillige Verbindung, ausgewählten Eingang und normalen
+Teilen-Dialog in DE/EN/RU/AR. Gestreamte Sicherung Fassung 3 enthält offene Ausgaben und erhält
+Rückbezüge; alte Formate bleiben lesbar. Der frühere Android-Eingang quittiert jetzt ebenfalls erst
+nach dauerhafter Übernahme und erneuter nativer Hash-Prüfung. Die neue Bedienung wird noch vollständig
+auf den Plattformen geprüft. [Bedienung, Sicherung und Nachweise](docs/PRO-VERBUND-BEDIENUNG.md).

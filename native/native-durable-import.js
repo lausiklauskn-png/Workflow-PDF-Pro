@@ -14,13 +14,16 @@
     if(!(file instanceof File)||file.size<=0||file.size>200*1024*1024)throw Error('PRO_FILE_INVALID');
     const source=identity(who),id=await store.key(source),sha256=await store.hash(file);
     if(expected.sha256!==undefined&&expected.sha256!==sha256||expected.size!==undefined&&expected.size!==file.size)throw Error('PRO_BYTES_CHANGED');
+    const contract=expected.contract?WFPProContract.contract(expected.contract,WFPProContract.APP):null;
+    if(contract&&(source.kind!=='pro'||contract.quelle!==source.source||contract.id!==source.transfer||contract.sha256!==sha256||contract.groesse!==file.size||contract.name!==file.name||contract.mime!==file.type))throw Error('PRO_CONTRACT_INVALID');
     const work=async({db,repo,flush})=>{
       let receipt=await repo.get(id);
       if(receipt&&(receipt.id!==id||receipt.kind!=='eingang'||!['vorbereitet','gespeichert'].includes(receipt.stand)||receipt.docId!=='pro-'+id.slice('pro-transfer-'.length)||receipt.sha256!==sha256||receipt.size!==file.size||receipt.name!==file.name||JSON.stringify(receipt.source)!==JSON.stringify(source)))throw Error('PRO_IDENTITY_CONFLICT');
+      if(receipt&&JSON.stringify(receipt.vertrag||null)!==JSON.stringify(contract))throw Error('PRO_IDENTITY_CONFLICT');
       // A durable completed receipt also survives deliberate later editing or
       // deletion of the document. Repeating must never replace those changes.
       if(receipt?.stand==='gespeichert')return {id:receipt.docId,repeated:true};
-      if(!receipt){receipt={id,kind:'eingang',stand:'vorbereitet',docId:'pro-'+id.slice('pro-transfer-'.length),source,sha256,size:file.size,name:file.name,at:new Date().toISOString()};await repo.put(receipt);}
+      if(!receipt){receipt={id,kind:'eingang',stand:'vorbereitet',docId:'pro-'+id.slice('pro-transfer-'.length),source,sha256,size:file.size,name:file.name,at:new Date().toISOString(),...(contract?{vertrag:contract}:{})};await repo.put(receipt);}
       let doc=await db.get('docs',receipt.docId);
       if(doc){
         // A moved library or restored backup still carries the document's

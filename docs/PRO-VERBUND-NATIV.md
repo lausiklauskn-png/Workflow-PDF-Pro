@@ -38,10 +38,14 @@ oder andere Metadaten unter derselben Kennung werden abgelehnt. Originale im
 Übergabefach werden nicht gelöscht. Fachverzeichnisse sind über `tresorFach` lesbar;
 das macht fremde app-eigene Originalformate nicht automatisch lesbar.
 
-Diese Ausbaustufe stellt die native Verbindung bereit. Die gemeinsame Bedienung
-zum Verbinden, Annehmen und Senden über den normalen Workflow-Import wird darauf
-aufgebaut. Die Windows-Brückenproben verwenden einen kanonischen Familienakte-
-Akteur und ausdrücklich aufgerufene native Methoden. Sie sind kein Nachweis für
-zwei installierte Endbenutzer-Apps. Der normale dauerhafte Betriebssystem-Eingang
-ist getrennt in [PRO-EINGANG.md](PRO-EINGANG.md) beschrieben. Releases und Geschenk-
+Die native Grundlage wurde in PR #53 auf beiden Plattformen vollständig geprüft.
+Der Java-Klassenpfad ist relativ zum absoluten Laufzeitordner, damit auch die von
+Tauri gelieferten erweiterten Windows-Pfade funktionieren. Der Prozess wurde
+zusätzlich mit 20 MiB bei seiner Speichergrenze von 256 MiB geprüft.
+
+Die [gemeinsame Bedienung](PRO-VERBUND-BEDIENUNG.md) ergänzt den normalen Workflow-
+Import und die gewöhnliche Ausgabe. Brücken- und Produktproben verwenden einen
+kanonischen Familienakte-Java-Akteur als Gegenüber. Sie sind kein Nachweis für zwei
+installierte Endbenutzer-Apps. Der normale dauerhafte Betriebssystem-Eingang ist
+getrennt in [PRO-EINGANG.md](PRO-EINGANG.md) beschrieben. Releases und Geschenk-
 Downloads folgen erst nach der vollständigen übergreifenden Umsetzung.

@@ -302,7 +302,8 @@ public final class ProVaultPlugin extends Plugin {
     @PluginMethod public void tresorEingang(PluginCall call){work(call,()->tresor.eingang());}
     @PluginMethod public void tresorEingangOeffnen(PluginCall call){work(call,()->tresor.eingangOeffnen(call.getString("id")));}
     @PluginMethod public void tresorEingangTeil(PluginCall call){work(call,()->tresor.eingangTeil(call.getString("ticket")));}
-    @PluginMethod public void tresorEingangMarkieren(PluginCall call){work(call,()->{tresor.eingangMarkieren(call.getString("id"));return new JSONObject().put("markiert",true);});}
+    @PluginMethod public void tresorEingangAbbrechen(PluginCall call){work(call,()->{tresor.eingangAbbrechen(call.getString("ticket"));return new JSONObject();});}
+    @PluginMethod public void tresorEingangMarkieren(PluginCall call){work(call,()->{tresor.eingangMarkieren(call.getString("id"),call.getString("vaultId"),call.getString("sha256"));return new JSONObject().put("markiert",true);});}
     @PluginMethod public void tresorEinziehen(PluginCall call){
         if(worker.closed()){call.reject("NATIVE_ACTIVITY_CLOSED");return;}
         if(!choosing.compareAndSet(false,true)){call.reject("VAULT_BUSY","VAULT_BUSY");return;}

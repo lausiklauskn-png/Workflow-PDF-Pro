@@ -57,6 +57,13 @@ test('product vault: real core and IndexedDB, native transport protocol fixture'
         const pdf=await PDFLib.PDFDocument.create();pdf.addPage();const bytes=await pdf.save();
         const receipt=await WFPDurableImport.take(new File([bytes],'Portable.pdf',{type:'application/pdf'}),{kind:'native',batch:'migration',item:'portable'});
         const doc=await WFP.DB.get('docs',receipt.id);
+        await WFPProTransferStore.run(async ctx=>{
+          const bytes=new Uint8Array([37,80,68,70,10]),sha256=await WFPProTransferStore.hash(bytes);
+          const base={vertrag:'familienakte-uebergabe/1',id:'pending',quelle:'workflow-pdf-pro',ziel:'familienakte',dokumentId:doc.id,name:'Prepared output.pdf',mime:'application/pdf',groesse:bytes.length,sha256};
+          const id=await WFPProTransferStore.key(WFPProContract.outgoingIdentity('shared-vault',base)),vertrag={...base,id:'wfp-'+id.slice('pro-transfer-'.length)},payloadId=WFPProContract.payloadId(sha256);
+          await WFPProTransferStore.writePayload(ctx,{payloadId,sha256,groesse:bytes.length},bytes);
+          await ctx.repo.put({id,kind:'ausgang',vaultId:'shared-vault',vertrag,payloadId,stand:'vorbereitet',at:new Date().toISOString()});
+        });
         await WFP.DB.put('files',{id:doc.id+'~original',bytes:new Uint8Array([7,8]),name:'original.png'});
         await WFP.DB.put('files',{id:'ue:'+doc.id+':de-ru',job:{page:5,texte:['Имя']}});
         localStorage.setItem('wfpdf_einst_v1',JSON.stringify({schluessel:{mistral:'synthetic-device-secret'},kiOk:{mistral:true},ueVon:'de',ueNach:'ru'}));
@@ -79,7 +86,12 @@ test('product vault: real core and IndexedDB, native transport protocol fixture'
       const prefs=await page.evaluate(async()=> (await new WFPVaultRecords(Capacitor.Plugins.WorkflowVault).load('target','settings','workflow-preferences-v1')).record);
       assert.equal(JSON.stringify(prefs).includes('synthetic-device-secret'),false);
       assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('wfpdf_einst_v1')).schluessel.mistral),'synthetic-device-secret');
-      assert.equal(await page.evaluate(async()=>{const rows=await WFPProTransferStore.snapshot();return rows.length===1&&rows[0].stand==='gespeichert'&&rows[0].source.batch==='migration';}),true);
+      assert.equal(await page.evaluate(async()=>{const rows=await WFPProTransferStore.snapshot(),incoming=rows.filter(r=>r.kind==='eingang');return incoming.length===1&&incoming[0].stand==='gespeichert'&&incoming[0].source.batch==='migration';}),true);
+      assert.equal(await page.evaluate(async()=>WFPProTransferStore.run(async ctx=>{
+        const rows=await WFPProTransferStore.snapshotIn(ctx),out=rows.filter(r=>r.kind==='ausgang');
+        if(rows.length!==2||out.length!==1||out[0].stand!=='vorbereitet'||ctx.scope!=='vault')return false;
+        return (await WFPProTransferStore.readPayload(ctx,{payloadId:out[0].payloadId,...out[0].vertrag})).join(',')==='37,80,68,70,10';
+      })),true,'pending output and bytes migrate with the selected encrypted library');
     });
     await t.test('locked restart holds library access until explicit unlock, never erases the real index',async()=>{
       fixture.unlocked=false;await page.reload();await page.waitForSelector('.native-vault-dialog');

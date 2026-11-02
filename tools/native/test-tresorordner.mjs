@@ -43,17 +43,18 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
     if(method==='remove'){view().delete(key(a.store,a.id));return {saved:true};}
     if(method==='tresorZustand'){fixture.log.push(['tresorZustand',a]);return {...fixture.tresor};}
     if(method==='tresorEinziehen'){fixture.log.push(['tresorEinziehen',a]);if(fixture.einzugFehler){const e=fixture.einzugFehler;fixture.einzugFehler=null;throw Error(e);}
-      fixture.tresor={gewaehlt:true,ordner:'Tresor-Probe',gemerkt:true,offen:true,eingezogen:true,erreichbar:true,vorhanden:true,pruefung:'PASST',eintraege:0};return {...fixture.tresor,eingezogenJetzt:true,angelegt:true};}
+      fixture.tresor={gewaehlt:true,kennung:'test-tresor',ordner:'Tresor-Probe',gemerkt:true,offen:true,eingezogen:true,erreichbar:true,vorhanden:true,pruefung:'PASST',eintraege:0};return {...fixture.tresor,eingezogenJetzt:true,angelegt:true};}
     if(method==='tresorVerzeichnis'){fixture.log.push(['tresorVerzeichnis',a]);const neu=JSON.stringify(a.zeilen)!==JSON.stringify(fixture.zeilen);fixture.zeilen=a.zeilen;fixture.tresor.eintraege=a.zeilen.length;return {geschrieben:neu,eintraege:a.zeilen.length};}
     if(method==='tresorSperren'){fixture.log.push(['tresorSperren',a]);fixture.tresor={...fixture.tresor,offen:false,eingezogen:false};return {...fixture.tresor};}
     // Übergabefach „Eingang-WorkflowPDF“ (Pro-Umbau 5), Stücke zu 500 Byte (Java: 192 KB) — so wird mehrfach gelesen
     if(method==='tresorEingang'){fixture.log.push(['tresorEingang',a]);return {ordner:'Eingang-WorkflowPDF',eintraege:fixture.eingang,marken:fixture.marken};}
     if(method==='tresorEingangOeffnen'){fixture.log.push(['tresorEingangOeffnen',a]);const e=fixture.eingang.find(x=>x.id===a.id);if(!e)throw Error('TRESOR_EINTRAG_FEHLT');const ticket=randomUUID();fixture.eingangTickets.set(ticket,{data:fixture.eingangDaten.get(a.id),pos:0});return {ticket,groesse:e.groesse,name:e.name,art:e.art};}
     if(method==='tresorEingangTeil'){const tk=fixture.eingangTickets.get(a.ticket);const teil=tk.data.subarray(tk.pos,tk.pos+500);tk.pos+=teil.length;fixture.log.push(['tresorEingangTeil',teil.length]);const fertig=teil.length<500;if(fertig)fixture.eingangTickets.delete(a.ticket);return {data:teil.toString('base64'),fertig};}
-    if(method==='tresorEingangMarkieren'){fixture.log.push(['tresorEingangMarkieren',a]);fixture.marken.push(a.id);return {markiert:true};}
+    if(method==='tresorEingangAbbrechen'){fixture.eingangTickets.delete(a.ticket);return {};}
+    if(method==='tresorEingangMarkieren'){fixture.log.push(['tresorEingangMarkieren',a]);assert.equal(a.vaultId,fixture.tresor.kennung);assert.equal(a.sha256,createHash('sha256').update(fixture.eingangDaten.get(a.id)).digest('hex'));fixture.marken.push(a.id);return {markiert:true};}
     throw Error('Unknown bridge method '+method);
   }
-  const tresorMethoden=['tresorZustand','tresorEinziehen','tresorVerzeichnis','tresorSperren','tresorEingang','tresorEingangOeffnen','tresorEingangTeil','tresorEingangMarkieren'];
+  const tresorMethoden=['tresorZustand','tresorEinziehen','tresorVerzeichnis','tresorSperren','tresorEingang','tresorEingangOeffnen','tresorEingangTeil','tresorEingangAbbrechen','tresorEingangMarkieren'];
   const methoden=['state','migration','choose','unlock','lock','prepareMigration','completeMigration','cancelMigration','beginBatch','abortBatch','commitBatch','begin','append','finish','abort','info','read','list','remove'];
   async function seite(mitTresor){
     const page=await browser.newPage();await page.exposeFunction('__vaultCall',call);
@@ -131,7 +132,7 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
       const pdf=await PDFDocument.create();const f=await pdf.embedFont(StandardFonts.Helvetica);
       for(let i=0;i<3;i++)pdf.addPage([400,500]).drawText('Beleg 4711 von BookLedgerPro, Seite '+(i+1),{x:20,y:400,size:12,font:f});
       const bytes=Buffer.from(await pdf.save());
-      fixture.eingang=[{id:'e-4711',name:'Beleg 4711.pdf',art:'application/pdf',datum:Date.now(),groesse:bytes.length,schreiber:'bookledgerpro'},{id:'e-alt',name:'Schon da.pdf',art:'application/pdf',datum:1,groesse:10,schreiber:'bookledgerpro'}];
+      fixture.eingang=[{id:'e-4711',name:'Beleg 4711.pdf',art:'application/pdf',datum:Date.now(),groesse:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),schreiber:'bookledgerpro'},{id:'e-alt',name:'Schon da.pdf',art:'application/pdf',datum:1,groesse:10,schreiber:'bookledgerpro'}];
       fixture.marken=['e-alt'];fixture.eingangDaten.set('e-4711',bytes);fixture.log.length=0;
       await page.evaluate(()=>WFPTresorordner.eingangHinweis());
       await page.waitForSelector('#nativeEingangHinweis');

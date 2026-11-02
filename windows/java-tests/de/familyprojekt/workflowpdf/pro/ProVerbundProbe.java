@@ -42,6 +42,8 @@ public final class ProVerbundProbe {
         Map<String,Object> out=m("aktion",action,"vaultId",id);out.putAll(m(extra));return out;
     }
     public static void main(String[] args)throws Exception {
+        if(args.length==3&&args[0].equals("ui-seed")){uiSeed(Path.of(args[1]),Path.of(args[2]));return;}
+        if(args.length==3&&args[0].equals("ui-confirm")){uiConfirm(Path.of(args[1]),Path.of(args[2]));return;}
         if(args.length==2&&args[0].equals("seed")){seed(Path.of(args[1]));return;}
         if(args.length==2&&args[0].equals("confirm")){confirm(Path.of(args[1]));return;}
         Path root=Files.createTempDirectory("wfp-common-probe-");
@@ -128,6 +130,27 @@ public final class ProVerbundProbe {
             if(!"windows-family-17".equals(inbox.beschreibung(entry).get("bezug")))throw new AssertionError("source relation lost");
             inbox.quittieren(entry,ProVerbund.sha(BYTES));
             System.out.println(Json.schreiben(m("confirmed",true,"entryId",entry)));
+        }
+    }
+    private static void uiSeed(Path root,Path file)throws Exception {
+        try(TresorOrdner family=TresorOrdner.oeffnen(new DateiAblage(root.toFile()),Fach.FAMILIENAKTE_APP,PASSWORD)) {
+            Eintrag e=new Uebergaben(family).senden(Fach.WORKFLOW_PDF_APP,"windows-family-ui","family-doc-ui","","Pro-Verbund UI.pdf","application/pdf",Files.newInputStream(file));
+            System.out.println(Json.schreiben(m("vaultId",family.id(),"entryId",e.id,"sha256",e.sha256,"size",e.groesse)));
+        }
+    }
+    private static void uiConfirm(Path root,Path output)throws Exception {
+        try(TresorOrdner family=TresorOrdner.oeffnen(new DateiAblage(root.toFile()),Fach.FAMILIENAKTE_APP,PASSWORD)) {
+            Uebergaben inbox=new Uebergaben(family);List<Map<String,Object>> pending=inbox.offen();
+            if(pending.size()!=1)throw new AssertionError("expected one ordinary Workflow output");
+            String entry=(String)pending.get(0).get("entryId");Map<String,Object> contract=inbox.beschreibung(entry);
+            if(!"windows-family-ui".equals(contract.get("bezug"))||!"family-doc-ui".equals(contract.get("dokumentId")))throw new AssertionError("ordinary output source lost");
+            byte[] bytes=inbox.lesen(entry);Files.write(output,bytes);
+            if(!Arrays.equals(bytes,Files.readAllBytes(output)))throw new AssertionError("fixture output not persisted");
+            inbox.quittieren(entry,ProVerbund.sha(bytes));
+            boolean accepted=false;
+            for(Eintrag e:family.eigenesVerzeichnis(Fach.EINGANG_WORKFLOW_PDF.slug))
+                if(e.verweis.startsWith("Uebergaben/windows-family-ui/"))accepted=inbox.bestaetigt(Fach.WORKFLOW_PDF_APP,e.id);
+            System.out.println(Json.schreiben(m("confirmed",true,"workflowAccepted",accepted,"entryId",entry,"sha256",ProVerbund.sha(bytes))));
         }
     }
 }

@@ -11,7 +11,7 @@ const cases=[
  ['request success mistaken for transaction commit','pro-transfer-store.js',receiptLine,receiptLine.replace(';};',';resolve(result);};'),1,'receipt request success followed by transaction abort is never acknowledged'],
  ['stored PDF never verified','native-durable-import.js','await store.hash(await db.getFile(doc.id))!==receipt.pdfHash','false',2,'fresh persisted PDF mismatch keeps the source and retries without a duplicate'],
  ['restart reimports completed input','native-durable-import.js',"if(receipt?.stand==='gespeichert')return {id:receipt.docId,repeated:true};","if(receipt?.stand==='gespeichert')await db.del('docs',receipt.docId);",1,'cold page restart after ack failure retains receipt and subsequent user edits'],
- ['backup drops accepted receipts','native-sicherung.js','if(restored.proQuittungen)await welt.WFPProTransferStore.restore(restored.proQuittungen);',';',1,'native backup restores receipts only after complete authentication and does not duplicate an open intake']
+ ['backup drops accepted receipts','native-sicherung.js','if(restored.proQuittungen)await store.restoreIn(restored.proQuittungen,ctx);',';',1,'native backup restores receipts only after complete authentication and does not duplicate an open intake']
 ];
 const temp=await mkdtemp(join(tmpdir(),'wfp-incoming-counter-'));let missed=0;
 const escaped=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
