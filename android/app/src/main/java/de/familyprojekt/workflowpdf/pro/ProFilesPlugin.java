@@ -166,16 +166,16 @@ public final class ProFilesPlugin extends Plugin {
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
                 Intent chooser = Intent.createChooser(intent, call.getString("title", "Workflow PDF Pro"));
+                // Klaus 2026-11-03: nach dem Teilen in die Familienakte zeigte Workflow PDF Pro die Familienakte und kam nicht
+                // zurück. Ein Start „für Ergebnis“ legt die Ziel-App in die Aufgabe des Absenders, auch wenn sie singleTask ist.
+                // Deshalb gewöhnlicher Start wie in BookLedgerPro (BlpFilesPlugin): die Ziel-App öffnet in ihrer eigenen Aufgabe.
+                // Android meldet die Zustellung ohnehin nicht zuverlässig — die Antwort bleibt dieselbe wie vorher.
                 getActivity().runOnUiThread(() -> {
-                    try { startActivityForResult(call, chooser, "shared"); }
+                    try { getActivity().startActivity(chooser); call.resolve(new JSObject().put("opened", true).put("deliveryConfirmed", false)); }
                     catch (Exception error) { call.reject("SHARE_UNAVAILABLE"); }
                 });
             } catch (Exception error) { call.reject("FILE_OPERATION_FAILED"); }
         });
-    }
-    @ActivityCallback private void shared(PluginCall call, ActivityResult result) {
-        // Android's chooser does not reliably report delivery/cancellation. Do not claim delivery.
-        if (call != null) call.resolve(new JSObject().put("opened", true).put("deliveryConfirmed", false));
     }
     /** App-Version für die Anzeige im Fuß und in den Einstellungen (Klaus 2026-10-22). */
     @PluginMethod public void appInfo(PluginCall call) {

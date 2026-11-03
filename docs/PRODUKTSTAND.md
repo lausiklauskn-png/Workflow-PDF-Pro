@@ -20,12 +20,21 @@ Konkrete Quellen, Läufe, Größen und vollständige Prüfsummen:
 [maschinenlesbare Nachweise](PRO-VERBUND-VEROEFFENTLICHUNG-1.0.11.json).
 Bereits veröffentlichte Versionen nicht erneut auslösen.
 
-## In Arbeit: Kern 1.1.9 / App 1.0.12 (Klaus 2026-11-03, nicht veröffentlicht)
+## 1.0.12 veröffentlicht (Klaus 2026-11-03) · 1.0.13 in Arbeit
 
-Kern bytegleich aus Workflow-PDF main `0ed15e5` (PR #142, #143): Schriftgröße
-je Feld, Feld wächst mit, Einrasten, eigene Feldarten, Erkennung ohne Belegtes, ⟳ ohne Verlust (Notstand-Schnappschuss),
-Umlaute im Namen aus dem PDF-Titel. App **1.0.12 / Build 13** (Android, Windows). Keine Adapteränderung. Veröffentlichung nur
-vom main-Stand nach Klaus' Wort; die PWA-Seite (Pages) liefert 1.1.9 seit dem Merge von #142.
+**1.0.12** (Kern 1.1.9 bytegleich aus Workflow-PDF main `0ed15e5`, PR #142/#143; Quelle `448c158` = #58): Schriftgröße je Feld,
+Feld wächst mit, Einrasten, eigene Feldarten, Erkennung ohne Belegtes, ⟳ ohne Verlust, Umlaute im Namen.
+[Android v1.0.12](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.12) (Lauf 41645443670, Build 13,
+SHA-256 `35e8ed6e363f8f18215493aa8ab37e9f815a7a14e0a6895ba32d24e6be8bc397`, 83.346.114 B, signierte Installation und Datenerhalt
+im Lauf geprüft) · [Windows windows-v1.0.12](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.12)
+(Lauf 41644590893, SHA-256 `25f32cdca0af91509005afa4721a216f859daed57e6c1df2b963e65634e76be0`, 26.444.595 B, unsigniert).
+Beide Downloads unabhängig geladen, Prüfsummen gleich. Nicht erneut auslösen. ⚠ Am Tablet und am Windows-PC nicht gemessen.
+
+**1.0.13 / Build 14** (Klaus' Befund am Tablet): nach „Teilen → Familienakte“ zeigte Workflow PDF Pro die Familienakte und kam
+nicht zurück. Das Teilen-Fenster wurde „für Ergebnis“ gestartet; Android legt die Ziel-App dann in die Aufgabe des Absenders.
+Jetzt gewöhnlicher Start wie in BookLedgerPro (`ProFilesPlugin.share`), Antwort an die App unverändert. Probe
+`tools/native/test-teilen-eigene-aufgabe.mjs` (in `test:native-web`, Gegenprobe mit dem alten Code rot). Die Familienakte trägt
+`ProFilesPlugin.java` bytegleich und zieht nach.
 
 ## Fertiggestellter Produktbau und offene zusätzliche Paarprobe
 
