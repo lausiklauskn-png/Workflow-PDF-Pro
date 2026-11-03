@@ -2,7 +2,11 @@
 # Preserve the actual test status and publish bounded runtime diagnostics when
 # hosted Actions log downloads are unavailable to a later coding environment.
 set -uo pipefail
-cd "$(dirname "$0")/../../android" || exit 1
+cd "$(dirname "$0")/../.." || exit 1
+# Every ordinary native suite executes NativeAppSwitchTest. Its real recipient
+# must be installed here too, not only in the production-acceptance wrapper.
+bash tools/native/install-family-share-probe.sh || exit 1
+cd android || exit 1
 ./gradlew --no-daemon --max-workers=2 :app:connectedDebugAndroidTest
 native_test_status=$?
 if (( native_test_status != 0 )); then

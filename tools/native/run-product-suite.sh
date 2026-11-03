@@ -4,7 +4,6 @@
 set -uo pipefail
 cd "$(dirname "$0")/../.." || exit 1
 python3 tools/native/webview-runtime.py install work/webview-runtime || exit 1
-bash tools/native/install-family-share-probe.sh || exit 1
 bash tools/native/run-connected.sh
 product_status=$?
 python3 tools/native/verify-signed-install.py android/app/build/outputs/apk/debug/app-debug.apk --development-probe
