@@ -1,7 +1,7 @@
 import {readFile,readdir,mkdir,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import assert from 'node:assert/strict';
-const required=['FolderImportTest','IncomingFilesTest','NativeDocumentVaultTest','NativeProVerbundTest','NativeProVerbundProductTest','NativeFoundationTest','NativeIncomingTest','NativeVaultProductTest','NativeChromeTest','IncomingInboxTest','NativeTranslateTest','NativeSpeechTest','NativeCoreProductTest','NativePickerProductTest','NativeOutputTest'];
+const required=['FolderImportTest','IncomingFilesTest','NativeDocumentVaultTest','NativeProVerbundTest','NativeProVerbundProductTest','NativeFoundationTest','NativeIncomingTest','NativeVaultProductTest','NativeChromeTest','IncomingInboxTest','NativeTranslateTest','NativeSpeechTest','NativeCoreProductTest','NativePickerProductTest','NativeOutputTest','NativeAppSwitchTest'];
 async function files(directory){const out=[];for(const file of await readdir(directory,{withFileTypes:true})){const path=join(directory,file.name);if(file.isDirectory())out.push(...await files(path));else if(/^TEST-.*\.xml$/.test(file.name))out.push(path);}return out;}
 const paths=await files('android/app/build/outputs/androidTest-results');assert.ok(paths.length,'No actual instrumented result XML');
 let tests=0;const classes=new Set();
