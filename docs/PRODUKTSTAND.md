@@ -20,12 +20,30 @@ Konkrete Quellen, Läufe, Größen und vollständige Prüfsummen:
 [maschinenlesbare Nachweise](PRO-VERBUND-VEROEFFENTLICHUNG-1.0.11.json).
 Bereits veröffentlichte Versionen nicht erneut auslösen.
 
-## In Arbeit: Kern 1.1.9 / App 1.0.12 (Klaus 2026-11-03, nicht veröffentlicht)
+## Zwischenzeitlich veröffentlicht: Kern 1.1.9 / App 1.0.12
 
 Kern bytegleich aus Workflow-PDF main `0ed15e5` (PR #142, #143): Schriftgröße
 je Feld, Feld wächst mit, Einrasten, eigene Feldarten, Erkennung ohne Belegtes, ⟳ ohne Verlust (Notstand-Schnappschuss),
-Umlaute im Namen aus dem PDF-Titel. App **1.0.12 / Build 13** (Android, Windows). Keine Adapteränderung. Veröffentlichung nur
-vom main-Stand nach Klaus' Wort; die PWA-Seite (Pages) liefert 1.1.9 seit dem Merge von #142.
+Umlaute im Namen aus dem PDF-Titel. App **1.0.12 / Build 13** (Android, Windows). Keine Adapteränderung.
+GitHub-Abgleich am 03.11.2026: Android v1.0.12 (Lauf41645443670) und Windows windows-v1.0.12
+(41644590893) sind von main448c158 veröffentlicht. Dieselben Versionen nicht erneut auslösen.
+Die PWA-Seite (Pages) liefert 1.1.9 seit dem Merge von #142.
+
+## Konkrete Nutzerrückmeldung: Appwechsel 1.0.13 / Build14
+
+Klaus meldet den eigenständigen Android-PDF-Editor: Nach Teilen an Familienakte bleibt
+deren Fenster im Arbeitsbereich des Editors. Die eingebettete Familienakte-PDF-App ist
+ausdrücklich nicht betroffen. Korrektur ausschließlich im Android-Ausgabeadapter:
+Empfänger mit eigenem Task starten, Teilen ohne Aktivitäts-Rückkanal öffnen und nur
+das Öffnen bestätigen. Kein Beleg für Zustellung. Die gültigen PDF-Bytes und Lesefreigaben bleiben.
+
+Android und Windows werden als1.0.13 gemeinsam geführt; Windows behält sein eigenes
+Teilen und manuelles Update. Der PWA-Kern1.1.9 bleibt bytegleich: Android-Task-Flags
+haben im Browser keine Entsprechung. iOS ist weiter nur vorbereitet, nicht freigegeben.
+Neue gezielte OS-Probe: wirklicher Android-Chooser, veröffentlichte Familienakte2.28.16,
+kalter/warmer Empfänger, getrennte wiederverwendete Tasks und erhaltener Senderstand.
+Die zusätzliche vollständige Tresor-App-Paar-Abnahme wird dadurch nicht nachgeholt.
+Veröffentlichung erst nach den vorhandenen Freigabeprüfungen des tatsächlichen main-Commits.
 
 ## Fertiggestellter Produktbau und offene zusätzliche Paarprobe
 

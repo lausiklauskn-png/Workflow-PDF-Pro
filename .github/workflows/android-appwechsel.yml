@@ -2,6 +2,7 @@ name: Android-Appwechsel mit veröffentlichter Familienakte
 on:
   push:
     branches: [codex/android-appwechsel]
+    paths: ['android/**', 'native/**', 'tools/native/run-app-switch.sh', 'tools/native/install-family-share-probe.sh', '.github/workflows/android-appwechsel.yml']
   workflow_dispatch:
     inputs:
       counterprobe:
@@ -56,7 +57,9 @@ jobs:
         with:
           name: android-appwechsel-${{ github.sha }}
           path: |
-            work/appwechsel/
+            work/appwechsel/logcat.txt
+            work/appwechsel/chooser.xml
+            work/appwechsel/chooser.png
             android/app/build/outputs/androidTest-results/
             android/app/build/reports/androidTests/
           if-no-files-found: error

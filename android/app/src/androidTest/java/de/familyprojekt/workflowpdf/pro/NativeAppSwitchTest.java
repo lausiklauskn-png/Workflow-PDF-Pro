@@ -95,6 +95,12 @@ public final class NativeAppSwitchTest {
                 JSObject reply=share.await();assertTrue(reply.getBoolean("opened"));assertFalse(reply.getBoolean("deliveryConfirmed"));
             }
             assertTrue("Share launch must release sender before choosing a recipient",everyLaunchReplied);
-        }finally{device.executeShellCommand("am force-stop "+FAMILY);}
+        }finally{
+            // A failed selection must not leave the system sheet covering later
+            // independent product tests and stealing their input focus.
+            String foreground=device.getCurrentPackageName();
+            if("com.android.intentresolver".equals(foreground)||"android".equals(foreground))device.pressBack();
+            device.executeShellCommand("am force-stop "+FAMILY);
+        }
     }
 }
