@@ -205,6 +205,7 @@
       const wanted=needed||active?.state;
       if(wanted?.configured&&P){const z=ortZeile({...wanted,unlocked:false},note);if(z){z.id='nativeAblageOrt';ablage.append(z);}}
       text.textContent=t('blocked');ablage.append(text,note,actions);
+      {const m=window.WFPWoLiegtWas?.meldung(error);if(m)note.textContent=m;}
       button(actions,'unlock',async()=>{
         const wanted=needed||active?.state;
         if(wanted){const answer=await api.unlock({location:wanted.location,language:language()});if(answer.cancelled)return;}
@@ -219,12 +220,24 @@
           await boot();
         }
       });
+      window.WFPWoLiegtWas?.knopf(actions);
     }else{
       if(active){const z=ortZeile(active.state,note);if(z){z.id='nativeAblageOrt';ablage.append(z);}else{text.textContent=t('folder')+(active.state.folder||'');}}
       else text.textContent=t('internal');
       if(text.textContent)ablage.append(text);
       ablage.append(note,actions);
-      button(actions,'choose',async()=>{const answer=await api.choose({language:language()});if(!answer.cancelled)await confirmMove(answer.state);},!active);
+      // Ordnerwahl (Klaus 2026-11-03): ein abgelehnter Ordner ist kein Speicherfehler – Meldung im Kasten, Ablage bleibt offen.
+      // „Anderen Ordner wählen“ aus der Rückfrage öffnet die Ordnerwahl gleich noch einmal.
+      button(actions,'choose',async()=>{
+        note.textContent='';
+        for(let mal=0;mal<3;mal++){
+          let answer;
+          try{answer=await api.choose({language:language()});}
+          catch(error){const m=window.WFPWoLiegtWas?.meldung(error);if(m){note.textContent=m;return;}throw error;}
+          if(answer.cancelled){if(answer.andererOrdner)continue;return;}
+          await confirmMove(answer.state);return;
+        }
+      },!active);
       if(active&&typeof api.createRecovery==='function'){
         const line=document.createElement('p');line.id='nativeVaultRecovery';ablage.insertBefore(line,actions);
         const show=info=>{line.textContent=info?.exists?t('recoveryDone')+new Date(info.created||info.createdAt).toLocaleDateString(language()):t('recoveryNone');};
@@ -237,6 +250,7 @@
       window.WFPProVerbund?.append(panel,fuss);
       // Gemeinsamer Tresorordner (Schritt D1): eigener Abschnitt „Tresor (alle Pro-Apps)“, nur bei entsperrter Ablage.
       if(active&&window.WFPTresorordner)void WFPTresorordner.abschnitt(panel,fuss,active.state).catch(()=>{});
+      window.WFPWoLiegtWas?.knopf(fuss);
       button(fuss,'close',async()=>{panel.close();panel.remove();panel=null;});
     }
   }

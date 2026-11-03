@@ -8,7 +8,7 @@ export const root = fileURLToPath(new URL('../../', import.meta.url));
 export const runtimeRoots = ['assets/', 'vendor/', 'icons/', 'sbkim/', 'beispiele/'];
 export const runtimeFiles = ['index.html', 'sw.js', 'manifest.webmanifest', 'impressum.html',
   'sicherheit.html', 'LICENSE', 'RECHTE.md', 'THIRD_PARTY.md'];
-export const vaultFiles=['vault-codec.js','vault-records.js','vault-journal.js','vault-db.js','vault-gate.js','vault-preferences.js','vault-migration.js','native-vault.js','native-tresorordner.js'];
+export const vaultFiles=['vault-codec.js','vault-records.js','vault-journal.js','vault-db.js','vault-gate.js','vault-preferences.js','vault-migration.js','native-vault.js','native-tresorordner.js','native-wo-liegt-was.js'];
 // Gemeinsame Bedien-Bausteine aller Pro-Apps (Quelle Private Brain Pro, byte-gleich, Pin native/pro-bedienung-herkunft.json).
 export const bedienFiles = ['pro-bedienung.js', 'pro-bedienung.css', 'pro-hintergrund.js', 'pro-geraet.js', 'pro-ueberall.js', 'pro-ueberall.css', 'pro-chefcode.js'];
 // Scanner und Kamera unter Windows (Pro-Umbau 5): hier gepflegt, byte-gleich nach BookLedgerPro (Pin native/pro-scanner-herkunft.json).

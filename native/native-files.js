@@ -35,7 +35,8 @@
   }
   async function save(blob, name) {
     const id = await transfer(blob, name);
-    try { const result = await api.save({ id }); if (result.saved) notify(t('saved')); return result; }
+    // Ziel im Tresor-Ordner: Android fragt nach (TresorSchutz.java); abgelehnt → Hinweis statt stiller Stille.
+    try { const result = await api.save({ id, language: document.documentElement.lang || 'de' }); if (result.saved) notify(t('saved')); else if (result.imTresor) notify(window.WFPWoLiegtWas?.text('imTresor') || t('fail')); return result; }
     finally { await api.abort({ id }).catch(() => {}); }
   }
   let sharing = false;

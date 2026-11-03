@@ -24,7 +24,7 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
     const view=()=>fixture.batch||fixture.records;
     if(method==='state')return a.location?candidate():state();
     if(method==='migration')return {location:fixture.migration};
-    if(method==='choose')return {state:candidate(),location:'target',created:true};
+    if(method==='choose'){fixture.log.push(['choose',a]);if(fixture.chooseFehler){const e=fixture.chooseFehler;fixture.chooseFehler=null;throw Error(e);}if(fixture.chooseAntworten?.length)return fixture.chooseAntworten.shift();return {state:candidate(),location:'target',created:true};}
     if(method==='unlock'){fixture.unlocked=true;return {unlocked:true};}
     if(method==='lock'){fixture.unlocked=false;return candidate();}
     if(method==='prepareMigration'){fixture.migration='target';return {saved:true};}
@@ -43,7 +43,7 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
     if(method==='remove'){view().delete(key(a.store,a.id));return {saved:true};}
     if(method==='tresorZustand'){fixture.log.push(['tresorZustand',a]);return {...fixture.tresor};}
     if(method==='tresorEinziehen'){fixture.log.push(['tresorEinziehen',a]);if(fixture.einzugFehler){const e=fixture.einzugFehler;fixture.einzugFehler=null;throw Error(e);}
-      fixture.tresor={gewaehlt:true,kennung:'test-tresor',ordner:'Tresor-Probe',gemerkt:true,offen:true,eingezogen:true,erreichbar:true,vorhanden:true,pruefung:'PASST',eintraege:0};return {...fixture.tresor,eingezogenJetzt:true,angelegt:true};}
+      fixture.tresor={gewaehlt:true,kennung:'test-tresor',ordner:'Tresor-Probe',gemerkt:true,offen:true,eingezogen:true,erreichbar:true,vorhanden:true,pruefung:'PASST',eintraege:0};return {...fixture.tresor,eingezogenJetzt:true,angelegt:true,ebeneHoeher:!!fixture.ebeneHoeher};}
     if(method==='tresorVerzeichnis'){fixture.log.push(['tresorVerzeichnis',a]);const neu=JSON.stringify(a.zeilen)!==JSON.stringify(fixture.zeilen);fixture.zeilen=a.zeilen;fixture.tresor.eintraege=a.zeilen.length;return {geschrieben:neu,eintraege:a.zeilen.length};}
     if(method==='tresorSperren'){fixture.log.push(['tresorSperren',a]);fixture.tresor={...fixture.tresor,offen:false,eingezogen:false};return {...fixture.tresor};}
     // Übergabefach „Eingang-WorkflowPDF“ (Pro-Umbau 5), Stücke zu 500 Byte (Java: 192 KB) — so wird mehrfach gelesen
@@ -60,7 +60,7 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
     const page=await browser.newPage();await page.exposeFunction('__vaultCall',call);
     await page.addInitScript(names=>{
       const vault={};for(const method of names)vault[method]=a=>__vaultCall(method,a);
-      const files={};for(const method of ['begin','append','finish','abort','save','share','print','openLink'])files[method]=async()=>({});
+      const files={};for(const method of ['begin','append','finish','abort','save','share','print','openLink'])files[method]=async a=>{(window.__filesLog??=[]).push([method,a]);return window.__filesAntwort?.[method]??({});};
       window.Capacitor={isNativePlatform:()=>true,Plugins:{WorkflowFiles:files,WorkflowVault:vault}};
     },mitTresor?[...methoden,...tresorMethoden]:methoden);
     await page.goto('http://127.0.0.1:'+server.address().port+'/');await page.waitForFunction(()=>window.WFPNativeVault&&!WFPNativeVault.gate.blocked&&window.__wfpdf&&window.PDFLib);
@@ -111,8 +111,49 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
       assert.equal(fixture.log.some(([m])=>m==='tresorVerzeichnis'),false);
       assert.equal(await page.getAttribute('#nativeTresorordner','data-zustand'),'neu');
     });
+    await t.test('App-Ordner oder Verwaltung gewählt: Meldung nennt tresorordner.json, nichts geschrieben',async()=>{
+      for(const [code,muster] of [['TRESOR_ORDNER_APP_ORDNER',/App-Ordner im Tresor.*tresorordner\.json/],['TRESOR_ORDNER_VERWALTUNG',/„Tresorordner“.*tresorordner\.json/],['TRESOR_NICHT_VORHANDEN',/keine „tresorordner\.json“.*kein neuer Tresor/]]){
+        fixture.einzugFehler=code;
+        await knopf(page,'In den Tresorordner einziehen').click();
+        await page.waitForFunction(m=>new RegExp(m).test(document.querySelector('#nativeTresorordnerHinweis')?.textContent||''),muster.source);
+        assert.doesNotMatch(await page.textContent('#nativeTresorordnerHinweis'),/Code:/,'Klartext statt Code');
+      }
+      assert.equal(fixture.log.some(([m])=>m==='tresorVerzeichnis'),false);
+      assert.equal(await page.getAttribute('#nativeTresorordner','data-zustand'),'neu');
+    });
+    await t.test('„Wo liegt was?“ im Kasten Tresor & Ablage: Plan-Text, Fach, Eingang, Menüweg, Original speichern',async()=>{
+      await page.locator('.native-vault-dialog [data-wo-liegt-was]').click();
+      await page.waitForSelector('#nativeWoLiegtWas[open]');
+      const text=await page.textContent('#nativeWoLiegtWas');
+      for(const m of [/Wo liegt was\?/,/in dem die Datei „tresorordner\.json“ liegt/,/Nie den Unterordner „Tresorordner“ wählen/,/„Eingang-…“ sind Briefkästen/,/nur nach Nummern und sind verschlüsselt/,/Offene Dateien \(PDF, \.json, \.txt\) gehören nicht in den Tresor-Ordner/,/Ein Passwort gilt für alle Pro-Apps/])assert.match(text,m);
+      assert.match(await page.textContent('#nativeWoLiegtWas [data-wo-app]'),/Ordner „Workflow PDF Pro“ · Eingang: „Eingang-WorkflowPDF“/);
+      assert.match(await page.textContent('#nativeWoLiegtWas [data-wo-weg]'),/Tresor & Ablage.*In den Tresorordner einziehen/);
+      assert.match(await page.textContent('#nativeWoLiegtWas [data-wo-original]'),/Ordner ausgeben.*Original, unverändert/);
+      await page.locator('#nativeWoLiegtWas button').filter({hasText:'Schließen'}).click();
+      await page.waitForFunction(()=>!document.getElementById('nativeWoLiegtWas'));
+    });
+    await t.test('Ablage: abgelehnter Ordner zeigt die Meldung im Kasten, sperrt nichts; „Anderen Ordner wählen“ fragt neu',async()=>{
+      fixture.log.length=0;fixture.chooseFehler='VAULT_ORDNER_VERWALTUNG';
+      await page.locator('#nativeAblage button').filter({hasText:'Ordner wählen'}).click();
+      await page.waitForFunction(()=>/„Tresorordner“.*tresorordner\.json.*Nichts wurde angelegt/.test(document.querySelector('#nativeAblageHinweis')?.textContent||''));
+      assert.equal(await page.evaluate(()=>'wfpVaultLocked' in document.documentElement.dataset),false,'kein Sperrbildschirm');
+      assert.equal(await page.locator('#nativeTresorordner').count(),1,'Kasten bleibt offen');
+      fixture.chooseAntworten=[{cancelled:true,rueckfrage:'FRAGEN_NEU',andererOrdner:true},{cancelled:true,rueckfrage:'FRAGEN_NEU'}];
+      await page.locator('#nativeAblage button').filter({hasText:'Ordner wählen'}).click();
+      await page.waitForFunction(()=>true);await new Promise(r=>setTimeout(r,300));
+      assert.equal(fixture.log.filter(([m])=>m==='choose').length,3,'nach „Anderen Ordner wählen“ gleich noch einmal die Ordnerwahl');
+      assert.equal(fixture.chooseAntworten.length,0);
+      assert.equal(fixture.primary,'target','Ablage unverändert');
+    });
+    await t.test('Speichern unter in den Tresor abgelehnt: Hinweis statt Erfolg; Sprache geht an Android',async()=>{
+      const r=await page.evaluate(async()=>{window.__filesLog=[];window.__filesAntwort={begin:{id:'x1'},save:{cancelled:true,imTresor:true}};
+        const out=await WFPNativeFiles.save(new Blob(['{}'],{type:'application/json'}),'Arbeitsstand.workfloh.json');delete window.__filesAntwort;
+        return {out,save:__filesLog.find(([m])=>m==='save')[1],zeile:document.getElementById('nativeFileStatus')?.textContent};});
+      assert.equal(r.out.imTresor,true);assert.equal(r.save.language,'de');
+      assert.match(r.zeile,/Nicht gespeichert: Das Ziel war der Tresor-Ordner/);
+    });
     await t.test('Einzug: danach Inhaltsverzeichnis aus der Bibliothek (Name, Größe, Fingerabdruck, Auszug), ohne Inhalt und Passwort',async()=>{
-      fixture.log.length=0;
+      fixture.log.length=0;fixture.ebeneHoeher=true;
       await knopf(page,'In den Tresorordner einziehen').click();
       await page.waitForFunction(()=>document.querySelector('#nativeTresorordner')?.dataset.zustand==='verbunden');
       const einzug=fixture.log.find(([m])=>m==='tresorEinziehen')[1];
@@ -126,6 +167,7 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
       assert.deepEqual(Object.keys(z).sort(),['art','auszug','datum','groesse','id','name','sha256','verweis']);
       assert.equal(JSON.stringify(fixture.log).includes('passw'),false);
       assert.match(await page.textContent('#nativeTresorordnerHinweis'),/Eingezogen/);
+      assert.match(await page.textContent('#nativeTresorordnerHinweis'),/Verbunden ist jetzt der Ordner darüber, in dem „tresorordner\.json“ liegt/,'App-Ordner gewählt, Ebene darüber genommen: gesagt');fixture.ebeneHoeher=false;
       assert.match(await page.textContent('#nativeTresorordnerZeile'),/verbunden: Tresor-Probe · Einträge im Inhaltsverzeichnis: 1/);
     });
     await t.test('Eingang-WorkflowPDF: neue Datei anderer Pro-Apps steht da, „Übernehmen“ liest sie ein und markiert erst danach',async()=>{
@@ -202,4 +244,18 @@ test('Sperren von Hand bleibt gesperrt: zustand() und Inhaltsverzeichnis öffnen
   assert.match(java,/private TresorOrdner offenOderGemerkt\(\) throws IOException \{\s*try \{pruefeKennung\(\);\}catch\(IOException error\)\{schliessen\(\);throw error;\}\s*if \(offen == null && \(vonHandGesperrt \|\| !gemerktEntsperren\(\)\)\) throw new IOException\("TRESOR_GESPERRT"\);/,'Eingang prüft die Ordnerkennung und öffnet nach Sperren nicht wieder');
   assert.match(java,/JSONObject verzeichnis\(JSONArray zeilen, DocumentVault vault\) throws Exception \{\s*offenOderGemerkt\(\);/,'Verzeichnis verwendet denselben geprüften Zugang');
   assert.equal((java.match(/gemerktEntsperren\(\)/g)||[]).length,3,'alle Fachzugriffe bündeln ihre Sperrprüfung im gemeinsamen Zugang');
+});
+
+// Ordnerwahl und Tresor-Schutz (Klaus 2026-11-03). Die Regeln selbst prüft die JVM-Probe OrdnerWahlTest; die Android-Plugins
+// laufen hier nicht (kein SDK). Geprüft wird, dass sie die Regeln an der richtigen Stelle und VOR dem Schreiben benutzen.
+test('Ordnerwahl und Tresor-Schutz sind in den Android-Plugins verdrahtet (Quelltext, kein Gerät)',async()=>{
+  const pro=join(root,'android/app/src/main/java/de/familyprojekt/workflowpdf/pro/');
+  const plugin=await readFile(pro+'ProVaultPlugin.java','utf8'),vault=await readFile(pro+'DocumentVault.java','utf8'),files=await readFile(pro+'ProFilesPlugin.java','utf8');
+  assert.match(plugin,/String art=OrdnerWahl\.ablage\([^;]+;\s*if\(OrdnerWahl\.abgelehnt\(art\)\)throw new java\.io\.IOException\("VAULT_ORDNER_"\+art\);\s*DocumentVault\.Place place=candidate\.inspect\(tree\)/,'Ablage: erst einordnen, Abgelehntes vor inspect/anlegen abweisen');
+  assert.match(plugin,/if\(!exists&&OrdnerWahl\.frage\(art\)\)getActivity\(\)\.runOnUiThread\(\(\)->rueckfrage\(/,'ohne erkennbaren Tresor erst fragen');
+  assert.match(plugin,/setPositiveButton\(Q_WORDS\[3\]\[lang\],\(d,w\)->password\(call,vault,place,0\)\)/,'Anlegen erst nach „Neue Ablage hier anlegen“');
+  assert.match(vault,/if \(OrdnerWahl\.unterordnerAnlegen\(displayName\(candidate, candidate\.root\), children\(candidate, candidate\.root\)\.isEmpty\(\)\)\) candidate\.root = create\(/,'nie verschachteln');
+  assert.match(plugin,/String art=OrdnerWahl\.tresor\(gewaehlt,ordnerName\(tree\)\);[\s\S]*?throw new java\.io\.IOException\(nur\?"TRESOR_NICHT_VORHANDEN":"TRESOR_ORDNER_"\+pruefung\);[\s\S]*?tresor\.baumSetzen\(baum\);/,'Tresor: falscher Ordner wird vor baumSetzen abgewiesen');
+  assert.match(files,/if \(TresorSchutz\.imTresor\(getContext\(\), uri\)\) \{[\s\S]*?TresorSchutz\.warnen\([\s\S]*?return;\s*\}\s*schreiben\(saving, uri\);/,'Speichern unter: Tresor-Ziel erst fragen, dann schreiben');
+  assert.match(plugin,/if\(TresorSchutz\.imTresor\(getContext\(\),uri\)\)\{\s*TresorSchutz\.warnen\(/,'Ersatzschlüssel-Datei: Tresor-Ziel erst fragen');
 });

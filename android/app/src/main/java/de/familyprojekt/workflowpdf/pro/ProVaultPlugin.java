@@ -73,9 +73,15 @@ public final class ProVaultPlugin extends Plugin {
                 if(!"content".equals(tree.getScheme())||(data.getFlags()&flags)!=flags)throw new SecurityException();
                 getContext().getContentResolver().takePersistableUriPermission(tree,flags);
                 locations.ensureIdle();
-                DocumentVault candidate=locations.candidate();DocumentVault.Place place=candidate.inspect(tree);boolean exists=candidate.existing(place);
+                DocumentVault candidate=locations.candidate();
+                // Befund SD-Karte 2026-11-03: Hauptablageordner ODER „Workflow PDF Pro“ öffnen dieselbe Ablage; Verwaltung,
+                // fremde Fächer und ein „Workflow PDF Pro“ ohne Kopf werden abgelehnt; ohne erkennbaren Tresor erst fragen.
+                String art=OrdnerWahl.ablage(new de.familyprojekt.tresor.SafAblage(getContext().getContentResolver(),tree),candidate.treeName(tree));
+                if(OrdnerWahl.abgelehnt(art))throw new java.io.IOException("VAULT_ORDNER_"+art);
+                DocumentVault.Place place=candidate.inspect(tree);boolean exists=candidate.existing(place);
                 if(call.getString("expectedVaultId")!=null&&!exists)throw new java.io.IOException("VAULT_WRONG_FOLDER");
-                getActivity().runOnUiThread(()->password(call,candidate,place,exists?1:0));
+                if(!exists&&OrdnerWahl.frage(art))getActivity().runOnUiThread(()->rueckfrage(call,candidate,place,art));
+                else getActivity().runOnUiThread(()->password(call,candidate,place,exists?1:0));
             }catch(Exception error){choosing.set(false);String code=code(error);call.reject(code,code);}
         });
     }
@@ -98,6 +104,31 @@ public final class ProVaultPlugin extends Plugin {
         {"Mindestens 10 Zeichen; beide Passwörter müssen übereinstimmen. Hinweis bestätigen.","Use at least 10 matching characters and confirm the notice.","Не менее 10 символов; пароли должны совпадать. Подтвердите предупреждение.","استخدم 10 أحرف على الأقل، وطابق كلمتي المرور وأكّد التنبيه."},
         {"Passwort falsch oder Speicherort nicht erreichbar. Keine Daten wurden zurückgesetzt.","Wrong password or storage unavailable. No data was reset.","Неверный пароль или хранилище недоступно. Данные не сброшены.","كلمة المرور غير صحيحة أو التخزين غير متاح. لم تتم إعادة تعيين البيانات."}
     };
+    private static final String[][] Q_WORDS={
+        {"Hier liegt kein Tresor","No vault here","Здесь нет сейфа","لا توجد خزنة هنا"},
+        {"In diesem Ordner liegt keine „tresorordner.json“. Für den gemeinsamen Tresor aller Pro-Apps wähle den Ordner, in dem „tresorordner.json“ liegt (zum Beispiel „Privat Brain Pro Hauptablageordner“). Nur wenn du wirklich eine neue, eigene Ablage willst: „Neue Ablage hier anlegen“ – dann entsteht darin der Ordner „Workflow PDF Pro“.",
+         "This folder has no “tresorordner.json”. For the shared vault of all Pro apps, choose the folder that contains “tresorordner.json” (for example “Privat Brain Pro Hauptablageordner”). Only if you really want a new, separate storage: “Create new storage here” – a folder “Workflow PDF Pro” is created inside.",
+         "В этой папке нет «tresorordner.json». Для общего сейфа всех Pro-приложений выберите папку, в которой лежит «tresorordner.json». Только если нужно новое отдельное хранилище: «Создать здесь» – внутри появится папка «Workflow PDF Pro».",
+         "لا يحتوي هذا المجلد على «tresorordner.json». للخزنة المشتركة لكل تطبيقات Pro اختر المجلد الذي يحتوي «tresorordner.json». فقط إذا أردت تخزيناً جديداً منفصلاً: «إنشاء تخزين جديد هنا» – سيُنشأ داخله مجلد «Workflow PDF Pro»."},
+        {"Das ist ein leerer Ordner „Workflow PDF Pro“. Liegt er im gemeinsamen Tresor, wähle besser den Ordner darüber, in dem „tresorordner.json“ liegt. Oder lege die Ablage direkt in diesem Ordner an (es entsteht kein weiterer Unterordner).",
+         "This is an empty “Workflow PDF Pro” folder. If it is inside the shared vault, better choose the folder above it that contains “tresorordner.json”. Or create the storage directly in this folder (no further subfolder is created).",
+         "Это пустая папка «Workflow PDF Pro». Если она в общем сейфе, лучше выберите папку выше, где лежит «tresorordner.json». Или создайте хранилище прямо в этой папке (без вложенной папки).",
+         "هذا مجلد «Workflow PDF Pro» فارغ. إن كان داخل الخزنة المشتركة فاختر المجلد الأعلى الذي يحتوي «tresorordner.json». أو أنشئ التخزين مباشرة في هذا المجلد (دون مجلد فرعي آخر)."},
+        {"Neue Ablage hier anlegen","Create new storage here","Создать здесь","إنشاء تخزين جديد هنا"},
+        {"Anderen Ordner wählen","Choose another folder","Выбрать другую папку","اختيار مجلد آخر"}
+    };
+    /** Rückfrage, bevor in einem Ordner ohne erkennbaren Tresor eine neue Ablage entsteht. Nichts ist bis hier geschrieben. */
+    private void rueckfrage(PluginCall call,DocumentVault vault,DocumentVault.Place place,String art){
+        if(worker.closed()||getActivity().isFinishing()||getActivity().isDestroyed()){choosing.set(false);call.reject("NATIVE_ACTIVITY_CLOSED");return;}
+        String language=call.getString("language","de");int index=Arrays.asList("de","en","ru","ar").indexOf(language);final int lang=index<0?0:index;
+        AlertDialog dialog=new AlertDialog.Builder(getActivity()).setTitle(Q_WORDS[0][lang])
+            .setMessage(Q_WORDS[OrdnerWahl.FRAGEN_FACH_LEER.equals(art)?2:1][lang])
+            .setNegativeButton(WORDS[6][lang],(d,w)->{choosing.set(false);call.resolve(new JSObject().put("cancelled",true).put("rueckfrage",art));})
+            .setNeutralButton(Q_WORDS[4][lang],(d,w)->{choosing.set(false);call.resolve(new JSObject().put("cancelled",true).put("rueckfrage",art).put("andererOrdner",true));})
+            .setPositiveButton(Q_WORDS[3][lang],(d,w)->password(call,vault,place,0)).create();
+        dialog.setOnCancelListener(d->{choosing.set(false);call.resolve(new JSObject().put("cancelled",true).put("rueckfrage",art));});
+        dialog.show();
+    }
     private void password(PluginCall call,DocumentVault vault,DocumentVault.Place place,int mode){
         if(worker.closed()||getActivity().isFinishing()||getActivity().isDestroyed()){choosing.set(false);call.reject("NATIVE_ACTIVITY_CLOSED");return;}
         String language=call.getString("language","de");int index=Arrays.asList("de","en","ru","ar").indexOf(language);final int lang=index<0?0:index;
@@ -240,7 +271,20 @@ public final class ProVaultPlugin extends Plugin {
         if(shownShares==null||sharesStatus==null)return;
         Intent data=result.getData();int lang=sharesLang;
         if(result.getResultCode()!=Activity.RESULT_OK||data==null||data.getData()==null)return;
-        Uri uri=data.getData();byte[] text=sharesText(lang).getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        Uri uri=data.getData();
+        // Ersatzschlüssel nie offen in den Tresor-Ordner (Plan: „getrennt aufbewahren“): erst warnen.
+        if(TresorSchutz.imTresor(getContext(),uri)){
+            TresorSchutz.warnen(getActivity(),new String[]{"de","en","ru","ar"}[lang],trotzdem->{
+                if(trotzdem)sharesSchreiben(uri,lang);
+                else worker.execute(()->{TresorSchutz.leeresZielEntfernen(getContext(),uri);getActivity().runOnUiThread(()->{if(sharesStatus!=null)sharesStatus.setText(R_WORDS[18][lang]);});});
+            });
+            return;
+        }
+        sharesSchreiben(uri,lang);
+    }
+    private void sharesSchreiben(Uri uri,int lang){
+        if(shownShares==null)return;
+        byte[] text=sharesText(lang).getBytes(java.nio.charset.StandardCharsets.UTF_8);
         worker.execute(()->{
             boolean ok=false;
             try{
@@ -334,22 +378,50 @@ public final class ProVaultPlugin extends Plugin {
                 if(!"content".equals(tree.getScheme())||(data.getFlags()&flags)!=flags)throw new SecurityException();
                 getContext().getContentResolver().takePersistableUriPermission(tree,flags);
                 boolean nur=call.getBoolean("nurVerbinden",false);
-                DocumentVault v=nur?vaultOrNull(call):vault(call);String pruefung=nur?"PASST":tresor.pruefen(tree,v.identity());
-                if(nur)tresor.pruefenVerbindung(tree);
-                // Nichts übernehmen, wenn der Ordner nicht genau diesen Tresor enthält. Die Freigabe bleibt (sie kann die des Tresors selbst sein).
-                if(!"PASST".equals(pruefung))throw new java.io.IOException("TRESOR_ORDNER_"+pruefung);
-                tresor.baumSetzen(tree);
+                DocumentVault v=nur?vaultOrNull(call):vault(call);
+                // Befund SD-Karte 2026-11-03: falscher Ordner → klare Meldung, nie still ein neuer Tresor. Wurde ein App-Ordner
+                // im Tresor gewählt und hält diese App schon die Freigabe der Ebene darüber (eigene Ablage dort), gilt diese.
+                de.familyprojekt.tresor.SafAblage gewaehlt=new de.familyprojekt.tresor.SafAblage(getContext().getContentResolver(),tree);
+                String art=OrdnerWahl.tresor(gewaehlt,ordnerName(tree));
+                Uri baum=tree;String pruefung=nur?art:tresor.pruefen(tree,v.identity());
+                if(!"PASST".equals(pruefung)){Uri oben=ebeneDarueber(tree,v,nur);if(oben!=null){baum=oben;pruefung="PASST";call.getData().put("ebeneHoeher",true);}}
+                if(!"PASST".equals(pruefung)){
+                    // Nichts übernehmen, wenn der Ordner nicht genau diesen Tresor enthält. Die Freigabe bleibt (sie kann die des Tresors selbst sein).
+                    if(OrdnerWahl.TRESOR_APP_ORDNER.equals(art)||OrdnerWahl.TRESOR_VERWALTUNG.equals(art))throw new java.io.IOException("TRESOR_ORDNER_"+art);
+                    throw new java.io.IOException(nur?"TRESOR_NICHT_VORHANDEN":"TRESOR_ORDNER_"+pruefung);
+                }
+                if(nur)tresor.pruefenVerbindung(baum);
+                tresor.baumSetzen(baum);
                 tresorWeiter(call,v);
             }catch(Exception error){choosing.set(false);String code=code(error);call.reject(code,code);}
         });
     }
+    /** Die gemerkte Freigabe der eigenen Ablage, wenn sie genau über dem gewählten Ordner liegt und dort der Tresor ist. */
+    private Uri ebeneDarueber(Uri gewaehlt,DocumentVault v,boolean nur){
+        try{
+            Uri oben=v==null?null:v.baumUri();if(oben==null)return null;
+            String g=android.provider.DocumentsContract.getTreeDocumentId(gewaehlt),o=android.provider.DocumentsContract.getTreeDocumentId(oben);
+            if(g.equals(o)||!OrdnerWahl.liegtIn(oben.getAuthority(),o,gewaehlt.getAuthority(),g))return null;
+            de.familyprojekt.tresor.SafAblage a=new de.familyprojekt.tresor.SafAblage(getContext().getContentResolver(),oben);
+            if(nur)return de.familyprojekt.tresor.TresorOrdner.vorhanden(a)?oben:null;
+            return "PASST".equals(TresorEinzug.pruefen(a,v.identity()))?oben:null;
+        }catch(Exception keine){return null;}
+    }
+    /** Anzeigename des gewählten Ordners (ohne Schreiben, ohne eine Ablage anzulegen). */
+    private String ordnerName(Uri tree){
+        Uri doc=android.provider.DocumentsContract.buildDocumentUriUsingTree(tree,android.provider.DocumentsContract.getTreeDocumentId(tree));
+        try(android.database.Cursor c=getContext().getContentResolver().query(doc,new String[]{android.provider.DocumentsContract.Document.COLUMN_DISPLAY_NAME},null,null,null)){
+            return c!=null&&c.moveToFirst()?c.getString(0):"";
+        }catch(Exception keiner){return "";}
+    }
+    private static JSONObject hinweis(PluginCall call,JSONObject zustand)throws JSONException{return zustand.put("ebeneHoeher",call.getBoolean("ebeneHoeher",false));}
     /** Auf dem Arbeits-Thread: offen oder gemerkt → gleich einziehen, sonst Passwort-Dialog. */
     private void tresorWeiter(PluginCall call,DocumentVault v)throws Exception{
         tresor.entsperrenGewuenscht();
         boolean nur=call.getBoolean("nurVerbinden",false);
         // Zustand prüft auch einen zwischenzeitlich ersetzten oder entfernten Ordner.
         tresor.zustand(v);
-        if(tresor.istOffen()||tresor.gemerktEntsperren()){if(!nur)tresor.einziehen(v);choosing.set(false);call.resolve(JSObject.fromJSONObject(tresor.zustand(v).put("eingezogenJetzt",!nur)));return;}
+        if(tresor.istOffen()||tresor.gemerktEntsperren()){if(!nur)tresor.einziehen(v);choosing.set(false);call.resolve(JSObject.fromJSONObject(hinweis(call,tresor.zustand(v).put("eingezogenJetzt",!nur))));return;}
         boolean anlegen=!tresor.vorhanden();
         if(nur&&anlegen)throw new java.io.IOException("TRESOR_NICHT_VORHANDEN");
         getActivity().runOnUiThread(()->tresorPasswort(call,v,anlegen));
@@ -379,7 +451,7 @@ public final class ProVaultPlugin extends Plugin {
                 try{
                     boolean nur=call.getBoolean("nurVerbinden",false);
                     tresor.mitPasswort(p,anlegen,keep,v,nur);
-                    JSObject state=JSObject.fromJSONObject(tresor.zustand(v).put("eingezogenJetzt",!nur).put("angelegt",anlegen));
+                    JSObject state=JSObject.fromJSONObject(hinweis(call,tresor.zustand(v).put("eingezogenJetzt",!nur).put("angelegt",anlegen)));
                     getActivity().runOnUiThread(()->{clear.run();dialog.dismiss();choosing.set(false);call.resolve(state);});
                 }catch(Exception error){
                     String code=code(error);

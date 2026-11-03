@@ -203,6 +203,10 @@ final class DocumentVault {
         return p;
     }
     boolean existing(Place p) throws IOException { return child(p, p.root, HEADER) != null; }
+    /** Anzeigename des gewählten Ordners selbst (vor inspect, für {@link OrdnerWahl}). */
+    String treeName(Uri tree) throws IOException { Place p = new Place(); p.tree = tree; return displayName(p, DocumentsContract.getTreeDocumentId(tree)); }
+    /** Die gemerkte Ordnerfreigabe dieser Ablage (für die Ebene über einem gewählten App-Ordner); null ohne. */
+    Uri baumUri() { return configured() ? Uri.parse(prefs.getString("tree", "")) : null; }
     void unlock(CharSequence password, boolean remember) throws Exception {
         if (!configured()) throw failure("VAULT_NOT_CONFIGURED");
         Place p = new Place(); p.tree = Uri.parse(prefs.getString("tree", "")); p.root = prefs.getString("root", ""); p.label = prefs.getString("label", FOLDER);
@@ -362,7 +366,8 @@ final class DocumentVault {
         byte[] salt = VaultCrypto.random(16), pw = VaultCrypto.passwordBytes(password), derived = null;
         String createdHeader = null;
         try {
-            if (!FOLDER.equals(displayName(candidate, candidate.root)) || !children(candidate, candidate.root).isEmpty()) candidate.root = create(candidate, candidate.root, DIR, FOLDER);
+            // Nie verschachteln (Befund SD-Karte 2026-11-03): ein Ordner „Workflow PDF Pro“ wird nur leer genommen.
+            if (OrdnerWahl.unterordnerAnlegen(displayName(candidate, candidate.root), children(candidate, candidate.root).isEmpty())) candidate.root = create(candidate, candidate.root, DIR, FOLDER);
             candidate.label = displayName(candidate, candidate.root);
             derived = VaultCrypto.pbkdf2(pw, salt, VaultCrypto.ITERATIONS);
             byte[] wrapped = VaultCrypto.seal(derived, candidate.key, bytes(logical(candidate, "password")));

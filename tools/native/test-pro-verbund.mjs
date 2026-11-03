@@ -40,7 +40,7 @@ test('Pro collaboration with durable ordinary library and exact outgoing version
       if(method==='state')return {configured:false,internal:true};
       if(method==='migration')return {location:null};
       if(method==='tresorZustand')return state();
-      if(method==='tresorVerbinden'){f.connected=true;f.open=true;return state();}
+      if(method==='tresorVerbinden'){if(f.verbindenFehler){const e=f.verbindenFehler;f.verbindenFehler=null;throw Error(e);}f.connected=true;f.open=true;return {...state(),ebeneHoeher:!!f.ebeneHoeher};}
       if(method==='tresorSperren'){f.open=false;return state();}
       if(method==='tresorUebergabe'){
         if(!f.open||a.vaultId!==f.root)throw Error('TRESOR_UEBERGABE_FREMD');
@@ -133,6 +133,16 @@ test('Pro collaboration with durable ordinary library and exact outgoing version
     assert.match(await page.textContent('#nativeProVerbund'),/Keine Verbindung/);await page.click('#nativeProVerbund [data-pro-action="connect"]');
     await page.waitForSelector('#nativeProVerbund [data-pro-entry]');assert.equal(await page.evaluate(()=>__wfpdf.S.docs.length),0);
     assert.equal(f.marks.length,0);assert.equal(f.sent.size,0);assert.equal(await page.evaluate(()=>WFPNativeVault.aktiv()),null);assert.deepEqual(errors,[]);await page.close();
+  });
+  await t.test('wrong folder for the shared vault: plain message, no new vault; app folder resolved one level up is reported',async()=>{
+    const {page,f,errors}=await setup({connected:false,verbindenFehler:'TRESOR_ORDNER_APP_ORDNER'});await page.evaluate(()=>WFPProVerbund.dialog());
+    assert.equal(await page.locator('#nativeProVerbund [data-wo-liegt-was]').count(),1,'„Wo liegt was?“ in the Pro-Apps dialog');
+    await page.click('#nativeProVerbund [data-pro-action="connect"]');
+    await page.waitForFunction(()=>/App-Ordner im Tresor.*tresorordner\.json/.test(document.querySelector('[data-pro-status]')?.textContent||''));
+    assert.equal(f.connected,false);
+    f.ebeneHoeher=true;await page.click('#nativeProVerbund [data-pro-action="connect"]');
+    await page.waitForFunction(()=>/Verbunden ist jetzt der Ordner darüber/.test(document.querySelector('[data-pro-status]')?.textContent||''));
+    assert.deepEqual(errors,[]);await page.close();
   });
   await t.test('only selected incoming file is acknowledged after ordinary PDF and original are committed',async()=>{
     const {page,f,errors}=await setup({items:[seed(),seed('family-b',pdfBytes,'B.pdf')]});await page.evaluate(()=>WFPProVerbund.dialog());
