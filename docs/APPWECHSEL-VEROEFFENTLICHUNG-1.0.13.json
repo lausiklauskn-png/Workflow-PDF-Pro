@@ -1,0 +1,89 @@
+{
+  "version": "1.0.13",
+  "source": "1ea49db1eb9b23969f051030247a56472e528d3b",
+  "recordedUtc": "2026-11-03T19:45:10+00:00",
+  "releases": [
+    {
+      "repo": "Workflow-PDF-Pro",
+      "tag": "windows-v1.0.13",
+      "source": "1ea49db1eb9b23969f051030247a56472e528d3b",
+      "run": 41699023539,
+      "publishedAt": "2026-11-03T19:00:49Z",
+      "url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.13",
+      "publicHashCheck": "Anonymous curl download; local size and SHA256 equal public GitHub asset digests. See release workflow for native install/update/feed checks.",
+      "assets": [
+        {
+          "name": "Workflow-PDF-Pro-Windows-1.0.13-Setup.exe",
+          "size": 26445225,
+          "digest": "sha256:559065bcfa080a4296cf858af01a7384d97c539bdd11e1e51626d282f0361b10",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.13/Workflow-PDF-Pro-Windows-1.0.13-Setup.exe"
+        },
+        {
+          "name": "Workflow-PDF-Pro-Windows-1.0.13-Setup.exe.sha256",
+          "size": 107,
+          "digest": "sha256:6c43150e6fc8f2df3cfcf1b7e45d919061a5e5e2d4227818f3051a90c0b22299",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.13/Workflow-PDF-Pro-Windows-1.0.13-Setup.exe.sha256"
+        }
+      ],
+      "downloadProof": [
+        {
+          "name": "Workflow-PDF-Pro-Windows-1.0.13-Setup.exe",
+          "bytes": 26445225,
+          "sha256": "559065bcfa080a4296cf858af01a7384d97c539bdd11e1e51626d282f0361b10",
+          "anonymousDownload": true
+        }
+      ]
+    },
+    {
+      "repo": "Workflow-PDF-Pro",
+      "tag": "v1.0.13",
+      "source": "1ea49db1eb9b23969f051030247a56472e528d3b",
+      "run": 41701010489,
+      "publishedAt": "2026-11-03T19:41:44Z",
+      "url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.13",
+      "publicHashCheck": "Anonymous curl download; local size and SHA256 equal public GitHub asset digests. See release workflow for native install/update/feed checks.",
+      "assets": [
+        {
+          "name": "Workflow-PDF-Pro-1.0.13.apk",
+          "size": 83346114,
+          "digest": "sha256:55068653f29eae321e6cfc64c712e83b6e4530f2c06f15e9dc30c51fdbe96407",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.13/Workflow-PDF-Pro-1.0.13.apk"
+        },
+        {
+          "name": "Workflow-PDF-Pro-1.0.13.apk.installation.json",
+          "size": 416,
+          "digest": "sha256:62e904098df4c86bf9197eb780535944a8c9a16484ff5b02a419ee96ee7cce35",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.13/Workflow-PDF-Pro-1.0.13.apk.installation.json"
+        },
+        {
+          "name": "Workflow-PDF-Pro-1.0.13.apk.json",
+          "size": 381,
+          "digest": "sha256:b1d55b5f2f2d19a32c5cdd95a01037c88b8f30f4ea79826b1011cb1cdaccf1a8",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.13/Workflow-PDF-Pro-1.0.13.apk.json"
+        },
+        {
+          "name": "Workflow-PDF-Pro-1.0.13.apk.sha256",
+          "size": 94,
+          "digest": "sha256:1a7819d8017411b4606934751aef381c914de67290a675d9d7437d5d58e18c8b",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.13/Workflow-PDF-Pro-1.0.13.apk.sha256"
+        }
+      ],
+      "downloadProof": [
+        {
+          "name": "Workflow-PDF-Pro-1.0.13.apk",
+          "bytes": 83346114,
+          "sha256": "55068653f29eae321e6cfc64c712e83b6e4530f2c06f15e9dc30c51fdbe96407",
+          "anonymousDownload": true
+        }
+      ]
+    }
+  ],
+  "publicDownloadsVerified": true,
+  "identitiesPreserved": true,
+  "androidBuild": 14,
+  "checkedMainNativeRun": 41696817320,
+  "checkedMainWindowsRun": 41696817356,
+  "pwaCore": "1.1.9 unchanged; Android task flags have no browser equivalent",
+  "windowsUpdate": "manual installer, unsigned",
+  "ios": "prepared, not published"
+}

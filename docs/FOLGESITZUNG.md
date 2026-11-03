@@ -1,8 +1,6 @@
-# Wiederanlauf einer Sitzung (Codex und Claude Code)
+# Wiederanlauf nach Workflow PDF Pro 1.0.13
 
-Aktuelle Übergabe: [Abschluss 1.0.11](../BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md),
-[Nachfolge](../BRIEF_NACHFOLGE_2026-11-03_NACH-PRO-VERBUND.md).
-Android und Windows 1.0.11 sind veröffentlicht; nicht erneut dieselben Releases auslösen.
+Aktuell: [Appwechsel-Abschluss](../BRIEF_ABSCHLUSS_2026-11-03_APPWECHSEL.md) und [Nachfolge](../BRIEF_NACHFOLGE_2026-11-03_NACH-APPWECHSEL.md). Android und Windows 1.0.13 sind veröffentlicht; dieselben Versionen nicht erneut auslösen.
 
 
 Regeln: [`AGENTS.md`](../AGENTS.md). Stand aller Fassungen: [`PRODUKTSTAND.md`](PRODUKTSTAND.md).

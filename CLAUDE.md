@@ -4,7 +4,17 @@
 
 Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 
-**Aktueller Abschluss des Pro-Verbunds:** Android und Windows **1.0.11 veröffentlicht**,
+**Aktueller Abschluss: Appwechsel 1.0.13 veröffentlicht.** Android 1.0.13/Build 14
+und Windows 1.0.13 sind vom geprüften main 1ea49db veröffentlicht und öffentlich per SHA-256
+nachgeprüft. Aktuell: `BRIEF_ABSCHLUSS_2026-11-03_APPWECHSEL.md`,
+`BRIEF_NACHFOLGE_2026-11-03_NACH-APPWECHSEL.md` und
+`docs/APPWECHSEL-VEROEFFENTLICHUNG-1.0.13.json`. Kern 1.1.9 bleibt bytegleich;
+iOS nur vorbereitet. Diese Fassungen nicht erneut veröffentlichen. Familienakte 2.28.17
+enthält denselben kanonischen Ausgabeadapter mit Herkunftspin 1ea49db und hält beim
+Android-Zurück am Anfang geöffnet. Die ältere vollständige Android-Tresor-Paar-Abnahme
+bleibt separat offen; Familienakte PR #59 bleibt Entwurf.
+
+**Historischer Abschluss des Pro-Verbunds:** Android und Windows **1.0.11 veröffentlicht**,
 Kern **1.1.8** bytegleich. Downloads/Hashes und Prüfgrenzen:
 `BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md`, `docs/PRODUKTSTAND.md`.
 Nachfolge: `BRIEF_NACHFOLGE_2026-11-03_NACH-PRO-VERBUND.md`. Dieselben Versionen nicht erneut
