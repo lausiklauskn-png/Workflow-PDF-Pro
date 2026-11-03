@@ -11,6 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.uiautomator.*;
 import com.getcapacitor.*;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.*;
@@ -64,8 +65,18 @@ public final class NativeAppSwitchTest {
             int previousFamilyTask=-1;boolean everyLaunchReplied=true;
             for(int attempt=0;attempt<2;attempt++){
                 Reply share=new Reply("share",new JSObject().put("ids",new JSONArray().put(id)).put("title","Appwechsel-Probe"));files.share(share);
-                UiObject2 target=device.wait(Until.findObject(By.textContains("Familienakte")),20000);
-                assertNotNull("Real chooser must offer the installed Family APK",target);
+                UiObject2 target=device.wait(Until.findObject(By.textContains("Familienakte")),8000);
+                // Android initially shows only part of its share sheet. Expand
+                // and scroll it as a user would instead of assuming a grid row.
+                for(int scroll=0;target==null&&scroll<3;scroll++){
+                    device.swipe(device.getDisplayWidth()/2,device.getDisplayHeight()*4/5,device.getDisplayWidth()/2,device.getDisplayHeight()/5,25);
+                    target=device.wait(Until.findObject(By.textContains("Familienakte")),5000);
+                }
+                if(target==null){
+                    device.dumpWindowHierarchy(new File(activity.getFilesDir(),"chooser.xml"));
+                    device.takeScreenshot(new File(activity.getFilesDir(),"chooser.png"));
+                }
+                assertNotNull("Real chooser must offer the installed Family APK; native error="+share.error,target);
                 boolean repliedBeforeSelection=share.done.await(4,TimeUnit.SECONDS);everyLaunchReplied &= repliedBeforeSelection;
                 target.click();assertTrue("Recipient must be foreground",device.wait(Until.hasObject(By.pkg(FAMILY)),20000));
                 int recipientTask=familyTask();
