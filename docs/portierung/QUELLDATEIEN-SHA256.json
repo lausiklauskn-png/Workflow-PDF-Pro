@@ -1,5 +1,5 @@
 {
-  "commit": "64dba2df1d6402bd95bcced1351189b8ca1ca163",
+  "commit": "6d9d3d54ea61056402c7acac54343a179f7640ef",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
@@ -578,8 +578,8 @@
     },
     {
       "path": "tests/feldschrift.mjs",
-      "bytes": 23744,
-      "sha256": "83842a4366910332ba509fff34e899263de4be3de108c0c80eaa241625cac75b"
+      "bytes": 24197,
+      "sha256": "fafc8f27d499b1f2afbc3712c344199ee6cb87f92e8bcb9bafed7591cbdfa4b2"
     },
     {
       "path": "tests/gegenprobe_arbeit.mjs",
