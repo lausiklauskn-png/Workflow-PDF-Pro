@@ -22,10 +22,10 @@ Bereits veröffentlichte Versionen nicht erneut auslösen.
 
 ## In Arbeit: Kern 1.1.9 / App 1.0.12 (Klaus 2026-11-03, nicht veröffentlicht)
 
-Kern bytegleich aus Workflow-PDF `74d2cad` (Zweig `ccr-439ebaae-usy0pg`, PR Workflow-PDF #142, noch nicht auf main): Schriftgröße
+Kern bytegleich aus Workflow-PDF main `64dba2d` (PR #142): Schriftgröße
 je Feld, Feld wächst mit, Einrasten, eigene Feldarten, Erkennung ohne Belegtes, ⟳ ohne Verlust (Notstand-Schnappschuss),
 Umlaute im Namen aus dem PDF-Titel. App **1.0.12 / Build 13** (Android, Windows). Keine Adapteränderung. Veröffentlichung nur
-vom main-Stand nach Klaus' Wort; die PWA-Seite (Pages) liefert 1.1.9 erst nach dem Merge von #142.
+vom main-Stand nach Klaus' Wort; die PWA-Seite (Pages) liefert 1.1.9 seit dem Merge von #142.
 
 ## Fertiggestellter Produktbau und offene zusätzliche Paarprobe
 
