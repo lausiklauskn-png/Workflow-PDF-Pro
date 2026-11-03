@@ -1,0 +1,10 @@
+{
+  "zweck": "Nur die ausdrückliche Gegenprobe, nicht zur Veröffentlichung",
+  "probe": "NativeAppSwitchTest mit echtem Android-Chooser und Familienakte2.28.16",
+  "pruefstand": "e7e73c23f5470a5f0d7f957db5c549a7e0dbea04",
+  "alter_adapter": "448c158e7c5d89006f56e4bcc4549b6cd43a7231",
+  "erwartet": "Share launch must release sender before choosing a recipient",
+  "workflow_input": {
+    "counterprobe": true
+  }
+}
