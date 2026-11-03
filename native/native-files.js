@@ -12,7 +12,7 @@
     save: ['Speichern unter …', 'Save as …', 'Сохранить как …', 'حفظ باسم …'],
     fail: ['Dateiaktion fehlgeschlagen. Es wurde kein Erfolg bestätigt.', 'File action failed. Success was not confirmed.', 'Ошибка операции с файлом. Успех не подтверждён.', 'فشلت عملية الملف. لم يتم تأكيد النجاح.'],
     saved: ['Datei gespeichert und geprüft.', 'File saved and verified.', 'Файл сохранён и проверен.', 'تم حفظ الملف والتحقق منه.'],
-    shared: ['Teilen-Fenster geschlossen. Eine Zustellung an andere Apps wird nicht bestätigt.', 'Share window closed. Delivery to another app is not confirmed.', 'Окно отправки закрыто. Доставка в другое приложение не подтверждается.', 'أُغلقت نافذة المشاركة. لا يُؤكَّد التسليم إلى تطبيق آخر.']
+    shared: ['Teilen-Fenster geöffnet. Eine Zustellung an andere Apps wird nicht bestätigt.', 'Share window opened. Delivery to another app is not confirmed.', 'Окно отправки открыто. Доставка в другое приложение не подтверждается.', 'فُتحت نافذة المشاركة. لا يُؤكَّد التسليم إلى تطبيق آخر.']
   };
   const t = key => words[key][Math.max(0, ['de', 'en', 'ru', 'ar'].indexOf(document.documentElement.lang))];
   function notify(text) {

@@ -165,17 +165,20 @@ public final class ProFilesPlugin extends Plugin {
                     intent.setClipData(clips);
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
+                // The recipient owns its task/window. Never attach it as an
+                // activity-for-result inside the standalone PDF editor's task.
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 Intent chooser = Intent.createChooser(intent, call.getString("title", "Workflow PDF Pro"));
+                chooser.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 getActivity().runOnUiThread(() -> {
-                    try { startActivityForResult(call, chooser, "shared"); }
+                    try {
+                        getActivity().startActivity(chooser);
+                        call.resolve(new JSObject().put("opened", true).put("deliveryConfirmed", false));
+                    }
                     catch (Exception error) { call.reject("SHARE_UNAVAILABLE"); }
                 });
             } catch (Exception error) { call.reject("FILE_OPERATION_FAILED"); }
         });
-    }
-    @ActivityCallback private void shared(PluginCall call, ActivityResult result) {
-        // Android's chooser does not reliably report delivery/cancellation. Do not claim delivery.
-        if (call != null) call.resolve(new JSObject().put("opened", true).put("deliveryConfirmed", false));
     }
     /** App-Version für die Anzeige im Fuß und in den Einstellungen (Klaus 2026-10-22). */
     @PluginMethod public void appInfo(PluginCall call) {
