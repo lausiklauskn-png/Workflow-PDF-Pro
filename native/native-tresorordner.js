@@ -48,7 +48,7 @@
   const index=()=>Math.max(0,['de','en','ru','ar'].indexOf(document.documentElement.lang));
   const t=(key,v={})=>String(words[key][index()]).replace(/\{(\w+)\}/g,(_,x)=>String(v[x]??''));
   const language=()=>document.documentElement.lang||'de';
-  const message=error=>{const code=String(error?.code||error?.message||'');return words[code]?t(code):t('failed')+code;};
+  const message=error=>{const code=String(error?.code||error?.message||'');return words[code]?t(code):window.WFPWoLiegtWas?.meldung(code)||t('failed')+code;};
   const AUSZUG=1000;
   let busy=false,last=0,note='';
 
@@ -195,6 +195,7 @@
           const r=await api.tresorEinziehen({location:state.location,language:language(),...(neu?{neuWaehlen:true}:{})});
           if(r?.abgebrochen)return;
           if(r?.eingezogenJetzt){await aktualisieren(true);info.textContent=t('done');note='';}
+          if(r?.ebeneHoeher&&window.WFPWoLiegtWas)info.textContent=(info.textContent?info.textContent+' ':'')+WFPWoLiegtWas.text('ebeneHoeher');
         }catch(error){info.textContent=message(error);}
         const keep=info.textContent;await zeigen();info.textContent=keep;
       };

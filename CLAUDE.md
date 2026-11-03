@@ -4,6 +4,8 @@
 
 Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 
+**Ordnerwahl und Tresor-Schutz (3.11.2026, Zweig, nicht veröffentlicht):** Hauptablageordner oder „Workflow PDF Pro“ öffnen dieselbe Ablage, keine Verschachtelung, Rückfrage vor neuer Ablage, „Speichern unter“ in den Tresor fragt nach, Hilfe „Wo liegt was?“ — `docs/TRESORORDNER.md` letzter Abschnitt.
+
 **Aktueller Abschluss: Appwechsel 1.0.13 veröffentlicht.** Android 1.0.13/Build 14
 und Windows 1.0.13 sind vom geprüften main 1ea49db veröffentlicht und öffentlich per SHA-256
 nachgeprüft. Aktuell: `BRIEF_ABSCHLUSS_2026-11-03_APPWECHSEL.md`,
@@ -24,7 +26,7 @@ Gesamtabnahme behaupten. Die folgenden datierten Abschnitte sind historische St�
 
 **Bausteine Fassung 7 (31.10.2026, nach PB #121):** „Überall suchen“ kennt die drei neuen Fächer; nachgezogen mit `tools/native/bedienung-nachziehen.mjs --quelle ../Privat-Brain-Pro`. Proben `test-pro-bedienung` 64 · `test-ueberall` 16.
 
-**Pro-Umbau 14 A3 (31.10.2026, Klaus' Antworten 1, 2, 5, 6):** Tresor-Paket mit acht Fächern (neu „Private Brain V3“, „Familienakte“, „Eingang-Familienakte“; JUnit 10 grün). **Im Netz antworten** (`native/native-netz.js`, Kasten unter dem Chefcode, ab Werk aus): öffentlich nur Dateiname (verglichen auch nur mit ihm), im eigenen Netz mit Schalter „Mit Ausschnitt“ der Seitentext in Abschnitten aus den gespeicherten Vektoren der Bedeutungssuche (Anfang + Briefende, ≤ 60 je Dokument), eine Zeile je Dokument, Korpus live (Funktion, nach `enableAnswering` gesetzt), Datenbank des Kerns nur lesend ohne Version. Braucht das geladene Sprachmodell (Bibliothek → Suche nach Bedeutung). Probe `test-netz` 16 · Gegenprobe 4/4. Nicht am Gerät, kein Relais; Workflow-PDF (PWA) noch nicht.
+**Pro-Umbau 14 A3 (31.10.2026, Klaus' Antworten 1, 2, 5, 6):** Tresor-Paket mit damals acht Fächern (neu „Private Brain V3“, „Familienakte“, „Eingang-Familienakte“; JUnit 10 grün; seit 1.11.2026 **neun** mit „Eingang-Private-Brain“, siehe `Fach.java`). **Im Netz antworten** (`native/native-netz.js`, Kasten unter dem Chefcode, ab Werk aus): öffentlich nur Dateiname (verglichen auch nur mit ihm), im eigenen Netz mit Schalter „Mit Ausschnitt“ der Seitentext in Abschnitten aus den gespeicherten Vektoren der Bedeutungssuche (Anfang + Briefende, ≤ 60 je Dokument), eine Zeile je Dokument, Korpus live (Funktion, nach `enableAnswering` gesetzt), Datenbank des Kerns nur lesend ohne Version. Braucht das geladene Sprachmodell (Bibliothek → Suche nach Bedeutung). Probe `test-netz` 16 · Gegenprobe 4/4. Nicht am Gerät, kein Relais; Workflow-PDF (PWA) noch nicht.
 
 **Pro-Umbau 14, Sitzung A (31.10.2026):** Chef getrennt — Bedien-Bausteine **Fassung 6** aus Private Brain Pro (`native/pro-chefcode.js` Fassung 2): Chef-PIN (6–12 Ziffern, nur Prüfwert gespeichert), gesperrt nur Zustand; Mitarbeiter treten mit dem Beitritts-Zettel `CHEF1-…` bei und ändern nur mit Chef-PIN. App **1.0.11**/12 (nicht veröffentlicht). Probe `test-ueberall` (Chef richtet ein, gesperrt ohne Code-Feld, entsperren → entfernen). Ausführlich: Private Brain Pro `docs/UEBERALL-SUCHEN.md`. Nicht am Gerät.
 

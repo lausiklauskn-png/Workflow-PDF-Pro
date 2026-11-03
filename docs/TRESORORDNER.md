@@ -169,7 +169,7 @@ Bisher zeigte Workflow PDF Pro es nicht an. Jetzt:
 
 Klaus' Antworten 1 und 2: V3 bekommt ein **eigenes** Fach („Private Brain V3“, App-Kennung `private-brain-v3`), die Familienakte ein eigenes
 („Familienakte“, `familienakte`) und ein Übergabefach („Eingang-Familienakte“, jede App legt ab, die Familienakte liest). `Fach.java` hat damit
-acht Fächer und fünf Apps. Ein Fach entsteht erst beim ersten Ablegen; ein älterer Tresor bleibt ohne Umbau gültig, alte Apps lesen die neuen
+acht Fächer und fünf Apps (seit 1.11.2026 neun: dazu „Eingang-Private-Brain“, siehe unten). Ein Fach entsteht erst beim ersten Ablegen; ein älterer Tresor bleibt ohne Umbau gültig, alte Apps lesen die neuen
 Fächer nur dann nicht, wenn sie sie nicht kennen (ihr `Fach.nachSlug` meldet `TRESOR_FACH_UNBEKANNT`, nichts wird verändert).
 Probe: `TresorOrdnerTest.neueFaecherV3UndFamilienakteOhneUmbauAlterTresore` (V3 schreibt nur ins eigene Fach und in den Eingang, die Familienakte
 liest beides, Private Brain Pro darf nicht in das V3-Fach). Gegenprobe ohne die Fächer: genau diese Probe rot.
@@ -246,3 +246,48 @@ Wiederholung, Konflikt, falsche Prüfsumme, Überschreitung der Größe und Orig
 Drei weitere Gegenproben gefangen (Konfliktprüfung, früher Erfolg, Original-Prüfsumme).
 Dies ist der gemeinsame Baustein, noch kein Nachweis seiner vollständigen Verdrahtung in
 Android, Windows oder den eigenständigen Oberflächen. V3 bleibt eine getrennte Variante.
+
+## Ordnerwahl und keine offenen Dateien im Tresor (Klaus 2026-11-03, „Ja zum Plan“)
+
+Befund von Klaus' SD-Karte: in `Privat Brain Pro Hauptablageordner/Workflow PDF Pro/` (die Ablage = das Fach, verschlüsselte
+`.wpv` und eine verschlüsselte `.wfps`-Sicherung) lagen zusätzlich **offene** Dateien (zwei „Eröffnungsmail …pdf“, zwei
+„….workfloh.json“), zwei weitere `.workfloh.json` direkt im Hauptablageordner — vermutlich über „Speichern unter“ oder Teilen.
+Gelöscht wurde dort nichts.
+
+**1 Ordnerwahl (Android).** Reine Regeln in `OrdnerWahl.java` (JVM-Probe `OrdnerWahlTest`), benutzt von `ProVaultPlugin`:
+- Ablage („Ordner wählen / vorhandenen Tresor öffnen …“): der Hauptablageordner **oder** der Ordner „Workflow PDF Pro“ darin
+  öffnen dieselbe Ablage (das tat `DocumentVault.inspect` schon, wenn der Kopf `workflow-pdf-pro.tresor.json` da ist).
+  **Nie verschachteln:** ein Ordner „Workflow PDF Pro“ wird nur leer genommen (`OrdnerWahl.unterordnerAnlegen`); mit Inhalt, aber
+  ohne Kopf → `VAULT_ORDNER_FACH_OHNE_KOPF`, nichts angelegt. Vorher entstand dort „Workflow PDF Pro/Workflow PDF Pro“.
+- Abgelehnt mit Klartext, nichts angelegt: „Tresorordner/“ (auch umbenannt, erkannt an Passwort-Plätzen + `verzeichnis/`) und
+  Ordner anderer Apps oder Eingang-Fächer.
+- **Rückfrage** vor einer neuen Ablage, wenn kein Tresor zu erkennen ist (kein `tresorordner.json`) oder ein leerer
+  „Workflow PDF Pro“ gewählt wurde: „Wähle den Ordner, in dem tresorordner.json liegt“ · Abbrechen · Anderen Ordner wählen ·
+  Neue Ablage hier anlegen. Ist `tresorordner.json` da und fehlt nur das eigene Fach, legt die App „Workflow PDF Pro“ ohne Frage an.
+- Gemeinsamer Tresor (Einziehen und „Tresorordner verbinden“): App-Ordner oder „Tresorordner/“ gewählt → klare Meldung
+  (`TRESOR_ORDNER_APP_ORDNER`, `TRESOR_ORDNER_VERWALTUNG`), ohne `tresorordner.json` → `TRESOR_NICHT_VORHANDEN` mit „Es wurde kein
+  neuer Tresor angelegt“. **Hochgehen** geht mit Androids Ordnerwahl nicht; nur wenn diese App für die eigene Ablage schon die
+  Freigabe genau der Ebene darüber hält und dort der Tresor liegt, nimmt sie diese und sagt es („Verbunden ist jetzt der Ordner
+  darüber …“). Sonst nie still ein neuer Tresor.
+
+**2 Keine offenen Dateien in den Tresor.** `TresorSchutz.java`: liegt das Ziel aus „Speichern unter“ (`ACTION_CREATE_DOCUMENT`,
+also PDF, `.workfloh.json`, ZIP aus `ProFilesPlugin.save`, und die Ersatzschlüssel-Datei) in einem Ordner, für den die App eine
+dauerhafte Schreibfreigabe hält (nur Ablage und Tresorordner), fragt Android: „Dieser Ordner ist der Tresor – dort liegen nur
+verschlüsselte Dateien … Lieber z. B. Downloads wählen.“ · Abbrechen · Trotzdem speichern. Abbrechen entfernt nur das eben
+angelegte, nachweislich leere (0 Byte) Ziel. **Erkannt** wird über die Dokumentkennungen von Androids Speicher-Anbieter
+(Gerät, SD-Karte: `<Speicher>:<Pfad>`). **Nicht erkannt:** Ziele über andere Anbieter (Downloads-Ansicht, Drive …), „Teilen“ an
+eine Dateien-App, die selbst in den Tresor speichert, und Windows (eigener Weg, Lücke in `docs/PRODUKTSTAND.md`).
+
+**3 Hilfe „Wo liegt was?“** (`native/native-wo-liegt-was.js`, app-eigen; gemeinsame Bausteine unverändert): Knopf im Kasten
+„Tresor & Ablage“ (auch im Sperrzustand) und im Fenster „Zusammenarbeit mit Pro-Apps“. Text aus dem gemeinsamen Plan, darunter
+„Diese App: Ordner „Workflow PDF Pro“ · Eingang: „Eingang-WorkflowPDF““, der Menüweg und „mit echtem Namen speichern“.
+DE und EN; RU/AR zeigen Deutsch.
+
+**4 Original speichern / echte Namen:** gibt es schon im Kern (Bibliothek: 📤 beim Dokument; „📤 Ordner ausgeben“ → „Original,
+unverändert“ → ZIP); die Hilfe verweist darauf. Nichts neu gebaut.
+
+**5 Fächer:** neun (siehe `Fach.java`), die frühere Zeile „acht Fächer“ ist als damaliger Stand gekennzeichnet.
+
+Proben (3.11.2026, Behälter, kein Gerät): JVM `OrdnerWahlTest` 7 grün (+ `TresorEinzugTest` 3) · `test-tresorordner.mjs` 15 grün (5 neue Teilproben + Quelltext-Verdrahtung) · `test-pro-verbund.mjs` 18 grün (1 neu) · Gegenprobe `TRESOR_JARS=… WFP_CHROMIUM=… node tools/native/gegenprobe-ordnerwahl.mjs` **20 gefangen · 0 durchgerutscht**, 2 Kontrollen grün. Android-Klassen nur gegen das Android-14-Framework (Robolectric android-all) mit selbst geschriebenen Capacitor/AndroidX-Hüllen übersetzt, nicht im Emulator und nicht am Tablet.
+
+Das Paket `de.familyprojekt.tresor` ist **unverändert** (Pins bleiben, nichts nachzuziehen).

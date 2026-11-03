@@ -119,13 +119,36 @@ public final class ProFilesPlugin extends Plugin {
     @ActivityCallback private void saved(PluginCall call, ActivityResult result) {
         if (call == null) { worker.execute(() -> saving = null); return; }
         worker.submit(call, () -> {
+            boolean frage = false;
             try {
-                Transfer t = transfer(saving, true);
+                transfer(saving, true);
                 if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null || result.getData().getData() == null) {
                     call.resolve(new JSObject().put("cancelled", true)); return;
                 }
                 Uri uri = result.getData().getData();
                 if (!"content".equals(uri.getScheme())) throw new SecurityException();
+                // Keine offenen Dateien in den Tresor (Klaus 2026-11-03): erst fragen, dann schreiben oder das leere Ziel entfernen.
+                // „saving“ bleibt bis zur Antwort belegt, damit kein zweites Speichern dazwischenkommt.
+                if (TresorSchutz.imTresor(getContext(), uri)) {
+                    frage = true;
+                    String id = saving;
+                    TresorSchutz.warnen(getActivity(), call.getString("language", "de"), trotzdem -> worker.execute(() -> {
+                        try {
+                            if (!trotzdem) { TresorSchutz.leeresZielEntfernen(getContext(), uri); call.resolve(new JSObject().put("cancelled", true).put("imTresor", true)); return; }
+                            schreiben(id, uri); call.resolve(new JSObject().put("saved", true).put("imTresor", true));
+                        } catch (Exception error) { call.reject("FILE_SAVE_FAILED"); }
+                        finally { saving = null; }
+                    }));
+                    return;
+                }
+                schreiben(saving, uri);
+                call.resolve(new JSObject().put("saved", true));
+            } catch (Exception error) { frage = false; call.reject("FILE_SAVE_FAILED"); }
+            finally { if (!frage) saving = null; }
+        });
+    }
+    private void schreiben(String id, Uri uri) throws Exception {
+                Transfer t = transfer(id, true);
                 try (InputStream in = new FileInputStream(t.file); OutputStream out = getContext().getContentResolver().openOutputStream(uri, "wt")) {
                     if (out == null) throw new IOException();
                     byte[] bytes = new byte[CHUNK]; int n;
@@ -133,10 +156,6 @@ public final class ProFilesPlugin extends Plugin {
                     out.flush();
                 }
                 if (!MessageDigest.isEqual(hash(new FileInputStream(t.file)), hash(getContext().getContentResolver().openInputStream(uri)))) throw new IOException();
-                call.resolve(new JSObject().put("saved", true));
-            } catch (Exception error) { call.reject("FILE_SAVE_FAILED"); }
-            finally { saving = null; }
-        });
     }
     @PluginMethod public void share(PluginCall call) {
         worker.submit(call, () -> {

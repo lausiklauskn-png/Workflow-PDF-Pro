@@ -39,7 +39,9 @@
     invalid:['Dieser Eintrag kann nicht übernommen werden.','This entry cannot be imported.','Эту запись нельзя принять.','لا يمكن استلام هذا الإدخال.']
   };
   const lang=()=>document.documentElement.lang||'de',t=key=>words[key][Math.max(0,['de','en','ru','ar'].indexOf(lang()))];
-  const errorText=error=>error?.message==='PRO_LIBRARY_CHANGED'?t('changed'):t('failed')+String(error?.code||error?.message||'PRO_FAILED');
+  const errorText=error=>error?.message==='PRO_LIBRARY_CHANGED'?t('changed'):window.WFPWoLiegtWas?.meldung(error)||t('failed')+String(error?.code||error?.message||'PRO_FAILED');
+  // Verbinden: wurde ein App-Ordner im Tresor gewählt und die Ebene darüber genommen, steht das danach da.
+  const verbinden=async extra=>{const r=await api.tresorVerbinden({language:lang(),...extra});return r?.ebeneHoeher?window.WFPWoLiegtWas?.text('ebeneHoeher'):undefined;};
   function el(tag,text){const node=document.createElement(tag);if(text!==undefined)node.textContent=text;return node;}
   function button(parent,label,handler,id){
     const b=el('button',label);b.type='button';b.className='knopf';if(id)b.dataset.proAction=id;b.onclick=handler;parent.append(b);return b;
@@ -56,7 +58,7 @@
     document.getElementById('nativeProVerbund')?.close();
     const p=panel(t('title'),'nativeProVerbund');explanation(p,'info');
     const body=el('div'),note=el('p');note.setAttribute('role','status');note.dataset.proStatus='';p.append(body,note);
-    const footer=el('div');p.append(footer);button(footer,t('close'),()=>p.close(),'close');
+    const footer=el('div');p.append(footer);window.WFPWoLiegtWas?.knopf(footer);button(footer,t('close'),()=>p.close(),'close');
     let busy=false;
     const act=async work=>{
       if(busy)return;busy=true;note.textContent='';
@@ -70,9 +72,9 @@
       const content=el('div'),z=await T.state(),path=z.pfad||z.ordner||'';
       content.append(el('p',(z.offen?t('connected'):z.gewaehlt?t('locked'):t('none'))+(path?' · '+path:'')));
       const actions=el('div');content.append(actions);
-      if(!z.offen)button(actions,t(z.gewaehlt?'unlock':'connect'),()=>void act(()=>api.tresorVerbinden({language:lang()})),'connect');
+      if(!z.offen)button(actions,t(z.gewaehlt?'unlock':'connect'),()=>void act(()=>verbinden({})),'connect');
       if(z.gewaehlt){
-        button(actions,t('other'),()=>void act(()=>api.tresorVerbinden({language:lang(),neuWaehlen:true})),'choose');
+        button(actions,t('other'),()=>void act(()=>verbinden({neuWaehlen:true})),'choose');
         if(z.offen)button(actions,t('lock'),()=>void act(()=>api.tresorSperren({})),'lock');
         if(z.gemerkt)button(actions,t('forget'),()=>void act(()=>api.tresorSperren({vergessen:true})),'forget');
       }

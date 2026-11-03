@@ -95,6 +95,12 @@ Kleine Korrekturen werden gesammelt und dann zusammen in alle Fassungen gebracht
    (`assets/style.css`, Regel unter 640 px) keine `order`, alle anderen schon.
    Der Fehler aus der Videoaufnahme (russisch, „← Библиотека“ außerhalb) ließ sich in der
    Web-App nicht nachstellen.
+2. Ordnerwahl und Tresor-Schutz (3.11.2026, Zweig `ccr-709c886f-8v07gh`, nicht veröffentlicht): Android hat die
+   Regeln (`OrdnerWahl.java`, `TresorSchutz.java`), die Hilfe „Wo liegt was?“ (`native/native-wo-liegt-was.js`) gilt
+   für Android und Windows. **Lücke Windows:** die eigene Ordnerwahl und „Speichern unter“ laufen dort über
+   `windows/src-tauri` und `windows/java` und kennen die neuen Prüfungen (Verwaltung/fremdes Fach ablehnen,
+   Rückfrage, Warnung beim Speichern in den Tresor) noch nicht. Grund: eigener Weg (Tauri-Dialog, Dateipfade),
+   eigene Sitzung. Beschreibung: `docs/TRESORORDNER.md`, letzter Abschnitt.
 
 ## Entscheidung zu iOS (Klaus, 22.10.2026)
 
