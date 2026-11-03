@@ -1,5 +1,5 @@
 {
-  "commit": "6d9d3d54ea61056402c7acac54343a179f7640ef",
+  "commit": "0ed15e53d9735c32e9b3c7a3b40871c2e4f7b922",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
