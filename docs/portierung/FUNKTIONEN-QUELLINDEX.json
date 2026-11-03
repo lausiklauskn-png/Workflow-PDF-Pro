@@ -667,475 +667,475 @@
   },
   {
     "source": "assets/app.js",
-    "line": 1678,
+    "line": 1680,
     "function": "feldElement",
     "parameters": "f"
   },
   {
     "source": "assets/app.js",
-    "line": 1725,
+    "line": 1727,
     "function": "linkZiel",
     "parameters": "typ, v"
   },
   {
     "source": "assets/app.js",
-    "line": 1740,
+    "line": 1742,
     "function": "linkFeld",
     "parameters": "f, inp, el"
   },
   {
     "source": "assets/app.js",
-    "line": 1762,
+    "line": 1764,
     "function": "nrGleich",
     "parameters": "a, b"
   },
   {
     "source": "assets/app.js",
-    "line": 1763,
+    "line": 1765,
     "function": "dokeMitNummer",
     "parameters": "art, nr"
   },
   {
     "source": "assets/app.js",
-    "line": 1767,
+    "line": 1769,
     "function": "nummerOeffnen",
     "parameters": "art, nr"
   },
   {
     "source": "assets/app.js",
-    "line": 1782,
+    "line": 1784,
     "function": "ziehen",
     "parameters": "e, f, el, art"
   },
   {
     "source": "assets/app.js",
-    "line": 1824,
+    "line": 1826,
     "function": "markiere",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 1829,
+    "line": 1831,
     "function": "feldVorlagen",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 1830,
+    "line": 1832,
     "function": "vorlageVon",
     "parameters": "f"
   },
   {
     "source": "assets/app.js",
-    "line": 1838,
+    "line": 1840,
     "function": "vorlageMerken",
     "parameters": "f"
   },
   {
     "source": "assets/app.js",
-    "line": 1851,
+    "line": 1853,
     "function": "vorlageLoeschen",
     "parameters": "id"
   },
   {
     "source": "assets/app.js",
-    "line": 1858,
+    "line": 1860,
     "function": "feldSetzen",
     "parameters": "seite, e, lage"
   },
   {
     "source": "assets/app.js",
-    "line": 1871,
+    "line": 1873,
     "function": "vorlageSetzen",
     "parameters": "v, seite, e, lage"
   },
   {
     "source": "assets/app.js",
-    "line": 1882,
+    "line": 1884,
     "function": "platzierenStart",
     "parameters": "t"
   },
   {
     "source": "assets/app.js",
-    "line": 1890,
+    "line": 1892,
     "function": "zeichneModus",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 1898,
+    "line": 1900,
     "function": "zeichneBand",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 1910,
+    "line": 1912,
     "function": "zeichneFuss",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 1971,
+    "line": 1973,
     "function": "unterschreiben",
     "parameters": "f"
   },
   {
     "source": "assets/app.js",
-    "line": 2003,
+    "line": 2005,
     "function": "zuschneiden",
     "parameters": "c"
   },
   {
     "source": "assets/app.js",
-    "line": 2013,
+    "line": 2015,
     "function": "feldLoeschen",
     "parameters": "f"
   },
   {
     "source": "assets/app.js",
-    "line": 2018,
+    "line": 2020,
     "function": "erkannterText",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 2028,
+    "line": 2030,
     "function": "seiteDialog",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 2038,
+    "line": 2040,
     "function": "dateienAnhaengen",
     "parameters": "files"
   },
   {
     "source": "assets/app.js",
-    "line": 2046,
+    "line": 2048,
     "function": "seitenAnhaengen",
     "parameters": "teile"
   },
   {
     "source": "assets/app.js",
-    "line": 2073,
+    "line": 2075,
     "function": "seiteZuschneiden",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 2114,
+    "line": 2116,
     "function": "erkennenDialog",
     "parameters": "ids"
   },
   {
     "source": "assets/app.js",
-    "line": 2148,
+    "line": 2150,
     "function": "erkenneViele",
     "parameters": "ids, mitKi"
   },
   {
     "source": "assets/app.js",
-    "line": 2167,
+    "line": 2169,
     "function": "typAusLabel",
     "parameters": "f"
   },
   {
     "source": "assets/app.js",
-    "line": 2181,
+    "line": 2183,
     "function": "inhaltUebernehmen",
     "parameters": "felder, items, ctx, W, H"
   },
   {
     "source": "assets/app.js",
-    "line": 2213,
+    "line": 2215,
     "function": "kiSeitenBild",
     "parameters": "p, vp, c, kand, seite"
   },
   {
     "source": "assets/app.js",
-    "line": 2235,
+    "line": 2237,
     "function": "erkenneDok",
     "parameters": "d, bytes, mitKi, melde, rein"
   },
   {
     "source": "assets/app.js",
-    "line": 2338,
+    "line": 2340,
     "function": "formatText",
     "parameters": "d"
   },
   {
     "source": "assets/app.js",
-    "line": 2345,
+    "line": 2347,
     "function": "ausgabeBytes",
     "parameters": "doc, bytes, m"
   },
   {
     "source": "assets/app.js",
-    "line": 2357,
+    "line": 2359,
     "function": "ordnerAusgabe",
     "parameters": "o"
   },
   {
     "source": "assets/app.js",
-    "line": 2411,
+    "line": 2413,
     "function": "exportDialog",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 2467,
+    "line": 2469,
     "function": "jobLesen",
     "parameters": "id"
   },
   {
     "source": "assets/app.js",
-    "line": 2478,
+    "line": 2480,
     "function": "stammOrdner",
     "parameters": "q"
   },
   {
     "source": "assets/app.js",
-    "line": 2483,
+    "line": 2485,
     "function": "abkoemmling",
     "parameters": "x, o"
   },
   {
     "source": "assets/app.js",
-    "line": 2484,
+    "line": 2486,
     "function": "ergebnisOrdner",
     "parameters": "d, schluessel, zusatz"
   },
   {
     "source": "assets/app.js",
-    "line": 2496,
+    "line": 2498,
     "function": "uebersetzenStart",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 2521,
+    "line": 2523,
     "function": "beispieleLaden",
     "parameters": "nur"
   },
   {
     "source": "assets/app.js",
-    "line": 2541,
+    "line": 2543,
     "function": "ueEinlesen",
     "parameters": "dateien, ordnerName"
   },
   {
     "source": "assets/app.js",
-    "line": 2553,
+    "line": 2555,
     "function": "ueFotoAblegen",
     "parameters": "bytes"
   },
   {
     "source": "assets/app.js",
-    "line": 2571,
+    "line": 2573,
     "function": "chromeTabAdresse",
     "parameters": "l"
   },
   {
     "source": "assets/app.js",
-    "line": 2595,
+    "line": 2597,
     "function": "chromeHinweis",
     "parameters": "url, kopiert"
   },
   {
     "source": "assets/app.js",
-    "line": 2606,
+    "line": 2608,
     "function": "inChromeOeffnen",
     "parameters": "l, vorher"
   },
   {
     "source": "assets/app.js",
-    "line": 2633,
+    "line": 2635,
     "function": "chromeTabKnoepfe",
     "parameters": "el, lage, vorher"
   },
   {
     "source": "assets/app.js",
-    "line": 2648,
+    "line": 2650,
     "function": "zurueckBand",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 2656,
+    "line": 2658,
     "function": "chromeTabRueckweg",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 2678,
+    "line": 2680,
     "function": "originalVon",
     "parameters": "d"
   },
   {
     "source": "assets/app.js",
-    "line": 2693,
+    "line": 2695,
     "function": "dateiGroesse",
     "parameters": "id"
   },
   {
     "source": "assets/app.js",
-    "line": 2695,
+    "line": 2697,
     "function": "teilPlanZeigen",
     "parameters": "dl, g, zu"
   },
   {
     "source": "assets/app.js",
-    "line": 2720,
+    "line": 2722,
     "function": "teileAnlegen",
     "parameters": "d, plan"
   },
   {
     "source": "assets/app.js",
-    "line": 2748,
+    "line": 2750,
     "function": "uebersetzenDialog",
     "parameters": "ids, alleGewaehlt, opt"
   },
   {
     "source": "assets/app.js",
-    "line": 2824,
+    "line": 2826,
     "function": "uebersetzerErzeugen",
     "parameters": "weg, von, nach, mitRueck, knopf, zu, ids"
   },
   {
     "source": "assets/app.js",
-    "line": 2860,
+    "line": 2862,
     "function": "felderUebersetzen",
     "parameters": "felder, uebersetzer, mitLabel"
   },
   {
     "source": "assets/app.js",
-    "line": 2874,
+    "line": 2876,
     "function": "rueckwegMoeglich",
     "parameters": "d"
   },
   {
     "source": "assets/app.js",
-    "line": 2876,
+    "line": 2878,
     "function": "rueckwegDialog",
     "parameters": "id, opt"
   },
   {
     "source": "assets/app.js",
-    "line": 2911,
+    "line": 2913,
     "function": "rueckwegLaufen",
     "parameters": "d, src, von, nach, uebersetzer, weg"
   },
   {
     "source": "assets/app.js",
-    "line": 2947,
+    "line": 2949,
     "function": "messen",
     "parameters": "docs"
   },
   {
     "source": "assets/app.js",
-    "line": 2969,
+    "line": 2971,
     "function": "uebersetzeViele",
     "parameters": "ids, von, nach, hin, zurueck, weg"
   },
   {
     "source": "assets/app.js",
-    "line": 3077,
+    "line": 3079,
     "function": "spracheWaehlen",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3099,
+    "line": 3101,
     "function": "spracheingabe",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3107,
+    "line": 3109,
     "function": "spracheKnopf",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3135,
+    "line": 3137,
     "function": "dauerStand",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3136,
+    "line": 3138,
     "function": "dauerBitten",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3143,
+    "line": 3145,
     "function": "sicherungErinnerung",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3155,
+    "line": 3157,
     "function": "sicherungDialog",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3218,
+    "line": 3220,
     "function": "einstellungen",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3269,
+    "line": 3271,
     "function": "installHinweis",
     "parameters": "fertig"
   },
   {
     "source": "assets/app.js",
-    "line": 3295,
+    "line": 3297,
     "function": "videoFuer",
     "parameters": "lang, hoch, teil"
   },
   {
     "source": "assets/app.js",
-    "line": 3303,
+    "line": 3305,
     "function": "erklaervideo",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3378,
+    "line": 3380,
     "function": "hilfe",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3416,
+    "line": 3418,
     "function": "start",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3534,
+    "line": 3536,
     "function": "geteiltUebernehmen",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3564,
+    "line": 3566,
     "function": "weiterNachNeuladen",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3577,
+    "line": 3579,
     "function": "scanDirektstart",
     "parameters": ""
   },
   {
     "source": "assets/app.js",
-    "line": 3589,
+    "line": 3591,
     "function": "oeffnenMitEmpfangen",
     "parameters": ""
   },
