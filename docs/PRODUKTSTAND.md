@@ -3,21 +3,21 @@
 Aktualisiert am 03.11.2026. Die Gleichstandsregel wurde von Klaus in der Sitzung
 `session_01HPcxRUAQ4njoMSMPSUhGae` festgelegt. Veröffentlichte Versionen wurden gegen GitHub Releases abgeglichen.
 
-## Übersicht nach der Pro-Verbund-Veröffentlichung
+## Aktuelle Übersicht nach der Appwechsel-Korrektur
 
 | Produkt | Plattform | Tatsächlicher Stand | Öffentlich? |
 | --- | --- | --- | --- |
-| Workflow PDF | Browser/PWA | Kern 1.1.8 auf main, PR #141; unverändert im Pro-Bündel | Quelle öffentlich; Auslieferung des Webprojekts separat |
-| Workflow PDF Pro | Android | **1.0.11 / Build 12**, dauerhafte Signatur; sichtbare Erst-/Überinstallation mit Datenerhalt geprüft | [v1.0.11](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.11) |
-| Workflow PDF Pro | Windows | **1.0.11**, wirklicher Installer und öffentlicher Download geprüft; unsigniert, manuelles Update | [windows-v1.0.11](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.11) |
+| Workflow PDF | Browser/PWA | Kern 1.1.9 auf main 0ed15e5; unverändert im Pro-Bündel | Quelle öffentlich; Auslieferung des Webprojekts separat |
+| Workflow PDF Pro | Android | **1.0.13 / Build 14**, dauerhafte Signatur; sichtbare Erst-/Überinstallation mit Datenerhalt geprüft | [v1.0.13](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.13) |
+| Workflow PDF Pro | Windows | **1.0.13**, wirklicher Installer und öffentlicher Download geprüft; unsigniert, manuelles Update | [windows-v1.0.13](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.13) |
 | Workflow PDF Pro | iOS | vorbereitet, nicht veröffentlicht | nein |
 | Private Brain Pro | Android | **1.0.44**, eigener erfolgreicher Release 41508739185 | [v1.0.44](https://github.com/lausiklauskn-png/Privat-Brain-Pro/releases/tag/v1.0.44) |
 | Private Brain Pro | Windows | **1.0.44**, eigener erfolgreicher Release 41508795969 | [windows-v1.0.44](https://github.com/lausiklauskn-png/Privat-Brain-Pro/releases/tag/windows-v1.0.44) |
 | Private Brain Pro | iOS | noch nicht veröffentlicht | nein |
 
 Konkrete Quellen, Läufe, Größen und vollständige Prüfsummen:
-[Abschluss](../BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md),
-[maschinenlesbare Nachweise](PRO-VERBUND-VEROEFFENTLICHUNG-1.0.11.json).
+[Appwechsel-Abschluss](../BRIEF_ABSCHLUSS_2026-11-03_APPWECHSEL.md),
+[maschinenlesbare Nachweise 1.0.13](APPWECHSEL-VEROEFFENTLICHUNG-1.0.13.json).
 Bereits veröffentlichte Versionen nicht erneut auslösen.
 
 ## Zwischenzeitlich veröffentlicht: Kern 1.1.9 / App 1.0.12
@@ -29,7 +29,7 @@ GitHub-Abgleich am 03.11.2026: Android v1.0.12 (Lauf41645443670) und Windows win
 (41644590893) sind von main448c158 veröffentlicht. Dieselben Versionen nicht erneut auslösen.
 Die PWA-Seite (Pages) liefert 1.1.9 seit dem Merge von #142.
 
-## Konkrete Nutzerrückmeldung: Appwechsel 1.0.13 / Build14
+## Veröffentlicht: Appwechsel 1.0.13 / Build 14
 
 Klaus meldet den eigenständigen Android-PDF-Editor: Nach Teilen an Familienakte bleibt
 deren Fenster im Arbeitsbereich des Editors. Die eingebettete Familienakte-PDF-App ist
@@ -38,12 +38,12 @@ Empfänger mit eigenem Task starten, Teilen ohne Aktivitäts-Rückkanal öffnen 
 das Öffnen bestätigen. Kein Beleg für Zustellung. Die gültigen PDF-Bytes und Lesefreigaben bleiben.
 
 Android und Windows werden als1.0.13 gemeinsam geführt; Windows behält sein eigenes
-Teilen und manuelles Update. Der PWA-Kern1.1.9 bleibt bytegleich: Android-Task-Flags
+Teilen und manuelles Update. Der PWA-Kern 1.1.9 bleibt bytegleich: Android-Task-Flags
 haben im Browser keine Entsprechung. iOS ist weiter nur vorbereitet, nicht freigegeben.
-Neue gezielte OS-Probe: wirklicher Android-Chooser, veröffentlichte Familienakte2.28.16,
+Neue gezielte OS-Probe: wirklicher Android-Chooser, veröffentlichte Familienakte 2.28.16,
 kalter/warmer Empfänger, getrennte wiederverwendete Tasks und erhaltener Senderstand.
 Die zusätzliche vollständige Tresor-App-Paar-Abnahme wird dadurch nicht nachgeholt.
-Veröffentlichung erst nach den vorhandenen Freigabeprüfungen des tatsächlichen main-Commits.
+Android und Windows 1.0.13 sind nach den vollständigen Freigaben von main 1ea49db veröffentlicht und öffentlich nachgeprüft. Aktuell: [Appwechsel-Abschluss](../BRIEF_ABSCHLUSS_2026-11-03_APPWECHSEL.md) und [Dateinachweise](APPWECHSEL-VEROEFFENTLICHUNG-1.0.13.json).
 
 ## Fertiggestellter Produktbau und offene zusätzliche Paarprobe
 
