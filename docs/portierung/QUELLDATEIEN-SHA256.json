@@ -1,5 +1,5 @@
 {
-  "commit": "1ef7c6fddbb289893e83d54a5aeb2ada764792cb",
+  "commit": "0ed15e53d9735c32e9b3c7a3b40871c2e4f7b922",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
@@ -18,8 +18,8 @@
     },
     {
       "path": "CLAUDE.md",
-      "bytes": 112529,
-      "sha256": "7bbdeab91b6df5f4ecae601ff66beb325d41e7a0787feb9bd192986e97121e82"
+      "bytes": 119698,
+      "sha256": "af3b6515480cc97827f9a56280fa9e3ccb821b7b71d6737649c8504a5a2b7992"
     },
     {
       "path": "LICENSE",
@@ -43,8 +43,8 @@
     },
     {
       "path": "assets/app.js",
-      "bytes": 283866,
-      "sha256": "1d6e5be1570f1220d66f6fa3d5b3e722777dbc342a3965999960d65cc96f8f7a"
+      "bytes": 301135,
+      "sha256": "09d2e81b80ff7c41a0cef91c353ce6fad5da40b0655fd1a7ab6fb353e66f74bc"
     },
     {
       "path": "assets/bedeutung.js",
@@ -83,18 +83,18 @@
     },
     {
       "path": "assets/erkennung.js",
-      "bytes": 25232,
-      "sha256": "89863116242d3d832487d1f525a2f471a19d8b20ec7da21a51ce0bbe5ae84f0c"
+      "bytes": 27846,
+      "sha256": "d9e794ec71501caee5a6da944a0721b38a5509859ac07a3d0b2cc5aad947d3e7"
     },
     {
       "path": "assets/export.js",
-      "bytes": 12881,
-      "sha256": "7bfa6b7ea32aca38f29556ad7ab086b3dbad5431adec280114174365981c3d8d"
+      "bytes": 13736,
+      "sha256": "cc712d87f4b36ecbf43c86e22b42ecd77c642ffff0116ce24612f0fa8f6dcd5f"
     },
     {
       "path": "assets/html-export.js",
-      "bytes": 5923,
-      "sha256": "b2fe5c3db9a5489ca91cfe8fffb360fe60b6dee2775e120e67296b4c349a5d46"
+      "bytes": 6007,
+      "sha256": "29a00294627ca3f131fe0ae05170cec92e22361b99d0581d32060be6065dd7c1"
     },
     {
       "path": "assets/netz.js",
@@ -158,8 +158,8 @@
     },
     {
       "path": "assets/sprache-texte.js",
-      "bytes": 422646,
-      "sha256": "8ce108be0c69f8eaaf49b6dc26c703057cf38fc70d295ed77578ace1370ed8e6"
+      "bytes": 429060,
+      "sha256": "a41b607cb6c36990cfe07653fe37ea0fdd8686febb620bbdcfe0d44a409a5485"
     },
     {
       "path": "assets/sprache.js",
@@ -178,8 +178,8 @@
     },
     {
       "path": "assets/style.css",
-      "bytes": 51157,
-      "sha256": "13499f5518e9451fb8a65243cb4f22433b325ea07ecb19bb66d1e7d976a23f9c"
+      "bytes": 51553,
+      "sha256": "e996aaad5f950b5187bec6f19322023e8965bef8933bbd3de359acdb094a2707"
     },
     {
       "path": "assets/suche.js",
@@ -389,7 +389,7 @@
     {
       "path": "index.html",
       "bytes": 13243,
-      "sha256": "5c36287d5820a37ec02037cfd197fcd305f919093b246c27c49508eaa7519d98"
+      "sha256": "20664d569d071e7e0273349dfcda037fcf195b2177710ccd178beeaad71c1098"
     },
     {
       "path": "manifest.webmanifest",
@@ -399,12 +399,12 @@
     {
       "path": "package-lock.json",
       "bytes": 2973,
-      "sha256": "895596b7c2cf7bdef6dc7885bfbc1391736aef996c0c9249cf3f9f09d7280e69"
+      "sha256": "1f33437c0bb29b9323250b5ec736539228dd80b9ffd77f5ab8ec2a3a9e7f05e5"
     },
     {
       "path": "package.json",
-      "bytes": 1484,
-      "sha256": "a0456e1158b3e84d37f08a0f3f93a68dbbe15ca842388f70c4e45325af150346"
+      "bytes": 1514,
+      "sha256": "03b604c3956ddb10b4ef9abb533911986949dbd34446b021f189be92959b19db"
     },
     {
       "path": "sbkim/01_storage.js",
@@ -469,7 +469,7 @@
     {
       "path": "sw.js",
       "bytes": 5384,
-      "sha256": "3e427bc4c225bad11d772270a5589b7e4378ccbc3af07b014f720bdfc5bf18e5"
+      "sha256": "c150bd459e99db2372c8846bce906524f9b0b38f46e09de4656bd87b423c9bc1"
     },
     {
       "path": "tests/arbeit.mjs",
@@ -533,8 +533,8 @@
     },
     {
       "path": "tests/e2e.mjs",
-      "bytes": 40489,
-      "sha256": "93662ae129661c742b3bb17acfab27d1966bed0be2b7b8cfe029d181ecb2fc84"
+      "bytes": 41487,
+      "sha256": "da1664e1d11963488d28b14ea3ec7512f0f668cb3d0db7a6e4fa5a2b771d7200"
     },
     {
       "path": "tests/eingang-vorlagen/Vorlage-0D-PDF-versteckter-Text.pdf",
@@ -577,6 +577,11 @@
       "sha256": "cd592f93e5b76a30cbe66b882ed394874efeb15cd4ab52749f85ee2efac4481c"
     },
     {
+      "path": "tests/feldschrift.mjs",
+      "bytes": 24197,
+      "sha256": "fafc8f27d499b1f2afbc3712c344199ee6cb87f92e8bcb9bafed7591cbdfa4b2"
+    },
+    {
       "path": "tests/gegenprobe_arbeit.mjs",
       "bytes": 6777,
       "sha256": "f6c2f3f0329d4c5214d8cc68e065e003f7b13a70cb6fb27f7180a36fba75d892"
@@ -615,6 +620,11 @@
       "path": "tests/gegenprobe_eingang.mjs",
       "bytes": 10309,
       "sha256": "6c01294b876361e4c3050df6f3e542d233a396a1faf28e25b9f7ab6d4436973e"
+    },
+    {
+      "path": "tests/gegenprobe_feldschrift.mjs",
+      "bytes": 8685,
+      "sha256": "c7eeb60daec5514136ef5f886c54d5a8ae2c1ceb4b899a2ae43047c4d86028bd"
     },
     {
       "path": "tests/gegenprobe_import-abschluss.mjs",
@@ -689,7 +699,7 @@
     {
       "path": "tests/gegenprobe_version.mjs",
       "bytes": 4859,
-      "sha256": "54020bc4fa6f61a51f06db16e849277f1213dbe0da5679e6610d9186b6795e00"
+      "sha256": "7d4b4d01ae0eaf08766a1038cf6019fd5cdec96aa061ecaad0f097cc36882917"
     },
     {
       "path": "tests/import-abschluss.mjs",
