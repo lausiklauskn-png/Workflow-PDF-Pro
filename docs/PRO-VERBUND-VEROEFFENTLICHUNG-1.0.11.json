@@ -1,0 +1,106 @@
+{
+  "releases": [
+    {
+      "repo": "Workflow-PDF-Pro",
+      "tag": "windows-v1.0.11",
+      "source": "e2c57b3f514c0c3f118c23f243bf5ee9fe756bb7",
+      "run": 41509257161,
+      "publishedAt": "2026-11-02T19:23:09Z",
+      "url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.11",
+      "publicHashCheck": "Successful release workflow independently fetched and compared published assets",
+      "assets": [
+        {
+          "name": "Workflow-PDF-Pro-Windows-1.0.11-Setup.exe",
+          "size": 26379338,
+          "digest": "sha256:70cc12d732f25b65852e831f0ec707d0118ef9949e678a0eaf8ca49bb9c96c84",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.11/Workflow-PDF-Pro-Windows-1.0.11-Setup.exe"
+        },
+        {
+          "name": "Workflow-PDF-Pro-Windows-1.0.11-Setup.exe.sha256",
+          "size": 107,
+          "digest": "sha256:e8be718ee901f7dd508112bc2b4c42fd87e11027a39ed43336da6b5235e869a2",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.11/Workflow-PDF-Pro-Windows-1.0.11-Setup.exe.sha256"
+        }
+      ]
+    },
+    {
+      "repo": "Workflow-PDF-Pro",
+      "tag": "v1.0.11",
+      "source": "0affaf162a6c58057c643c1d3b9b797a6512725b",
+      "run": 41547904611,
+      "publishedAt": "2026-11-03T00:09:17Z",
+      "url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.11",
+      "publicHashCheck": "Anonymous curl download; local size and SHA256 equal public GitHub asset digests. See release workflow for native install/update/feed checks.",
+      "assets": [
+        {
+          "name": "Workflow-PDF-Pro-1.0.11.apk",
+          "size": 83337922,
+          "digest": "sha256:b659def8d0d10826e8c892feda0a3cd0d75697711be2c71d6299f91765ca387c",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.11/Workflow-PDF-Pro-1.0.11.apk"
+        },
+        {
+          "name": "Workflow-PDF-Pro-1.0.11.apk.installation.json",
+          "size": 416,
+          "digest": "sha256:99a7bad22239a7f4b08dc9c0052910d75a3043283304136e2d12ead25b8e6aed",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.11/Workflow-PDF-Pro-1.0.11.apk.installation.json"
+        },
+        {
+          "name": "Workflow-PDF-Pro-1.0.11.apk.json",
+          "size": 381,
+          "digest": "sha256:b66af1b748dd82efa2142c8dc876bfca3ccce58a93b09b8685ef2ddbc0445a63",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.11/Workflow-PDF-Pro-1.0.11.apk.json"
+        },
+        {
+          "name": "Workflow-PDF-Pro-1.0.11.apk.sha256",
+          "size": 94,
+          "digest": "sha256:21ac03369e8d6642f17a72255bf4c0190f93f8da4818013235d2dd8935119633",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.11/Workflow-PDF-Pro-1.0.11.apk.sha256"
+        }
+      ],
+      "downloadProof": [
+        {
+          "name": "Workflow-PDF-Pro-1.0.11.apk",
+          "bytes": 83337922,
+          "sha256": "b659def8d0d10826e8c892feda0a3cd0d75697711be2c71d6299f91765ca387c",
+          "anonymousDownload": true
+        }
+      ],
+      "publicInstallationProof": {
+        "receipt": {
+          "applicationId": "de.familyprojekt.workflowpdf.pro",
+          "versionName": "1.0.11",
+          "versionCode": 12,
+          "commit": "0affaf162a6c58057c643c1d3b9b797a6512725b",
+          "certificateSha256": "0da805c9ad11ded86227fa4398e9237766f9f2d12bec66d65cb20309cbea3837",
+          "apkSha256": "b659def8d0d10826e8c892feda0a3cd0d75697711be2c71d6299f91765ca387c",
+          "filename": "Workflow-PDF-Pro-1.0.11.apk"
+        },
+        "installation": {
+          "applicationId": "de.familyprojekt.workflowpdf.pro",
+          "apkSha256": "b659def8d0d10826e8c892feda0a3cd0d75697711be2c71d6299f91765ca387c",
+          "commit": "0affaf162a6c58057c643c1d3b9b797a6512725b",
+          "versionCode": 12,
+          "api": 31,
+          "firstInstall": true,
+          "reinstallPreservesData": true,
+          "developmentProbe": false,
+          "probe": "visible WebView UI; folder retained across signed APK reinstall; no debug JS access"
+        },
+        "certificatePinMatched": true,
+        "publicJsonHashesMatched": true
+      }
+    }
+  ],
+  "nativeAcceptanceRun": 41544678113,
+  "nativeAcceptanceSource": "0affaf162a6c58057c643c1d3b9b797a6512725b",
+  "windowsFamilyPair": {
+    "run": 41506243317,
+    "job": 125490024575,
+    "complete": true
+  },
+  "androidFamilyPair": {
+    "run": 41514065036,
+    "job": 125515603016,
+    "complete": false
+  }
+}

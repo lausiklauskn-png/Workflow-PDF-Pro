@@ -1,35 +1,40 @@
 # Produktstand: was es gibt und was veröffentlicht wird
 
-Aktualisiert am 02.11.2026. Die Gleichstandsregel wurde von Klaus in der Sitzung
+Aktualisiert am 03.11.2026. Die Gleichstandsregel wurde von Klaus in der Sitzung
 `session_01HPcxRUAQ4njoMSMPSUhGae` festgelegt. Veröffentlichte Versionen wurden gegen GitHub Releases abgeglichen.
 
-## Übersicht
+## Übersicht nach der Pro-Verbund-Veröffentlichung
 
-| Produkt | Plattform | Stand | Öffentlich? |
-|---|---|---|---|
-| Workflow PDF (Web) | Browser/PWA | **1.1.8 auf main** (PR #141): gewöhnlicher Import mit optionaler nativer Reservierung und Herkunft der tatsächlich ausgegebenen Dateien; Seitenauslieferung getrennt prüfen | Quellstand öffentlich |
-| Workflow PDF Pro | Android (APK) | **1.0.9 veröffentlicht am 29.10.2026**: [v1.0.9](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.9); neuer Bau mit Kern 1.1.8 noch in Prüfung | ja (1.0.9) |
-| Workflow PDF Pro | Windows (Setup.exe, unsigniert) | **1.0.5 veröffentlicht 26.10.2026**: [windows-v1.0.5](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.5), 15.866.577 B, SHA-256 `7e4e9195…`, Lauf 40384462589 (Installer aus Windows-Bau 40383101175) | ja (1.0.5) |
-| Workflow PDF Pro | iOS (iPhone/iPad) | in Vorbereitung durch Codex, Zweig `codex/ios-native-host` | **nein, nur privat** |
-| Private Brain Pro | Android (APK) | **1.0.42 veröffentlicht am 28.10.2026**: [v1.0.42](https://github.com/lausiklauskn-png/Privat-Brain-Pro/releases/tag/v1.0.42); PR #124 mit Pro-Verbund auf main, noch kein neues Release | ja (1.0.42) |
-| Private Brain Pro | Windows | **1.0.41 veröffentlicht am 27.10.2026**: [windows-v1.0.41](https://github.com/lausiklauskn-png/Privat-Brain-Pro/releases/tag/windows-v1.0.41); PR #124 mit Pro-Verbund auf main, noch kein neues Release | ja (1.0.41) |
-| Private Brain Pro | iOS | noch nicht begonnen | später: nur vorbereiten |
+| Produkt | Plattform | Tatsächlicher Stand | Öffentlich? |
+| --- | --- | --- | --- |
+| Workflow PDF | Browser/PWA | Kern 1.1.8 auf main, PR #141; unverändert im Pro-Bündel | Quelle öffentlich; Auslieferung des Webprojekts separat |
+| Workflow PDF Pro | Android | **1.0.11 / Build 12**, dauerhafte Signatur; sichtbare Erst-/Überinstallation mit Datenerhalt geprüft | [v1.0.11](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.11) |
+| Workflow PDF Pro | Windows | **1.0.11**, wirklicher Installer und öffentlicher Download geprüft; unsigniert, manuelles Update | [windows-v1.0.11](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.11) |
+| Workflow PDF Pro | iOS | vorbereitet, nicht veröffentlicht | nein |
+| Private Brain Pro | Android | **1.0.44**, eigener erfolgreicher Release 41508739185 | [v1.0.44](https://github.com/lausiklauskn-png/Privat-Brain-Pro/releases/tag/v1.0.44) |
+| Private Brain Pro | Windows | **1.0.44**, eigener erfolgreicher Release 41508795969 | [windows-v1.0.44](https://github.com/lausiklauskn-png/Privat-Brain-Pro/releases/tag/windows-v1.0.44) |
+| Private Brain Pro | iOS | noch nicht veröffentlicht | nein |
 
-## Laufender Pro-Verbund-Bau (02.11.2026)
+Konkrete Quellen, Läufe, Größen und vollständige Prüfsummen:
+[Abschluss](../BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md),
+[maschinenlesbare Nachweise](PRO-VERBUND-VEROEFFENTLICHUNG-1.0.11.json).
+Bereits veröffentlichte Versionen nicht erneut auslösen.
 
-Der Betriebssystem-Eingang verwendet in Android und Windows denselben dauerhaften
-Import mit Quittungen, Wiederanlauf, Sicherung und Ablagewechsel; siehe
-[PRO-EINGANG.md](PRO-EINGANG.md). Die Plattformprüfungen und der anschließende
-Hin-/Rückweg über den optionalen gemeinsamen Pro-Tresor werden noch abgeschlossen.
-Die native freiwillige Verbindung ist mit PR #53 auf Android und Windows geprüft:
-[Android](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/41435279416),
-[installiertes Windows](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/actions/runs/41435279156).
-Die [gemeinsame Bedienung](PRO-VERBUND-BEDIENUNG.md), dauerhafte Ausgänge und ihre
-gestreamte Sicherung kommen im anschließenden Baustein hinzu. Dessen volle Plattform-
-prüfung steht noch aus. Der bisherige Einzug der eigenen Ablage (D1) bleibt Android-
-spezifisch; die unabhängige Verbindung setzt einen Einzug nicht voraus. iOS bleibt
-vorbereitet; die PWA hat Importhaken und Ausgabeherkunft, aber keine native
-Tresorverbindung. Neue APK-/Windows-Downloads sind noch nicht veröffentlicht.
+## Fertiggestellter Produktbau und offene zusätzliche Paarprobe
+
+PR #53/#54 verbinden den vorhandenen gemeinsamen Tresor auf Android und Windows,
+einschließlich ausgewähltem Eingang, gewöhnlicher Ausgabe, dauerhaften Quittungen,
+gestreamter Sicherung und Quellbezug. Der Betriebssystem-Eingang verwendet denselben
+dauerhaften Kernimport. Reguläre native Abnahme 41544678113 auf dem geprüften
+Freigabeprüfer-Stand ist vollständig bestanden; beide Produktionspakete sind veröffentlicht.
+Das Windows-Paar mit Familienakte ist vollständig geprüft (41506243317 / 125490024575).
+Die zusätzliche Android-Paarprobe mit Familienakte bleibt nach Abbruch der Testmaschine
+offen; keine vollständige Sechs-Paare-Gesamtabnahme behaupten.
+
+Der Einzug der eigenen Ablage (D1) bleibt Android-spezifisch; die freiwillige Verbindung
+unter Windows benötigt diesen Einzug nicht. PWA und iOS besitzen keine gleichwertige
+native Tresorverbindung. Persönliche Geräte, Scanner und SD/USB werden nur aus konkreten
+Rückmeldungen geprüft. Vorhandene Praxisbögen verwenden, keine neue allgemeine Testserie.
 
 ## Gleichstandsregel (Klaus, 22.10.2026, gilt immer)
 

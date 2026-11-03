@@ -1,6 +1,6 @@
 # Workflow PDF Pro auf Android
 
-**[Workflow PDF Pro 1.0.3 als APK herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.3/Workflow-PDF-Pro-1.0.3.apk)**
+**[Workflow PDF Pro 1.0.11 als APK herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.11/Workflow-PDF-Pro-1.0.11.apk)**
 
 Die reguläre APK ist veröffentlicht. Signatur, öffentliche Downloadbytes und
 tatsächliche Produktionsinstallation mit erhaltenen Daten nach erneuter
@@ -9,7 +9,7 @@ Signatur-/Installationsnachweise; der Android-Baustand nennt die genauen Läufe.
 
 ## Update einer vorhandenen Installation
 
-Die APK 1.0.3 direkt über die vorhandene App installieren. Die installierte Version steht
+Die APK 1.0.11 direkt über die vorhandene App installieren. Die installierte Version steht
 unten unter „Impressum & Datenschutz“ und ganz unten in den Einstellungen. **Nicht vorher
 deinstallieren.** App-Kennung und Signieridentität bleiben gleich; die
 Versions-/Buildnummer steigt. Ein neuer Tresor muss dafür nicht angelegt werden.
@@ -72,6 +72,15 @@ an die Bibliothek. Private Empfangskopien sind getrennte Arbeitskopien; über
 **Empfangene Dateien wiederherstellen** in den Einstellungen lassen sie sich
 erneut anbieten oder ausdrücklich löschen. Erneutes Einlesen kann Duplikate
 erzeugen. Das Löschen einer Empfangskopie entfernt keine importierten Dokumente.
+
+## Freiwillige Zusammenarbeit mit Familienakte Pro
+
+Unter „Pro-Apps“ oder „Tresor & Ablage“ denselben vorhandenen gemeinsamen
+Pro-Tresor verbinden. Eine gewählte Datei bereitstellen; in der Ziel-App aufnehmen
+und danach die Zielbestätigung prüfen. Erst dauerhafte Aufnahme bestätigt den
+Empfang. Die eigene Bibliothek bleibt eigenständig nutzbar.
+[Bedienung](PRO-VERBUND-BEDIENUNG.md),
+[aktuelle Downloads und offene zusätzliche Android-Paarprobe](../BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md).
 
 ## Prüfstand
 

@@ -1,5 +1,9 @@
 # Gemeinsamer Pro-Tresor: native Anbindung
 
+Aktueller Veröffentlichungsstand: Android und Windows **1.0.11**.
+[Downloads, erfolgreiche Prüfungen und offene zusätzliche Android-Paarprobe](../BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md).
+
+
 `WorkflowVault.tresorVerbinden` verbindet einen vorhandenen gemeinsamen Tresor,
 ohne die eigene Workflow-Bibliothek einzurichten oder umzuziehen. Android verwendet
 die vorhandene dauerhafte Ordnerfreigabe. Windows verwendet einen nativen

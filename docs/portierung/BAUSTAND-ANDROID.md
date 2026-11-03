@@ -1,5 +1,15 @@
 # Android-Bau: tatsächlich ausgeführter erster Abschnitt
 
+## Aktuell: Android 1.0.11 veröffentlicht
+
+Downloads, vollständige Prüfsummen, Quellstände und erfolgreiche Veröffentlichungen:
+[Abschluss Pro-Verbund](../../BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md).
+Reguläre native Prüfungen sind bestanden. Windows-Paar mit Familienakte vollständig
+geprüft; Android-Paar mit Familienakte weiterhin nicht vollständig geprüft.
+Persönliche Geräte und Datenträger noch nicht behauptet. Die folgenden datierten
+Abschnitte sind historische Bauaufzeichnungen, keine aktuelle Veröffentlichungssperre.
+
+
 20.10.2026. Noch keine vollständige App-Freigabe und kein ausgeliefertes Paket.
 Dieser Stand ergänzt die historischen Ausgangsprüfungen in PRUEFSTAND.md.
 
