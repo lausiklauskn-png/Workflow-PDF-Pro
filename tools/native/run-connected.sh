@@ -9,6 +9,10 @@ bash tools/native/install-family-share-probe.sh || exit 1
 cd android || exit 1
 ./gradlew --no-daemon --max-workers=2 :app:connectedDebugAndroidTest
 native_test_status=$?
+mkdir -p ../work/acceptance/appwechsel
+for file in chooser.xml chooser.png; do
+  timeout 10 adb exec-out run-as de.familyprojekt.workflowpdf.pro.debug cat "files/$file" > "../work/acceptance/appwechsel/$file" || rm -f "../work/acceptance/appwechsel/$file"
+done
 if (( native_test_status != 0 )); then
   native_runtime_log="${RUNNER_TEMP:-/tmp}/workflow-native-runtime-errors.txt"
   adb logcat -d -s AndroidRuntime:E Capacitor/Console:E > "$native_runtime_log" 2>&1 || true

@@ -44,6 +44,16 @@ public final class NativeAppSwitchTest {
         Matcher match=Pattern.compile("ActivityRecord\\{[^\\n}]* "+FAMILY+"/[^\\n}]* t(\\d+)").matcher(dump);
         assertTrue("Family activity missing from real Android tasks",match.find());return Integer.parseInt(match.group(1));
     }
+    private void closeBlockedSdkLauncher()throws Exception{
+        // The API35 SDK may raise this system-launcher dialog after its boot
+        // key injection, before our test starts. Never dismiss an app-under-test
+        // ANR: the exact Pixel Launcher title is an essential boundary here.
+        UiObject2 title=device.findObject(By.res("android:id/alertTitle").text("Pixel Launcher isn't responding"));
+        if(title==null)return;
+        android.util.Log.w("WFP-Appwechsel","Pre-existing SDK Pixel Launcher ANR: close that launcher through its system dialog");
+        UiObject2 close=device.findObject(By.res("android:id/aerr_close"));assertNotNull(close);close.click();
+        assertTrue(device.wait(Until.gone(By.res("android:id/alertTitle").text("Pixel Launcher isn't responding")),10000));
+    }
     @Test public void coldAndWarmFamilyShareUseSeparateReusableTaskAndPreserveSender()throws Exception{
         device.executeShellCommand("am force-stop "+FAMILY);
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
@@ -64,6 +74,7 @@ public final class NativeAppSwitchTest {
             Reply finish=new Reply("finish",new JSObject().put("id",id).put("size",pdf.length));files.finish(finish);finish.await();
             int previousFamilyTask=-1;boolean everyLaunchReplied=true;
             for(int attempt=0;attempt<2;attempt++){
+                closeBlockedSdkLauncher();
                 Reply share=new Reply("share",new JSObject().put("ids",new JSONArray().put(id)).put("title","Appwechsel-Probe"));files.share(share);
                 UiObject2 target=device.wait(Until.findObject(By.textContains("Familienakte")),8000);
                 // Android initially shows only part of its share sheet. Expand
@@ -98,6 +109,7 @@ public final class NativeAppSwitchTest {
         }finally{
             // A failed selection must not leave the system sheet covering later
             // independent product tests and stealing their input focus.
+            closeBlockedSdkLauncher();
             String foreground=device.getCurrentPackageName();
             if("com.android.intentresolver".equals(foreground)||"android".equals(foreground))device.pressBack();
             device.executeShellCommand("am force-stop "+FAMILY);
