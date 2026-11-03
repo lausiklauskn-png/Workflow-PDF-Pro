@@ -4,6 +4,14 @@
 
 Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 
+**Aktueller Abschluss des Pro-Verbunds:** Android und Windows **1.0.11 veröffentlicht**,
+Kern **1.1.8** bytegleich. Downloads/Hashes und Prüfgrenzen:
+`BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md`, `docs/PRODUKTSTAND.md`.
+Nachfolge: `BRIEF_NACHFOLGE_2026-11-03_NACH-PRO-VERBUND.md`. Dieselben Versionen nicht erneut
+veröffentlichen. Windows-Paar mit Familienakte vollständig geprüft; Android-Paar noch
+nicht vollständig geprüft (Familienakte #59 bleibt Entwurf). Keine vollständige
+Gesamtabnahme behaupten. Die folgenden datierten Abschnitte sind historische Stände.
+
 **Bausteine Fassung 7 (31.10.2026, nach PB #121):** „Überall suchen“ kennt die drei neuen Fächer; nachgezogen mit `tools/native/bedienung-nachziehen.mjs --quelle ../Privat-Brain-Pro`. Proben `test-pro-bedienung` 64 · `test-ueberall` 16.
 
 **Pro-Umbau 14 A3 (31.10.2026, Klaus' Antworten 1, 2, 5, 6):** Tresor-Paket mit acht Fächern (neu „Private Brain V3“, „Familienakte“, „Eingang-Familienakte“; JUnit 10 grün). **Im Netz antworten** (`native/native-netz.js`, Kasten unter dem Chefcode, ab Werk aus): öffentlich nur Dateiname (verglichen auch nur mit ihm), im eigenen Netz mit Schalter „Mit Ausschnitt“ der Seitentext in Abschnitten aus den gespeicherten Vektoren der Bedeutungssuche (Anfang + Briefende, ≤ 60 je Dokument), eine Zeile je Dokument, Korpus live (Funktion, nach `enableAnswering` gesetzt), Datenbank des Kerns nur lesend ohne Version. Braucht das geladene Sprachmodell (Bibliothek → Suche nach Bedeutung). Probe `test-netz` 16 · Gegenprobe 4/4. Nicht am Gerät, kein Relais; Workflow-PDF (PWA) noch nicht.
@@ -47,21 +55,21 @@ ist die Quelle für alle Pro-Apps (BookLedgerPro, Private Brain Pro kopieren byt
 `native/native-durable-import.js` verwendet den normalen Kernimport mit einer vorab reservierten Kennung,
 liest PDF und Original zurück und speichert erst dann die Quittung. `pro-transfer-store.js` bindet sie an
 die gewählte Ablage; Sicherung und Ablagewechsel nehmen sie mit. Kein Quittieren allein nach einem
-Datei-Ereignis. Der Kern ist bytegleich aus Workflow-PDF **1.1.7**, PR #140; zum Nachziehen nur
+Datei-Ereignis. Der Kern ist jetzt bytegleich aus Workflow-PDF **1.1.8**, PR #141; zum Nachziehen nur
 `tools/onboarding/nachziehen.py` verwenden. Der native Einstieg lädt genau einen Netz-Antwortadapter.
-Verhalten und Grenzen: [docs/PRO-EINGANG.md](docs/PRO-EINGANG.md). Die gemeinsame Pro-Tresor-Verbindung
-und das neue Release folgen im übergreifenden Auftrag; die bestehende App-Nummer bleibt bis dahin gleich.
+Verhalten und Grenzen: [docs/PRO-EINGANG.md](docs/PRO-EINGANG.md). Die gemeinsame Pro-Tresor-Verbindung und die Veröffentlichungen 1.0.11 sind abgeschlossen;
+die zusätzliche vollständige Android-App-Paar-Abnahme bleibt offen.
 
 Die native Grundlage der freiwilligen Verbindung ist nun auf Android und Windows vorhanden:
 `WorkflowVault.tresorVerbinden`, `tresorUebergabe` und `tresorFach`. Sie richtet keine eigene
 Arbeitsablage ein. Windows bündelt den kanonischen Java-Tresor mit minimaler Laufzeit und nutzt
 eigene Passwortdialoge sowie DPAPI. PR #53 ist nach vollständiger Android- und installierter
-Windows-Abnahme auf main; kein neuer Installer veröffentlicht. [Vertrag und Grenzen](docs/PRO-VERBUND-NATIV.md).
+Windows-Abnahme auf main; Installer 1.0.11 veröffentlicht. [Vertrag und Grenzen](docs/PRO-VERBUND-NATIV.md).
 
 Die anschließende Bedienung verwendet den bytegleichen Kern **1.1.8**, Workflow-PDF PR #141.
 `native-pro-transfers.js` bindet Quittungen, Ausgangsbytes und Herkunft an dieselbe Arbeitsablage;
 `native-pro-verbund.js` bietet die freiwillige Verbindung, ausgewählten Eingang und normalen
 Teilen-Dialog in DE/EN/RU/AR. Gestreamte Sicherung Fassung 3 enthält offene Ausgaben und erhält
 Rückbezüge; alte Formate bleiben lesbar. Der frühere Android-Eingang quittiert jetzt ebenfalls erst
-nach dauerhafter Übernahme und erneuter nativer Hash-Prüfung. Die neue Bedienung wird noch vollständig
-auf den Plattformen geprüft. [Bedienung, Sicherung und Nachweise](docs/PRO-VERBUND-BEDIENUNG.md).
+nach dauerhafter Übernahme und erneuter nativer Hash-Prüfung. Die Bedienung hat die regulären nativen Plattformprüfungen bestanden;
+die zusätzliche Android-Paarprobe mit Familienakte bleibt offen. [Bedienung, Sicherung und Nachweise](docs/PRO-VERBUND-BEDIENUNG.md).

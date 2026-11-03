@@ -1,5 +1,15 @@
 # Windows-Bau (Tauri 2, WebView2): Baustand
 
+## Aktuell: Windows 1.0.11 veröffentlicht
+
+Downloads, vollständige Prüfsummen, Quellstände und erfolgreiche Veröffentlichungen:
+[Abschluss Pro-Verbund](../../BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md).
+Reguläre native Prüfungen sind bestanden. Windows-Paar mit Familienakte vollständig
+geprüft; Android-Paar mit Familienakte weiterhin nicht vollständig geprüft.
+Persönliche Geräte und Datenträger noch nicht behauptet. Die folgenden datierten
+Abschnitte sind historische Bauaufzeichnungen, keine aktuelle Veröffentlichungssperre.
+
+
 Stand 21.10.2026. Auftrag: `BRIEF_NACHFOLGE_2026-10-21_WINDOWS.md`. Klaus hat Tauri gewählt.
 Gebaut und geprüft wird auf GitHub-Windows-Rechnern (`windows-latest`). **Auf Klaus' eigenem
 Windows-PC ist die App nicht gemessen**, bis er es bestätigt.

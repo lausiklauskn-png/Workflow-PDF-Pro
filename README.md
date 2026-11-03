@@ -1,13 +1,21 @@
 # Workflow PDF Pro
 
-**[Android-APK 1.0.5 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.5/Workflow-PDF-Pro-1.0.5.apk)** · [Erstinstallation](docs/ANDROID-START.md)
+**[Android-APK 1.0.11 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.11/Workflow-PDF-Pro-1.0.11.apk)** · [Erstinstallation](docs/ANDROID-START.md)
 
-**[Windows 1.0.5 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.5/Workflow-PDF-Pro-Windows-1.0.5-Setup.exe)** (Windows 10/11, 64 Bit) ·
-[Prüfsumme](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.5/Workflow-PDF-Pro-Windows-1.0.5-Setup.exe.sha256) ·
+**[Windows 1.0.11 herunterladen](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.11/Workflow-PDF-Pro-Windows-1.0.11-Setup.exe)** (Windows 10/11, 64 Bit) ·
+[Prüfsumme](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.11/Workflow-PDF-Pro-Windows-1.0.11-Setup.exe.sha256) ·
 [Windows-Baustand](docs/portierung/BAUSTAND-WINDOWS.md). Doppelt anklicken; keine Administratorrechte nötig.
 Noch unsigniert: Bei „Der Computer wurde durch Windows geschützt“ auf „Weitere Informationen“ und dann
 „Trotzdem ausführen“ klicken. Keine automatischen Updates: eine neue Version von Hand über die alte
 installieren. Auf einem eigenen Windows-PC ist die App noch nicht gemessen.
+
+**Aktuell: 1.0.11, Kern 1.1.8.** Freiwillige Zusammenarbeit mit Familienakte Pro,
+Private Brain Pro und BookLedgerPro über den vorhandenen Pro-Tresor: ausgewählte
+Dateien, dauerhafte Aufnahmebestätigung, Rückbezug, wiederholbare Ausgänge und Sicherung.
+[Veröffentlichungsnachweise und Grenzen](BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md).
+Die zusätzliche Android-App-Paar-Abnahme mit Familienakte ist noch nicht vollständig.
+
+Historische Versionshinweise:
 
 Version 1.0.5 (26.10.2026): Bildbeschreibung an jedem Foto (eigene Worte oder Bildmodell, in der Suche findbar), Webkern 1.1.3;
 enthält 1.0.4 (Direktstart des Scanners aus BookLedgerPro, `?scan=1&von=<App>`, Webkern 1.1.1) und Kern 1.1.2 (Worker löscht nur noch
@@ -22,7 +30,7 @@ Als Update über die vorhandene App installieren; vorher nicht deinstallieren.
 
 Native Android-App mit dem vollständigen
 [Workflow PDF](https://github.com/lausiklauskn-png/Workflow-PDF)-Kern.
-Das Quellrepository und die übernommenen 191 Quelldateien bleiben unverändert.
+Der Kern wird mit geprüftem Herkunftsnachweis bytegleich übernommen.
 
 Android enthält den lokalen PDF-/Formular-Editor, Scanner und OCR, Ausgabe und
 Drucken, Arbeitsstände und Sicherungen, Suche, Spracheingabe und die bestehenden
@@ -39,12 +47,12 @@ geschütztem Hin-/Rücktransport oder freiwillig über bestehende KI-Anbieter mi
 eigenem Schlüssel möglich. Der Chrome-Weg verwendet die gewählte sichtbare
 Laufmeldung mit Abbruch; Reinigung und Bestätigung bleiben erhalten.
 
-Die reguläre APK 1.0.1 ist nach vollständiger Freigabeprüfung, bestehender Signatur
-und erfolgreicher Produktionsinstallation unter [Releases](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.1)
-verfügbar. Aktueller Stand und tatsächliche Nachweise:
+Die reguläre APK **1.0.11** ist nach vollständiger Freigabeprüfung, bestehender Signatur
+und erfolgreicher sichtbarer Erst-/Überinstallation mit erhaltenen Daten unter
+[Releases](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.11) verfügbar. Aktueller Stand und tatsächliche Nachweise:
 [Android-Baustand](docs/portierung/BAUSTAND-ANDROID.md). Die erste physische
 Geräteabnahme ist für Samsung Galaxy Tab S6 und S21 vorgesehen. Windows (Tauri 2)
-ist als 1.0.1 veröffentlicht; iOS folgt.
+ist als **1.0.11** veröffentlicht; iOS bleibt vorbereitet und unveröffentlicht.
 
 [Erstinstallation und Speicherwahl](docs/ANDROID-START.md) ·
 [Entwicklungsfortsetzung](docs/FOLGESITZUNG.md) ·

@@ -1,5 +1,9 @@
 # Freiwillige Zusammenarbeit mit Pro-Apps
 
+Aktueller Veröffentlichungsstand: Android und Windows **1.0.11**.
+[Downloads, erfolgreiche Prüfungen und offene zusätzliche Android-Paarprobe](../BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md).
+
+
 In den Einstellungen führt „Pro-Apps“ zur Verbindung mit einem vorhandenen
 Tresorordner. Derselbe Zugang steht unter „Tresor & Ablage“. Jede App behält ihre
 eigene Arbeitsablage; eine Verbindung übernimmt oder sendet noch keine Datei.

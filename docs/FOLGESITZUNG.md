@@ -1,5 +1,10 @@
 # Wiederanlauf einer Sitzung (Codex und Claude Code)
 
+Aktuelle Übergabe: [Abschluss 1.0.11](../BRIEF_ABSCHLUSS_2026-11-03_PRO-VERBUND.md),
+[Nachfolge](../BRIEF_NACHFOLGE_2026-11-03_NACH-PRO-VERBUND.md).
+Android und Windows 1.0.11 sind veröffentlicht; nicht erneut dieselben Releases auslösen.
+
+
 Regeln: [`AGENTS.md`](../AGENTS.md). Stand aller Fassungen: [`PRODUKTSTAND.md`](PRODUKTSTAND.md).
 Frühere Zwischenstände stehen in den Briefen und in der Git-Historie, nicht mehr hier.
 
