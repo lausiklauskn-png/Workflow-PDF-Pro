@@ -3,6 +3,11 @@ on:
   push:
     branches: [codex/android-appwechsel]
   workflow_dispatch:
+    inputs:
+      counterprobe:
+        description: Bisherigen Teilen-Code aus 1.0.12 als Gegenprobe einsetzen
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -19,6 +24,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+      - name: Nur auf ausdrücklichen Gegenproben-Auftrag den bisherigen Teilen-Code einsetzen
+        if: inputs.counterprobe == true
+        run: |
+          git fetch --depth=1 origin 448c158e7c5d89006f56e4bcc4549b6cd43a7231
+          git show FETCH_HEAD:android/app/src/main/java/de/familyprojekt/workflowpdf/pro/ProFilesPlugin.java > android/app/src/main/java/de/familyprojekt/workflowpdf/pro/ProFilesPlugin.java
       - run: npm ci
       - run: npm run sync:android
       - name: KVM
@@ -40,16 +50,13 @@ jobs:
             python3 tools/native/webview-runtime.py collect work/webview-runtime
             python3 tools/native/webview-runtime.py install work/webview-runtime
             bash tools/native/install-family-share-probe.sh
-            cd android && ./gradlew --no-daemon --max-workers=2 connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=de.familyprojekt.workflowpdf.pro.NativeAppSwitchTest
-      - name: Android-Protokoll sichern
-        if: always()
-        run: adb logcat -d > appwechsel-logcat.txt || true
+            bash tools/native/run-app-switch.sh
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: android-appwechsel-${{ github.sha }}
           path: |
-            appwechsel-logcat.txt
+            work/appwechsel/logcat.txt
             android/app/build/outputs/androidTest-results/
             android/app/build/reports/androidTests/
           if-no-files-found: error
