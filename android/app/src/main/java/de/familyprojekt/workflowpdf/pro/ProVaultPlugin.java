@@ -567,8 +567,8 @@ public final class ProVaultPlugin extends Plugin {
             boolean keep=remember.isChecked();dialog.setCancelable(false);dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
             worker.submit(call,()->{
                 try{
-                    JSONObject state=einrichtenAusfuehren(tree,s,e,name,tresorDa,ablageDa,p,keep);
-                    getActivity().runOnUiThread(()->{clear.run();dialog.dismiss();choosing.set(false);call.resolve(JSObject.fromJSONObject(state));});
+                    JSObject state=JSObject.fromJSONObject(einrichtenAusfuehren(tree,s,e,name,tresorDa,ablageDa,p,keep));
+                    getActivity().runOnUiThread(()->{clear.run();dialog.dismiss();choosing.set(false);call.resolve(state);});
                 }catch(Exception error){
                     String code=code(error);
                     if("TRESOR_PASSWORT".equals(code)||"TRESOR_PASSWORT_FALSCH".equals(code))
