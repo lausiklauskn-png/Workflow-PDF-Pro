@@ -272,15 +272,16 @@ public final class ProVaultPlugin extends Plugin {
         Intent data=result.getData();int lang=sharesLang;
         if(result.getResultCode()!=Activity.RESULT_OK||data==null||data.getData()==null)return;
         Uri uri=data.getData();
-        // Ersatzschlüssel nie offen in den Tresor-Ordner (Plan: „getrennt aufbewahren“): erst warnen.
-        if(TresorSchutz.imTresor(getContext(),uri)){
-            TresorSchutz.warnen(getActivity(),new String[]{"de","en","ru","ar"}[lang],trotzdem->{
-                if(trotzdem)sharesSchreiben(uri,lang);
-                else worker.execute(()->{TresorSchutz.leeresZielEntfernen(getContext(),uri);getActivity().runOnUiThread(()->{if(sharesStatus!=null)sharesStatus.setText(R_WORDS[18][lang]);});});
-            });
-            return;
-        }
-        sharesSchreiben(uri,lang);
+        // Ersatzschlüssel nie offen in den Tresor (Plan: „getrennt aufbewahren“); seit 2026-11-04 gesperrt statt gefragt.
+        // Die Prüfung liest Ordner über SAF, deshalb auf dem Arbeits-Thread.
+        worker.execute(()->{
+            if(TresorSchutz.imTresor(getContext(),uri)){
+                TresorSchutz.leeresZielEntfernen(getContext(),uri);
+                TresorSchutz.gesperrt(getActivity(),new String[]{"de","en","ru","ar"}[lang],()->{if(sharesStatus!=null)sharesStatus.setText(R_WORDS[18][lang]);});
+                return;
+            }
+            sharesSchreiben(uri,lang);
+        });
     }
     private void sharesSchreiben(Uri uri,int lang){
         if(shownShares==null)return;
@@ -462,6 +463,144 @@ public final class ProVaultPlugin extends Plugin {
                 }
             });
         }));dialog.show();first.requestFocus();
+    }
+
+    // ---------- Einrichten in einem Schritt (Klaus 2026-11-04) ----------
+    // „Er soll nur die SD-Karte oder den Hauptspeicher zuweisen … die App soll die Ordner selbst anlegen.“ Der Nutzer wählt nur
+    // den Speicher; Hauptordner (Paket) findet den Tresor am Inhalt oder legt ihn an (Name frei, Vorschlag „Family-Projekt“).
+    // EIN Passwort für Tresor und eigene Ablage „Workflow PDF Pro“ darin. Bis zur Bestätigung im Passwort-Fenster ist nichts
+    // geschrieben; ein falsches Tresor-Passwort darf neu versucht werden.
+    private static final String[][] E_WORDS={
+        {"Tresor einrichten","Set up vault","Настроить сейф","إعداد الخزنة"},
+        {"Tresor öffnen","Open vault","Открыть сейф","فتح الخزنة"},
+        {"Neuer Tresor-Hauptordner","New vault main folder","Новая главная папка сейфа","مجلد الخزنة الرئيسي الجديد"},
+        {"Im gewählten Speicher entsteht ein Ordner für alle Pro-Apps. Name frei wählbar:","A folder for all Pro apps is created in the chosen storage. Choose any name:","В выбранном хранилище будет создана папка для всех Pro-приложений. Имя на выбор:","سيُنشأ في التخزين المختار مجلد لكل تطبيقات Pro. اختر أي اسم:"},
+        {"Dieser Name geht nicht (keine Zeichen wie / \\ : * ? \" < > |, nicht der Name eines Fachs). Bitte anderen Namen.","This name is not allowed (no / \\ : * ? \" < > |, not the name of a compartment). Please choose another.","Это имя недопустимо (без / \\ : * ? \" < > |, не имя отсека). Выберите другое.","هذا الاسم غير مسموح (بدون / \\ : * ? \" < > |، وليس اسم قسم). اختر اسماً آخر."},
+        {"Ein Passwort für den gemeinsamen Tresor und die Ablage von Workflow PDF Pro darin. Es verlässt das Gerät nie. Mindestens 10 Zeichen.","One password for the shared vault and Workflow PDF Pro’s storage inside it. It never leaves the device. At least 10 characters.","Один пароль для общего сейфа и хранилища Workflow PDF Pro в нём. Он не покидает устройство. Не менее 10 символов.","كلمة مرور واحدة للخزنة المشتركة ولتخزين Workflow PDF Pro داخلها. لا تغادر الجهاز. 10 أحرف على الأقل."},
+        {"Das Passwort des Tresors (dasselbe wie in den anderen Pro-Apps). Die Ablage von Workflow PDF Pro darin bekommt dasselbe Passwort.","The vault password (the same as in the other Pro apps). Workflow PDF Pro’s storage inside gets the same password.","Пароль сейфа (тот же, что в других Pro-приложениях). Хранилище Workflow PDF Pro в нём получит тот же пароль.","كلمة مرور الخزنة (نفسها في تطبيقات Pro الأخرى). يحصل تخزين Workflow PDF Pro داخلها على نفس كلمة المرور."},
+        {"Gefunden: ","Found: ","Найдено: ","تم العثور على: "},
+        {"Neu: ","New: ","Новое: ","جديد: "}
+    };
+    @PluginMethod public void tresorEinrichten(PluginCall call){
+        if(worker.closed()){call.reject("NATIVE_ACTIVITY_CLOSED");return;}
+        if(!choosing.compareAndSet(false,true)){call.reject("VAULT_BUSY","VAULT_BUSY");return;}
+        Intent intent=null;String selected=call.getString("volume","");
+        if(Build.VERSION.SDK_INT>=29&&!selected.isEmpty()){
+            StorageManager storage=(StorageManager)getContext().getSystemService(Context.STORAGE_SERVICE);
+            if(storage!=null)for(StorageVolume v:storage.getStorageVolumes())if(selected.equals(v.isPrimary()?"primary":String.valueOf(v.getUuid())))intent=v.createOpenDocumentTreeIntent();
+        }
+        if(intent==null)intent=new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION|Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION|Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        try{startActivityForResult(call,intent,"einrichtenGewaehlt");}
+        catch(Exception error){choosing.set(false);call.reject("VAULT_FOLDER_UNAVAILABLE","VAULT_FOLDER_UNAVAILABLE");}
+    }
+    @ActivityCallback private void einrichtenGewaehlt(PluginCall call,ActivityResult result){
+        if(call==null){choosing.set(false);return;}
+        Intent data=result.getData();
+        if(result.getResultCode()!=Activity.RESULT_OK||data==null||data.getData()==null){choosing.set(false);call.resolve(new JSObject().put("abgebrochen",true));return;}
+        Uri tree=data.getData();int flags=Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+        worker.submit(call,()->{
+            try{
+                if(!"content".equals(tree.getScheme())||(data.getFlags()&flags)!=flags)throw new SecurityException();
+                getContext().getContentResolver().takePersistableUriPermission(tree,flags);
+                locations.ensureIdle();
+                de.familyprojekt.tresor.SafAblage s=new de.familyprojekt.tresor.SafAblage(getContext().getContentResolver(),tree);
+                de.familyprojekt.tresor.Hauptordner.Ergebnis e=de.familyprojekt.tresor.Hauptordner.suchen(s,ordnerName(tree));
+                if(!e.gefunden()&&!e.anlegen())throw new java.io.IOException("TRESOR_ORDNER_"+e.art);
+                if(de.familyprojekt.tresor.Hauptordner.ANLEGEN_DARIN.equals(e.art))getActivity().runOnUiThread(()->einrichtenName(call,tree,s,e,null));
+                else einrichtenPruefen(call,tree,s,e,null);
+            }catch(Exception error){choosing.set(false);String code=code(error);call.reject(code,code);}
+        });
+    }
+    private int sprache(PluginCall call){int i=Arrays.asList("de","en","ru","ar").indexOf(call.getString("language","de"));return i<0?0:i;}
+    /** Name des neuen Hauptordners (Vorschlag „Family-Projekt“), nur wenn im Speicher schon anderes liegt. UI-Thread. */
+    private void einrichtenName(PluginCall call,Uri tree,de.familyprojekt.tresor.SafAblage s,de.familyprojekt.tresor.Hauptordner.Ergebnis e,String fehler){
+        if(worker.closed()||getActivity().isFinishing()||getActivity().isDestroyed()){choosing.set(false);call.reject("NATIVE_ACTIVITY_CLOSED");return;}
+        int lang=sprache(call);
+        LinearLayout box=new LinearLayout(getContext());box.setOrientation(LinearLayout.VERTICAL);int pad=(int)(20*getContext().getResources().getDisplayMetrics().density);box.setPadding(pad,pad,pad,pad);
+        if(lang==3)box.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView help=new TextView(getContext());help.setText(E_WORDS[3][lang]);box.addView(help);
+        EditText feld=new EditText(getContext());feld.setSingleLine(true);feld.setText(de.familyprojekt.tresor.Hauptordner.VORSCHLAG);feld.selectAll();box.addView(feld);
+        TextView status=new TextView(getContext());if(fehler!=null)status.setText(E_WORDS[4][lang]);box.addView(status);
+        AlertDialog dialog=new AlertDialog.Builder(getActivity()).setTitle(E_WORDS[2][lang]).setView(box)
+            .setNegativeButton(WORDS[6][lang],(d,w)->{choosing.set(false);call.resolve(new JSObject().put("abgebrochen",true));})
+            .setPositiveButton(WORDS[7][lang],null).create();
+        dialog.setOnCancelListener(d->{choosing.set(false);call.resolve(new JSObject().put("abgebrochen",true));});
+        dialog.setOnShowListener(d->dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(x->{
+            String n;
+            try{n=de.familyprojekt.tresor.Hauptordner.name(feld.getText().toString());}catch(java.io.IOException falsch){status.setText(E_WORDS[4][lang]);return;}
+            dialog.dismiss();
+            worker.submit(call,()->{try{einrichtenPruefen(call,tree,s,e,n);}catch(Exception error){choosing.set(false);String code=code(error);call.reject(code,code);}});
+        }));
+        dialog.show();feld.requestFocus();
+    }
+    /** Arbeits-Thread: steht schon ein Tresor/eine Ablage da? Dann das eine Passwort-Fenster. */
+    private void einrichtenPruefen(PluginCall call,Uri tree,de.familyprojekt.tresor.SafAblage s,de.familyprojekt.tresor.Hauptordner.Ergebnis e,String name)throws Exception{
+        if(name!=null&&s.gibtEs(name)&&(!s.istOrdner(name)||!s.liste(name).isEmpty()))throw new java.io.IOException("TRESOR_NAME_BELEGT");
+        boolean tresorDa=e.gefunden();
+        String pfad=e.gefunden()?e.pfad:"";
+        boolean ablageDa=tresorDa&&s.gibtEs((pfad.isEmpty()?"":pfad+"/")+TresorEinzug.KOPF_PFAD);
+        String zeige=e.gefunden()?(pfad.isEmpty()?ordnerName(tree):pfad):name!=null?name:ordnerName(tree);
+        getActivity().runOnUiThread(()->einrichtenPasswort(call,tree,s,e,name,tresorDa,ablageDa,zeige));
+    }
+    private void einrichtenPasswort(PluginCall call,Uri tree,de.familyprojekt.tresor.SafAblage s,de.familyprojekt.tresor.Hauptordner.Ergebnis e,String name,boolean tresorDa,boolean ablageDa,String zeige){
+        if(worker.closed()||getActivity().isFinishing()||getActivity().isDestroyed()){choosing.set(false);call.reject("NATIVE_ACTIVITY_CLOSED");return;}
+        int lang=sprache(call);boolean anlegen=!tresorDa;
+        LinearLayout box=new LinearLayout(getContext());box.setOrientation(LinearLayout.VERTICAL);int pad=(int)(20*getContext().getResources().getDisplayMetrics().density);box.setPadding(pad,pad,pad,pad);
+        if(lang==3)box.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView ort=new TextView(getContext());ort.setText(E_WORDS[tresorDa?7:8][lang]+zeige);box.addView(ort);
+        TextView help=new TextView(getContext());help.setText(E_WORDS[anlegen?5:6][lang]);box.addView(help);
+        EditText first=new EditText(getContext()),second=new EditText(getContext());
+        for(EditText field:new EditText[]{first,second}){field.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);if(Build.VERSION.SDK_INT>=26)field.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);}
+        first.setHint(WORDS[2][lang]);second.setHint(WORDS[3][lang]);box.addView(first);if(anlegen)box.addView(second);
+        CheckBox notice=new CheckBox(getContext());notice.setText(T_WORDS[4][lang]);if(anlegen)box.addView(notice);
+        CheckBox remember=new CheckBox(getContext());remember.setText(WORDS[5][lang]);remember.setChecked(true);box.addView(remember);
+        TextView status=new TextView(getContext());box.addView(status);ScrollView scroll=new ScrollView(getContext());scroll.addView(box);
+        Runnable clear=()->{first.getText().clear();second.getText().clear();};
+        AlertDialog dialog=new AlertDialog.Builder(getActivity()).setTitle(E_WORDS[anlegen?0:1][lang]).setView(scroll)
+            .setNegativeButton(WORDS[6][lang],(d,w)->{clear.run();choosing.set(false);call.resolve(new JSObject().put("abgebrochen",true));})
+            .setPositiveButton(WORDS[7][lang],null).create();
+        dialog.setOnCancelListener(d->{clear.run();choosing.set(false);call.resolve(new JSObject().put("abgebrochen",true));});
+        dialog.setOnShowListener(d->dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(x->{
+            String p=java.text.Normalizer.normalize(first.getText(),java.text.Normalizer.Form.NFC);
+            if(p.codePointCount(0,p.length())<10||anlegen&&(!p.equals(java.text.Normalizer.normalize(second.getText(),java.text.Normalizer.Form.NFC))||!notice.isChecked())){status.setText(WORDS[8][lang]);return;}
+            boolean keep=remember.isChecked();dialog.setCancelable(false);dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
+            worker.submit(call,()->{
+                try{
+                    JSObject state=JSObject.fromJSONObject(einrichtenAusfuehren(tree,s,e,name,tresorDa,ablageDa,p,keep));
+                    getActivity().runOnUiThread(()->{clear.run();dialog.dismiss();choosing.set(false);call.resolve(state);});
+                }catch(Exception error){
+                    String code=code(error);
+                    if("TRESOR_PASSWORT".equals(code)||"TRESOR_PASSWORT_FALSCH".equals(code))
+                        getActivity().runOnUiThread(()->{clear.run();status.setText(T_WORDS[5][lang]);dialog.setCancelable(true);dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);});
+                    else getActivity().runOnUiThread(()->{clear.run();dialog.dismiss();choosing.set(false);call.reject(code,code);});
+                }
+            });
+        }));dialog.show();first.requestFocus();
+    }
+    /** Arbeits-Thread: Hauptordner anlegen, Tresor prüfen/anlegen, eigene Ablage öffnen/anlegen, einziehen, Lies-mich. */
+    private JSONObject einrichtenAusfuehren(Uri tree,de.familyprojekt.tresor.SafAblage s,de.familyprojekt.tresor.Hauptordner.Ergebnis e,String name,boolean tresorDa,boolean ablageDa,String p,boolean keep)throws Exception{
+        String pfad=e.gefunden()?e.pfad:de.familyprojekt.tresor.Hauptordner.ANLEGEN_DARIN.equals(e.art)?name:"";
+        // Erst prüfen, dann schreiben: ein falsches Tresor-Passwort verändert nichts.
+        if(tresorDa){
+            String w=s.kennung(pfad);if(w==null)throw new java.io.IOException("TRESOR_ORDNER_NICHT_ERREICHBAR");
+            de.familyprojekt.tresor.TresorOrdner.oeffnen(new de.familyprojekt.tresor.SafAblage(getContext().getContentResolver(),tree,w),TresorEinzug.APP,p).close();
+        }
+        de.familyprojekt.tresor.Hauptordner.ablage(s,e,name); // legt bei ANLEGEN_DARIN den Ordner an, sonst nichts
+        String wurzel=s.kennung(pfad);if(wurzel==null)throw new java.io.IOException("TRESOR_ORDNER_NICHT_ERREICHBAR");
+        DocumentVault candidate=locations.candidate();DocumentVault.Place place=candidate.inspectIn(tree,wurzel);
+        try{
+            if(ablageDa)candidate.open(place,p,keep);else candidate.initialize(place,p,keep);
+        }catch(java.io.IOException falsch){
+            // Ablage mit anderem Passwort (älterer Stand): nicht raten; Tresor bleibt unverändert.
+            if("VAULT_PASSWORD".equals(falsch.getMessage()))throw new java.io.IOException("TRESOR_ABLAGE_PASSWORT_ANDERS");
+            throw falsch;
+        }
+        String location=locations.adopt(candidate);
+        tresor.baumSetzen(tree,wurzel);
+        tresor.mitPasswort(p,!tresorDa,keep,candidate,false);
+        try{de.familyprojekt.tresor.Hauptordner.liesMichAnlegen(new de.familyprojekt.tresor.SafAblage(getContext().getContentResolver(),tree,wurzel));}catch(Exception ohne){/* Lies-mich ist ein Zusatz */}
+        return tresor.zustand(candidate).put("location",location).put("state",locations.state(location)).put("angelegt",!tresorDa).put("ablageAngelegt",!ablageDa).put("hauptordner",pfad);
     }
     @Override protected void handleOnDestroy(){worker.close(()->{tresor.schliessen();locations.close();});}
 }

@@ -114,4 +114,12 @@ public final class OrdnerWahlTest {
         assertFalse(OrdnerWahl.liegtIn("com.example.cloud", HAUPT, "com.example.cloud", HAUPT + "/a.pdf"));   // fremde Kennungen: keine Aussage
         assertFalse(OrdnerWahl.liegtIn(EXT, null, EXT, HAUPT));
     }
+
+    @Test public void oberordnerBisZurFreigabe() {
+        assertEquals(java.util.Arrays.asList("1234-AB:Family-Projekt/Familienakte", "1234-AB:Family-Projekt", "1234-AB:"),
+            OrdnerWahl.oberordner("1234-AB:", "1234-AB:Family-Projekt/Familienakte/x.pdf"));
+        assertEquals(java.util.Arrays.asList("primary:Download"), OrdnerWahl.oberordner("primary:Download", "primary:Download/x.pdf"));
+        assertTrue(OrdnerWahl.oberordner("primary:Download", "primary:Documents/x.pdf").isEmpty());
+        assertTrue(OrdnerWahl.oberordner("primary:Dow", "primary:Download/x.pdf").isEmpty());
+    }
 }

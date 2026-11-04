@@ -291,3 +291,44 @@ unverändert“ → ZIP); die Hilfe verweist darauf. Nichts neu gebaut.
 Proben (3.11.2026, Behälter, kein Gerät): JVM `OrdnerWahlTest` 7 grün (+ `TresorEinzugTest` 3) · `test-tresorordner.mjs` 15 grün (5 neue Teilproben + Quelltext-Verdrahtung) · `test-pro-verbund.mjs` 18 grün (1 neu) · Gegenprobe `TRESOR_JARS=… WFP_CHROMIUM=… node tools/native/gegenprobe-ordnerwahl.mjs` **20 gefangen · 0 durchgerutscht**, 2 Kontrollen grün. Android-Klassen nur gegen das Android-14-Framework (Robolectric android-all) mit selbst geschriebenen Capacitor/AndroidX-Hüllen übersetzt, nicht im Emulator und nicht am Tablet.
 
 Das Paket `de.familyprojekt.tresor` ist **unverändert** (Pins bleiben, nichts nachzuziehen).
+
+## Nur den Speicher wählen – den Hauptordner findet oder legt die App an (Klaus 2026-11-04)
+
+Klaus: „Er soll nur die SD-Karte oder den Hauptspeicher zuweisen … die Apps sollen die Ordner selbst anlegen, benennen und den
+Pfad suchen. Es soll nie wieder passieren, dass ich eine Datei in einen falschen Ordner ablege.“ · „Kann jeder den Namen selber
+wählen? … Familienprojekt oder Family-Projekt.“
+
+**Schritt 1 (dieser Stand): die gemeinsame Regel im Paket** `de.familyprojekt.tresor` (byte-gleich in alle Pro-Apps):
+- `Hauptordner.suchen(gewählter Ordner, Name)`: Tresor erkannt am **Inhalt** (`tresorordner.json`), nie am Namen —
+  `GEFUNDEN` (der Ordner selbst oder genau ein Ordner darin, auch ein alter wie „Privat Brain Pro Hauptablageordner“) ·
+  `ANLEGEN_HIER` (leerer Ordner) · `ANLEGEN_DARIN` (Speicher mit Inhalt: neuer Hauptordner darin) · `UNTERORDNER` (Fach,
+  Eingang oder Verwaltung gewählt, auch umbenannt am Inhalt erkannt: nichts tun) · `MEHRERE` (nie raten).
+- `Hauptordner.name(…)`: Name frei wählbar, Vorschlag **„Family-Projekt“**; abgelehnt: verbotene Zeichen (Windows/FAT),
+  „.“/„..“, > 80 Zeichen, Namen von Fächern und Verwaltung.
+- `Hauptordner.ablage(…)` + `UnterAblage`: die App arbeitet im Hauptordner, auch wenn nur der Speicher freigegeben ist;
+  nie in einen vorhandenen Ordner mit Inhalt hinein (`TRESOR_NAME_BELEGT`).
+- Proben: JVM `HauptordnerTest` 9 grün, `TresorOrdnerTest` 15 grün (javac + JUnit 4.13.2 im Behälter); Gegenprobe von Hand
+  6 eingebaute Fehler → je rot.
+
+**Schritt 2 (verdrahtet in Workflow PDF Pro, Android):** Einstellungen › „Tresor & Ablage“ › **„Tresor einrichten – nur Speicher
+wählen …“** (`WorkflowVault.tresorEinrichten`, `ProVaultPlugin`):
+1. Speicher wählen (SD-Karte, Gerätespeicher oder einen Ordner darauf). `Hauptordner.suchen` sagt, was dort ist; ein Fach, ein Eingang,
+   die Verwaltung oder mehrere Tresore werden abgewiesen (`TRESOR_ORDNER_UNTERORDNER` / `…_MEHRERE`), **bevor** etwas angelegt wird.
+2. Liegt im Speicher schon anderes: Name des neuen Hauptordners (Vorschlag „Family-Projekt“, frei wählbar, geprüft mit `Hauptordner.name`).
+3. **Ein** Passwort-Fenster für Tresor **und** eigene Ablage „Workflow PDF Pro“ darin. Vorhandener Tresor: erst das Passwort prüfen
+   (falsch → neu versuchen, nichts geschrieben), dann den Hauptordner anlegen, die Ablage öffnen oder anlegen, einziehen. Hat eine alte
+   Ablage ein anderes Passwort: `TRESOR_ABLAGE_PASSWORT_ANDERS`, nichts verändert (alter Weg „Ordner wählen …“ bleibt).
+4. **Lies-mich** `LIES-MICH.txt` im Hauptordner (`Hauptordner.liesMichAnlegen`, nur wenn sie fehlt; eine bearbeitete bleibt).
+- Die Freigabe bleibt der gewählte Speicher; gearbeitet wird im Hauptordner darunter (`SafAblage` mit Wurzelkennung,
+  `DocumentVault.inspectIn`, `ProTresorordner.baumSetzen(baum, wurzel)`). Android gibt für einen Unterordner keine eigene Baum-Freigabe her.
+- **„Speichern unter“ in den Tresor ist gesperrt, nicht mehr gefragt** (auch die Ersatzschlüssel-Datei): leeres Ziel wird entfernt,
+  ein Hinweis erscheint, nichts wird geschrieben. Erkannt am **Inhalt** der Ordner über dem Ziel (`tresorordner.json` oder
+  `….tresor.json`, `OrdnerWahl.oberordner`, `TresorSchutz.geschuetzt`) – der Rest der SD-Karte bleibt frei, auch wenn der ganze Speicher
+  freigegeben ist. Nur Androids Speicher-Anbieter (Gerät, SD); andere Anbieter werden nicht erkannt (benannte Grenze).
+- Windows: noch nicht (Knopf erscheint nur, wo die Brücke `tresorEinrichten` hat).
+- Proben (Behälter, kein Gerät, kein Android-SDK): JVM `HauptordnerTest` 10, `TresorOrdnerTest` 15, `OrdnerWahlTest` 8 grün ·
+  `test-tresorordner.mjs` 15 grün (Quelltext: Reihenfolge prüfen → anlegen → Ablage → Einzug → Lies-mich; Sperre) · Gegenprobe
+  `gegenprobe-ordnerwahl.mjs` 4 neue Fälle gefangen. Die Android-Klassen übersetzt erst die CI; am Gerät nicht geprüft.
+
+Paket geändert (`Hauptordner`, `SafAblage.kennung`): Pins neu (`node tools/tresor/pins.mjs --schreiben`), nach Familienakte,
+BookLedgerPro und Private Brain Pro nachziehen.

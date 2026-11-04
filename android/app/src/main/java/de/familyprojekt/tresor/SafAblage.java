@@ -76,6 +76,9 @@ public final class SafAblage implements Ablage {
         return aktuell;
     }
 
+    /** Dokumentkennung eines Ordners oder einer Datei unter der Wurzel (null, wenn es ihn nicht gibt); "" = die Wurzel. */
+    public String kennung(String pfad) throws IOException { return finden(pfad == null ? "" : pfad); }
+
     private String eltern(String pfad) { int i = pfad.lastIndexOf('/'); return i < 0 ? "" : pfad.substring(0, i); }
     private String name(String pfad) { return pfad.substring(pfad.lastIndexOf('/') + 1); }
 

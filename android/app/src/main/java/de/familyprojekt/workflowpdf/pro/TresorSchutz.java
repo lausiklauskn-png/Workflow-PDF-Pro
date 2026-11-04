@@ -7,13 +7,12 @@ import android.net.Uri;
 import android.provider.DocumentsContract;
 import androidx.appcompat.app.AlertDialog;
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 /**
  * Keine offenen Dateien in den Tresor (Klaus 2026-11-03, Plan Punkt 5). Befund SD-Karte: offene PDFs und
  * „….workfloh.json“ lagen im Fach „Workflow PDF Pro“ und direkt im Hauptablageordner.
  *
- * Erkannt wird ein Ziel aus Androids „Speichern unter“, das innerhalb eines Ordners liegt, für den diese App eine
+ * Seit 2026-11-04 gesperrt statt gefragt. Erkannt wird ein Ziel aus Androids „Speichern unter“, das innerhalb eines Ordners liegt, für den diese App eine
  * dauerhafte Schreibfreigabe hält. Solche Freigaben nimmt die App nur für die eigene Ablage und den gemeinsamen
  * Tresorordner (ProVaultPlugin). Vergleich über {@link OrdnerWahl#liegtIn}: nur Androids Speicher-Anbieter
  * (Gerät, SD-Karte) — ein Ziel über einen anderen Anbieter (Downloads-Ansicht, Drive …) wird nicht erkannt.
@@ -30,34 +29,45 @@ final class TresorSchutz {
             Uri baum = p.getUri();
             try {
                 if (!DocumentsContract.isTreeUri(baum)) continue;
-                if (OrdnerWahl.liegtIn(baum.getAuthority(), DocumentsContract.getTreeDocumentId(baum), ziel.getAuthority(), dok)) return true;
+                String wurzel = DocumentsContract.getTreeDocumentId(baum);
+                if (!OrdnerWahl.liegtIn(baum.getAuthority(), wurzel, ziel.getAuthority(), dok)) continue;
+                // Seit 2026-11-04 darf die Freigabe der ganze Speicher sein (nur Speicher wählen, Klaus). Gesperrt ist
+                // deshalb nicht alles darin, sondern nur, was in einem Tresor-Hauptordner oder einer App-Ablage liegt –
+                // erkannt am Inhalt der Ordner über dem Ziel (tresorordner.json bzw. ….tresor.json), auch bei anderen Apps.
+                for (String ordner : OrdnerWahl.oberordner(wurzel, dok))
+                    if (geschuetzt(new de.familyprojekt.tresor.SafAblage(context.getContentResolver(), baum, ordner))) return true;
             } catch (Exception weiter) { /* nächste Freigabe */ }
         }
         return false;
     }
 
+    /** Liegt hier ein Tresor-Hauptordner oder eine App-Ablage einer Pro-App? */
+    static boolean geschuetzt(de.familyprojekt.tresor.Ablage a) throws java.io.IOException {
+        if (de.familyprojekt.tresor.TresorOrdner.vorhanden(a)) return true;
+        for (String n : a.liste("")) if (n.endsWith(".tresor.json")) return true;
+        return false;
+    }
+
     private static final String[][] W = {
-        {"Das ist der Tresor", "This is the vault", "Это сейф", "هذه هي الخزنة"},
-        {"Dieser Ordner ist der Tresor – dort liegen nur verschlüsselte Dateien. Eine offene Datei wäre dort für jeden lesbar, der die SD-Karte hat. Lieber z. B. „Downloads“ wählen.",
-         "This folder is the vault – only encrypted files belong there. An open file there could be read by anyone who has the SD card. Better choose e.g. “Downloads”.",
-         "Эта папка – сейф, там только зашифрованные файлы. Открытый файл там сможет прочитать любой, у кого есть SD-карта. Лучше выберите, например, «Загрузки».",
-         "هذا المجلد هو الخزنة – لا يوجد فيه إلا ملفات مشفّرة. يمكن لأي شخص لديه بطاقة SD قراءة ملف مفتوح هناك. الأفضل اختيار «التنزيلات» مثلاً."},
-        {"Abbrechen", "Cancel", "Отмена", "إلغاء"},
-        {"Trotzdem speichern", "Save anyway", "Всё равно сохранить", "الحفظ على أي حال"}
+        {"Nicht im Tresor speichern", "Not inside the vault", "Не в сейфе", "ليس داخل الخزنة"},
+        {"Dieser Ordner gehört zum Tresor der Pro-Apps – dort liegen nur verschlüsselte Dateien, die die Apps selbst verwalten. Eine offene Datei wäre dort für jeden lesbar, der die SD-Karte hat. Bitte einen anderen Ordner wählen, z. B. „Downloads“.",
+         "This folder belongs to the Pro apps’ vault – only encrypted files managed by the apps belong there. An open file there could be read by anyone who has the SD card. Please choose another folder, e.g. “Downloads”.",
+         "Эта папка относится к сейфу Pro-приложений – там только зашифрованные файлы, которыми управляют приложения. Открытый файл там сможет прочитать любой, у кого есть SD-карта. Выберите другую папку, например «Загрузки».",
+         "هذا المجلد جزء من خزنة تطبيقات Pro – لا يوجد فيه إلا ملفات مشفّرة تديرها التطبيقات. يمكن لأي شخص لديه بطاقة SD قراءة ملف مفتوح هناك. يرجى اختيار مجلد آخر، مثل «التنزيلات»."},
+        {"Verstanden", "OK", "Понятно", "حسناً"}
     };
 
-    /** Warnen; {@code weiter} bekommt true für „Trotzdem speichern“, false für Abbrechen. Läuft auf dem UI-Thread. */
-    static void warnen(Activity activity, String language, Consumer<Boolean> weiter) {
+    /** Speichern in den Tresor ist gesperrt (Klaus 2026-11-04: „sperren statt fragen“). Nur ein Hinweis, kein „Trotzdem“. UI-Thread. */
+    static void gesperrt(Activity activity, String language, Runnable danach) {
         int i = Arrays.asList("de", "en", "ru", "ar").indexOf(language == null ? "de" : language);
         int l = i < 0 ? 0 : i;
         activity.runOnUiThread(() -> {
-            if (activity.isFinishing() || activity.isDestroyed()) { weiter.accept(false); return; }
+            if (activity.isFinishing() || activity.isDestroyed()) { danach.run(); return; }
             boolean[] einmal = { false };
-            Consumer<Boolean> fertig = wahl -> { if (!einmal[0]) { einmal[0] = true; weiter.accept(wahl); } };
+            Runnable fertig = () -> { if (!einmal[0]) { einmal[0] = true; danach.run(); } };
             AlertDialog d = new AlertDialog.Builder(activity).setTitle(W[0][l]).setMessage(W[1][l])
-                .setNegativeButton(W[2][l], (x, y) -> fertig.accept(false))
-                .setPositiveButton(W[3][l], (x, y) -> fertig.accept(true)).create();
-            d.setOnCancelListener(x -> fertig.accept(false));
+                .setPositiveButton(W[2][l], (x, y) -> fertig.run()).create();
+            d.setOnDismissListener(x -> fertig.run());
             d.show();
         });
     }
