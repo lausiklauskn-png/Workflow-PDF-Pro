@@ -291,3 +291,26 @@ unverändert“ → ZIP); die Hilfe verweist darauf. Nichts neu gebaut.
 Proben (3.11.2026, Behälter, kein Gerät): JVM `OrdnerWahlTest` 7 grün (+ `TresorEinzugTest` 3) · `test-tresorordner.mjs` 15 grün (5 neue Teilproben + Quelltext-Verdrahtung) · `test-pro-verbund.mjs` 18 grün (1 neu) · Gegenprobe `TRESOR_JARS=… WFP_CHROMIUM=… node tools/native/gegenprobe-ordnerwahl.mjs` **20 gefangen · 0 durchgerutscht**, 2 Kontrollen grün. Android-Klassen nur gegen das Android-14-Framework (Robolectric android-all) mit selbst geschriebenen Capacitor/AndroidX-Hüllen übersetzt, nicht im Emulator und nicht am Tablet.
 
 Das Paket `de.familyprojekt.tresor` ist **unverändert** (Pins bleiben, nichts nachzuziehen).
+
+## Nur den Speicher wählen – den Hauptordner findet oder legt die App an (Klaus 2026-11-04)
+
+Klaus: „Er soll nur die SD-Karte oder den Hauptspeicher zuweisen … die Apps sollen die Ordner selbst anlegen, benennen und den
+Pfad suchen. Es soll nie wieder passieren, dass ich eine Datei in einen falschen Ordner ablege.“ · „Kann jeder den Namen selber
+wählen? … Familienprojekt oder Family-Projekt.“
+
+**Schritt 1 (dieser Stand): die gemeinsame Regel im Paket** `de.familyprojekt.tresor` (byte-gleich in alle Pro-Apps):
+- `Hauptordner.suchen(gewählter Ordner, Name)`: Tresor erkannt am **Inhalt** (`tresorordner.json`), nie am Namen —
+  `GEFUNDEN` (der Ordner selbst oder genau ein Ordner darin, auch ein alter wie „Privat Brain Pro Hauptablageordner“) ·
+  `ANLEGEN_HIER` (leerer Ordner) · `ANLEGEN_DARIN` (Speicher mit Inhalt: neuer Hauptordner darin) · `UNTERORDNER` (Fach,
+  Eingang oder Verwaltung gewählt, auch umbenannt am Inhalt erkannt: nichts tun) · `MEHRERE` (nie raten).
+- `Hauptordner.name(…)`: Name frei wählbar, Vorschlag **„Family-Projekt“**; abgelehnt: verbotene Zeichen (Windows/FAT),
+  „.“/„..“, > 80 Zeichen, Namen von Fächern und Verwaltung.
+- `Hauptordner.ablage(…)` + `UnterAblage`: die App arbeitet im Hauptordner, auch wenn nur der Speicher freigegeben ist;
+  nie in einen vorhandenen Ordner mit Inhalt hinein (`TRESOR_NAME_BELEGT`).
+- Proben: JVM `HauptordnerTest` 9 grün, `TresorOrdnerTest` 15 grün (javac + JUnit 4.13.2 im Behälter); Gegenprobe von Hand
+  6 eingebaute Fehler → je rot.
+
+**Noch nicht verdrahtet** (nächste Schritte): die Ordnerwahl der Apps (Workflow PDF Pro, Familienakte, BookLedgerPro) auf diese
+Regel umstellen, eigene Ablage und Einzug zu **einem** Schritt mit einem Passwort zusammenfassen, „Speichern unter“ in den Tresor
+sperren statt fragen, Lies-mich-Datei im Hauptordner. ⚠ Android erlaubt auf neueren Geräten nicht, das Hauptverzeichnis einer
+SD-Karte in der Ordnerwahl zu nehmen — dort wählt man einen Ordner darauf (oder legt in der Ordnerwahl einen an). Nicht am Gerät geprüft.
