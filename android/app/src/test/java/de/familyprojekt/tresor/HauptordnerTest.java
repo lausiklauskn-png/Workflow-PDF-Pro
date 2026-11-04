@@ -112,4 +112,19 @@ public final class HauptordnerTest {
         for (String p : new String[]{"", "/a", "a/", "a//b", "a/../b", ".."})
             assertEquals(p, "TRESOR_PFAD_UNGUELTIG", code(() -> new UnterAblage(a, p)));
     }
+
+    @Test public void liesMichEntstehtNurImTresorUndBleibtUnveraendert() throws Exception {
+        File d = leer(); DateiAblage a = new DateiAblage(d);
+        assertEquals("TRESOR_NICHT_VORHANDEN", code(() -> Hauptordner.liesMichAnlegen(a)));
+        assertFalse(new File(d, Hauptordner.LIES_MICH).exists());
+        TresorOrdner.anlegen(a, Fach.WORKFLOW_PDF_APP, PW).close();
+        assertTrue(Hauptordner.liesMichAnlegen(a));
+        String text = new String(Files.readAllBytes(new File(d, Hauptordner.LIES_MICH).toPath()), "UTF-8");
+        assertTrue(text.contains("tresorordner.json") && text.contains("GANZEN Hauptordner"));
+        Files.write(new File(d, Hauptordner.LIES_MICH).toPath(), "eigene Notiz".getBytes("UTF-8"));
+        assertFalse(Hauptordner.liesMichAnlegen(a));
+        assertEquals("eigene Notiz", new String(Files.readAllBytes(new File(d, Hauptordner.LIES_MICH).toPath()), "UTF-8"));
+        // Die Lies-mich-Datei stört das Wiederfinden nicht.
+        assertEquals(Hauptordner.GEFUNDEN, Hauptordner.suchen(a, "Family-Projekt").art);
+    }
 }

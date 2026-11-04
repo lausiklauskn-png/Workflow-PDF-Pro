@@ -105,6 +105,25 @@ final class OrdnerWahl {
         if (bp.isEmpty()) return true;                        // ganzer Speicher freigegeben
         return dp.equals(bp) || dp.startsWith(bp + "/");
     }
+    /**
+     * Die Ordner über einem Dokument bis einschließlich der Wurzel der Freigabe, nächster zuerst (nur Kennungen von
+     * „com.android.externalstorage.documents“, „<Speicher>:<Pfad>“). Liegt das Dokument nicht darin: leer.
+     */
+    static java.util.List<String> oberordner(String wurzelKennung, String dokKennung) {
+        java.util.List<String> aus = new java.util.ArrayList<>();
+        if (!liegtIn(EXTERN, wurzelKennung, EXTERN, dokKennung)) return aus;
+        int w = wurzelKennung.indexOf(':'), d = dokKennung.indexOf(':');
+        String speicher = dokKennung.substring(0, d), wurzelPfad = ohneSchraegstrich(wurzelKennung.substring(w + 1));
+        String pfad = ohneSchraegstrich(dokKennung.substring(d + 1));
+        while (true) {
+            int i = pfad.lastIndexOf('/');
+            pfad = i < 0 ? "" : pfad.substring(0, i);
+            if (pfad.length() < wurzelPfad.length()) break;
+            aus.add(speicher + ":" + pfad);
+            if (pfad.equals(wurzelPfad)) break;
+        }
+        return aus;
+    }
     static final String EXTERN = "com.android.externalstorage.documents";
     private static String ohneSchraegstrich(String p) {
         String s = p;

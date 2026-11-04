@@ -14,6 +14,7 @@
     KEIN_DATEIEN_PROGRAMM:['Keine Dateien-App gefunden, die Ordner zeigen kann. Pfad: ','No Files app found that can show folders. Path: ','Не найдено приложение «Файлы». Путь: ','لم يُعثر على تطبيق ملفات يعرض المجلدات. المسار: '],
     internal:['Gerätespeicher – keine SD-Karte erforderlich.','Device storage – no SD card required.','Память устройства — SD-карта не требуется.','تخزين الجهاز — لا حاجة إلى بطاقة SD.'],
     folder:['Ablage von Workflow PDF Pro: ','Workflow PDF Pro storage: ','Хранилище Workflow PDF Pro: ','تخزين Workflow PDF Pro: '],
+    einrichten:['Tresor einrichten – nur Speicher wählen …','Set up vault – just choose the storage …','Настроить сейф – выбрать только хранилище …','إعداد الخزنة – اختر التخزين فقط …'],
     choose:['Ordner wählen / vorhandenen Tresor öffnen …','Choose folder / open existing vault …','Выбрать папку / открыть хранилище …','اختيار مجلد / فتح خزنة موجودة …'],
     unlock:['Entsperren / erneut versuchen','Unlock / retry','Разблокировать / повторить','فتح القفل / إعادة المحاولة'],
     regrant:['Ordner erneut freigeben …','Grant folder access again …','Снова разрешить доступ к папке …','السماح بالوصول إلى المجلد مجدداً …'],
@@ -228,6 +229,16 @@
       ablage.append(note,actions);
       // Ordnerwahl (Klaus 2026-11-03): ein abgelehnter Ordner ist kein Speicherfehler – Meldung im Kasten, Ablage bleibt offen.
       // „Anderen Ordner wählen“ aus der Rückfrage öffnet die Ordnerwahl gleich noch einmal.
+      // Ein Schritt (Klaus 2026-11-04): nur den Speicher wählen; Hauptordner, Tresor und eigene Ablage mit einem Passwort.
+      const einSchritt=typeof api.tresorEinrichten==='function';
+      if(einSchritt)button(actions,'einrichten',async()=>{
+        note.textContent='';
+        let answer;
+        try{answer=await api.tresorEinrichten({language:language()});}
+        catch(error){const m=window.WFPWoLiegtWas?.meldung(error);if(m){note.textContent=m;return;}throw error;}
+        if(answer?.abgebrochen)return;
+        await confirmMove(answer.state);
+      },!active);
       button(actions,'choose',async()=>{
         note.textContent='';
         for(let mal=0;mal<3;mal++){
@@ -237,7 +248,7 @@
           if(answer.cancelled){if(answer.andererOrdner)continue;return;}
           await confirmMove(answer.state);return;
         }
-      },!active);
+      },!active&&!einSchritt);
       if(active&&typeof api.createRecovery==='function'){
         const line=document.createElement('p');line.id='nativeVaultRecovery';ablage.insertBefore(line,actions);
         const show=info=>{line.textContent=info?.exists?t('recoveryDone')+new Date(info.created||info.createdAt).toLocaleDateString(language()):t('recoveryNone');};

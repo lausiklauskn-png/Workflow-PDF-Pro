@@ -8,7 +8,7 @@
   const DE={
     titel:'Wo liegt was?',
     punkte:[
-      'Der gemeinsame Tresor aller Pro-Apps ist der Ordner, in dem die Datei „tresorordner.json“ liegt (bei Klaus: SD-Karte › Privat Brain Pro Hauptablageordner). Diesen Ordner wählst du in jeder App einmal aus.',
+      'Der gemeinsame Tresor aller Pro-Apps ist ein Hauptordner (Vorschlag „Family-Projekt“), erkennbar an der Datei „tresorordner.json“. Zum Einrichten wählst du in jeder App nur den Speicher (SD-Karte oder Gerätespeicher) – die App findet den Hauptordner selbst oder legt ihn an.',
       'Nie den Unterordner „Tresorordner“ wählen und nie einen App-Ordner darin.',
       'Darin legt jede App ihren eigenen Ordner an: Workflow PDF Pro · Private Brain · BookLedgerPro · Familienakte.',
       'Die Ordner „Eingang-…“ sind Briefkästen: Andere Apps legen dort etwas für diese App ab.',
@@ -28,8 +28,12 @@
     TRESOR_ORDNER_VERWALTUNG:'Das ist der Ordner „Tresorordner“ (nur Verwaltung). Wähle den Ordner darüber, in dem „tresorordner.json“ liegt. Nichts wurde verändert.',
     TRESOR_NICHT_VORHANDEN:'In diesem Ordner liegt keine „tresorordner.json“. Wähle den Ordner, in dem „tresorordner.json“ liegt. Es wurde kein neuer Tresor angelegt.',
     TRESOR_UMGEZOGEN:'Dieser Tresor ist umgezogen. Bitte den neuen Ort wählen. Nichts wurde verändert.',
+    TRESOR_ORDNER_UNTERORDNER:'Das ist ein Ordner innerhalb des Tresors (ein Fach, ein Eingang oder die Verwaltung). Bitte nur den Speicher wählen, z. B. die SD-Karte, oder den Hauptordner. Nichts wurde angelegt.',
+    TRESOR_ORDNER_MEHRERE:'In diesem Speicher liegen mehrere Tresore. Bitte den gewünschten Hauptordner direkt wählen. Nichts wurde angelegt.',
+    TRESOR_NAME_BELEGT:'Einen Ordner mit diesem Namen gibt es dort schon, und er ist nicht leer. Bitte einen anderen Namen wählen. Nichts wurde angelegt.',
+    TRESOR_ABLAGE_PASSWORT_ANDERS:'Der Tresor ist mit diesem Passwort offen, die Ablage von Workflow PDF Pro darin hat aber ein anderes (älteres) Passwort. Nichts wurde verändert. Bitte „Ordner wählen / vorhandenen Tresor öffnen“ mit dem alten Passwort nutzen.',
     ebeneHoeher:'Gewählt war ein Ordner im Tresor. Verbunden ist jetzt der Ordner darüber, in dem „tresorordner.json“ liegt.',
-    imTresor:'Nicht gespeichert: Das Ziel war der Tresor-Ordner. Dort liegen nur verschlüsselte Dateien. Bitte z. B. „Downloads“ wählen.'
+    imTresor:'Nicht gespeichert: Das Ziel lag im Tresor. Dort liegen nur verschlüsselte Dateien. Bitte z. B. „Downloads“ wählen.'
   };
   const EN={
     titel:'Where is what?',
@@ -53,8 +57,12 @@
     TRESOR_ORDNER_VERWALTUNG:'This is the “Tresorordner” folder (administration only). Choose the folder above it that contains “tresorordner.json”. Nothing was changed.',
     TRESOR_NICHT_VORHANDEN:'This folder has no “tresorordner.json”. Choose the folder that contains “tresorordner.json”. No new vault was created.',
     TRESOR_UMGEZOGEN:'This vault has moved. Please choose the new location. Nothing was changed.',
+    TRESOR_ORDNER_UNTERORDNER:'This is a folder inside the vault (a compartment, an inbox or the administration). Please choose only the storage, e.g. the SD card, or the main folder. Nothing was created.',
+    TRESOR_ORDNER_MEHRERE:'There are several vaults in this storage. Please choose the main folder you want directly. Nothing was created.',
+    TRESOR_NAME_BELEGT:'A folder with this name already exists there and is not empty. Please choose another name. Nothing was created.',
+    TRESOR_ABLAGE_PASSWORT_ANDERS:'The vault opens with this password, but Workflow PDF Pro’s storage inside has a different (older) password. Nothing was changed. Please use “Choose folder / open existing vault” with the old password.',
     ebeneHoeher:'A folder inside the vault was chosen. The folder above it, which contains “tresorordner.json”, is now connected.',
-    imTresor:'Not saved: the destination was the vault folder. Only encrypted files belong there. Please choose e.g. “Downloads”.'
+    imTresor:'Not saved: the destination was inside the vault. Only encrypted files belong there. Please choose e.g. “Downloads”.'
   };
   const W=()=>(document.documentElement.lang||'de').startsWith('en')?EN:DE;
   const text=key=>W()[key]??DE[key];

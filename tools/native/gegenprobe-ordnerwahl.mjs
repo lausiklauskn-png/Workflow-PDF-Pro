@@ -32,6 +32,11 @@ const faelle = [
   ['jvm', 'Nachbarordner mit gleichem Anfang gilt als Tresor', OW, 'return dp.equals(bp) || dp.startsWith(bp + "/");', 'return dp.startsWith(bp);'],
   ['jvm', 'fremder Anbieter verglichen', OW, 'if (!baumAnbieter.equals(dokAnbieter) || !EXTERN.equals(baumAnbieter)) return false;', ''],
   ['web', 'Speichern: Hinweis fehlt', 'native/native-files.js', "else if (result.imTresor) notify(window.WFPWoLiegtWas?.text('imTresor') || t('fail'));", ''],
+  // Ein Schritt und Sperre (Klaus 2026-11-04)
+  ['web', 'Java: Speichern unter ohne Sperrhinweis', J + 'workflowpdf/pro/ProFilesPlugin.java', 'TresorSchutz.gesperrt(getActivity(), call.getString("language", "de"), () -> {});', ''],
+  ['web', 'Java: ganze Freigabe statt Tresor gesperrt', J + 'workflowpdf/pro/TresorSchutz.java', 'for (String ordner : OrdnerWahl.oberordner(wurzel, dok))', 'for (String ordner : java.util.List.of(wurzel))'],
+  ['web', 'Java: Einrichten legt an, bevor das Passwort geprüft ist', J + 'workflowpdf/pro/ProVaultPlugin.java', '        de.familyprojekt.tresor.Hauptordner.ablage(s,e,name); // legt bei ANLEGEN_DARIN den Ordner an, sonst nichts\n', ''],
+  ['jvm', 'Lies-mich überschreibt eine vorhandene', J + 'tresor/Hauptordner.java', '        if (haupt.gibtEs(LIES_MICH)) return false;\n', ''],
   ['web', 'Java: Speichern schreibt ohne Frage', J + 'workflowpdf/pro/ProFilesPlugin.java', 'if (TresorSchutz.imTresor(getContext(), uri)) {', 'if (false) {'],
   // 3 Hilfe-Seite
   ['web', 'Hilfe: Knopf fehlt im Kasten', 'native/native-vault.js', "      window.WFPWoLiegtWas?.knopf(fuss);\n", ''],
@@ -62,9 +67,10 @@ for (const [art, titel, datei, alt, neu] of faelle) {
         for (const n of readdirSync(join(tmp, J, 'tresor'))) if (n !== 'SafAblage.java') cpSync(join(tmp, J, 'tresor', n), join(a, n));
         for (const n of ['TresorEinzug.java', 'OrdnerWahl.java', 'VaultCrypto.java']) cpSync(join(tmp, J, 'workflowpdf/pro', n), join(b, n));
         cpSync(join(tmp, 'android/app/src/test/java/de/familyprojekt/workflowpdf/pro/OrdnerWahlTest.java'), join(b, 'OrdnerWahlTest.java'));
+        for (const n of ['HauptordnerTest.java', 'TresorOrdnerTest.java']) cpSync(join(tmp, 'android/app/src/test/java/de/familyprojekt/tresor', n), join(a, n));
         const quellen = [...readdirSync(a).map(n => join(a, n)), ...readdirSync(b).map(n => join(b, n))];
         execFileSync('javac', ['-encoding', 'UTF-8', '-d', cls, '-cp', cp, ...quellen], { stdio: 'pipe' });
-        execFileSync('java', ['-cp', cls + ':' + cp, 'org.junit.runner.JUnitCore', 'de.familyprojekt.workflowpdf.pro.OrdnerWahlTest'], { stdio: 'pipe' });
+        execFileSync('java', ['-cp', cls + ':' + cp, 'org.junit.runner.JUnitCore', 'de.familyprojekt.workflowpdf.pro.OrdnerWahlTest', 'de.familyprojekt.tresor.HauptordnerTest'], { stdio: 'pipe' });
       } else {
         execFileSync('node', [join(tmp, 'tools/native/prepare-web.mjs')], { stdio: 'pipe', cwd: tmp });
         const probe = art === 'verbund' ? 'tools/native/test-pro-verbund.mjs' : 'tools/native/test-tresorordner.mjs';

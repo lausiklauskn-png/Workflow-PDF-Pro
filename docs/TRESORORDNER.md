@@ -310,7 +310,25 @@ wählen? … Familienprojekt oder Family-Projekt.“
 - Proben: JVM `HauptordnerTest` 9 grün, `TresorOrdnerTest` 15 grün (javac + JUnit 4.13.2 im Behälter); Gegenprobe von Hand
   6 eingebaute Fehler → je rot.
 
-**Noch nicht verdrahtet** (nächste Schritte): die Ordnerwahl der Apps (Workflow PDF Pro, Familienakte, BookLedgerPro) auf diese
-Regel umstellen, eigene Ablage und Einzug zu **einem** Schritt mit einem Passwort zusammenfassen, „Speichern unter“ in den Tresor
-sperren statt fragen, Lies-mich-Datei im Hauptordner. ⚠ Android erlaubt auf neueren Geräten nicht, das Hauptverzeichnis einer
-SD-Karte in der Ordnerwahl zu nehmen — dort wählt man einen Ordner darauf (oder legt in der Ordnerwahl einen an). Nicht am Gerät geprüft.
+**Schritt 2 (verdrahtet in Workflow PDF Pro, Android):** Einstellungen › „Tresor & Ablage“ › **„Tresor einrichten – nur Speicher
+wählen …“** (`WorkflowVault.tresorEinrichten`, `ProVaultPlugin`):
+1. Speicher wählen (SD-Karte, Gerätespeicher oder einen Ordner darauf). `Hauptordner.suchen` sagt, was dort ist; ein Fach, ein Eingang,
+   die Verwaltung oder mehrere Tresore werden abgewiesen (`TRESOR_ORDNER_UNTERORDNER` / `…_MEHRERE`), **bevor** etwas angelegt wird.
+2. Liegt im Speicher schon anderes: Name des neuen Hauptordners (Vorschlag „Family-Projekt“, frei wählbar, geprüft mit `Hauptordner.name`).
+3. **Ein** Passwort-Fenster für Tresor **und** eigene Ablage „Workflow PDF Pro“ darin. Vorhandener Tresor: erst das Passwort prüfen
+   (falsch → neu versuchen, nichts geschrieben), dann den Hauptordner anlegen, die Ablage öffnen oder anlegen, einziehen. Hat eine alte
+   Ablage ein anderes Passwort: `TRESOR_ABLAGE_PASSWORT_ANDERS`, nichts verändert (alter Weg „Ordner wählen …“ bleibt).
+4. **Lies-mich** `LIES-MICH.txt` im Hauptordner (`Hauptordner.liesMichAnlegen`, nur wenn sie fehlt; eine bearbeitete bleibt).
+- Die Freigabe bleibt der gewählte Speicher; gearbeitet wird im Hauptordner darunter (`SafAblage` mit Wurzelkennung,
+  `DocumentVault.inspectIn`, `ProTresorordner.baumSetzen(baum, wurzel)`). Android gibt für einen Unterordner keine eigene Baum-Freigabe her.
+- **„Speichern unter“ in den Tresor ist gesperrt, nicht mehr gefragt** (auch die Ersatzschlüssel-Datei): leeres Ziel wird entfernt,
+  ein Hinweis erscheint, nichts wird geschrieben. Erkannt am **Inhalt** der Ordner über dem Ziel (`tresorordner.json` oder
+  `….tresor.json`, `OrdnerWahl.oberordner`, `TresorSchutz.geschuetzt`) – der Rest der SD-Karte bleibt frei, auch wenn der ganze Speicher
+  freigegeben ist. Nur Androids Speicher-Anbieter (Gerät, SD); andere Anbieter werden nicht erkannt (benannte Grenze).
+- Windows: noch nicht (Knopf erscheint nur, wo die Brücke `tresorEinrichten` hat).
+- Proben (Behälter, kein Gerät, kein Android-SDK): JVM `HauptordnerTest` 10, `TresorOrdnerTest` 15, `OrdnerWahlTest` 8 grün ·
+  `test-tresorordner.mjs` 15 grün (Quelltext: Reihenfolge prüfen → anlegen → Ablage → Einzug → Lies-mich; Sperre) · Gegenprobe
+  `gegenprobe-ordnerwahl.mjs` 4 neue Fälle gefangen. Die Android-Klassen übersetzt erst die CI; am Gerät nicht geprüft.
+
+Paket geändert (`Hauptordner`, `SafAblage.kennung`): Pins neu (`node tools/tresor/pins.mjs --schreiben`), nach Familienakte,
+BookLedgerPro und Private Brain Pro nachziehen.

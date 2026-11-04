@@ -45,20 +45,26 @@ final class ProTresorordner {
     private SharedPreferences prefs() { return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE); }
     boolean gewaehlt() { return prefs().contains("baum"); }
     /** Ganzer Pfad des Tresorordners im Speicher (Leitfaden § 5). */
+    /** Dokumentkennung des Tresor-Hauptordners: gemerkt (seit 2026-11-04 darf er unter der Freigabe liegen) oder die Freigabe selbst. */
+    private String wurzel() {
+        String b = prefs().getString("baum", null); if (b == null) return null;
+        String w = prefs().getString("wurzel", null);
+        return w != null ? w : android.provider.DocumentsContract.getTreeDocumentId(Uri.parse(b));
+    }
     String pfad() {
         String b = prefs().getString("baum", null); if (b == null) return "";
-        try { String id = android.provider.DocumentsContract.getTreeDocumentId(Uri.parse(b)); return id.contains(":") ? id.substring(id.indexOf(':') + 1) : id; }
+        try { String id = wurzel(); return id.contains(":") ? id.substring(id.indexOf(':') + 1) : id; }
         catch (Exception e) { return ""; }
     }
     String speicher() {
         String b = prefs().getString("baum", null); if (b == null) return "";
-        try { String id = android.provider.DocumentsContract.getTreeDocumentId(Uri.parse(b)); return id.startsWith("primary:") ? "geraet" : id.contains(":") ? "karte" : ""; }
+        try { String id = wurzel(); return id.startsWith("primary:") ? "geraet" : id.contains(":") ? "karte" : ""; }
         catch (Exception e) { return ""; }
     }
     /** Dokument-Adresse des Tresorordners für „In Dateien öffnen“; null ohne gewählten Ordner. */
     Uri ordnerUri() {
         String b = prefs().getString("baum", null); if (b == null) return null;
-        Uri t = Uri.parse(b); return android.provider.DocumentsContract.buildDocumentUriUsingTree(t, android.provider.DocumentsContract.getTreeDocumentId(t));
+        Uri t = Uri.parse(b); return android.provider.DocumentsContract.buildDocumentUriUsingTree(t, wurzel());
     }
     boolean istOffen() { return offen != null; }
     /** Der Nutzer will ausdrücklich entsperren oder einziehen: der gemerkte Schlüssel darf wieder öffnen. */
@@ -68,7 +74,7 @@ final class ProTresorordner {
         if (ablage != null) return ablage;
         String baum = prefs().getString("baum", null);
         if (baum == null) throw new IOException("TRESOR_KEIN_ORDNER");
-        ablage = new SafAblage(context.getContentResolver(), Uri.parse(baum));
+        ablage = new SafAblage(context.getContentResolver(), Uri.parse(baum), wurzel());
         return ablage;
     }
 
@@ -84,14 +90,18 @@ final class ProTresorordner {
         if(a.gibtEs(de.familyprojekt.tresor.Umzug.VERMERK))throw new IOException("TRESOR_UMGEZOGEN");
     }
 
-    void baumSetzen(Uri baum) throws IOException {
+    void baumSetzen(Uri baum) throws IOException { baumSetzen(baum, android.provider.DocumentsContract.getTreeDocumentId(baum)); }
+
+    /** Tresor-Hauptordner merken: die Freigabe {@code baum} und darin der Ordner {@code wurzel} (Dokumentkennung). */
+    void baumSetzen(Uri baum, String wurzel) throws IOException {
         schliessen();
-        String name = baum.getLastPathSegment() == null ? "" : baum.getLastPathSegment();
+        String name = wurzel == null ? "" : wurzel;
         if (name.contains(":")) name = name.substring(name.indexOf(':') + 1);
+        if (name.contains("/")) name = name.substring(name.lastIndexOf('/') + 1);
         // Ein anderer Ordner: ein gemerkter Schlüssel gehört zum alten und wird vergessen.
-        SafAblage a=new SafAblage(context.getContentResolver(),baum);
+        SafAblage a=new SafAblage(context.getContentResolver(),baum,wurzel);
         String id=TresorOrdner.vorhanden(a)?TresorOrdner.kennung(a):null;
-        if (!prefs().edit().putString("baum", baum.toString()).putString("name", name).putString("ordnerKennung",id).remove("merken").remove("kennung").commit()) throw new IOException("TRESOR_NICHT_VERFUEGBAR");
+        if (!prefs().edit().putString("baum", baum.toString()).putString("wurzel", wurzel).putString("name", name).putString("ordnerKennung",id).remove("merken").remove("kennung").commit()) throw new IOException("TRESOR_NICHT_VERFUEGBAR");
         ablage = null;
     }
 

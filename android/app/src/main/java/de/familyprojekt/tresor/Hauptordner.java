@@ -77,6 +77,38 @@ public final class Hauptordner {
         return false;
     }
 
+    /** Name der Lies-mich-Datei im Tresor-Hauptordner (Klaus 2026-11-04). */
+    public static final String LIES_MICH = "LIES-MICH.txt";
+
+    /** Text der Lies-mich-Datei: was im Hauptordner liegt und was man dort nicht tun soll. Kein Name, kein Pfad, kein Geheimnis. */
+    public static String liesMichText() {
+        return "Tresor-Hauptordner der Pro-Apps (Family-Projekt)\r\n"
+            + "================================================\r\n\r\n"
+            + "Diesen Ordner haben die Pro-Apps angelegt (Workflow PDF Pro, Familienakte, BookLedgerPro, Private Brain Pro).\r\n"
+            + "Alles hier ist verschlüsselt. Ohne das Tresor-Passwort oder drei Ersatzschlüssel kann es niemand lesen.\r\n\r\n"
+            + "Was hier liegt\r\n"
+            + "- tresorordner.json: Kennung des Tresors (verschlüsselte Schlüssel, kein Passwort).\r\n"
+            + "- Tresorordner: Verwaltung (Passwortplätze, Ersatzschlüssel, Inhaltsverzeichnisse).\r\n"
+            + "- je App ein Fach (z. B. „Workflow PDF Pro“, „Familienakte“) und Eingänge (z. B. „Eingang-Familienakte“).\r\n\r\n"
+            + "Bitte nicht\r\n"
+            + "- Dateien von Hand hineinlegen, umbenennen oder verschieben. Offene Dateien gehören nicht hierher.\r\n"
+            + "- Einzelne Ordner löschen. Zum Sichern den GANZEN Hauptordner kopieren (z. B. auf einen USB-Stick).\r\n\r\n"
+            + "In einer App diesen Ordner wählen: einfach den Speicher (SD-Karte, Gerätespeicher) oder diesen Ordner antippen,\r\n"
+            + "die App findet den Tresor selbst.\r\n";
+    }
+
+    /**
+     * Legt die Lies-mich-Datei im Hauptordner an, wenn sie fehlt; eine vorhandene bleibt unverändert (auch wenn jemand
+     * sie bearbeitet hat). Nur im Hauptordner eines Tresors ({@code tresorordner.json} muss da sein).
+     * @return true, wenn sie jetzt angelegt wurde.
+     */
+    public static boolean liesMichAnlegen(Ablage haupt) throws IOException {
+        if (!TresorOrdner.vorhanden(haupt)) throw new IOException("TRESOR_NICHT_VORHANDEN");
+        if (haupt.gibtEs(LIES_MICH)) return false;
+        try (java.io.OutputStream aus = haupt.neu(LIES_MICH)) { aus.write(liesMichText().getBytes(java.nio.charset.StandardCharsets.UTF_8)); }
+        return true;
+    }
+
     /**
      * Prüft einen vom Nutzer getippten Namen für einen neuen Hauptordner und gibt ihn bereinigt zurück.
      * Leer → {@link #VORSCHLAG}. Abgelehnt ({@code TRESOR_NAME_UNGUELTIG}): Schrägstriche und andere auf Windows,

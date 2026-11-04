@@ -202,6 +202,17 @@ final class DocumentVault {
         p.label = displayName(p, p.root);
         return p;
     }
+    /**
+     * Wie {@link #inspect}, aber ab einem Ordner innerhalb der Freigabe (Tresor-Hauptordner, Klaus 2026-11-04: nur den
+     * Speicher wählen). {@code wurzel} ist dessen Dokumentkennung; die Freigabe bleibt die gewählte.
+     */
+    Place inspectIn(Uri tree, String wurzel) throws Exception {
+        if (!"content".equals(tree.getScheme()) || wurzel == null || wurzel.isEmpty()) throw failure("VAULT_FOLDER_UNAVAILABLE");
+        Place p = new Place(); p.tree = tree; p.root = wurzel;
+        if (child(p, p.root, HEADER) == null) { Entry own = child(p, p.root, FOLDER); if (own != null && DIR.equals(own.mime)) p.root = own.id; }
+        p.label = displayName(p, p.root);
+        return p;
+    }
     boolean existing(Place p) throws IOException { return child(p, p.root, HEADER) != null; }
     /** Anzeigename des gewählten Ordners selbst (vor inspect, für {@link OrdnerWahl}). */
     String treeName(Uri tree) throws IOException { Place p = new Place(); p.tree = tree; return displayName(p, DocumentsContract.getTreeDocumentId(tree)); }

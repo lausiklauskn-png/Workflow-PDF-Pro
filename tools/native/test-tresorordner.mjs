@@ -125,7 +125,7 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
       await page.locator('.native-vault-dialog [data-wo-liegt-was]').click();
       await page.waitForSelector('#nativeWoLiegtWas[open]');
       const text=await page.textContent('#nativeWoLiegtWas');
-      for(const m of [/Wo liegt was\?/,/in dem die Datei „tresorordner\.json“ liegt/,/Nie den Unterordner „Tresorordner“ wählen/,/„Eingang-…“ sind Briefkästen/,/nur nach Nummern und sind verschlüsselt/,/Offene Dateien \(PDF, \.json, \.txt\) gehören nicht in den Tresor-Ordner/,/Ein Passwort gilt für alle Pro-Apps/])assert.match(text,m);
+      for(const m of [/Wo liegt was\?/,/erkennbar an der Datei „tresorordner\.json“/,/Nie den Unterordner „Tresorordner“ wählen/,/„Eingang-…“ sind Briefkästen/,/nur nach Nummern und sind verschlüsselt/,/Offene Dateien \(PDF, \.json, \.txt\) gehören nicht in den Tresor-Ordner/,/Ein Passwort gilt für alle Pro-Apps/])assert.match(text,m);
       assert.match(await page.textContent('#nativeWoLiegtWas [data-wo-app]'),/Ordner „Workflow PDF Pro“ · Eingang: „Eingang-WorkflowPDF“/);
       assert.match(await page.textContent('#nativeWoLiegtWas [data-wo-weg]'),/Tresor & Ablage.*In den Tresorordner einziehen/);
       assert.match(await page.textContent('#nativeWoLiegtWas [data-wo-original]'),/Ordner ausgeben.*Original, unverändert/);
@@ -150,7 +150,7 @@ test('Tresorordner D1: Abschnitt im Tresor-Kasten, Einzug, Inhaltsverzeichnis au
         const out=await WFPNativeFiles.save(new Blob(['{}'],{type:'application/json'}),'Arbeitsstand.workfloh.json');delete window.__filesAntwort;
         return {out,save:__filesLog.find(([m])=>m==='save')[1],zeile:document.getElementById('nativeFileStatus')?.textContent};});
       assert.equal(r.out.imTresor,true);assert.equal(r.save.language,'de');
-      assert.match(r.zeile,/Nicht gespeichert: Das Ziel war der Tresor-Ordner/);
+      assert.match(r.zeile,/Nicht gespeichert: Das Ziel lag im Tresor/);
     });
     await t.test('Einzug: danach Inhaltsverzeichnis aus der Bibliothek (Name, Größe, Fingerabdruck, Auszug), ohne Inhalt und Passwort',async()=>{
       fixture.log.length=0;fixture.ebeneHoeher=true;
@@ -256,6 +256,15 @@ test('Ordnerwahl und Tresor-Schutz sind in den Android-Plugins verdrahtet (Quell
   assert.match(plugin,/setPositiveButton\(Q_WORDS\[3\]\[lang\],\(d,w\)->password\(call,vault,place,0\)\)/,'Anlegen erst nach „Neue Ablage hier anlegen“');
   assert.match(vault,/if \(OrdnerWahl\.unterordnerAnlegen\(displayName\(candidate, candidate\.root\), children\(candidate, candidate\.root\)\.isEmpty\(\)\)\) candidate\.root = create\(/,'nie verschachteln');
   assert.match(plugin,/String art=OrdnerWahl\.tresor\(gewaehlt,ordnerName\(tree\)\);[\s\S]*?throw new java\.io\.IOException\(nur\?"TRESOR_NICHT_VORHANDEN":"TRESOR_ORDNER_"\+pruefung\);[\s\S]*?tresor\.baumSetzen\(baum\);/,'Tresor: falscher Ordner wird vor baumSetzen abgewiesen');
-  assert.match(files,/if \(TresorSchutz\.imTresor\(getContext\(\), uri\)\) \{[\s\S]*?TresorSchutz\.warnen\([\s\S]*?return;\s*\}\s*schreiben\(saving, uri\);/,'Speichern unter: Tresor-Ziel erst fragen, dann schreiben');
-  assert.match(plugin,/if\(TresorSchutz\.imTresor\(getContext\(\),uri\)\)\{\s*TresorSchutz\.warnen\(/,'Ersatzschlüssel-Datei: Tresor-Ziel erst fragen');
+  // Seit 2026-11-04 gesperrt statt gefragt (Klaus): kein „Trotzdem speichern“, leeres Ziel weg, nichts geschrieben.
+  assert.match(files,/if \(TresorSchutz\.imTresor\(getContext\(\), uri\)\) \{\s*(?:\/\/[^\n]*\n\s*)?TresorSchutz\.leeresZielEntfernen\(getContext\(\), uri\);\s*TresorSchutz\.gesperrt\([\s\S]*?return;\s*\}\s*schreiben\(saving, uri\);/,'Speichern unter: Tresor-Ziel gesperrt, nie geschrieben');
+  assert.doesNotMatch(files+plugin,/Trotzdem|warnen\(/,'kein „Trotzdem speichern“ mehr');
+  assert.match(plugin,/if\(TresorSchutz\.imTresor\(getContext\(\),uri\)\)\{\s*TresorSchutz\.leeresZielEntfernen\(getContext\(\),uri\);\s*TresorSchutz\.gesperrt\([\s\S]*?return;\s*\}\s*sharesSchreiben\(uri,lang\);/,'Ersatzschlüssel-Datei: Tresor-Ziel gesperrt');
+  const schutz=await readFile(pro+'TresorSchutz.java','utf8');
+  assert.match(schutz,/for \(String ordner : OrdnerWahl\.oberordner\(wurzel, dok\)\)\s*if \(geschuetzt\(/,'gesperrt wird am Inhalt der Ordner über dem Ziel, nicht die ganze Freigabe');
+  // Ein Schritt (Klaus 2026-11-04): erst Passwort prüfen, dann Hauptordner anlegen, Ablage, Einzug, Lies-mich.
+  const ein=plugin.slice(plugin.indexOf('private JSONObject einrichtenAusfuehren('));
+  const reihe=['TresorOrdner.oeffnen(','Hauptordner.ablage(s,e,name)','candidate.inspectIn(tree,wurzel)','locations.adopt(candidate)','tresor.baumSetzen(tree,wurzel)','tresor.mitPasswort(p,!tresorDa,keep,candidate,false)','Hauptordner.liesMichAnlegen('];
+  let bei=-1;for(const r of reihe){const i=ein.indexOf(r);assert.ok(i>bei,'Einrichten: Reihenfolge '+r);bei=i;}
+  assert.match(plugin,/if\(!e\.gefunden\(\)&&!e\.anlegen\(\)\)throw new java\.io\.IOException\("TRESOR_ORDNER_"\+e\.art\);/,'Einrichten: Fach/Mehrere abgewiesen, bevor etwas angelegt wird');
 });
