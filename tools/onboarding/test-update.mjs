@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { join, resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+const temp = mkdtempSync(join(tmpdir(), 'pro-pdf-update-'));
+const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+try {
+  const pro = join(temp, 'pro'), quelle = join(pro, 'work/Workflow-PDF');
+  mkdirSync(join(pro, 'tools/onboarding'), { recursive: true });
+  mkdirSync(join(pro, 'docs/portierung'), { recursive: true });
+  mkdirSync(join(pro, 'upstream/workflow-pdf/assets'), { recursive: true });
+  mkdirSync(join(pro, 'native'), { recursive: true });
+  mkdirSync(join(quelle, 'assets'), { recursive: true });
+  for (const name of ['update.mjs', 'verify-upstream.mjs', 'nachziehen.py']) cpSync(resolve('tools/onboarding', name), join(pro, 'tools/onboarding', name));
+  git(quelle, 'init'); git(quelle, 'config', 'user.name', 'Probe'); git(quelle, 'config', 'user.email', 'probe@example.invalid');
+  const commit = () => { git(quelle, 'add', '.'); git(quelle, 'commit', '-m', 'Erfundener Kern'); return git(quelle, 'rev-parse', 'HEAD'); };
+  const altText = '// alter Testkern\n';
+  writeFileSync(join(quelle, 'assets/kern.js'), altText);
+  const alt = commit();
+  writeFileSync(join(pro, 'upstream/workflow-pdf/assets/kern.js'), altText);
+  writeFileSync(join(pro, 'native/adapter.js'), '// eigener Adapter');
+  writeFileSync(join(pro, 'docs/portierung/QUELLDATEIEN-SHA256.json'), JSON.stringify({ commit: alt, files: [{ path: 'assets/kern.js', sha256: createHash('sha256').update(altText).digest('hex') }] }));
+  const run = anwenden => spawnSync(process.execPath, ['tools/onboarding/update.mjs', '--lokal', ...(anwenden ? ['--anwenden'] : [])], { cwd: pro, encoding: 'utf8' });
+  let r = run(true); assert.equal(r.status, 0, r.stderr); assert.equal(JSON.parse(r.stdout).updateVorhanden, false);
+  writeFileSync(join(quelle, 'assets/kern.js'), '// neuer Testkern\n'); const neu = commit();
+  r = run(false); assert.equal(r.status, 0, r.stderr); assert.equal(JSON.parse(r.stdout).angewendet, false);
+  assert.equal(readFileSync(join(pro, 'upstream/workflow-pdf/assets/kern.js'), 'utf8'), altText);
+  r = run(true); assert.equal(r.status, 0, r.stderr); assert.equal(JSON.parse(r.stdout).quelle, neu);
+  assert.equal(readFileSync(join(pro, 'upstream/workflow-pdf/assets/kern.js'), 'utf8'), '// neuer Testkern\n');
+  assert.equal(readFileSync(join(pro, 'native/adapter.js'), 'utf8'), '// eigener Adapter');
+  writeFileSync(join(pro, 'upstream/workflow-pdf/assets/kern.js'), '// eigene Änderung');
+  r = run(true); assert.notEqual(r.status, 0); assert.match(r.stderr, /Abweichung/);
+  assert.equal(readFileSync(join(pro, 'upstream/workflow-pdf/assets/kern.js'), 'utf8'), '// eigene Änderung');
+  console.log('Pro-PDF-Update: Vorschau, Gleichstand, echter kanonischer Kopierer, Adaptererhalt und Gegenprobe bei lokaler Kernänderung bestanden.');
+} finally { rmSync(temp, { recursive: true, force: true }); }
