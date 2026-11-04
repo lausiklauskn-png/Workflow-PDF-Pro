@@ -8,7 +8,7 @@ Aktualisiert am 03.11.2026. Die Gleichstandsregel wurde von Klaus in der Sitzung
 | Produkt | Plattform | Tatsächlicher Stand | Öffentlich? |
 | --- | --- | --- | --- |
 | Workflow PDF | Browser/PWA | Kern 1.1.9 auf main 0ed15e5; unverändert im Pro-Bündel | Quelle öffentlich; Auslieferung des Webprojekts separat |
-| Workflow PDF Pro | Android | **1.0.13 / Build 14**, dauerhafte Signatur; sichtbare Erst-/Überinstallation mit Datenerhalt geprüft | [v1.0.13](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.13) |
+| Workflow PDF Pro | Android | **1.0.14 / Build 15** (Testfassung Tresor-Plan), dauerhafte Signatur, Freigabelauf 41749829952 | [v1.0.14](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.14) |
 | Workflow PDF Pro | Windows | **1.0.13**, wirklicher Installer und öffentlicher Download geprüft; unsigniert, manuelles Update | [windows-v1.0.13](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/windows-v1.0.13) |
 | Workflow PDF Pro | iOS | vorbereitet, nicht veröffentlicht | nein |
 | Private Brain Pro | Android | **1.0.44**, eigener erfolgreicher Release 41508739185 | [v1.0.44](https://github.com/lausiklauskn-png/Privat-Brain-Pro/releases/tag/v1.0.44) |

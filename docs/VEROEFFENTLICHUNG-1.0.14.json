@@ -1,0 +1,57 @@
+{
+  "version": "1.0.14",
+  "build": 15,
+  "source": "ccd2431213d51586d4d5103d764dfd8bd1c4c913",
+  "recordedUtc": "2026-11-04T01:25:00+00:00",
+  "note": "Android-Testfassung für Klaus' Tablet (Tresor-Plan #62, Version #63). Kein Windows-Release dieser Fassung; Windows bleibt 1.0.13.",
+  "nativeAcceptance": {
+    "run": 41745099404,
+    "attempt": 2,
+    "note": "Versuch 1: ein Emulator-Test (NativeChromeTest, SocketException: Connection reset) scheiterte; der Code war nur Versionsmetadaten; einmal neu gestartet, Versuch 2 grün."
+  },
+  "releases": [
+    {
+      "repo": "Workflow-PDF-Pro",
+      "tag": "v1.0.14",
+      "source": "ccd2431213d51586d4d5103d764dfd8bd1c4c913",
+      "run": 41749829952,
+      "publishedAt": "2026-11-04T01:17:53Z",
+      "url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/tag/v1.0.14",
+      "publicHashCheck": "Anonymous curl download from GitHub; local size and SHA256 equal public GitHub asset digest and .sha256 file.",
+      "assets": [
+        {
+          "name": "Workflow-PDF-Pro-1.0.14.apk",
+          "size": 83350299,
+          "digest": "sha256:ba4386349d7531a058643f427be439f782d1160d9ee6c6dd2b260ccc22c3df2a",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.14/Workflow-PDF-Pro-1.0.14.apk"
+        },
+        {
+          "name": "Workflow-PDF-Pro-1.0.14.apk.installation.json",
+          "size": 416,
+          "digest": "sha256:734252deaf2ffb83c3cbef9ee3ee98d7ff240446615581bee3dbfbbbf43c71af",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.14/Workflow-PDF-Pro-1.0.14.apk.installation.json"
+        },
+        {
+          "name": "Workflow-PDF-Pro-1.0.14.apk.json",
+          "size": 381,
+          "digest": "sha256:b205ae85fb48ad1f1e9d3378361aef89a23753ab3bacc4182d3307a94c083d5f",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.14/Workflow-PDF-Pro-1.0.14.apk.json"
+        },
+        {
+          "name": "Workflow-PDF-Pro-1.0.14.apk.sha256",
+          "size": 94,
+          "digest": "sha256:5440886490d1e706190f6ad050c766462f1c1d0f157f347777685b52f8fd8995",
+          "browser_download_url": "https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.14/Workflow-PDF-Pro-1.0.14.apk.sha256"
+        }
+      ],
+      "downloadProof": [
+        {
+          "name": "Workflow-PDF-Pro-1.0.14.apk",
+          "bytes": 83350299,
+          "sha256": "ba4386349d7531a058643f427be439f782d1160d9ee6c6dd2b260ccc22c3df2a",
+          "anonymousDownload": true
+        }
+      ]
+    }
+  ]
+}
