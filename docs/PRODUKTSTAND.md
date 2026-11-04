@@ -177,3 +177,10 @@ Ablauf war: `workflow-pdf-release.yml` (tag `v1.0.5`, commit main) direkt nach g
 Anker-Commit #27 seine Pfadfilter nicht traf, dann `windows-release.yml` (tag `windows-v1.0.5`). Beide über `workflow_dispatch` aus der Claude-Code-Sitzung, kein Git-Brückenbranch nötig.
 
 Ein Push, ein gespeicherter Workflow oder ein grüner Simulatorlauf ist keine Veröffentlichung.
+
+## Gemeinsamer Quellupdateweg (04.11.2026)
+
+`npm run update:pdf` und `.github/workflows/pdf-kern-update.yml` bereiten gemeinsame
+PDF-Kernupdates vor. Nur Entwicklungswerkzeuge; keine Änderung der ausgelieferten
+Android-/Windows-/iOS-Laufzeit oder der genannten Veröffentlichungsstände.
+Ablauf und Prüflimits: [PDF-KERN-UPDATES.md](PDF-KERN-UPDATES.md).
