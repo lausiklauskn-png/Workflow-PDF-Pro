@@ -4,6 +4,8 @@
 
 Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 
+**Android-Testfassung 1.0.14/Build 15 veröffentlicht (04.11.2026, Klaus' Wort):** Tresor-Plan (#62) und Version (#63), Lauf 41749829952, APK SHA-256 `ba438634…df2a`, 83.350.299 B, von GitHub unabhängig geprüft; Nachweis `docs/VEROEFFENTLICHUNG-1.0.14.json`. Windows bleibt 1.0.13. Nicht erneut veröffentlichen. Am Tablet nicht geprüft.
+
 **Ordnerwahl und Tresor-Schutz (3.11.2026, Zweig, nicht veröffentlicht):** Hauptablageordner oder „Workflow PDF Pro“ öffnen dieselbe Ablage, keine Verschachtelung, Rückfrage vor neuer Ablage, „Speichern unter“ in den Tresor fragt nach, Hilfe „Wo liegt was?“ — `docs/TRESORORDNER.md` letzter Abschnitt.
 
 **Aktueller Abschluss: Appwechsel 1.0.13 veröffentlicht.** Android 1.0.13/Build 14
