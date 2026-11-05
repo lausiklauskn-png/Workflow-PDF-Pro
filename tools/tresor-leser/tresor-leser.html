@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Nichts verlässt das Gerät: kein Netz, keine fremden Dateien. Nur eingebettetes Skript und Entschlüsseltes als blob:. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src blob: data:; media-src blob:; frame-src blob:; object-src blob:; connect-src blob:; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Tresor-Leser</title>
+<!--
+  Tresor-Leser für den gemeinsamen Pro-Tresor (Format familyprojekt-tresorordner/1, Schloss PBV1).
+  Klaus 2026-11-04: eine HTML-Datei, die neben dem Tresor auf SD-Karte/USB liegt und ihn in jedem Browser ohne Installation
+  öffnet – Passwort, Dokumente ansehen und einzeln herunterladen, NUR LESEND. Gepflegt in Workflow PDF Pro neben dem Paket
+  de.familyprojekt.tresor; die Rechnung folgt TresorOrdner.java und VaultCrypto.java Schritt für Schritt.
+  Ein Browser kann in einen gewählten Ordner nicht schreiben: der Tresor bleibt unverändert, auch bei falschem Passwort.
+-->
+<style>
+:root{--bg:#f4f1ec;--paper:#fffdf9;--fg:#1d2228;--muted:#5b636d;--line:#d8d0c4;--accent:#2f6f73;--accent-fg:#fff;--ok:#2e7d4f;--stop:#a33b2b;color-scheme:light}
+@media (prefers-color-scheme: dark){:root{--bg:#12161c;--paper:#19202a;--fg:#e6e2da;--muted:#a1a9b3;--line:#2d3641;--accent:#71b4b7;--accent-fg:#0c1819;--ok:#6cc392;--stop:#e08a7a;color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:20px max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left))}
+main{max-width:880px;margin:0 auto;display:grid;gap:20px}
+h1{font-size:1.5rem;margin:0}h2{font-size:1.1rem;margin:0 0 6px}
+p{margin:0}.muted{color:var(--muted)}
+.kasten{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button,.knopf,input[type=password]{font:inherit;font-size:.95rem;border-radius:8px;border:1px solid var(--line);padding:7px 12px;min-height:36px;background:transparent;color:var(--fg)}
+button,.knopf{cursor:pointer}
+button.primary,.knopf.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);font-weight:600}
+button:disabled{opacity:.55;cursor:default}
+input[type=password]{min-width:0;flex:1 1 240px;background:var(--bg)}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.status{font-size:.95rem}.status.fehler{color:var(--stop)}.status.gut{color:var(--ok)}
+.fach{display:grid;gap:6px}
+.fach h3{font-size:1rem;margin:0;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.fach h3 small{font-weight:400;color:var(--muted)}
+.tab{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:6px 8px;border-top:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);border-top:none}
+td.name{overflow-wrap:anywhere;min-width:12ch}
+td.zahl{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.tun{white-space:nowrap}
+td.tun button{min-height:30px;padding:4px 10px;font-size:.88rem}
+#ansicht{display:grid;gap:8px}
+#ansicht iframe,#ansicht img{width:100%;max-width:100%;border:1px solid var(--line);border-radius:8px;background:#fff}
+#ansicht iframe{height:70vh}
+#ansicht pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:10px;margin:0}
+ul.leise{margin:0;padding-left:1.2em;color:var(--muted);font-size:.92rem}
+</style>
+</head>
+<body>
+<main>
+ <header class="row" style="justify-content:space-between">
+  <h1 id="titel">Tresor-Leser</h1>
+  <div class="row"><button type="button" id="sprache" aria-label="Sprache">EN</button></div>
+ </header>
+ <p class="muted" id="zweck">Öffnet den gemeinsamen Tresor der Pro-Apps (Familienakte Pro, Private Brain Pro, Workflow PDF Pro, BookLedgerPro) in diesem Browser – ohne Installation, ohne Internet, nur lesend. So kommen Sie an Ihre Dokumente, auch wenn gerade kein Gerät mit den Apps zur Hand ist.</p>
+
+ <section class="kasten" id="schritt1">
+  <h2 id="s1t">1. Tresor-Ordner wählen</h2>
+  <p class="muted" id="s1p">Den Ordner wählen, in dem „tresorordner.json“ liegt (zum Beispiel „Family-Projekt“ auf der SD-Karte oder dem USB-Stick). Der Browser liest die Dateien nur; er kann im Ordner nichts ändern.</p>
+  <div class="row"><label class="knopf primary" for="ordner" id="ordnerKnopf">Ordner wählen …</label><input type="file" id="ordner" webkitdirectory directory multiple></div>
+  <p class="status" id="ordnerStatus" role="status"></p>
+ </section>
+
+ <section class="kasten" id="schritt2" hidden>
+  <h2 id="s2t">2. Passwort</h2>
+  <form class="row" id="pwForm" autocomplete="off">
+   <input type="password" id="pw" autocomplete="off" spellcheck="false" aria-labelledby="s2t">
+   <button type="submit" class="primary" id="oeffnen">Öffnen</button>
+  </form>
+  <p class="muted" id="s2p">Dasselbe Passwort wie in den Pro-Apps. Das Prüfen dauert einige Sekunden.</p>
+  <p class="status" id="pwStatus" role="status"></p>
+ </section>
+
+ <section class="kasten" id="schritt3" hidden>
+  <div class="row" style="justify-content:space-between"><h2 id="s3t">3. Dokumente</h2><button type="button" id="sperren">Sperren</button></div>
+  <p class="status gut" id="offenStatus" role="status"></p>
+  <div id="faecher" style="display:grid;gap:18px"></div>
+ </section>
+
+ <section class="kasten" id="ansichtKasten" hidden>
+  <div class="row" style="justify-content:space-between"><h2 id="ansichtTitel"></h2><button type="button" id="ansichtZu">Schließen</button></div>
+  <div id="ansicht"></div>
+ </section>
+
+ <section class="kasten">
+  <h2 id="gt">Was dieser Leser nicht kann</h2>
+  <ul class="leise" id="grenzen">
+   <li>Nichts ändern, löschen oder hinzufügen – dafür die Apps benutzen.</li>
+   <li>Mit Ersatzschlüsseln öffnen – nur mit dem Passwort.</li>
+   <li>Dateien im eigenen Format einer App öffnen (z. B. Mails von Private Brain Pro) – sie stehen nur als Zeile da.</li>
+   <li>Auf manchen Handys fehlt im Browser die Ordnerwahl; dann am Rechner öffnen.</li>
+  </ul>
+ </section>
+ <p class="muted" style="font-size:.85rem" id="fuss">Format familyprojekt-tresorordner/1 · Schloss PBV1 (AES-256-GCM, PBKDF2-HMAC-SHA256). Entschlüsseltes bleibt nur im Arbeitsspeicher dieses Fensters.</p>
+</main>
+<script>
+'use strict';
+(() => {
+// ---------- Format (wie TresorOrdner.java, VaultCrypto.java, Fach.java) ----------
+const FORMAT = 'familyprojekt-tresorordner', KOPF = 'tresorordner.json', VERWALTUNG = 'Tresorordner';
+const CHUNK = 256 * 1024, NONCE = 12, TAG = 16, KEY = 32, OVERHEAD = NONCE + TAG, HEADER = 4 + 1 + 4 + NONCE + KEY + TAG;
+const MIN_RUNDEN = 100000, MAX_RUNDEN = 10000000, VERZEICHNIS_MAX = 64 * 1024 * 1024;
+const UUID = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}';
+const APPS = ['private-brain', 'workflow-pdf-pro', 'bookledgerpro', 'private-brain-v3', 'familienakte'];
+const FAECHER = [['private-brain', 'Private Brain'], ['workflow-pdf-pro', 'Workflow PDF Pro'], ['bookledgerpro', 'BookLedgerPro'],
+  ['eingang-bookledgerpro', 'Eingang-BookLedgerPro'], ['eingang-workflowpdf', 'Eingang-WorkflowPDF'], ['private-brain-v3', 'Private Brain V3'],
+  ['familienakte', 'Familienakte'], ['eingang-familienakte', 'Eingang-Familienakte'], ['eingang-private-brain', 'Eingang-Private-Brain']];
+const APP_NAME = { 'private-brain': 'Private Brain Pro', 'workflow-pdf-pro': 'Workflow PDF Pro', 'bookledgerpro': 'BookLedgerPro', 'private-brain-v3': 'Private Brain V3', 'familienakte': 'Familienakte Pro' };
+const enc = new TextEncoder(), dec = new TextDecoder('utf-8', { fatal: true });
+const aad = (id, art, teil) => FORMAT + '|' + id + '|' + art + '|' + teil;
+class Fehler extends Error { constructor(code) { super(code); this.code = code; } }
+const kaputt = () => new Fehler('TRESOR_BESCHAEDIGT');
+function unhex(s) {
+  if (typeof s !== 'string' || s.length % 2 || /[^0-9a-f]/.test(s)) throw kaputt();
+  const out = new Uint8Array(s.length / 2); for (let i = 0; i < out.length; i++) out[i] = parseInt(s.substr(i * 2, 2), 16); return out;
+}
+const hex = b => Array.from(new Uint8Array(b), x => x.toString(16).padStart(2, '0')).join('');
+const gleich = (a, b) => { if (a.length !== b.length) return false; let d = 0; for (let i = 0; i < a.length; i++) d |= a[i] ^ b[i]; return d === 0; };
+const subtle = globalThis.crypto && crypto.subtle;
+async function gcmOpen(key, sealed, aadText) {
+  const k = await subtle.importKey('raw', key, 'AES-GCM', false, ['decrypt']);
+  return new Uint8Array(await subtle.decrypt({ name: 'AES-GCM', iv: sealed.subarray(0, NONCE), additionalData: typeof aadText === 'string' ? enc.encode(aadText) : aadText, tagLength: 128 }, k, sealed.subarray(NONCE)));
+}
+async function pbkdf2(passwort, salz, runden) {
+  const pw = enc.encode(passwort.normalize('NFC'));
+  const k = await subtle.importKey('raw', pw, 'PBKDF2', false, ['deriveBits']);
+  pw.fill(0);
+  return new Uint8Array(await subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: salz, iterations: runden }, k, 256));
+}
+async function hmac(key, text) {
+  const k = await subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return new Uint8Array(await subtle.sign('HMAC', k, enc.encode(text)));
+}
+function grundPruefen(m, id) { if (!m || m.format !== FORMAT || m.v !== 1 || (id != null && m.id !== id)) throw kaputt(); }
+
+// ---------- Dateien des gewählten Ordners ----------
+let dateien = new Map();         // relativer Pfad ab dem Tresor-Hauptordner → File
+let tresor = null;               // { id, haupt, faecher: Map slug→key }
+async function lesen(pfad, grenze) {
+  const f = dateien.get(pfad); if (!f) throw new Fehler('TRESOR_DATEI_FEHLT');
+  if (f.size > grenze) throw kaputt();
+  return new Uint8Array(await f.arrayBuffer());
+}
+async function json(pfad) { try { return JSON.parse(dec.decode(await lesen(pfad, 65536))); } catch (e) { if (e instanceof Fehler && e.code === 'TRESOR_DATEI_FEHLT') throw e; throw kaputt(); } }
+const liste = ordner => { const v = ordner + '/', out = []; for (const p of dateien.keys()) if (p.startsWith(v) && !p.slice(v.length).includes('/')) out.push(p.slice(v.length)); return out; };
+const istOrdner = ordner => { const v = ordner + '/'; for (const p of dateien.keys()) if (p.startsWith(v)) return true; return false; };
+
+function ordnerUebernehmen(files) {
+  const alle = Array.from(files).filter(f => f.webkitRelativePath || f.name);
+  const pfade = alle.map(f => (f.webkitRelativePath || f.name).replace(/\\/g, '/'));
+  const koepfe = pfade.filter(p => p === KOPF || p.endsWith('/' + KOPF)).map(p => p.slice(0, p.length - KOPF.length));
+  if (!koepfe.length) throw new Fehler('KEIN_TRESOR');
+  const tiefe = Math.min(...koepfe.map(p => p.split('/').length));
+  const oben = koepfe.filter(p => p.split('/').length === tiefe);
+  if (oben.length > 1) throw new Fehler('MEHRERE');
+  const vor = oben[0], m = new Map();
+  alle.forEach((f, i) => { if (pfade[i].startsWith(vor)) m.set(pfade[i].slice(vor.length), f); });
+  dateien = m;
+  return vor.replace(/\/$/, '').split('/').pop() || pfade[0].split('/')[0];
+}
+
+// ---------- Öffnen (wie TresorOrdner.oeffnen: Plätze probieren, Prüfwert vergleichen) ----------
+async function oeffnen(passwort) {
+  const kopf = await json(KOPF); grundPruefen(kopf, null);
+  const id = kopf.id; if (typeof id !== 'string' || !new RegExp('^' + UUID + '$').test(id)) throw kaputt();
+  const erwartet = unhex(kopf.pruefung);
+  for (const name of liste(VERWALTUNG).sort()) {
+    if (!new RegExp('^kennwort-' + UUID + '\\.json$').test(name)) continue;
+    const platz = await json(VERWALTUNG + '/' + name); grundPruefen(platz, id);
+    const runden = platz.runden, nr = platz.platz;
+    if (!Number.isInteger(runden) || runden < MIN_RUNDEN || runden > MAX_RUNDEN || platz.kdf !== 'PBKDF2-HMAC-SHA256' || typeof nr !== 'string') throw kaputt();
+    const salz = unhex(platz.salz), verpackt = unhex(platz.schluessel);
+    if (salz.length !== 16 || verpackt.length !== NONCE + KEY + TAG) throw kaputt();
+    const kek = await pbkdf2(passwort, salz, runden);
+    let haupt;
+    try { haupt = await gcmOpen(kek, verpackt, aad(id, 'kennwort', nr + '|' + runden)); } catch { continue; } finally { kek.fill(0); }
+    if (!gleich(await hmac(haupt, aad(id, 'pruefung', '1')), erwartet)) { haupt.fill(0); throw kaputt(); }
+    return { id, haupt, faecher: new Map() };
+  }
+  throw new Fehler('TRESOR_PASSWORT_FALSCH');
+}
+async function fachSchluessel(t, slug) {
+  if (t.faecher.has(slug)) return t.faecher.get(slug);
+  const d = await json(VERWALTUNG + '/fach-' + slug + '.json'); grundPruefen(d, t.id);
+  if (d.fach !== slug) throw kaputt();
+  let k; try { k = await gcmOpen(t.haupt, unhex(d.schluessel), aad(t.id, 'fach', slug)); } catch { throw kaputt(); }
+  if (k.length !== KEY) throw kaputt();
+  t.faecher.set(slug, k); return k;
+}
+
+// ---------- PBV1 lesen (wie VaultCrypto.Reader), Block für Block ----------
+function klartextGroesse(n) {
+  const body = n - HEADER, full = CHUNK + OVERHEAD;
+  if (body < OVERHEAD) throw kaputt();
+  const chunks = Math.floor(body / full), rest = body % full;
+  if (rest === 0) return chunks * CHUNK;
+  if (rest < OVERHEAD) throw kaputt();
+  return chunks * CHUNK + rest - OVERHEAD;
+}
+function blockAad(header, logisch, index, letzter) {
+  const name = enc.encode(logisch), out = new Uint8Array(header.length + name.length + 10);
+  out.set(header, 0); out.set(name, header.length); let o = header.length + name.length; out[o++] = 0;
+  new DataView(out.buffer).setBigInt64(o, BigInt(index)); o += 8; out[o] = letzter ? 1 : 0;
+  return out;
+}
+async function pbv1Lesen(file, schluessel, logisch, grenze, jeBlock) {
+  if (file.size > grenze + HEADER + OVERHEAD * Math.ceil(grenze / CHUNK + 1)) throw kaputt();
+  const plain = klartextGroesse(file.size), chunks = plain === 0 ? 1 : Math.ceil(plain / CHUNK);
+  const header = new Uint8Array(await file.slice(0, HEADER).arrayBuffer());
+  if (header.length !== HEADER || header[0] !== 80 || header[1] !== 66 || header[2] !== 86 || header[3] !== 49 || header[4] !== 1 ||
+      new DataView(header.buffer).getInt32(5) !== CHUNK) throw kaputt();
+  let key; try { key = await gcmOpen(schluessel, header.subarray(9, HEADER), 'pbv1-key|' + logisch); } catch { throw kaputt(); }
+  const teile = [];
+  try {
+    for (let i = 0; i < chunks; i++) {
+      const letzter = i === chunks - 1, laenge = (letzter ? plain - i * CHUNK : CHUNK) + OVERHEAD, ab = HEADER + i * (CHUNK + OVERHEAD);
+      const sealed = new Uint8Array(await file.slice(ab, ab + laenge).arrayBuffer());
+      if (sealed.length !== laenge) throw kaputt();
+      let block; try { block = await gcmOpen(key, sealed, blockAad(header, logisch, i, letzter)); } catch { throw kaputt(); }
+      teile.push(block); if (jeBlock) jeBlock(i + 1, chunks);
+    }
+  } finally { key.fill(0); }
+  return teile;
+}
+async function sha256Hex(teile) {
+  // Alles auf einmal: die Datei liegt ohnehin ganz im Speicher (Vorschau/Herunterladen).
+  const n = teile.reduce((s, t) => s + t.length, 0), all = new Uint8Array(n); let o = 0; for (const t of teile) { all.set(t, o); o += t.length; }
+  return hex(await subtle.digest('SHA-256', all));
+}
+
+// ---------- Inhaltsverzeichnis (neuester Stand je Schreiber) ----------
+async function verzeichnis(t, slug) {
+  const alle = [];
+  for (const app of APPS) {
+    const ordner = VERWALTUNG + '/verzeichnis/' + slug + '/' + app;
+    if (!istOrdner(ordner)) continue;
+    const namen = liste(ordner).filter(n => new RegExp('^v-[0-9]{20}-' + UUID + '\\.fpt$').test(n)).sort().reverse();
+    if (!namen.length) continue;
+    const rev = Number(namen[0].slice(2, 22)), k = await fachSchluessel(t, slug);
+    const teile = await pbv1Lesen(dateien.get(ordner + '/' + namen[0]), k, aad(t.id, 'verzeichnis', slug + '|' + app + '|' + rev), VERZEICHNIS_MAX);
+    const n = teile.reduce((s, x) => s + x.length, 0), roh = new Uint8Array(n); let o = 0; for (const x of teile) { roh.set(x, o); o += x.length; }
+    let d; try { d = JSON.parse(dec.decode(roh)); } catch { throw kaputt(); }
+    grundPruefen(d, t.id);
+    if (d.fach !== slug || d.schreiber !== app || d.revision !== rev || !Array.isArray(d.eintraege)) throw kaputt();
+    for (const e of d.eintraege) { if (!e || e.schreiber !== app || typeof e.id !== 'string' || typeof e.name !== 'string') throw kaputt(); alle.push(e); }
+  }
+  return alle;
+}
+async function dateiLesen(t, slug, ordnerName, e, jeBlock) {
+  if (e.verschluesselung !== 'fpt1') throw new Fehler('TRESOR_NUR_IN_DER_APP');
+  const datei = String(e.verweis || '').split('/').pop();
+  if (!new RegExp('^' + UUID + '\\.fpt$').test(datei) || datei !== e.id + '.fpt' || String(e.verweis).split('/').some(s => s === '..' || s === '')) throw new Fehler('TRESOR_EINTRAG_UNGUELTIG');
+  const f = dateien.get(ordnerName + '/' + e.verweis); if (!f) throw new Fehler('TRESOR_DATEI_FEHLT');
+  const teile = await pbv1Lesen(f, await fachSchluessel(t, slug), aad(t.id, 'datei', slug + '|' + e.id), Number.MAX_SAFE_INTEGER, jeBlock);
+  if (e.sha256 && await sha256Hex(teile) !== e.sha256) throw kaputt();
+  return new Blob(teile, { type: sichereArt(e.art) });
+}
+const sichereArt = a => /^(application\/pdf|image\/(png|jpeg|gif|webp)|text\/plain)$/.test(String(a || '')) ? a : 'application/octet-stream';
+
+// ---------- Oberfläche ----------
+const T = {
+  de: { titel: 'Tresor-Leser', zweck: document.getElementById('zweck').textContent, s1t: '1. Tresor-Ordner wählen', s1p: document.getElementById('s1p').textContent,
+    ordnerKnopf: 'Ordner wählen …', s2t: '2. Passwort', oeffnen: 'Öffnen', s2p: 'Dasselbe Passwort wie in den Pro-Apps. Das Prüfen dauert einige Sekunden.',
+    s3t: '3. Dokumente', sperren: 'Sperren', ansichtZu: 'Schließen', gt: 'Was dieser Leser nicht kann', fuss: document.getElementById('fuss').textContent,
+    grenzen: Array.from(document.querySelectorAll('#grenzen li'), li => li.textContent),
+    gefunden: 'Tresor gefunden: ', pruefe: 'Passwort wird geprüft …', offen: 'Offen: ', leer: 'Keine Einträge.', nurApp: 'nur in der App', ansehen: 'Ansehen', laden: 'Herunterladen',
+    sp: ['Name', 'Datum', 'Größe', 'von', ''], lese: 'Wird entschlüsselt … ', fachFehlt: 'Schlüssel des Fachs fehlt.', gesperrt: 'Gesperrt. Entschlüsseltes wurde verworfen.',
+    KEIN_TRESOR: 'In diesem Ordner liegt kein „tresorordner.json“. Bitte den Tresor-Ordner wählen (oder den Ordner darüber).',
+    MEHRERE: 'Hier liegen mehrere Tresore nebeneinander. Bitte genau einen Tresor-Ordner wählen.',
+    TRESOR_PASSWORT_FALSCH: 'Passwort falsch. Am Tresor wurde nichts verändert.', TRESOR_BESCHAEDIGT: 'Eine Datei des Tresors ist beschädigt oder passt nicht zu diesem Tresor.',
+    TRESOR_DATEI_FEHLT: 'Eine Datei fehlt im gewählten Ordner (ganz kopiert?).', TRESOR_NUR_IN_DER_APP: 'Diese Datei hat das eigene Format einer App; sie lässt sich nur dort öffnen.',
+    TRESOR_EINTRAG_UNGUELTIG: 'Dieser Eintrag ist ungültig.', KEIN_KRYPTO: 'Dieser Browser kann hier nicht entschlüsseln (WebCrypto fehlt). Bitte einen aktuellen Browser nehmen.', anders: 'Fehler: ' },
+  en: { titel: 'Vault reader', zweck: 'Opens the shared vault of the Pro apps (Familienakte Pro, Private Brain Pro, Workflow PDF Pro, BookLedgerPro) in this browser – no installation, no internet, read-only. So you can reach your documents even when no device with the apps is at hand.',
+    s1t: '1. Choose the vault folder', s1p: 'Choose the folder that contains “tresorordner.json” (for example “Family-Projekt” on the SD card or USB stick). The browser only reads the files; it cannot change anything in the folder.',
+    ordnerKnopf: 'Choose folder …', s2t: '2. Password', oeffnen: 'Open', s2p: 'The same password as in the Pro apps. Checking takes a few seconds.',
+    s3t: '3. Documents', sperren: 'Lock', ansichtZu: 'Close', gt: 'What this reader cannot do', fuss: 'Format familyprojekt-tresorordner/1 · lock PBV1 (AES-256-GCM, PBKDF2-HMAC-SHA256). Decrypted content stays only in this window’s memory.',
+    grenzen: ['Change, delete or add anything – use the apps for that.', 'Open with recovery keys – password only.', 'Open files in an app’s own format (e.g. Private Brain Pro emails) – they appear as a row only.', 'Some phone browsers lack folder selection; then open it on a computer.'],
+    gefunden: 'Vault found: ', pruefe: 'Checking password …', offen: 'Open: ', leer: 'No entries.', nurApp: 'in the app only', ansehen: 'View', laden: 'Download',
+    sp: ['Name', 'Date', 'Size', 'by', ''], lese: 'Decrypting … ', fachFehlt: 'The compartment key is missing.', gesperrt: 'Locked. Decrypted content was discarded.',
+    KEIN_TRESOR: 'This folder contains no “tresorordner.json”. Please choose the vault folder (or the folder above it).', MEHRERE: 'Several vaults lie side by side here. Please choose exactly one vault folder.',
+    TRESOR_PASSWORT_FALSCH: 'Wrong password. Nothing in the vault was changed.', TRESOR_BESCHAEDIGT: 'A vault file is damaged or does not belong to this vault.',
+    TRESOR_DATEI_FEHLT: 'A file is missing in the chosen folder (copied completely?).', TRESOR_NUR_IN_DER_APP: 'This file uses an app’s own format; it opens only there.',
+    TRESOR_EINTRAG_UNGUELTIG: 'This entry is invalid.', KEIN_KRYPTO: 'This browser cannot decrypt here (WebCrypto missing). Please use a current browser.', anders: 'Error: ' }
+};
+let lang = (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en';
+const $ = id => document.getElementById(id);
+const t = k => T[lang][k];
+const meldung = e => (e && e.code && T[lang][e.code]) || t('anders') + String(e && (e.code || e.message) || e);
+function setStatus(el, text, art) { el.textContent = text || ''; el.className = 'status' + (art ? ' ' + art : ''); }
+function sprache() {
+  document.documentElement.lang = lang; $('sprache').textContent = lang === 'de' ? 'EN' : 'DE';
+  for (const k of ['titel', 'zweck', 's1t', 's1p', 'ordnerKnopf', 's2t', 'oeffnen', 's2p', 's3t', 'sperren', 'ansichtZu', 'gt', 'fuss']) $(k).textContent = t(k);
+  document.querySelectorAll('#grenzen li').forEach((li, i) => { li.textContent = t('grenzen')[i]; });
+  document.title = t('titel');
+  if (tresor) zeigen().catch(e => setStatus($('offenStatus'), meldung(e), 'fehler'));
+}
+const groesse = n => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(0) + ' KB' : (n / 1048576).toFixed(1).replace('.', lang === 'de' ? ',' : '.') + ' MB';
+const datum = ms => ms ? new Date(ms).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB') : '';
+let ordnerName = '', ansichtUrl = null;
+function ansichtSchliessen() { if (ansichtUrl) URL.revokeObjectURL(ansichtUrl); ansichtUrl = null; $('ansicht').replaceChildren(); $('ansichtKasten').hidden = true; }
+function sperren(text) {
+  ansichtSchliessen();
+  if (tresor) { tresor.haupt.fill(0); for (const k of tresor.faecher.values()) k.fill(0); }
+  tresor = null; $('faecher').replaceChildren(); $('schritt3').hidden = true;
+  if (text) setStatus($('pwStatus'), text);
+}
+async function zeigen() {
+  const host = $('faecher'); host.replaceChildren();
+  setStatus($('offenStatus'), t('offen') + ordnerName, 'gut');
+  for (const [slug, ordner] of FAECHER) {
+    if (!dateien.has(VERWALTUNG + '/fach-' + slug + '.json')) continue;
+    const box = document.createElement('section'); box.className = 'fach'; box.dataset.fach = slug;
+    const h = document.createElement('h3'); h.textContent = ordner; box.append(h); host.append(box);
+    let eintraege;
+    try { eintraege = await verzeichnis(tresor, slug); }
+    catch (e) { const p = document.createElement('p'); p.className = 'status fehler'; p.textContent = meldung(e); box.append(p); continue; }
+    const klein = document.createElement('small'); klein.textContent = '· ' + eintraege.length; h.append(klein);
+    if (!eintraege.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = t('leer'); box.append(p); continue; }
+    eintraege.sort((a, b) => (b.datum || 0) - (a.datum || 0) || String(a.name).localeCompare(String(b.name)));
+    const wrap = document.createElement('div'); wrap.className = 'tab'; const tab = document.createElement('table');
+    const kopf = document.createElement('tr'); for (const s of t('sp')) { const th = document.createElement('th'); th.textContent = s; kopf.append(th); } tab.append(kopf);
+    for (const e of eintraege) {
+      const tr = document.createElement('tr'); tr.dataset.eintrag = e.id;
+      const z = (text, cls) => { const td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; tr.append(td); return td; };
+      z(e.name, 'name'); z(datum(e.datum), 'zahl'); z(groesse(Number(e.groesse) || 0), 'zahl'); z(APP_NAME[e.schreiber] || e.schreiber);
+      const tun = z('', 'tun');
+      if (e.verschluesselung === 'fpt1') {
+        const a = document.createElement('button'); a.type = 'button'; a.textContent = t('ansehen'); a.dataset.tun = 'ansehen';
+        const d = document.createElement('button'); d.type = 'button'; d.textContent = t('laden'); d.dataset.tun = 'laden';
+        a.onclick = () => holen(slug, ordner, e, false, a); d.onclick = () => holen(slug, ordner, e, true, d);
+        tun.append(a, ' ', d);
+      } else { tun.textContent = t('nurApp'); tun.className = 'tun muted'; }
+      tab.append(tr);
+      if (e.auszug) { const tr2 = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 5; td.className = 'muted'; td.style.borderTop = 'none'; td.style.paddingTop = '0'; td.textContent = e.auszug.slice(0, 200); tr2.append(td); tab.append(tr2); }
+    }
+    wrap.append(tab); box.append(wrap);
+  }
+  if (!host.children.length) { const p = document.createElement('p'); p.className = 'muted'; p.textContent = t('leer'); host.append(p); }
+}
+async function holen(slug, ordner, e, herunterladen, knopf) {
+  const alt = knopf.textContent; knopf.disabled = true;
+  try {
+    const blob = await dateiLesen(tresor, slug, ordner, e, (i, n) => { knopf.textContent = t('lese') + Math.round(i / n * 100) + ' %'; });
+    const url = URL.createObjectURL(blob);
+    if (herunterladen) {
+      const a = document.createElement('a'); a.href = url; a.download = String(e.name).replace(/[\\/:*?"<>|\x00-\x1f]/g, '_') || e.id; document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } else {
+      ansichtSchliessen(); ansichtUrl = url;
+      const v = $('ansicht'); $('ansichtTitel').textContent = e.name; $('ansichtKasten').hidden = false;
+      const art = blob.type;
+      if (art === 'application/pdf') { const f = document.createElement('iframe'); f.src = url; f.title = e.name; v.append(f); }
+      else if (art.startsWith('image/')) { const i = document.createElement('img'); i.src = url; i.alt = e.name; v.append(i); }
+      else if (art === 'text/plain') { const p = document.createElement('pre'); p.textContent = await blob.text(); v.append(p); }
+      else { const p = document.createElement('p'); p.className = 'muted'; p.textContent = e.art || 'application/octet-stream'; v.append(p); }
+      const a = document.createElement('a'); a.className = 'knopf'; a.href = url; a.download = String(e.name).replace(/[\\/:*?"<>|\x00-\x1f]/g, '_'); a.textContent = t('laden'); v.append(a);
+      $('ansichtKasten').scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
+    knopf.textContent = alt;
+  } catch (err) { knopf.textContent = alt; alert(meldung(err)); }
+  finally { knopf.disabled = false; }
+}
+$('sprache').onclick = () => { lang = lang === 'de' ? 'en' : 'de'; sprache(); };
+$('ordner').addEventListener('change', ev => {
+  sperren(''); $('schritt2').hidden = true; setStatus($('pwStatus'), '');
+  try { ordnerName = ordnerUebernehmen(ev.target.files || []); setStatus($('ordnerStatus'), t('gefunden') + ordnerName, 'gut'); $('schritt2').hidden = false; $('pw').focus(); }
+  catch (e) { dateien = new Map(); setStatus($('ordnerStatus'), meldung(e), 'fehler'); }
+});
+$('pwForm').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const feld = $('pw'), wert = feld.value; feld.value = '';
+  if (!subtle) { setStatus($('pwStatus'), t('KEIN_KRYPTO'), 'fehler'); return; }
+  if (!wert) return;
+  $('oeffnen').disabled = true; setStatus($('pwStatus'), t('pruefe'));
+  try { sperren(''); tresor = await oeffnen(wert); setStatus($('pwStatus'), ''); $('schritt3').hidden = false; await zeigen(); }
+  catch (e) { sperren(''); setStatus($('pwStatus'), meldung(e), 'fehler'); }
+  finally { $('oeffnen').disabled = false; }
+});
+$('sperren').onclick = () => sperren(t('gesperrt'));
+$('ansichtZu').onclick = ansichtSchliessen;
+window.addEventListener('pagehide', () => sperren(''));
+sprache();
+// Für Proben: die reine Rechnung ohne Oberfläche (keine Wirkung auf den Tresor).
+window.TresorLeser = Object.freeze({ ordnerUebernehmen, oeffnen, verzeichnis: (t2, s) => verzeichnis(t2, s), dateiLesen });
+})();
+</script>
+</body>
+</html>
