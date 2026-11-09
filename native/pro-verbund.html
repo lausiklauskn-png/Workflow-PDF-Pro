@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pro-App-Verbund</title>
+<style>
+/* Vorbild: Familienakte docs/landkarte (Farben, Rahmen, Punkte). Stand: grün funktioniert · gelb gestrichelt veröffentlicht, nicht zusammen geprüft · orange gestrichelt gebaut, wartet aufs Veröffentlichen · rot fehlt · grau gestrichelt geplant. */
+:root {
+  --bg: #f4f7f9; --fg: #17262f; --muted: #4f6472; --line: #c8d9e2; --card: #ffffff; --ast: #8fb3c4; --hervor: #1f4e79; --teal: #2a7f86;
+  --f-rand: #2f8a4f; --f-flaeche: #eef8f1; --b-rand: #c58a00; --b-flaeche: #fff8e6; --a-rand: #c0392b; --a-flaeche: #fdf3f3;
+  --g-rand: #6f7c86; --g-flaeche: #eef1f3; --hub: #e8f1f6; --o-rand: #d2601a; --o-flaeche: #fff0e4;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f171d; --fg: #e3ecf1; --muted: #9fb2bf; --line: #2b3d49; --card: #16222b; --ast: #4f7486; --hervor: #7db4e6; --teal: #5cc4cc;
+  --f-rand: #5fc78a; --f-flaeche: #13281b; --b-rand: #e0ad3c; --b-flaeche: #2c2410; --a-rand: #ff7a6b; --a-flaeche: #331a17;
+  --g-rand: #e6edf2; --g-flaeche: #26323a; --hub: #1a2a35; --o-rand: #ff9a52; --o-flaeche: #34210f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f171d; --fg: #e3ecf1; --muted: #9fb2bf; --line: #2b3d49; --card: #16222b; --ast: #4f7486; --hervor: #7db4e6; --teal: #5cc4cc;
+  --f-rand: #5fc78a; --f-flaeche: #13281b; --b-rand: #e0ad3c; --b-flaeche: #2c2410; --a-rand: #ff7a6b; --a-flaeche: #331a17;
+  --g-rand: #e6edf2; --g-flaeche: #26323a; --hub: #1a2a35; --o-rand: #ff9a52; --o-flaeche: #34210f; color-scheme: dark }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.45 var(--font); padding: 16px max(16px, env(safe-area-inset-right)) 80px max(16px, env(safe-area-inset-left)); overflow-x: hidden; }
+main { max-width: 1500px; margin: 0 auto; display: grid; gap: 14px; }
+h1 { font-size: 1.5rem; margin: 0; }
+h2 { font-size: 1.08rem; margin: 0; }
+h3 { font-size: .95rem; margin: 0; }
+p { margin: 0; }
+.eyebrow { font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); }
+.ic { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; vertical-align: -3px; }
+.kasten { border: 1px solid var(--line); border-radius: 12px; background: var(--card); padding: 12px 14px; display: grid; gap: 8px; min-width: 0; }
+.legende { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .86rem; align-items: center; }
+.legende span { display: inline-flex; align-items: center; gap: 6px; }
+.muster { display: inline-block; width: 24px; height: 15px; border-radius: 4px; flex: none; }
+.s-gruen { border: 2px solid var(--f-rand); background: var(--f-flaeche); }
+.s-gelb { border: 2px dashed var(--b-rand); background: var(--b-flaeche); }
+.s-rot { border: 2px solid var(--a-rand); background: var(--a-flaeche); }
+.s-grau { border: 2px dashed var(--g-rand); background: var(--g-flaeche); }
+.s-orange { border: 2px dashed var(--o-rand); background: var(--o-flaeche); }
+.leiste { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+button { font: inherit; color: inherit; }
+.k { font-weight: 600; font-size: .86rem; padding: 5px 11px; border-radius: 8px; border: 1px solid var(--hervor); background: var(--card); color: var(--hervor); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.k[aria-pressed="true"] { background: var(--hervor); color: var(--card); }
+.k b { font-variant-numeric: tabular-nums; }
+.so ol { margin: 0; padding-left: 1.2em; display: grid; gap: 2px; }
+.raster { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1000px) { .raster { grid-template-columns: minmax(0, 1fr) 380px; align-items: start; } .detail-spalte { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; } }
+/* Apps */
+.apps { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); }
+.app { position: relative; text-align: left; border: 2px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 10px 8px 12px; cursor: pointer; display: grid; gap: 2px; }
+.app strong { font-size: .93rem; }
+.app small { font-size: .76rem; color: var(--muted); }
+.app .plat { display: flex; flex-wrap: wrap; gap: 4px; }
+.plat i { font-style: normal; font-size: .7rem; font-weight: 700; padding: 0 6px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.app.an { border-color: var(--hervor); box-shadow: 0 0 0 2px var(--hervor); }
+/* Graph */
+.graph-rahmen { border: 1px solid var(--line); border-radius: 12px; background: var(--card); overflow: hidden; }
+#graph { display: block; width: 100%; height: auto; touch-action: manipulation; }
+#graph .linie { fill: none; stroke-width: 2.4; cursor: pointer; }
+#graph .linie.gruen { stroke: var(--f-rand); }
+#graph .linie.gelb { stroke: var(--b-rand); stroke-dasharray: 7 5; }
+#graph .linie.rot { stroke: var(--a-rand); }
+#graph .linie.grau { stroke: var(--g-rand); stroke-dasharray: 5 4; stroke-width: 2.8; }
+#graph .linie.orange { stroke: var(--o-rand); stroke-dasharray: 11 4; }
+#graph .treff { fill: none; stroke: transparent; stroke-width: 24; cursor: pointer; pointer-events: stroke; }
+#graph .linie { pointer-events: none; }
+#graph .linie.aus, #graph .knoten.aus { opacity: .14; }
+#graph .linie.an { stroke-width: 4; }
+#graph, #graph *, #graph *:focus { outline: none; }
+#graph .knoten { cursor: pointer; }
+#graph .knoten rect { fill: var(--card); stroke: var(--line); stroke-width: 2; }
+#graph .knoten.hub rect { fill: var(--hub); stroke: var(--teal); }
+#graph .knoten.an rect { stroke: var(--hervor); stroke-width: 3.5; }
+#graph text { fill: var(--fg); font: 600 15px var(--font); pointer-events: none; }
+#graph text.klein { font-weight: 400; font-size: 12px; fill: var(--muted); }
+#graph .spitze { fill: var(--muted); }
+/* Wege-Baum */
+.baum { display: grid; gap: 10px; }
+details.ast { border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+details.ast > summary { list-style: none; cursor: pointer; padding: 10px 12px; display: flex; gap: 8px; align-items: center; font-weight: 700; }
+details.ast > summary::-webkit-details-marker { display: none; }
+details.ast > summary .pf { margin-left: auto; transition: transform .15s; }
+details.ast[open] > summary .pf { transform: rotate(90deg); }
+details.ast > summary small { font-weight: 400; color: var(--muted); }
+.ast-inhalt { padding: 0 10px 10px; display: grid; gap: 6px; }
+.ast-inhalt > p { font-size: .84rem; color: var(--muted); padding: 0 4px; }
+.fach { border-left: 3px solid var(--teal); padding: 4px 0 4px 10px; display: grid; gap: 5px; }
+.fach-kopf { font-size: .84rem; font-weight: 700; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.fach-kopf small { font-weight: 400; color: var(--muted); }
+.weg { position: relative; width: 100%; text-align: left; border-radius: 8px; padding: 6px 10px 6px 24px; cursor: pointer; display: grid; gap: 1px; line-height: 1.3; }
+.weg .punkt { position: absolute; left: 9px; top: 12px; width: 8px; height: 8px; border-radius: 50%; }
+.weg.s-gruen .punkt { background: var(--f-rand); } .weg.s-gelb .punkt { background: var(--b-rand); }
+.weg.s-rot .punkt { background: var(--a-rand); } .weg.s-grau .punkt { background: var(--g-rand); } .weg.s-orange .punkt { background: var(--o-rand); }
+.weg strong { font-size: .86rem; overflow-wrap: anywhere; }
+.weg small { font-size: .76rem; color: var(--muted); overflow-wrap: anywhere; }
+.weg.an { box-shadow: 0 0 0 3px var(--hervor); }
+.weg.aus { display: none; }
+.richtung { color: var(--hervor); font-weight: 700; }
+/* Detail */
+.detail { display: grid; gap: 8px; }
+.detail dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 10px; font-size: .88rem; }
+.detail dt { color: var(--muted); }
+.detail dd { margin: 0; overflow-wrap: anywhere; }
+.marke { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 700; padding: 1px 9px; border-radius: 999px; justify-self: start; }
+.marke.s-gruen { color: var(--f-rand); } .marke.s-gelb { color: var(--b-rand); } .marke.s-rot { color: var(--a-rand); } .marke.s-grau { color: var(--g-rand); } .marke.s-orange { color: var(--o-rand); }
+.quelle { font-size: .74rem; color: var(--muted); font-family: ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+.leer { color: var(--muted); font-size: .9rem; }
+.zu { display: none; }
+@media (max-width: 999px) {
+  .detail-spalte.offen { position: fixed; z-index: 30; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); max-height: 62vh; overflow: auto; box-shadow: 0 10px 30px rgba(0,0,0,.3); border: 2px solid var(--hervor); }
+  .detail-spalte:not(.offen) { display: none; }
+  .zu { display: inline-flex; }
+}
+.waehle { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); align-items: end; }
+label.feld { display: grid; gap: 3px; font-size: .84rem; color: var(--muted); }
+select { font: inherit; color: var(--fg); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; width: 100%; }
+.antwort { display: grid; gap: 6px; }
+ul.liste { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.hinweis { font-size: .84rem; color: var(--muted); }
+/* Kein weißer Rahmen beim Antippen; nur Tastatur zeigt eine farbige Markierung */
+* { -webkit-tap-highlight-color: transparent; }
+:focus { outline: none; }
+button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+#graph g:focus, #graph g:focus-visible { outline: none; }
+#graph .knoten:focus-visible rect { stroke: var(--teal); stroke-width: 3.5; }
+.fehlt-teil { display: grid; gap: 6px; }
+.basic-schalter { font-size: .78rem; color: var(--muted); text-align: right; }
+.basic-schalter input { vertical-align: -2px; margin: 0 4px 0 0; }
+.fehlt-teil h3 { display: flex; gap: 8px; align-items: center; }
+@media print { .detail-spalte { display: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-tresor" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/></symbol>
+  <symbol id="i-teilen" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.6M8.2 13.2l7.6 4.6"/></symbol>
+  <symbol id="i-direkt" viewBox="0 0 24 24"><path d="M5 12h12"/><path d="M13 7l5 5-5 5"/><path d="M3 5v14"/></symbol>
+  <symbol id="i-mycel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M6.5 6.5l3.7 3.7M17.5 6.5l-3.7 3.7M6.5 17.5l3.7-3.7M17.5 17.5l-3.7-3.7"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+  <symbol id="i-baustein" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V5h3v3M13 8V5h3v3"/></symbol>
+  <symbol id="i-pfeil" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-vorsicht" viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.5"/></symbol>
+  <symbol id="i-zu" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+</svg>
+<main>
+  <div>
+    <span class="eyebrow">Entwurf · Stand 09.11.2026, 19 Uhr · nur Pro-Apps · aus den Repos gelesen</span>
+    <h1>Pro-App-Verbund</h1>
+    <p class="hinweis">Wie die Apps Daten weitergeben, sich kennenlernen und gemeinsam suchen. Nicht, was jede App einzeln kann.</p>
+  </div>
+
+  <section class="kasten">
+    <div class="legende" aria-label="Legende">
+      <span><i class="muster s-gruen"></i> funktioniert (veröffentlicht und in echten Proben oder am Gerät bestanden)</span>
+      <span><i class="muster s-gelb"></i> veröffentlicht, aber am Gerät noch nicht zusammen geprüft (oder nur teilweise)</span>
+      <span><i class="muster s-orange"></i> gebaut, wartet aufs Veröffentlichen oder Einbauen – schnell fertig</span>
+      <span><i class="muster s-rot"></i> funktioniert noch nicht</span>
+      <span><i class="muster s-grau"></i> geplant</span>
+      <span><b>→</b> eine Richtung</span><span><b>⇄</b> hin und zurück</span>
+      <span><svg class="ic"><use href="#i-vorsicht"/></svg> Vorsicht</span>
+    </div>
+    <div class="so"><ol>
+      <li>Tippe eine <b>App</b> an: alle ihre Wege leuchten auf.</li>
+      <li>Tippe einen <b>Weg</b> an (in der Karte oder in der Liste): unten steht von wo, wohin, was, wie und wie sicher.</li>
+      <li>Mit den Farb-Knöpfen blendest du nur grüne, gelbe, orange, rote oder graue Wege ein.</li>
+      <li><b>Orange</b> heißt: fertig gebaut, fehlt nur noch Veröffentlichen (oder Einbauen) und ein Test. Das geht am schnellsten.</li>
+    </ol></div>
+    <div class="leiste" id="filter" role="group" aria-label="Nach Stand filtern"></div>
+  </section>
+
+  <div class="raster">
+    <div style="display:grid;gap:14px;min-width:0">
+      <section class="kasten" aria-labelledby="h-apps">
+        <h2 id="h-apps">Die Apps</h2>
+        <div class="apps" id="apps"></div>
+      </section>
+
+      <section aria-labelledby="h-karte" style="display:grid;gap:8px">
+        <h2 id="h-karte">Karte</h2>
+        <p class="hinweis">In der Mitte: der gemeinsame Tresor (Dateien) und das Mycel (Visitenkarten und Suchantworten, nie Dateien). Linien direkt zwischen Apps sind Teilen, Direktstart, Links und eingebaute Teile.</p>
+        <div class="graph-rahmen"><svg id="graph" role="group" aria-label="Karte der Wege zwischen den Apps"></svg></div>
+      </section>
+
+      <section aria-labelledby="h-wege" style="display:grid;gap:8px">
+        <h2 id="h-wege">Wege zwischen den Apps</h2>
+        <div class="baum" id="baum"></div>
+      </section>
+
+      <section class="kasten" aria-labelledby="h-wohin">
+        <h2 id="h-wohin">Wenn ich … schicke, wo landet es?</h2>
+        <div class="waehle">
+          <label class="feld">von App <select id="von"></select></label>
+          <label class="feld">an App <select id="an"></select></label>
+        </div>
+        <div class="antwort" id="antwort" aria-live="polite"></div>
+      </section>
+
+      <section class="kasten" aria-labelledby="h-fehlt">
+        <h2 id="h-fehlt">Was fehlt noch</h2>
+        <p class="hinweis">Zuerst das Orange: das ist fertig und braucht nur Veröffentlichen und Testen. Danach Rot und Grau. Das ist die Bauliste.</p>
+        <div class="baum" id="fehlt"></div>
+      </section>
+    </div>
+
+    <aside class="kasten detail-spalte" id="detail-spalte" aria-labelledby="h-detail">
+      <div class="leiste" style="justify-content:space-between">
+        <h2 id="h-detail">Einzelheiten</h2>
+        <button class="k zu" type="button" id="zu"><svg class="ic"><use href="#i-zu"/></svg> Schließen</button>
+      </div>
+      <div class="detail" id="detail"><p class="leer">Tippe eine App oder einen Weg an.</p></div>
+    </aside>
+  </div>
+  <p class="basic-schalter"><label><input type="checkbox" id="basic-zeigen"> Basic-Varianten zeigen</label></p>
+</main>
+
+<script>
+"use strict";
+// ---------- Daten ----------
+const APPS = [
+  { id: 'fa', name: 'Familienakte Pro', kurz: 'Familienakte', plat: ['Android', 'Windows'],
+    text: 'Die native Familienakte (Fassung 2.28.50, heute veröffentlicht). Eingebaut: Workflow PDF als eigene Kopie (eigene Datenbank, gleicher Kern wie Workflow PDF Pro). Eigenes Fach „Familienakte“, Eingang „Eingang-Familienakte“. Hinweis: Windows 2.28.50 gibt es bisher nur als GitHub-Download; der Update-Server family-projekt.de kennt es noch nicht.',
+    quelle: 'Meine-Familienakte/CLAUDE.md · public/apps/workflow-pdf/' },
+  { id: 'blp', name: 'BookLedgerPro', kurz: 'BookLedgerPro', plat: ['Android', 'Windows'],
+    text: 'Buchhaltung. Veröffentlicht: 0.1.10 (Android und Windows), 0.1.11 (Windows); 0.1.12 wird gerade veröffentlicht. Eingebaut: Scanner-Kern von Workflow PDF, Angebotsplaner (Calculate) und Bedarfsanalyse (Needs). Eigenes Fach „BookLedgerPro“ (Sicherung, Belege), Eingang „Eingang-BookLedgerPro“.',
+    quelle: 'BookLedgerPro/CLAUDE.md · src/domain/tresorordner.js' },
+  { id: 'wpp', name: 'Workflow PDF Pro', kurz: 'Workflow PDF Pro', plat: ['Android', 'Windows'],
+    text: 'Scannen, Formulare. Hier wird der gemeinsame Tresor gepflegt (Quelle für alle). Enthält den PDF-Kern (Fassung 1.1.8/1.1.9), denselben, den auch die Familienakte und der Scanner in BookLedgerPro nutzen. Veröffentlicht: Android 1.0.14, Windows 1.0.13. Eigenes Fach „Workflow PDF Pro“, Eingang „Eingang-WorkflowPDF“.',
+    quelle: 'workflow-pdf-pro/CLAUDE.md · android/.../tresor/Fach.java' },
+  { id: 'pb', name: 'Private Brain Pro', kurz: 'Private Brain Pro', plat: ['Android', 'Windows'],
+    text: 'Mails, Dokumente, Bedeutungssuche. Veröffentlicht: Android 1.0.45, Windows 1.0.44; 1.0.46 ist zusammengeführt, wartet aufs Veröffentlichen. Quelle der gemeinsamen Bedien-Bausteine (Kasten „Überall suchen“, Chefcode, Hintergrundaufgabe). Eigenes Fach „Private Brain“, Eingang „Eingang-Private-Brain“.',
+    quelle: 'privat-brain-pro/CLAUDE.md · docs/PRO-VERBUND-NATIV.md' },
+  { id: 'wfpdf', basic: true, pro: 'wpp', name: 'Workflow PDF (Web-App, Basic)', kurz: 'Workflow PDF', plat: ['PWA'],
+    text: 'Die Web-App, aus der der Kern für Workflow PDF Pro, die Familienakte und den Scanner in BookLedgerPro kommt. Kein Tresor; Austausch über Teilen und Adressen.',
+    quelle: 'Workflow-PDF/CLAUDE.md' },
+  { id: 'basic', basic: true, pro: 'blp', name: 'BookLedger Basic', kurz: 'BL Basic', plat: ['PWA'],
+    text: 'Web-Kopie von BookLedgerPro mit eigener Datenbank. Kein Tresor. Daten kommen über eine Sicherungsdatei.',
+    quelle: 'bookledger-basic/CLAUDE.md' },
+  { id: 'fab', basic: true, pro: 'fa', name: 'Familienakte Basic (Web-App)', kurz: 'FA Basic', plat: ['PWA'],
+    text: 'Die Web-App der Familienakte. Kein Tresor; Austausch nur über Teilen und Dateien. Die Pro-Fassung heißt „Familienakte Pro“.',
+    quelle: 'Meine-Familienakte/CLAUDE.md (Namen) · public/manifest.webmanifest' },
+  { id: 'calc', name: 'Calculate & Needs (in BookLedgerPro)', kurz: 'Calculate/Needs', plat: ['in BLP'],
+    text: 'Angebotsplaner und Bedarfsanalyse. In BookLedgerPro eingebaut (unveränderte Kopie) – ein Teil der Pro-App.',
+    quelle: 'BookLedgerPro/apps/HERKUNFT.json' },
+  { id: 'workfloh', name: 'Mein-WorkFloh / Tomys WorkFloh', kurz: 'WorkFloh', plat: ['PWA'],
+    text: 'Aufträge (Web-App, keine Basic-Variante). Der Rundlauf Angebot → Auftrag → Rechnung geht nur über Web-Adressen; mit der nativen BookLedgerPro geht er noch nicht. Repo hier nicht vorhanden, aus BLP gelesen.',
+    quelle: 'BookLedgerPro/docs/UEBERNAHME_TOMY.md' },
+  { id: 'alis', name: 'Alis Moderaum', kurz: 'Alis Moderaum', plat: ['PWA'],
+    text: 'Boutique mit Warenwirtschaft und Kasse (Web-App, keine Basic-Variante; nur Karte, Bargeld in die Kassenlade). Die Umsatzsummen gehen heute nur an eine Web-Adresse, noch nicht in die native BookLedgerPro.',
+    quelle: 'Alis-Moderaum/CLAUDE.md · warehouse.html' },
+  { id: 'pbv3', name: 'Private Brain V3', kurz: 'PB V3', plat: ['Android', 'Windows'],
+    text: 'Eigene App mit eigenem Fach „Private Brain V3“ im Tresor. Repo hier nicht vorhanden – nicht nachgeprüft.',
+    quelle: 'workflow-pdf-pro/.../tresor/Fach.java' },
+];
+const HUBS = [
+  { id: 'tresor', name: 'Gemeinsamer Tresor', kurz: 'Tresor', text: 'Ein Ordner (Tablet, SD-Karte oder PC) mit einem Passwort für alle Pro-Apps. Neun Fächer. Jede App schreibt nur in ihr eigenes Fach und in die Eingänge der anderen; gelesen werden darf alles. Gelöscht wird in keinem Fach; „übernommen“ ist eine Marke. Nur in den Pro-Apps.', quelle: 'workflow-pdf-pro/android/.../tresor/Fach.java' },
+  { id: 'mycel', name: 'Mycel (SBKIM)', kurz: 'Mycel', text: 'Das Netz der Apps. Über das Mycel gehen nur Visitenkarten (Name, Siegel) und kurze Antwortzeilen auf Suchfragen – nie Dateien. Öffentlich nur Titel, Datum, Betrag oder Dateiname; mehr nur im eigenen Netz (Chefcode oder Beitritts-Code).', quelle: 'BookLedgerPro/src/sbkim/netz.js · src/domain/ueberall.js' },
+];
+
+const ARTEN = {
+  tresor: { name: 'Gemeinsamer Tresor', icon: 'i-tresor', satz: 'Datei wird verschlüsselt ins Eingangsfach der Ziel-App gelegt (Vertrag „familienakte-uebergabe/1“, höchstens 20 MiB je Datei). Die Ziel-App übernimmt sie von Hand und setzt danach die Marke „übernommen“. Erst diese Marke heißt: angekommen.' },
+  teilen: { name: 'Teilen (Android/Windows)', icon: 'i-teilen', satz: 'Das normale Teilen-Fenster des Geräts. Geht auch ohne Tresor. Ob die Ziel-App die Datei wirklich gespeichert hat, meldet niemand zurück.' },
+  direkt: { name: 'Direktstart', icon: 'i-direkt', satz: 'Eine App öffnet eine andere an einer bestimmten Stelle. Daten gehen meist per Teilen zurück.' },
+  link: { name: 'Adressen, Dateien und Verträge', icon: 'i-link', satz: 'Daten stecken in einer Web-Adresse oder einer Arbeitsstand-Datei. Web-Adressen nimmt die native BookLedgerPro nicht an – darum sind diese Wege dort rot.' },
+  mycel: { name: 'Mycel (Visitenkarte und Suche)', icon: 'i-mycel', satz: 'Nur Visitenkarten und Antwortzeilen. Keine Dateien.' },
+  baustein: { name: 'Eingebaut und gemeinsame Bausteine', icon: 'i-baustein', satz: 'Eine App enthält eine unveränderte Kopie einer anderen oder eines gemeinsamen Teils. Das ist Code, kein Datenweg – außer wo es dabei steht.' },
+};
+
+// stand: gruen | gelb | rot | grau
+const W = (o) => o;
+const WEGE = [
+  // ---- Tresor: eigene Ablage ----
+  W({ id: 't-blp-eigen', art: 'tresor', von: 'blp', nach: 'tresor', fach: 'BookLedgerPro', r: '→', titel: 'BookLedgerPro sichert in sein Fach',
+    was: 'Automatische Sicherung des Bestands (Unterordner „Sicherung“) und jedes Beleg-Original (Unterordner „Belege“).', wie: 'Von selbst, nur bei Änderung, höchstens alle 10 Minuten.', tun: 'Einmal Tresor einrichten oder wählen.',
+    stand: 'gruen', grund: 'Veröffentlicht; Ordner am Tablet mit allen drei Apps bestanden.', geprueft: 'Am Tablet 28.10.2026 (Schritt E).', quelle: 'BookLedgerPro/native/blp-native.js · docs/TRESORORDNER.md' }),
+  W({ id: 't-wpp-eigen', art: 'tresor', von: 'wpp', nach: 'tresor', fach: 'Workflow PDF Pro', r: '→', titel: 'Workflow PDF Pro legt seine Bibliothek ab',
+    was: 'Arbeitsstand und Dokumente der Bibliothek, gesammelt geschrieben.', wie: 'Nach 10 s Ruhe, beim Speichern, Schließen, Sperren.', tun: 'Ordner „Workflow PDF Pro“ wählen.',
+    stand: 'gruen', grund: 'Veröffentlicht; Ordner am Tablet bestanden.', geprueft: 'Am Tablet 28.10.2026 (Schritt E).', quelle: 'workflow-pdf-pro/docs/TRESORORDNER.md' }),
+  W({ id: 't-pb-eigen', art: 'tresor', von: 'pb', nach: 'tresor', fach: 'Private Brain', r: '→', titel: 'Private Brain Pro legt Originale und Katalog ab',
+    was: 'Originale, Mails, Katalogsicherung, verschlüsselt.', wie: 'Beim Einlesen und Sichern.', tun: 'Einzug in den Tresor ist eine eigene Wahl.',
+    stand: 'gruen', grund: 'Veröffentlicht; Ordner am Tablet bestanden.', geprueft: 'Am Tablet 28.10.2026 (Schritt E).', quelle: 'privat-brain-pro/docs/TRESORORDNER.md' }),
+  W({ id: 't-fa-eigen', art: 'tresor', von: 'fa', nach: 'tresor', fach: 'Familienakte', r: '→', titel: 'Familienakte legt Originale ab (mit Kurzfassung)',
+    was: 'Originale; seit 2.28.50 dazu eine Kurzfassung „Titel · Bereich · Datum“ und Textanfang (höchstens 1000 Zeichen) im Inhaltsverzeichnis. Gesundheit und Vorsorge nur Titel · Bereich · Datum.', wie: 'Beim Ablegen eines Originals im Pro-Tresor.', tun: 'Speicherort „Pro-Tresor“ wählen.',
+    stand: 'gelb', grund: 'Veröffentlicht in 2.28.50 (heute, Android und Windows). Ältere Originale bleiben ohne Kurzfassung. Am Gerät mit den anderen Apps nicht zusammen geprüft. Hinweis: Windows 2.28.50 nur als GitHub-Download, der Update-Server family-projekt.de fehlt noch.', geprueft: 'Nur automatische Proben.', quelle: 'Meine-Familienakte/docs/PRO-BRUECKEN.md · lib/tresor-kurzfassung.ts' }),
+  W({ id: 't-pbv3-eigen', art: 'tresor', von: 'pbv3', nach: 'tresor', fach: 'Private Brain V3', r: '→', titel: 'Private Brain V3 hat ein eigenes Fach',
+    was: 'Fach ist im Tresor vorgesehen.', wie: 'Unbekannt (Repo nicht hier).', tun: '–',
+    stand: 'gelb', grund: 'Das Fach ist im veröffentlichten Tresor-Paket; ob V3 es benutzt, ist nicht nachgeprüft.', geprueft: 'Nicht nachgeprüft.', quelle: 'workflow-pdf-pro/.../tresor/Fach.java' }),
+  // ---- Tresor: Übergaben ----
+  W({ id: 't-wpp-blp', art: 'tresor', von: 'wpp', nach: 'blp', fach: 'Eingang-BookLedgerPro', r: '→', titel: 'PDF oder Bild an BookLedgerPro',
+    was: 'PDF, Bilder (Rechnungen, Scans).', wie: 'Workflow PDF Pro: „Teilen“ → bei verbundenem Tresor erscheint „BookLedgerPro“.', tun: 'In BookLedgerPro: Tresorordner → „Neu im Tresorordner“ → Übernehmen (von Hand).',
+    stand: 'gelb', grund: 'Senden veröffentlicht (WPP 1.0.11 und neuer), Übernehmen von Hand in BLP veröffentlicht. Zwei-App-Probe am Gerät nicht vollständig. Das automatische Übernehmen ist ein eigener Weg (orange, BLP 0.1.12).', geprueft: 'Automatische Proben mit nachgestellter Gegen-App.', quelle: 'workflow-pdf-pro/docs/PRO-VERBUND-BEDIENUNG.md · BookLedgerPro/src/ui/views/tresorordner.js' }),
+  W({ id: 't-wpp-fa', art: 'tresor', von: 'wpp', nach: 'fa', fach: 'Eingang-Familienakte', r: '→', titel: 'PDF oder Bild an die Familienakte',
+    was: 'PDF, Bilder, kleine Arbeitsstände.', wie: '„Teilen“ → „Familienakte Pro“.', tun: 'In der Familienakte: „Pro-Eingang prüfen“ → aufnehmen.',
+    stand: 'gelb', grund: 'Veröffentlicht. Windows: echtes App-Paar in der Prüfumgebung geprüft. Android: Paarprobe nicht vollständig (Workflow-PDF-Pro #59 Entwurf).', geprueft: 'Windows-Paar geprüft; Android offen.', quelle: 'workflow-pdf-pro/CLAUDE.md · Meine-Familienakte/docs/PRO-VERBUND-NATIV.md' }),
+  W({ id: 't-wpp-pb', art: 'tresor', von: 'wpp', nach: 'pb', fach: 'Eingang-Private-Brain', r: '→', titel: 'PDF oder Bild an Private Brain Pro',
+    was: 'PDF, Bilder.', wie: '„Teilen“ → „Private Brain Pro“.', tun: 'In Private Brain: „Eingang prüfen und übernehmen“.',
+    stand: 'gelb', grund: 'Veröffentlicht (WPP 1.0.11+, PB 1.0.44), aber am Gerät noch nicht zusammen mit der anderen App geprüft.', geprueft: 'Nur automatische Proben je App.', quelle: 'workflow-pdf-pro/native/native-pro-verbund.js · privat-brain-pro/docs/PRO-VERBUND-NATIV.md' }),
+  W({ id: 't-pb-fa', art: 'tresor', von: 'pb', nach: 'fa', fach: 'Eingang-Familienakte', r: '→', titel: 'Datei aus Private Brain an die Familienakte',
+    was: 'Dateien, die der Familienakte-Eingang kennt.', wie: 'Datei öffnen → „An Pro-App …“ → Familienakte Pro.', tun: 'Familienakte: „Pro-Eingang prüfen“. In Private Brain „Bestätigungen prüfen“ zeigt dann „Im Eingang der Ziel-App“.',
+    stand: 'gruen', grund: 'Private Brain 1.0.44 veröffentlicht; Zwei-App-Proben mit der echten Familienakte auf Android und Windows bestanden.', geprueft: 'Zwei-App-Proben in der Prüfumgebung (02.11.), nicht am Tablet.', quelle: 'privat-brain-pro/docs/PRO-VERBUND-VEROEFFENTLICHUNG-1.0.44.md' }),
+  W({ id: 't-pb-fa-mail', art: 'tresor', von: 'pb', nach: 'fa', fach: 'Eingang-Familienakte', r: '→', titel: 'Mail mit Anhängen an die Familienakte',
+    was: 'Die unveränderte Mail (.eml) mit allen Anhängen.', wie: 'Geöffnete Mail → „An Familienakte teilen“. Gesperrter Tresor: erst fragen. Kein Tresor: Teilen-Fenster.', tun: 'Familienakte: „Pro-Eingang prüfen“ → aufnehmen; Anhänge auf Knopfdruck herauslösen.',
+    stand: 'orange', grund: 'Fertig gebaut und zusammengeführt (Private Brain 1.0.46). Wartet nur aufs Veröffentlichen und einen Test mit der echten Familienakte im selben Tresor.', geprueft: 'Nur automatische Proben (42 und 84 grün, Gegenprobe 9/9).', quelle: 'privat-brain-pro/docs/PRO-VERBUND-NATIV.md (Abschnitt 09.11.)' }),
+  W({ id: 't-pb-blp-mail', art: 'tresor', von: 'pb', nach: 'blp', fach: 'Eingang-BookLedgerPro/Mails', r: '→', titel: 'Rechnungsmail an BookLedgerPro',
+    was: 'Die Mail als .eml. BLP macht daraus einen Mail-Beleg, PDF-Anhänge werden eigene Belege mit Positionen.', wie: 'Geöffnete Mail → „An BookLedgerPro teilen“ → „In den Tresorordner“ (sonst Teilen-Fenster).', tun: 'BookLedgerPro: Tresorordner → Übernehmen.',
+    stand: 'gelb', grund: 'Veröffentlicht (PB 1.0.41). Der gemeinsame Ordner bestand am Tablet; ob dabei eine Mail übernommen wurde, steht nirgends.', geprueft: 'Ordner am Tablet 28.10.; Mail-Weg nur automatische Proben.', quelle: 'privat-brain-pro/native/native-tresorordner.js · assets/live-mail.js' }),
+  W({ id: 't-pb-blp', art: 'tresor', von: 'pb', nach: 'blp', fach: 'Eingang-BookLedgerPro', r: '→', titel: 'Datei aus Private Brain an BookLedgerPro',
+    was: 'PDF, Bilder, .eml.', wie: 'Datei öffnen → „An Pro-App …“ → BookLedgerPro.', tun: 'BookLedgerPro: Tresorordner → Übernehmen.',
+    stand: 'gelb', grund: 'Veröffentlicht (PB 1.0.44, BLP 0.1.10), aber am Gerät noch nicht zusammen mit der anderen App geprüft. Dass Mails als .eml statt .txt gehen, kommt erst mit PB 1.0.46 (eigener oranger Weg).', geprueft: 'Nur automatische Proben je App.', quelle: 'privat-brain-pro/docs/PRO-VERBUND-NATIV.md' }),
+  W({ id: 't-pb-wpp', art: 'tresor', von: 'pb', nach: 'wpp', fach: 'Eingang-WorkflowPDF', r: '→', titel: 'Datei aus Private Brain an Workflow PDF Pro',
+    was: 'PDF, Bilder.', wie: '„An Pro-App …“ → Workflow PDF Pro.', tun: 'Workflow PDF Pro: Eingang über den Karten → Dateien wählen → „Auswahl übernehmen“.',
+    stand: 'gelb', grund: 'Veröffentlicht (PB 1.0.44, WPP 1.0.11+), aber am Gerät noch nicht zusammen mit der anderen App geprüft.', geprueft: 'Nur automatische Proben je App.', quelle: 'workflow-pdf-pro/docs/PRO-VERBUND-BEDIENUNG.md' }),
+  W({ id: 't-blp-wpp', art: 'tresor', von: 'blp', nach: 'wpp', fach: 'Eingang-WorkflowPDF', r: '→', titel: 'Beleg an Workflow PDF Pro',
+    was: 'Beleg-Original (PDF, Bild).', wie: 'Belegzeile → „An Pro-App geben …“ → Workflow PDF Pro.', tun: 'Workflow PDF Pro: Eingang → „Auswahl übernehmen“.',
+    stand: 'gelb', grund: 'Veröffentlicht (BLP 0.1.10, WPP 1.0.14), aber am Gerät noch nicht zusammen mit der anderen App geprüft.', geprueft: 'Nur automatische Proben.', quelle: 'BookLedgerPro/src/ui/proAppGeben.js' }),
+  W({ id: 't-blp-pb', art: 'tresor', von: 'blp', nach: 'pb', fach: 'Eingang-Private-Brain', r: '→', titel: 'Beleg an Private Brain Pro',
+    was: 'Beleg-Original.', wie: '„An Pro-App geben …“ → Private Brain Pro.', tun: 'Private Brain: „Eingang prüfen und übernehmen“.',
+    stand: 'gelb', grund: 'Veröffentlicht (BLP 0.1.10, PB 1.0.44), aber am Gerät noch nicht zusammen mit der anderen App geprüft.', geprueft: 'Nur automatische Proben.', quelle: 'BookLedgerPro/src/ui/proAppGeben.js' }),
+  W({ id: 't-blp-fa', art: 'tresor', von: 'blp', nach: 'fa', fach: 'Eingang-Familienakte', r: '→', titel: 'Beleg an die Familienakte',
+    was: 'Beleg-Original.', wie: '„An Pro-App geben …“ → Familienakte Pro.', tun: 'Familienakte: „Pro-Eingang prüfen“.',
+    stand: 'gelb', grund: 'Veröffentlicht (BLP 0.1.10, Familienakte 2.28.50), aber am Gerät noch nicht zusammen mit der anderen App geprüft.', geprueft: 'Nur automatische Proben.', quelle: 'BookLedgerPro/src/ui/proAppGeben.js' }),
+  W({ id: 't-fa-wpp', art: 'tresor', von: 'fa', nach: 'wpp', fach: 'Eingang-WorkflowPDF', r: '→', titel: 'Unterlage aus der Familienakte an Workflow PDF Pro',
+    was: 'Eine Unterlage (PDF, Bild). Die Quelle bleibt in der Akte.', wie: 'Bibliothek → „An Pro-App geben …“ → Workflow PDF Pro.', tun: 'Workflow PDF Pro: Eingang → „Auswahl übernehmen“.',
+    stand: 'gelb', grund: 'Veröffentlicht. Windows: echtes App-Paar in der Prüfumgebung geprüft. Android nicht vollständig.', geprueft: 'Windows-Paar geprüft; Android offen.', quelle: 'Meine-Familienakte/docs/PRO-VERBUND-NATIV.md' }),
+  W({ id: 't-fa-pb', art: 'tresor', von: 'fa', nach: 'pb', fach: 'Eingang-Private-Brain', r: '→', titel: 'Unterlage aus der Familienakte an Private Brain Pro',
+    was: 'Eine Unterlage.', wie: '„An Pro-App geben …“ → Private Brain Pro.', tun: 'Private Brain: „Eingang prüfen und übernehmen“.',
+    stand: 'gruen', grund: 'Hin- und Rückweg mit der echten Familienakte in den Zwei-App-Proben (Android und Windows) bestanden; PB 1.0.44 veröffentlicht.', geprueft: 'Zwei-App-Proben in der Prüfumgebung, nicht am Tablet.', quelle: 'privat-brain-pro/docs/PRO-VERBUND-NATIV.md' }),
+  W({ id: 't-fa-blp', art: 'tresor', von: 'fa', nach: 'blp', fach: 'Eingang-BookLedgerPro', r: '→', titel: 'Rechnung aus der Familienakte an BookLedgerPro',
+    was: 'PDF, Bilder, .eml.', wie: '„An Pro-App geben …“ → BookLedgerPro.', tun: 'BookLedgerPro: Tresorordner → Übernehmen.',
+    stand: 'gelb', grund: 'Veröffentlicht (Familienakte 2.28.50, BLP 0.1.10), aber am Gerät noch nicht zusammen mit der anderen App geprüft.', geprueft: 'Nur automatische Proben.', quelle: 'Meine-Familienakte/docs/PRO-VERBUND-NATIV.md' }),
+  W({ id: 't-blp-auto', art: 'tresor', von: 'tresor', nach: 'blp', fach: 'Eingang-BookLedgerPro', r: '→', titel: 'BookLedgerPro: Eingang automatisch übernehmen',
+    was: 'Über den Belegen steht „N neue Belege von … – Alle übernehmen“; mit dem Schalter „automatisch übernehmen“ geschieht es von selbst. Nur aus dem Fach „Eingang-BookLedgerPro“.', wie: 'Beim Öffnen oder Entsperren.', tun: 'Einmal „Alle übernehmen“ antippen oder den Schalter einschalten.',
+    stand: 'orange', grund: 'Fertig gebaut in BookLedgerPro 0.1.12, das gerade veröffentlicht wird. Danach am Gerät mit einer zweiten App testen. In 0.1.10 gibt es nur „Neu im Tresorordner“ zum Übernehmen von Hand.', geprueft: 'Nur automatische Proben.', quelle: 'BookLedgerPro/src/ui/i18n.js (tresor.neuHinweis)' }),
+  W({ id: 'fab-hinweis', basic: true, art: 'link', von: 'fab', nach: 'fa', r: '→', titel: 'Familienakte Basic hat keinen Tresor',
+    was: 'Die Web-App „Familienakte Basic“ kann nicht in den gemeinsamen Tresor schreiben oder daraus lesen.', wie: '–', tun: 'Für den Austausch die Pro-App nutzen.',
+    stand: 'grau', grund: 'Basic-Variante: der Tresor gibt es nur in den Pro-Apps.', geprueft: '–', quelle: 'Meine-Familienakte/CLAUDE.md (Namen)' }),
+  W({ id: 't-pb-eml', art: 'tresor', von: 'pb', nach: 'tresor', fach: 'Eingang (alle Pro-Apps)', r: '→', titel: 'Private Brain: Mails als .eml statt .txt an jede Pro-App',
+    was: 'Bei Mails schickt „An Pro-App …“ die unveränderte .eml mit Anhängen statt einer Textdatei.', wie: 'Datei-Fenster → „An Pro-App …“.', tun: 'In der Ziel-App wie gewohnt übernehmen.',
+    stand: 'orange', grund: 'Fertig gebaut und zusammengeführt (Private Brain 1.0.46). Wartet nur aufs Veröffentlichen und einen Test.', geprueft: 'Nur automatische Proben.', quelle: 'privat-brain-pro/CLAUDE.md (Mail an die Familienakte, 09.11.)' }),
+  W({ id: 't-leser', art: 'tresor', von: 'tresor', nach: 'wpp', fach: 'alle Fächer (nur lesen)', r: '→', titel: 'Tresor-Leser: Tresor ohne App lesen',
+    was: 'Eine HTML-Datei auf der Karte, die den Tresor nur lesend öffnet – ohne Installation.', wie: 'Datei im Browser öffnen, Passwort eingeben.', tun: '–',
+    stand: 'orange', grund: 'Gebaut (Workflow-PDF-Pro #68 auf main), aber in keiner App eingebaut und nicht ausgeliefert. Braucht nur Einbauen und einen Test.', geprueft: 'Nur automatische Proben.', quelle: 'Meine-Familienakte/CLAUDE.md (Gemeinsamer Tresor)' }),
+  W({ id: 't-ein-pb', art: 'tresor', von: 'pb', nach: 'tresor', fach: 'Private Brain', r: '→', titel: 'Private Brain: Tresor in einem Schritt einrichten',
+    was: 'Speicher wählen → Tresor finden oder anlegen → ein Passwort für Tresor und Ablage.', wie: 'Einstellungen → „Tresor einrichten – nur Speicher wählen“.', tun: 'Speicher wählen.',
+    stand: 'orange', grund: 'Gebaut (#130 auf main nach 1.0.45, Klaus’ Freibrief 05.11.), noch nicht veröffentlicht. Kommt mit der nächsten Fassung.', geprueft: 'Nur automatische Proben (20 grün).', quelle: 'privat-brain-pro/docs/TRESORORDNER.md' }),
+  W({ id: 't-ein-wpp', art: 'tresor', von: 'wpp', nach: 'tresor', fach: 'Workflow PDF Pro', r: '→', titel: 'Workflow PDF Pro: Tresor in einem Schritt einrichten',
+    was: 'Hauptordner finden oder anlegen, ein Passwort, Lies-mich; Speichern in den Tresor gesperrt.', wie: '„Tresor einrichten – nur Speicher wählen“.', tun: 'Speicher wählen.',
+    stand: 'orange', grund: 'Gebaut (#67 auf main), laut Familienakte-Stand nach der veröffentlichten 1.0.14 – im Zweifel orange: wartet aufs Veröffentlichen.', geprueft: 'Nur automatische Proben.', quelle: 'Meine-Familienakte/CLAUDE.md (Gemeinsamer Tresor)' }),
+  W({ id: 't-ein-blp', art: 'tresor', von: 'blp', nach: 'tresor', fach: 'BookLedgerPro', r: '→', titel: 'BookLedgerPro und Familienakte: Tresor in einem Schritt einrichten',
+    was: 'Speicher wählen, Tresor finden oder anlegen, ein Passwort.', wie: '„Tresor einrichten – nur Speicher wählen“ (auch in der Familienakte, FA #92).', tun: 'Speicher wählen.',
+    stand: 'gelb', grund: 'In veröffentlichten Fassungen enthalten (BLP #454 in 0.1.10, FA #92 seit 2.28.48). Am Gerät nicht zusammen mit den anderen Apps geprüft.', geprueft: 'Nur automatische Proben.', quelle: 'bookledger-basic/CLAUDE.md (Nachzug 05.11.) · Meine-Familienakte/CLAUDE.md' }),
+  // ---- Tresor: fremde Fächer nur lesen ----
+  W({ id: 't-blp-lesen', art: 'tresor', von: 'tresor', nach: 'blp', fach: 'alle Fächer (nur lesen)', r: '→', titel: 'BookLedgerPro sucht in allen Fächern',
+    was: 'Inhaltsverzeichnisse aller Fächer (Name, Kurzfassung). Treffer nennen die App („in Meine Familienakte“). Öffnen nur zum Lesen, nichts wird übernommen.', wie: '„Überall suchen“, Wort- und Bedeutungssuche.', tun: 'Tresor entsperrt; für Bedeutung die Bedeutungssuche einschalten.',
+    stand: 'gelb', grund: 'Veröffentlicht in BLP 0.1.10 (#456); am Gerät mit echten Fächern der anderen Apps nicht geprüft.', geprueft: 'Nur automatische Proben mit nachgestellter Brücke.', quelle: 'BookLedgerPro/src/ui/tresorFund.js' }),
+  W({ id: 't-wpp-lesen', art: 'tresor', von: 'tresor', nach: 'wpp', fach: 'alle Fächer (nur lesen)', r: '→', titel: 'Workflow PDF Pro sucht in den Fächern der anderen',
+    was: 'Zeilen aus den Fächern der anderen Pro-Apps.', wie: '„Überall suchen“ unter der Bibliothekssuche.', tun: 'Tresor entsperrt.',
+    stand: 'gelb', grund: 'Veröffentlicht (Baustein Fassung 7 in WPP 1.0.11 und neuer); am Gerät nicht geprüft.', geprueft: 'Nur automatische Proben.', quelle: 'workflow-pdf-pro/native/native-ueberall.js · pro-ueberall.js' }),
+  W({ id: 't-pb-lesen', art: 'tresor', von: 'tresor', nach: 'pb', fach: 'alle Fächer (nur lesen)', r: '→', titel: 'Private Brain sucht in den Fächern der anderen',
+    was: 'Zeilen aus den Fächern der anderen Pro-Apps.', wie: '„Überall suchen“.', tun: 'Tresor entsperrt.',
+    stand: 'gelb', grund: 'Veröffentlicht (PB 1.0.44); am Gerät nicht geprüft.', geprueft: 'Nur automatische Proben.', quelle: 'privat-brain-pro/docs/UEBERALL-SUCHEN.md' }),
+  // ---- Teilen ----
+  W({ id: 's-wpp-blp', art: 'teilen', von: 'wpp', nach: 'blp', r: '→', titel: 'Scan per Teilen an BookLedgerPro',
+    was: 'PDF. Ein eigener Scan wird an der Marke „Workfloh PDF“ erkannt und nicht noch einmal geprüft.', wie: 'Android-Teilen → BookLedgerPro.', tun: 'In BookLedgerPro erscheint der Beleg.',
+    stand: 'gruen', grund: 'Veröffentlicht; Teilen ohne zweites Fenster nach Klaus’ Befunden am Tablet gebaut und in 0.1.3 geprüft.', geprueft: 'Am Tablet (Gegenprobe 0.1.3, 29.10.).', quelle: 'BookLedgerPro/CLAUDE.md (Umbau 7/8) · android/.../AndroidManifest.xml' }),
+  W({ id: 's-pb-blp', art: 'teilen', von: 'pb', nach: 'blp', r: '→', titel: 'Mail per Teilen an BookLedgerPro',
+    was: 'Die Mail als .eml.', wie: '„An BookLedgerPro teilen“ ohne Tresor → Android-Teilen.', tun: 'BookLedgerPro wählen.',
+    stand: 'gelb', grund: 'Veröffentlicht (PB 1.0.41); keine echte Teilen-Auswahl gemessen.', geprueft: 'Nur automatische Proben.', quelle: 'privat-brain-pro/assets/live-mail.js' }),
+  W({ id: 's-pb-fa', art: 'teilen', von: 'pb', nach: 'fa', r: '→', titel: 'Mail per Teilen an die Familienakte',
+    was: '.eml.', wie: 'Ohne Tresor: Android-Teilen.', tun: 'Familienakte wählen.',
+    stand: 'gelb', grund: 'Weg veröffentlicht (Android-Teilen). Dass die Datei nach dem Betreff heißt, kommt erst mit PB 1.0.46. Am Gerät nicht geprüft.', geprueft: 'Ungeprüft am Gerät.', quelle: 'privat-brain-pro/docs/PRO-VERBUND-NATIV.md' }),
+  W({ id: 's-blp-alle', art: 'teilen', von: 'blp', nach: 'wpp', r: '→', titel: 'Beleg normal teilen',
+    was: 'Beleg-Original an jede App.', wie: '„An Pro-App geben …“ → „Normal teilen“.', tun: 'App wählen.',
+    stand: 'gelb', grund: 'Veröffentlicht (BLP 0.1.10); am Gerät nicht gemessen.', geprueft: 'Automatische Proben.', quelle: 'BookLedgerPro/src/ui/proAppGeben.js' }),
+  W({ id: 's-wfpdf-blpweb', basic: true, art: 'teilen', von: 'wfpdf', nach: 'basic', r: '→', titel: 'Web-Apps: Teilen an BookLedger (Web)',
+    was: 'PDF, Bilder, Mails.', wie: 'Installierte Web-App steht in der Teilen-Liste.', tun: 'Web-App wählen.',
+    stand: 'gelb', grund: 'Gebaut; nur mit echtem Browser-Worker geprüft, nicht am Tablet.', geprueft: 'Automatische Proben.', quelle: 'BookLedgerPro/CLAUDE.md (Workflow-PDF-Einbindung) · sw.js' }),
+  // ---- Direktstart ----
+  W({ id: 'd-blp-wpp-scan', art: 'direkt', von: 'blp', nach: 'wpp', r: '⇄', titel: '„Mit Workflow PDF scannen“',
+    was: 'Hin: nur der Startbefehl. Zurück: das fertige PDF per Teilen.', wie: 'Android-Befehl „de.familyprojekt.workflowpdf.pro.SCANNEN“; ältere Workflow-PDF-Pro: nur öffnen.', tun: 'Dort scannen, „Teilen“ → BookLedgerPro.',
+    stand: 'gelb', grund: 'Veröffentlicht (BLP 0.1.2, WPP 1.0.8); Rückweg ist ein Handgriff. Ein Ergebnis am Tablet ist nicht vermerkt.', geprueft: 'Automatische Proben; Tablet nicht vermerkt.', quelle: 'workflow-pdf-pro/.../ScanDirekt.java · BookLedgerPro/CLAUDE.md (Umbau 6)' }),
+  W({ id: 'd-web-scan', basic: true, art: 'direkt', von: 'basic', nach: 'wfpdf', r: '⇄', titel: 'Web: Scanner von Workflow PDF öffnen',
+    was: 'Adresse „?scan=1&von=BookLedgerPro“; zurück per Teilen.', wie: 'Knopf in den Belegen.', tun: 'Scannen, „PDF erstellen“, Teilen.',
+    stand: 'gelb', grund: 'Gebaut; am Tablet nicht gemessen.', geprueft: 'Automatische Proben.', quelle: 'Workflow-PDF/CLAUDE.md (Direktstart)' }),
+  W({ id: 'd-blp-oeffnen', art: 'direkt', von: 'blp', nach: 'pb', r: '→', titel: 'Andere Pro-App öffnen',
+    was: 'Nichts – nur öffnen.', wie: 'Tresorordner → „In ‹App› öffnen“.', tun: '–',
+    stand: 'gelb', grund: 'Veröffentlicht; ob Android die andere App wirklich startet, ist ungemessen.', geprueft: 'Ungeprüft am Gerät.', quelle: 'BookLedgerPro/CLAUDE.md (Umbau 2)' }),
+  W({ id: 'd-pb-wpp', art: 'direkt', von: 'pb', nach: 'wpp', r: '→', titel: 'Workflow PDF Pro aus dem Werkzeug-Menü',
+    was: 'Nichts – startet die installierte App.', wie: '☰ → Werkzeuge.', tun: 'Freischaltung nötig.',
+    stand: 'gelb', grund: 'Veröffentlicht; am Tablet nicht vermerkt.', geprueft: 'Automatische Proben.', quelle: 'privat-brain-pro/CLAUDE.md (.34 Werkzeuge)' }),
+  // ---- Links / Verträge ----
+  W({ id: 'l-alis-blp', basic: true, art: 'link', von: 'alis', nach: 'basic', r: '→', titel: 'Umsatzsummen an die Buchhaltung (Web)',
+    was: 'Umsatz aus Verkäufen minus Retouren, Wareneinkauf eines Zeitraums. In BLP entstehen Buchungs-Entwürfe.', wie: 'Warenwirtschaft → „An BookLedgerPro übergeben“ (Adresse mit den Zahlen).', tun: 'Adresse von BookLedger eintragen; dort Entwürfe prüfen und festschreiben.',
+    stand: 'gelb', grund: 'Gebaut (Fassung 1); Ziel ist die Web-Adresse. Basic müsste als Adresse eingetragen werden.', geprueft: 'Automatische Proben.', quelle: 'Alis-Moderaum/warehouse.html · BookLedgerPro/src/domain/shopbuchung.js' }),
+  W({ id: 'l-alis-blp-app', art: 'link', von: 'alis', nach: 'blp', r: '→', titel: 'Umsatzsummen in die native BookLedgerPro-App',
+    was: 'Dieselben Summen.', wie: 'Der Link öffnet nur den Browser.', tun: '–', warn: true,
+    stand: 'rot', grund: 'Die Android-App nimmt keine Web-Adressen an (nur Teilen und Öffnen von PDF/Bild/Mail). Die Summen landen nicht in der App.', geprueft: 'Im Code nachgesehen (AndroidManifest).', quelle: 'BookLedgerPro/android/app/src/main/AndroidManifest.xml · Alis-Moderaum/kasse-core.js (blpUrl)' }),
+  W({ id: 'l-alis-kasse', art: 'link', von: 'alis', nach: 'blp', r: '→', titel: 'Bargeld: Kassenlade → Tagesabschluss',
+    was: 'Kein Datenweg. Die Kasse nimmt kein Bargeld; Barverkäufe senken nur den Bestand. Abends wird in BLP gezählt.', wie: 'Hinweis in der Kasse.', tun: 'In BLP „Kasse & Shop“ → Tagesabschluss.',
+    stand: 'gelb', grund: 'BLP-Seite (Kasse & Shop, Tagesabschluss) ist in 0.1.10 veröffentlicht; die Kassenlade in Alis heute gebaut. Kein Datenweg, nur ein Ablauf. Am Tablet nicht gemessen; rechtlich mit dem Steuerberater bestätigen.', geprueft: 'Automatische Proben.', quelle: 'Alis-Moderaum/CLAUDE.md · BookLedgerPro/src/domain/tagesabschluss.js' }),
+  W({ id: 'l-alis-f2', art: 'link', von: 'alis', nach: 'blp', r: '→', titel: 'Tagessummen Karte/Online (Fassung 2)',
+    was: 'Tagessummen nach Zahlart.', wie: '–', tun: '–',
+    stand: 'grau', grund: 'Geplant, nicht gebaut.', geprueft: '–', quelle: 'Alis-Moderaum/CLAUDE.md' }),
+  W({ id: 'l-blp-wf', basic: true, art: 'link', von: 'basic', nach: 'workfloh', r: '⇄', titel: 'Angebot → Auftrag → Rechnung (Rundlauf)',
+    was: 'Angenommenes Angebot als Auftrag; zurück Verweis; Stand „Rechnung“ und „bezahlt“.', wie: 'Adressen mit Vertrag v2 „Vorgang“ (nur Web).', tun: 'WorkFloh übernimmt erst auf Tipp.',
+    stand: 'gelb', grund: 'Gebaut (R1–R3), nur im Browser. Am Tablet nicht gemessen.', geprueft: 'Automatische Proben in beiden Apps.', quelle: 'BookLedgerPro/docs/UEBERNAHME_TOMY.md' }),
+  W({ id: 'l-wf-blpapp', art: 'link', von: 'workfloh', nach: 'blp', r: '⇄', titel: 'Rundlauf mit der nativen BookLedgerPro-App',
+    was: 'Dasselbe wie im Web.', wie: 'Später über Teilen/„Öffnen mit“ mit derselben Datei.', tun: '–', warn: true,
+    stand: 'rot', grund: 'Die native App teilt keinen Speicher mit den WorkFlohs und nimmt die Adressen nicht an.', geprueft: 'Im Code nachgesehen.', quelle: 'BookLedgerPro/CLAUDE.md (R2: „die nativen Apps teilen keinen Speicher“)' }),
+  W({ id: 'l-blp-wfpdf', art: 'link', von: 'blp', nach: 'wpp', r: '⇄', titel: 'Angebot zum Unterschreiben an Workflow PDF Pro',
+    was: 'Angebots-PDF mit drei Feldern (angenommen, Ort/Datum, Unterschrift); zurück das unterschriebene PDF.', wie: 'Arbeitsstand-Datei per Teilen; zurück per Teilen, Zuordnung über eine Marke im PDF.', tun: 'Status von Hand setzen.',
+    stand: 'gelb', grund: 'In BLP und im PDF-Kern von WPP veröffentlicht. Rückweg nur in der Probe nachgestellt (mit der Web-Fassung), in den Pro-Apps nicht eigens und nicht am Tablet geprüft.', geprueft: 'Automatische Proben.', quelle: 'BookLedgerPro/src/domain/workflowPdfRundlauf.js' }),
+  W({ id: 't-pb-wpp-mail', art: 'tresor', von: 'pb', nach: 'wpp', fach: 'Eingang-WorkflowPDF', r: '→', titel: 'Mail mit Anhängen an Workflow PDF Pro',
+    was: 'Eine ganze Mail (.eml) samt Anhängen.', wie: 'Nicht möglich: Workflow PDF Pro nimmt über den Tresor nur PDF und Bilder an. Heute geht nur der einzelne Anhang (PDF/Bild) über „An Pro-App …“.', tun: 'Anhang in Private Brain öffnen → „An Pro-App …“ → Workflow PDF Pro.',
+    stand: 'grau', grund: 'Nicht gebaut: Private Brain lässt .eml an Workflow PDF Pro nicht zu, Workflow PDF Pro liest keine Mails. Idee: Workflow PDF Pro löst die PDF-Anhänge einer .eml selbst heraus.', geprueft: '–', quelle: 'privat-brain-pro/native/native-pro-verbund.js (Zeile „target===workflow-pdf-pro“) · workflow-pdf-pro/native/pro-transfer-contract.js' }),
+  W({ id: 'l-fa-blp-geld', art: 'link', von: 'fa', nach: 'blp', r: '⇄', titel: 'Geldkarte: Familienakte ↔ BookLedgerPro',
+    was: 'Daten aus der Familienakte in BLP aktualisieren.', wie: '–', tun: '–',
+    stand: 'grau', grund: 'Im Bauplan, nicht gebaut. Heute kann BLP Funde aus der Familienakte nur lesen.', geprueft: '–', quelle: 'BookLedgerPro/docs/design/BAUPLAN-NEUAUSRICHTUNG-2026-11-09.md · src/ui/tresorFund.js' }),
+  W({ id: 'l-blp-basic', basic: true, art: 'link', von: 'blp', nach: 'basic', r: '→', titel: 'Daten von Pro-Web nach Basic',
+    was: 'Ganzer Bestand.', wie: 'Sicherungsdatei erstellen, in Basic einspielen.', tun: 'Von Hand.',
+    stand: 'gelb', grund: 'Gebaut; Weg ist eine Sicherung, kein Abgleich.', geprueft: 'Automatische Proben.', quelle: 'bookledger-basic/CLAUDE.md' }),
+  // ---- Mycel ----
+  W({ id: 'm-karte', art: 'mycel', von: 'blp', nach: 'mycel', r: '⇄', titel: 'Visitenkarte und Siegel (alle Apps)',
+    was: 'Name, Siegel, Bedeutungs-Vektor der App. Gerätename nur als Anzeige. Keine Dateien.', wie: 'Siegel-Fenster → Verbinden (nur auf Tipp, beim Laden geht nichts ins Netz).', tun: 'Einmal verbinden.',
+    stand: 'gelb', grund: 'In allen veröffentlichten Pro-Apps eingebaut (Familienakte auf der Seite „Netz“). Ein echtes Relais ist in keiner Probe gemessen.', geprueft: 'Automatische Proben, kein echtes Relais.', quelle: 'Meine-Familienakte/docs/MYCEL.md · BookLedgerPro/CLAUDE.md (Umbau 11)' }),
+  W({ id: 'm-blp', art: 'mycel', von: 'blp', nach: 'mycel', r: '→', titel: 'BookLedgerPro antwortet',
+    was: 'Öffentlich: Titel · Datum · Betrag. Eigenes Netz mit „Mit Ausschnitt“: eine Zeile je Beleg mit Ausschnitt (≤ 200 Zeichen), ganzer Brief verglichen.', wie: 'Mycel-Seite → „Anderen antworten“.', tun: 'Einschalten.',
+    stand: 'gelb', grund: 'Veröffentlicht (0.1.6 antwortete still leer, seit 0.1.7 behoben). Kein echtes Relais gemessen.', geprueft: 'Automatische Proben und Gegenprobe.', quelle: 'BookLedgerPro/src/sbkim/netz.js · src/domain/ueberall.js' }),
+  W({ id: 'm-wpp', art: 'mycel', von: 'wpp', nach: 'mycel', r: '→', titel: 'Workflow PDF Pro antwortet',
+    was: 'Öffentlich: nur Dateiname. Eigenes Netz mit Ausschnitt: Seitentext in Abschnitten (Anfang und Briefende).', wie: 'Einstellungen → „Im Netz antworten“ (ab Werk aus).', tun: 'Sprachmodell laden, einschalten.',
+    stand: 'gelb', grund: 'Veröffentlicht (WPP 1.0.11 und neuer); nicht am Gerät, kein Relais.', geprueft: 'Automatische Proben, Gegenprobe 4/4.', quelle: 'workflow-pdf-pro/native/native-netz.js' }),
+  W({ id: 'm-pb', art: 'mycel', von: 'pb', nach: 'mycel', r: '→', titel: 'Private Brain Pro antwortet',
+    was: 'Katalogeinträge mit Anfang und Ende langer Texte.', wie: 'Mycel einschalten.', tun: 'Ältere Dateien neu einlesen (sonst fehlt das Ende).',
+    stand: 'gelb', grund: 'Veröffentlicht (PB 1.0.44; antwortete vorher nie, behoben in A2). Nicht am Gerät.', geprueft: 'Automatische Proben, Gegenprobe 3/3.', quelle: 'privat-brain-pro/CLAUDE.md (Umbau 14 A2)' }),
+  W({ id: 'm-fa', art: 'mycel', von: 'fa', nach: 'mycel', r: '→', titel: 'Familienakte antwortet (nur eigenes Netz)',
+    was: 'Titel · Bereich · Datum; mit Ausschnitt auch Textstelle. Gesundheit und Vorsorge nur mit eigenem Schalter. Öffentlich: keine Antwort.', wie: 'Seite „Netz“ → „Im eigenen Netz antworten“ (drei Schalter, ab Werk aus; nach Neuladen wieder aus).', tun: 'Eigenes Netz über das Fenster „Verbinden“ → „Netz“.', warn: true,
+    stand: 'gelb', grund: 'Veröffentlicht in 2.28.50 (heute, Android und Windows). Nicht geprüft, ob eine andere App die Antwort sieht; kein echtes Relais. Windows 2.28.50 nur als GitHub-Download, Update-Server fehlt noch.', geprueft: 'Automatische Proben; nicht geprüft, ob eine andere App die Antwort sieht.', quelle: 'Meine-Familienakte/docs/PRO-BRUECKEN.md · lib/netz-antwort.ts' }),
+  W({ id: 'm-wfpdf', basic: true, art: 'mycel', von: 'wfpdf', nach: 'mycel', r: '→', titel: 'Workflow PDF (Web) antwortet',
+    was: 'Wie Workflow PDF Pro.', wie: 'Einstellungen → „Im Netz antworten“.', tun: 'Einschalten.',
+    stand: 'gelb', grund: 'Gebaut; kein Relais, kein Tablet.', geprueft: 'Automatische Proben, Gegenprobe 6/6.', quelle: 'Workflow-PDF/assets/netz.js' }),
+  W({ id: 'm-fragen', art: 'mycel', von: 'mycel', nach: 'blp', r: '→', titel: 'Fragen ans Netz („Überall suchen“)',
+    was: 'Antwortzeilen der anderen Apps mit Herkunft. Gilt auch für Workflow PDF Pro und Private Brain.', wie: 'Haken „Netz“ in „Überall suchen“.', tun: 'Haken setzen.',
+    stand: 'gelb', grund: 'Veröffentlicht in BLP, WPP, PB; kein echtes Relais gemessen.', geprueft: 'Automatische Proben.', quelle: 'BookLedgerPro/src/ui/views/sbkimsuche.js · pro-ueberall.js' }),
+  W({ id: 'm-chef', art: 'mycel', von: 'pb', nach: 'mycel', r: '⇄', titel: 'Eigenes Netz per Chefcode',
+    was: 'Gleicher Code = eigenes Netz. Chef mit Chef-PIN; Mitarbeiter treten mit Zettel „CHEF1-…“ bei.', wie: 'Kasten „Chefcode“ (BLP, WPP, PB).', tun: 'Chef legt fest, andere treten bei.',
+    stand: 'gelb', grund: 'Veröffentlicht (BLP 0.1.8+, WPP 1.0.11+, PB 1.0.44); nicht am Gerät.', geprueft: 'Automatische Proben, Gegenprobe 8/8.', quelle: 'privat-brain-pro/docs/UEBERALL-SUCHEN.md' }),
+  W({ id: 'm-fa-chef', biegung: -90, art: 'mycel', von: 'fa', nach: 'mycel', r: '⇄', titel: 'Chefcode-Kasten in der Familienakte',
+    was: 'Derselbe Kasten wie in den anderen Pro-Apps.', wie: 'Heute nur über den Netz-Kasten (gleicher Code geht).', tun: '–',
+    stand: 'grau', grund: 'Nicht eingebaut: der Baustein braucht die Pro-Bedienung, die die Familienakte nicht hat.', geprueft: '–', quelle: 'Meine-Familienakte/docs/PRO-BRUECKEN.md (Abschnitt 3)' }),
+  W({ id: 'm-alis', art: 'mycel', von: 'alis', nach: 'mycel', r: '⇄', titel: 'Alis Moderaum ist ein Mycel-Knoten',
+    was: 'Visitenkarte (Schublade „alismoderaum“).', wie: 'Verbinden-Fenster.', tun: '–',
+    stand: 'gelb', grund: 'Eingebaut und auf der Web-Seite; Antworten nicht nachgeprüft.', geprueft: 'Ungeprüft.', quelle: 'Alis-Moderaum/CLAUDE.md' }),
+  // ---- Eingebaut / Bausteine ----
+  W({ id: 'b-kern-wpp', basic: true, art: 'baustein', von: 'wfpdf', nach: 'wpp', r: '→', titel: 'Kern von Workflow PDF in Workflow PDF Pro',
+    was: 'Der ganze PDF-Kern (Fassung 1.1.8/1.1.9), unverändert.', wie: 'Kopie im Ordner „upstream“.', tun: '–',
+    stand: 'gruen', grund: 'Veröffentlicht, byte-gleich geprüft.', geprueft: 'Automatische Proben und Klaus’ Nutzung.', quelle: 'workflow-pdf-pro/upstream/workflow-pdf' }),
+  W({ id: 'b-kern-fa', art: 'baustein', von: 'wpp', nach: 'fa', r: '→', titel: 'Workflow PDF als eigene Variante in der Familienakte',
+    was: 'Ganze Workflow-PDF-App als Kopie, mit eigener Datenbank; gleicher Kern wie in Workflow PDF Pro (Pflicht laut Familienakte). Daneben gibt es Workflow PDF Pro einzeln.', wie: 'Brücke trennt die Daten; kein gemeinsamer Speicher.', tun: '–',
+    stand: 'gruen', grund: 'Veröffentlicht, in der Familienakte benutzt.', geprueft: 'Automatische Proben; APK von Klaus grob geprüft.', quelle: 'Meine-Familienakte/public/apps/workflow-pdf/ · fa-wfpdf-bruecke.js' }),
+  W({ id: 'b-scan-blp', art: 'baustein', von: 'wpp', nach: 'blp', r: '→', titel: 'Scanner-Kern in BookLedgerPro (gleicher Kern wie Workflow PDF Pro)',
+    was: 'Scanner von Workflow PDF; Ergebnis wird direkt ein Beleg mit Text.', wie: 'Belege → „Scannen“.', tun: '–',
+    stand: 'gelb', grund: 'Veröffentlicht; Kamera-Fehler am Tablet behoben (0.1.1), danach nicht wieder vermerkt.', geprueft: 'Automatische Proben.', quelle: 'BookLedgerPro/assets/wfpdf/HERKUNFT.json' }),
+  W({ id: 'b-calc', art: 'baustein', von: 'calc', nach: 'blp', r: '→', titel: 'Calculate und Needs in BookLedgerPro',
+    was: 'Angebotspositionen gehen in das Angebotsformular von BLP (Datenvertrag v1, anhängen).', wie: 'Knopf in der eingebauten App; die Brücke fängt den Sprung ab.', tun: 'Entwurf prüfen und speichern.',
+    stand: 'gruen', grund: 'Veröffentlicht; von Klaus am Tablet benutzt (Befunde 28.10.).', geprueft: 'Am Tablet 28.10.; automatische Proben.', quelle: 'BookLedgerPro/apps/blp-bruecke.js · apps/HERKUNFT.json' }),
+  W({ id: 'b-tresorpaket', art: 'baustein', von: 'wpp', nach: 'blp', r: '→', titel: 'Tresor-Paket (Quelle Workflow PDF Pro)',
+    was: 'Dasselbe Schloss in BLP, Private Brain und Familienakte – darum ein Passwort für alle.', wie: 'Byte-gleiche Kopie mit Fingerabdrücken.', tun: '–',
+    stand: 'gruen', grund: 'In allen vier Apps byte-gleich, veröffentlicht.', geprueft: 'Automatische Proben.', quelle: 'BookLedgerPro/native/tresor-herkunft.json' }),
+  W({ id: 'b-bedienung', art: 'baustein', von: 'pb', nach: 'wpp', r: '→', titel: 'Bedien-Bausteine (Quelle Private Brain)',
+    was: '„Überall suchen“, Chefcode, Hintergrundaufgabe, Tresor & Ablage – gleich in BLP und WPP.', wie: 'Byte-gleiche Kopie.', tun: '–',
+    stand: 'gruen', grund: 'Kopien geprüft (Fassung 7).', geprueft: 'Automatische Proben.', quelle: 'workflow-pdf-pro/native/pro-bedienung-herkunft.json' }),
+  W({ id: 'b-basic', basic: true, art: 'baustein', von: 'blp', nach: 'basic', r: '→', titel: 'BookLedger Basic = Kopie von BookLedgerPro',
+    was: 'Ganzer Web-Teil, eigene Datenbank, eigenes Logo.', wie: 'Nachziehen mit Werkzeug, Fingerabdrücke je Datei.', tun: '–',
+    stand: 'gruen', grund: 'Nachgezogen und veröffentlicht (Pages).', geprueft: 'Automatische Proben.', quelle: 'bookledger-basic/HERKUNFT-PRO.json' }),
+];
+
+// ---------- Hilfen ----------
+const $ = (s) => document.querySelector(s);
+const ALLE = [...APPS, ...HUBS];
+const name = (id) => (ALLE.find((a) => a.id === id) || { name: id }).name;
+const kurz = (id) => (ALLE.find((a) => a.id === id) || { kurz: id }).kurz;
+const STAND = { gruen: 'funktioniert', gelb: 'veröffentlicht, nicht zusammen geprüft', orange: 'gebaut, wartet aufs Veröffentlichen', rot: 'funktioniert noch nicht', grau: 'geplant' };
+const RANG = { gruen: 0, gelb: 1, orange: 2, rot: 3, grau: 4 };
+function h(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) { if (v == null || v === false) continue; if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v); }
+  for (const c of kids.flat()) if (c != null) e.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return e;
+}
+function icon(id, cls = 'ic') { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('class', cls); s.setAttribute('aria-hidden', 'true'); const u = document.createElementNS('http://www.w3.org/2000/svg', 'use'); u.setAttribute('href', '#' + id); s.append(u); return s; }
+
+const zustand = { filter: 'alle', app: null, weg: null, basic: false };
+// Basic-Varianten bleiben in den Daten (basic: true, pro: Pro-App) – ab Werk ausgeblendet.
+// Später: Hinweis „Das gibt es mit der Pro-Version“ aus genau diesen Einträgen.
+const WS = () => WEGE.filter((w) => zustand.basic || !w.basic);
+const AS = () => APPS.filter((a) => zustand.basic || !a.basic);
+const sichtbar = (w) => zustand.filter === 'alle' || w.stand === zustand.filter;
+const gehoertZu = (w, a) => w.von === a || w.nach === a;
+
+// ---------- Filter ----------
+function filterBauen() {
+  const f = $('#filter'); f.replaceChildren();
+  const zahl = (s) => WS().filter((w) => s === 'alle' || w.stand === s).length;
+  for (const [s, t] of [['alle', 'Alle'], ['gruen', 'Grün'], ['gelb', 'Gelb'], ['orange', 'Orange'], ['rot', 'Rot'], ['grau', 'Grau']]) {
+    f.append(h('button', { class: 'k', type: 'button', 'aria-pressed': String(zustand.filter === s), 'data-filter': s,
+      onclick: () => { zustand.filter = s; alles(); } }, s === 'alle' ? null : h('i', { class: 'muster s-' + s }), t, ' ', h('b', {}, zahl(s))));
+  }
+}
+
+// ---------- Apps ----------
+function appsBauen() {
+  const box = $('#apps'); box.replaceChildren();
+  for (const a of AS()) {
+    const n = WS().filter((w) => gehoertZu(w, a.id)).length;
+    box.append(h('button', { class: 'app' + (zustand.app === a.id ? ' an' : ''), type: 'button', 'data-app': a.id, 'aria-pressed': String(zustand.app === a.id),
+      onclick: () => appWaehlen(a.id) },
+      h('strong', {}, a.name), a.basic ? h('small', {}, 'Basic-Variante') : null, h('span', { class: 'plat' }, a.plat.map((p) => h('i', {}, p))), h('small', {}, n + ' Wege')));
+  }
+}
+function appWaehlen(id) { zustand.app = zustand.app === id ? null : id; zustand.weg = null; alles(); if (zustand.app) detailApp(id); else detailLeer(); }
+
+// ---------- Graph ----------
+const LAYOUT = {
+  breit: { w: 1000, h: 620, pos: {
+    tresor: [330, 205], mycel: [690, 310],
+    fa: [120, 90], blp: [500, 80], wpp: [120, 540], pb: [500, 550],
+    pbv3: [120, 310], calc: [860, 80], workfloh: [870, 200], alis: [870, 470],
+    basic: [690, 175], wfpdf: [690, 450], fab: [300, 445] } },
+  schmal: { w: 400, h: 860, pos: {
+    calc: [95, 55], fa: [95, 165], blp: [305, 165], wpp: [95, 320], pb: [305, 320],
+    tresor: [110, 490], alis: [305, 480], pbv3: [95, 650], mycel: [295, 650],
+    workfloh: [95, 810],
+    fab: [305, 810], wfpdf: [95, 950], basic: [305, 950] } },
+};
+function graphBauen() {
+  const svg = $('#graph'); const L0 = LAYOUT[innerWidth < 700 ? 'schmal' : 'breit'];
+  const sichtIds = new Set([...AS(), ...HUBS].map((a) => a.id));
+  const L = { w: L0.w, h: zustand.basic ? (L0.w < 500 ? 1000 : L0.h) : L0.h, pos: Object.fromEntries(Object.entries(L0.pos).filter(([k]) => sichtIds.has(k))) };
+  svg.setAttribute('viewBox', `0 0 ${L.w} ${L.h}`);
+  const NS = 'http://www.w3.org/2000/svg'; const mk = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+  svg.replaceChildren();
+  const defs = mk('defs', {}); const m = mk('marker', { id: 'sp', viewBox: '0 0 10 10', refX: '9', refY: '5', markerWidth: '6', markerHeight: '6', orient: 'auto-start-reverse' });
+  m.append(mk('path', { d: 'M0 0 L10 5 L0 10 z', class: 'spitze' })); defs.append(m); svg.append(defs);
+  // Paare zählen: mehrere Wege zwischen denselben Knoten fächern sich weit auf,
+  // Anfang und Ende sitzen versetzt am Rand der Kästen (nicht alle in der Mitte).
+  const groesse = (id) => (id === 'tresor' || id === 'mycel') ? [140, 52] : [150, 42];
+  const rand = (c, wh, p, z) => { // vom Punkt p (im Kasten um c) Richtung z bis zum Kastenrand
+    const dx = z[0] - p[0], dy = z[1] - p[1];
+    const tx = dx > 0 ? (c[0] + wh[0] / 2 - p[0]) / dx : dx < 0 ? (c[0] - wh[0] / 2 - p[0]) / dx : Infinity;
+    const ty = dy > 0 ? (c[1] + wh[1] / 2 - p[1]) / dy : dy < 0 ? (c[1] - wh[1] / 2 - p[1]) / dy : Infinity;
+    const t = Math.min(tx, ty), l = Math.hypot(dx, dy) || 1;
+    return [p[0] + dx * t + dx / l * 3, p[1] + dy * t + dy / l * 3];
+  };
+  const anzahl = new Map();
+  for (const w of WS()) { if (!L.pos[w.von] || !L.pos[w.nach]) continue; const k = [w.von, w.nach].sort().join('|'); anzahl.set(k, (anzahl.get(k) || 0) + 1); }
+  const paare = new Map();
+  const linien = mk('g', {}); svg.append(linien);
+  const ABSTAND = L.w < 500 ? 30 : 38;
+  for (const w of WS()) {
+    const A = L.pos[w.von], B = L.pos[w.nach]; if (!A || !B) continue;
+    const key = [w.von, w.nach].sort().join('|'); const i = paare.get(key) || 0; paare.set(key, i + 1);
+    const n = anzahl.get(key); const vorz = w.von < w.nach ? 1 : -1; // gleiche Richtung für beide Lesarten
+    // biegung: eigener Bogen für Wege, die sonst gerade durch einen anderen Kasten liefen (z. B. Familienakte → Mycel durch den Tresor)
+    const off = (i - (n - 1) / 2) * ABSTAND * vorz + (w.biegung || 0);
+    const dx = B[0] - A[0], dy = B[1] - A[1], len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
+    const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2;
+    const cx = mx + nx * off * 1.6, cy = my + ny * off * 1.6;
+    const wa = groesse(w.von), wb = groesse(w.nach);
+    // Andockpunkt im Kasten quer zur Linie verschieben (begrenzt auf den Kasten), dann bis zum Rand
+    const kl = (v, m) => Math.max(-m, Math.min(m, v));
+    const ver = (C, wh) => [C[0] + kl(nx * off * 0.9, wh[0] / 2 - 10), C[1] + kl(ny * off * 0.9, wh[1] / 2 - 6)];
+    const a = rand(A, wa, ver(A, wa), [cx, cy]);
+    const b = rand(B, wb, ver(B, wb), [cx, cy]);
+    const d = `M${a[0].toFixed(1)} ${a[1].toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
+    const aus = !sichtbar(w) || (zustand.app && !gehoertZu(w, zustand.app));
+    const g = mk('g', { 'data-weg': w.id });
+    const p = mk('path', { d, class: `linie ${w.stand}${aus ? ' aus' : ''}${zustand.weg === w.id ? ' an' : ''}` });
+    if (w.r === '→') p.setAttribute('marker-end', 'url(#sp)');
+    if (w.r === '⇄') { p.setAttribute('marker-end', 'url(#sp)'); p.setAttribute('marker-start', 'url(#sp)'); }
+    const t = mk('path', { d, class: 'treff' }); const ti = mk('title', {}); ti.textContent = `${kurz(w.von)} ${w.r} ${kurz(w.nach)}: ${w.titel}`; t.append(ti);
+    if (aus) t.style.pointerEvents = 'none'; else t.addEventListener('click', () => wegWaehlen(w.id));
+    g.append(p, t); linien.append(g);
+  }
+  for (const n of ALLE) {
+    const p = L.pos[n.id]; if (!p) continue;
+    const hub = n.id === 'tresor' || n.id === 'mycel'; const bw = hub ? 140 : 150, bh = hub ? 52 : 42;
+    const verbunden = !zustand.app || zustand.app === n.id || WS().some((w) => gehoertZu(w, zustand.app) && gehoertZu(w, n.id));
+    const g = mk('g', { class: `knoten${hub ? ' hub' : ''}${zustand.app === n.id ? ' an' : ''}${verbunden ? '' : ' aus'}`, 'data-knoten': n.id, role: 'button', tabindex: '0', 'aria-label': n.name });
+    g.append(mk('rect', { x: p[0] - bw / 2, y: p[1] - bh / 2, width: bw, height: bh, rx: hub ? 26 : 10 }));
+    const t = mk('text', { x: p[0], y: p[1] + (hub ? -2 : 5), 'text-anchor': 'middle' }); t.textContent = n.kurz; g.append(t);
+    if (hub) { const s = mk('text', { x: p[0], y: p[1] + 16, 'text-anchor': 'middle', class: 'klein' }); s.textContent = n.id === 'tresor' ? 'Dateien' : 'Visitenkarten, Antworten'; g.append(s); }
+    const los = () => (hub ? hubWaehlen(n.id) : appWaehlen(n.id));
+    g.addEventListener('click', los); g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); los(); } });
+    svg.append(g);
+  }
+}
+function hubWaehlen(id) { zustand.app = zustand.app === id ? null : id; zustand.weg = null; alles(); if (zustand.app) detailApp(id); else detailLeer(); }
+
+// ---------- Baum ----------
+function wegKnopf(w) {
+  const aus = !sichtbar(w) || (zustand.app && !gehoertZu(w, zustand.app));
+  return h('button', { class: `weg s-${w.stand}${aus ? ' aus' : ''}${zustand.weg === w.id ? ' an' : ''}`, type: 'button', 'data-weg': w.id, onclick: () => wegWaehlen(w.id) },
+    h('i', { class: 'punkt' }),
+    h('strong', {}, w.warn ? icon('i-vorsicht') : null, w.warn ? ' ' : null, w.titel),
+    h('small', {}, h('span', { class: 'richtung' }, `${kurz(w.von)} ${w.r} ${kurz(w.nach)}`), w.fach ? ' · Fach „' + w.fach + '“' : '', ' · ', STAND[w.stand]));
+}
+const offen = new Set(['tresor']);
+function baumBauen() {
+  const b = $('#baum'); b.replaceChildren();
+  for (const [art, A] of Object.entries(ARTEN)) {
+    const wege = WS().filter((w) => w.art === art);
+    const zeigbar = wege.filter((w) => sichtbar(w) && (!zustand.app || gehoertZu(w, zustand.app))).length;
+    const d = h('details', { class: 'ast', 'data-art': art }, h('summary', {}, icon(A.icon), A.name, ' ', h('small', {}, `${zeigbar} von ${wege.length}`), icon('i-pfeil', 'ic pf')));
+    if (offen.has(art) || zustand.app) d.open = true;
+    d.addEventListener('toggle', () => { d.open ? offen.add(art) : offen.delete(art); });
+    const inhalt = h('div', { class: 'ast-inhalt' }, h('p', {}, A.satz));
+    if (art === 'tresor') {
+      const gruppen = new Map();
+      for (const w of wege) { const k = w.fach.replace(/\/.*$/, ''); if (!gruppen.has(k)) gruppen.set(k, []); gruppen.get(k).push(w); }
+      for (const [fach, ws] of gruppen) {
+        const eingang = /^Eingang/.test(fach); const leser = fach.startsWith('alle');
+        inhalt.append(h('div', { class: 'fach' }, h('div', { class: 'fach-kopf' }, icon('i-tresor'), leser ? 'Alle Fächer lesen' : 'Fach „' + fach + '“',
+          h('small', {}, leser ? 'nur lesen, nichts ändern' : eingang ? 'Eingang: alle Pro-Apps legen ab, nur die Empfänger-App übernimmt' : 'eigenes Fach: nur diese App schreibt')), ws.map(wegKnopf)));
+      }
+    } else inhalt.append(...wege.map(wegKnopf));
+    d.append(inhalt); b.append(d);
+  }
+}
+
+// ---------- Detail ----------
+const spalte = () => $('#detail-spalte');
+function zeigen() { spalte().classList.add('offen'); }
+function detailLeer() { $('#detail').replaceChildren(h('p', { class: 'leer' }, 'Tippe eine App oder einen Weg an.')); spalte().classList.remove('offen'); }
+function wegWaehlen(id) { zustand.weg = id; alles(); const w = WEGE.find((x) => x.id === id); const d = $('#detail');
+  d.replaceChildren(
+    h('span', { class: 'marke s-' + w.stand }, h('i', { class: 'muster s-' + w.stand, style: 'width:16px;height:11px' }), STAND[w.stand]),
+    h('h3', {}, w.titel),
+    h('p', { class: 'richtung' }, `${name(w.von)} ${w.r} ${name(w.nach)}`),
+    h('dl', {},
+      h('dt', {}, 'Art'), h('dd', {}, ARTEN[w.art].name),
+      w.fach ? [h('dt', {}, 'Fach/Ordner'), h('dd', {}, w.fach)] : null,
+      h('dt', {}, 'Was'), h('dd', {}, w.was),
+      h('dt', {}, 'Wie'), h('dd', {}, w.wie),
+      h('dt', {}, 'Du tust'), h('dd', {}, w.tun),
+      h('dt', {}, 'Warum diese Farbe'), h('dd', {}, w.warn ? [icon('i-vorsicht'), ' '] : null, w.grund),
+      h('dt', {}, 'Zuletzt geprüft'), h('dd', {}, w.geprueft)),
+    h('p', { class: 'quelle' }, 'Quelle: ' + w.quelle));
+  zeigen();
+}
+function detailApp(id) {
+  const a = ALLE.find((x) => x.id === id); const ws = WS().filter((w) => gehoertZu(w, id)).sort((x, y) => RANG[x.stand] - RANG[y.stand]);
+  const z = (s) => ws.filter((w) => w.stand === s).length;
+  $('#detail').replaceChildren(
+    h('h3', {}, a.name), a.basic ? h('p', { class: 'hinweis' }, 'Basic-Variante. Die Pro-Fassung: ' + name(a.pro) + '.') : null, a.plat ? h('p', { class: 'hinweis' }, a.plat.join(' · ')) : null, h('p', {}, a.text),
+    h('p', { class: 'hinweis' }, `${ws.length} Wege: ${z('gruen')} grün, ${z('gelb')} gelb, ${z('orange')} orange, ${z('rot')} rot, ${z('grau')} grau`),
+    h('ul', { class: 'liste' }, ws.map((w) => h('li', {}, wegKnopf(w)))),
+    h('p', { class: 'quelle' }, 'Quelle: ' + a.quelle));
+  zeigen();
+}
+
+// ---------- Wohin ----------
+function wohinBauen() {
+  const von = $('#von'), an = $('#an');
+  const alt = [von.value || 'pb', an.value || 'fa'];
+  for (const s of [von, an]) s.replaceChildren(...AS().map((a) => h('option', { value: a.id }, a.name)));
+  von.value = AS().some((a) => a.id === alt[0]) ? alt[0] : 'pb'; an.value = AS().some((a) => a.id === alt[1]) ? alt[1] : 'fa';
+  if (!von.dataset.an) { von.dataset.an = '1';
+    von.value = 'pb'; an.value = 'fa';
+    von.addEventListener('change', wohin); an.addEventListener('change', wohin);
+  }
+  wohin();
+}
+function wohin() {
+  const v = $('#von').value, a = $('#an').value, box = $('#antwort');
+  if (v === a) { box.replaceChildren(h('p', { class: 'hinweis' }, 'Bitte zwei verschiedene Apps wählen.')); return; }
+  const ws = WS().filter((w) => w.art !== 'mycel' && ((w.von === v && w.nach === a) || (w.r === '⇄' && w.von === a && w.nach === v))).sort((x, y) => RANG[x.stand] - RANG[y.stand]);
+  if (!ws.length) {
+    const tresorApps = ['fa', 'blp', 'wpp', 'pb'];
+    const satz = tresorApps.includes(v) && tresorApps.includes(a) ? 'Kein eigener Weg eingetragen.' : 'Kein direkter Weg. Bleibt das normale Teilen des Geräts (ohne Rückmeldung) – oder es gibt keinen.';
+    box.replaceChildren(h('p', {}, satz)); return;
+  }
+  const best = ws[0];
+  box.replaceChildren(
+    h('p', {}, h('b', {}, 'Am besten: '), best.titel, best.fach ? ` → landet im Fach „${best.fach}“.` : '.'),
+    h('p', { class: 'hinweis' }, 'Beim Empfänger: ', best.tun),
+    h('ul', { class: 'liste' }, ws.map((w) => h('li', {}, wegKnopf(w)))));
+}
+
+// ---------- Fehlt ----------
+function fehltBauen() {
+  const teile = [
+    ['orange', 'Schnell fertig (orange): nur veröffentlichen und testen'],
+    ['rot', 'Funktioniert noch nicht (rot): muss gebaut werden'],
+    ['grau', 'Geplant (grau)'],
+  ];
+  $('#fehlt').replaceChildren(...teile.map(([s, t]) => {
+    const ws = WS().filter((w) => w.stand === s);
+    return h('div', { class: 'fehlt-teil', 'data-fehlt': s }, h('h3', {}, h('i', { class: 'muster s-' + s }), t, ' ', h('b', {}, ws.length)),
+      h('ul', { class: 'liste' }, ws.map((w) => h('li', {}, wegKnopf(w)))));
+  }));
+}
+
+function alles() { filterBauen(); appsBauen(); graphBauen(); baumBauen(); wohinBauen(); fehltBauen(); }
+$('#basic-zeigen').addEventListener('change', (e) => {
+  zustand.basic = e.target.checked;
+  if (!zustand.basic) { const w = WEGE.find((x) => x.id === zustand.weg); if ((w && w.basic) || (APPS.find((a) => a.id === zustand.app) || {}).basic) { zustand.weg = null; zustand.app = null; detailLeer(); } }
+  alles();
+});
+$('#zu').addEventListener('click', () => { spalte().classList.remove('offen'); });
+let breiteVorher = innerWidth;
+addEventListener('resize', () => { if ((innerWidth < 700) !== (breiteVorher < 700)) graphBauen(); breiteVorher = innerWidth; });
+filterBauen(); appsBauen(); graphBauen(); baumBauen(); wohinBauen(); fehltBauen();
+</script>
+</body>
+</html>
