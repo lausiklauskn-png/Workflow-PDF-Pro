@@ -2,7 +2,7 @@
   "quelle": "lausiklauskn-png/BookLedgerPro",
   "datei": "assets/pro-verbund.html",
   "ziel": "native/pro-verbund.html",
-  "sha256": "3cbe20f19bf82a72591eded54679c5338b2d4e6a29034c01a46728a68853220d",
-  "stand": "2026-11-09",
+  "sha256": "eb857a6a5bd7143183d1bb5e98d9b78f8340b43685a52c89671f0796762b6cc0",
+  "stand": "2026-11-10",
   "hinweis": "Byte-gleiche Kopie aus BookLedgerPro. Nie hier von Hand ändern; dort pflegen und neu kopieren."
 }
