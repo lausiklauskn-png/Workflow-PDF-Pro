@@ -25,3 +25,10 @@ header.kopf .marke .marke-sub { flex-basis:100%; }
 .wpp-kopf-version { padding:0 4px;margin:0;border:0;border-radius:4px;background:none;color:inherit;opacity:.7;font:inherit;font-size:.72rem;line-height:1.4;cursor:pointer;white-space:nowrap; }
 .wpp-kopf-version:hover, .wpp-kopf-version:focus-visible { opacity:1;outline:1px solid currentColor;outline-offset:1px; }
 header.kopf .pro-schrift-knopf { height:32px; }
+.native-verbund-eintrag{display:inline-flex;align-items:center;gap:.25rem}
+.native-verbund-karte{position:fixed;inset:0;width:100vw;max-width:none;height:100dvh;max-height:none;margin:0;padding:0;border:0;display:flex;flex-direction:column;background:var(--papier,#fff);color:var(--text,#17202a)}
+.native-verbund-karte:not([open]){display:none}
+.native-verbund-karte::backdrop{background:#0009}
+.native-verbund-kopf{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:max(.5rem,env(safe-area-inset-top)) max(.75rem,env(safe-area-inset-right)) .5rem max(.75rem,env(safe-area-inset-left));border-bottom:1px solid #8886}
+.native-verbund-kopf h2{flex:1;margin:0;font-size:1rem}.native-verbund-kopf small{flex-basis:100%}
+.native-verbund-karte iframe{flex:1;min-height:0;width:100%;border:0;background:#fff}

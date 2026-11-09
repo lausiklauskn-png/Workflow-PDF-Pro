@@ -13,7 +13,7 @@ export const vaultFiles=['vault-codec.js','vault-records.js','vault-journal.js',
 export const bedienFiles = ['pro-bedienung.js', 'pro-bedienung.css', 'pro-hintergrund.js', 'pro-geraet.js', 'pro-ueberall.js', 'pro-ueberall.css', 'pro-chefcode.js'];
 // Scanner und Kamera unter Windows (Pro-Umbau 5): hier gepflegt, byte-gleich nach BookLedgerPro (Pin native/pro-scanner-herkunft.json).
 export const scannerFiles = ['pro-scanner.js', 'pro-scanner.css'];
-export const nativeFiles = [...bedienFiles, ...scannerFiles, 'native-ohne-web.js', 'native-ueberall.js', 'native-chefcode.js', 'native-netz.js', 'native-kopf.js', 'native-updates.js', 'native-hintergrund.js', 'native-scan-direkt.js', 'native-sicherung.js', 'native-bootstrap.js', 'native-files.js', 'native-import.js', 'pro-transfer-contract.js', 'pro-transfer-store.js', 'native-durable-import.js', 'native-pro-transfers.js', 'native-pro-verbund.js', 'native-incoming.js', 'native-chrome.js', 'native-speech.js', 'native-translate.js', 'chrome/helper.html', 'chrome/helper.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
+export const nativeFiles = [...bedienFiles, ...scannerFiles, 'native-ohne-web.js', 'native-ueberall.js', 'native-chefcode.js', 'native-netz.js', 'native-kopf.js', 'native-verbund-karte.js', 'pro-verbund.html', 'native-updates.js', 'native-hintergrund.js', 'native-scan-direkt.js', 'native-sicherung.js', 'native-bootstrap.js', 'native-files.js', 'native-import.js', 'pro-transfer-contract.js', 'pro-transfer-store.js', 'native-durable-import.js', 'native-pro-transfers.js', 'native-pro-verbund.js', 'native-incoming.js', 'native-chrome.js', 'native-speech.js', 'native-translate.js', 'chrome/helper.html', 'chrome/helper.js', ...vaultFiles, 'native.css', 'PRIVATE-BRAIN-LICENSE.txt'];
 export const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 
 // This allowlist is deliberately independent of a recursive checkout copy.
@@ -53,6 +53,9 @@ export async function prepareWeb(out = join(root, 'www')) {
     if ((await lstat(path)).isSymbolicLink()) throw new Error('Unsafe native adapter: ' + name);
     adapters.set(name, await readFile(path));
   }
+  // Pro-App-Verbund (Vorschau): byte-gleiche Kopie aus BookLedgerPro, nie von Hand ändern.
+  const verbundPin = JSON.parse(await readFile(join(root, 'native/pro-verbund.herkunft.json'), 'utf8'));
+  if (digest(adapters.get('pro-verbund.html')) !== verbundPin.sha256) throw new Error('pro-verbund.html weicht vom Pin native/pro-verbund.herkunft.json ab');
   const adapterUrl = name => 'native/' + name + '?v=' + digest(adapters.get(name));
   let html = contents.get('index.html').toString('utf8');
   html = replaceOnce(html, '<title>Workfloh PDF —', '<title>Workflow PDF Pro —');
@@ -74,7 +77,7 @@ export async function prepareWeb(out = join(root, 'www')) {
   const appTag = html.match(/<script defer src="assets\/app\.js\?v=\d+"><\/script>/g);
   if (appTag?.length !== 1) throw new Error('Native injection anchor changed: app.js');
   html = replaceOnce(html, appTag[0],
-    ['pro-bedienung.js','pro-hintergrund.js','pro-geraet.js','native-bootstrap.js','native-files.js','native-import.js','pro-transfer-contract.js','pro-transfer-store.js','native-durable-import.js','native-pro-transfers.js','native-pro-verbund.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles,'native-updates.js','native-hintergrund.js','native-scan-direkt.js','native-sicherung.js','native-ohne-web.js','pro-scanner.js','pro-ueberall.js','native-ueberall.js','pro-chefcode.js','native-chefcode.js','native-netz.js','native-kopf.js'].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n'+appTag[0]);
+    ['pro-bedienung.js','pro-hintergrund.js','pro-geraet.js','native-bootstrap.js','native-files.js','native-import.js','pro-transfer-contract.js','pro-transfer-store.js','native-durable-import.js','native-pro-transfers.js','native-pro-verbund.js','native-incoming.js','native-chrome.js','native-speech.js','native-translate.js',...vaultFiles,'native-updates.js','native-hintergrund.js','native-scan-direkt.js','native-sicherung.js','native-ohne-web.js','pro-scanner.js','pro-ueberall.js','native-ueberall.js','pro-chefcode.js','native-chefcode.js','native-netz.js','native-kopf.js','native-verbund-karte.js'].map(name=>'<script defer src="'+adapterUrl(name)+'"></script>').join('\n')+'\n'+appTag[0]);
   await rm(out, { recursive: true, force: true });
   await mkdir(out, { recursive: true });
   const receipt = { sourceCommit: manifest.commit, coreByteIdenticalExcept: ['index.html: native branding, adapter tags, native network controller instead of web network script tag, empty wfp-version (filled by the app)'], files: [] };
