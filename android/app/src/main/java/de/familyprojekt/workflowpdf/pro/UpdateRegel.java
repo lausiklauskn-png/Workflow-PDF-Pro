@@ -12,6 +12,10 @@ final class UpdateRegel {
     static final String REPO = "lausiklauskn-png/Workflow-PDF-Pro";
     private static final Pattern TAG = Pattern.compile("^v(\\d{1,4})\\.(\\d{1,4})\\.(\\d{1,4})$");
     private static final Pattern NAME = Pattern.compile("^(\\d{1,4})\\.(\\d{1,4})\\.(\\d{1,4})(?:-[A-Za-z0-9.]+)?$");
+    /** Name der APK in einer Veröffentlichung: nur einfache Zeichen, keine Pfadteile. */
+    private static final Pattern APK = Pattern.compile("^[A-Za-z0-9._-]{1,120}\\.apk$");
+    private static final Pattern DIGEST = Pattern.compile("^sha256:([0-9a-f]{64})$");
+    static final long APK_GRENZE = 400L * 1024 * 1024;
 
     static int[] version(String text, boolean tag) {
         Matcher m = (tag ? TAG : NAME).matcher(text == null ? "" : text);
@@ -26,24 +30,37 @@ final class UpdateRegel {
     static JSONObject auswerten(String installiert, JSONArray releases) throws Exception {
         int[] ich = version(installiert, false);
         if (ich == null) throw new IllegalArgumentException("UPDATE_VERSION_UNBEKANNT");
-        int[] best = ich; String bestTag = null;
+        int[] best = ich; String bestTag = null; JSONObject bestApk = null;
         for (int i = 0; i < releases.length(); i++) {
             JSONObject r = releases.optJSONObject(i);
             if (r == null || r.optBoolean("draft", true) || r.optBoolean("prerelease", true)) continue;
             String tag = r.optString("tag_name", ""); int[] v = version(tag, true);
             if (v == null || !neuer(v, best)) continue;
-            JSONArray assets = r.optJSONArray("assets"); boolean apk = false;
+            JSONArray assets = r.optJSONArray("assets"); JSONObject apk = null;
             for (int j = 0; assets != null && j < assets.length(); j++) {
                 JSONObject a = assets.optJSONObject(j);
-                if (a != null && "uploaded".equals(a.optString("state")) && a.optLong("size", 0) > 0 && a.optString("name").toLowerCase(java.util.Locale.ROOT).endsWith(".apk")) apk = true;
+                if (a != null && "uploaded".equals(a.optString("state")) && a.optLong("size", 0) > 0 && a.optString("name").toLowerCase(java.util.Locale.ROOT).endsWith(".apk")) { apk = a; break; }
             }
-            if (!apk) continue;
-            best = v; bestTag = tag;
+            if (apk == null) continue;
+            best = v; bestTag = tag; bestApk = apk;
         }
         String ichText = ich[0] + "." + ich[1] + "." + ich[2];
         JSONObject out = new JSONObject().put("installiert", ichText);
         if (bestTag == null) return out.put("status", "current").put("version", ichText);
-        return out.put("status", "available").put("version", bestTag.substring(1)).put("tag", bestTag);
+        out.put("status", "available").put("version", bestTag.substring(1)).put("tag", bestTag);
+        // Für „Direkt laden“: Name, Größe und (wenn GitHub sie nennt) SHA-256 der APK. Die Adresse baut die App selbst (download()).
+        String name = bestApk.optString("name", ""); long groesse = bestApk.optLong("size", 0);
+        Matcher d = DIGEST.matcher(bestApk.optString("digest", ""));
+        if (APK.matcher(name).matches() && groesse > 0 && groesse <= APK_GRENZE) {
+            out.put("apk", name).put("groesse", groesse);
+            if (d.matches()) out.put("sha256", d.group(1));
+        }
+        return out;
+    }
+    /** Feste Download-Adresse der APK; Tag und Name werden geprüft, nie eine Adresse aus dem Netz übernommen. */
+    static String download(String tag, String apk) {
+        if (version(tag, true) == null || apk == null || !APK.matcher(apk).matches()) throw new IllegalArgumentException("UPDATE_TAG");
+        return "https://github.com/" + REPO + "/releases/download/" + tag + "/" + apk;
     }
     /** Feste Seite der Veröffentlichung; nie eine Adresse aus dem Netz. */
     static String seite(String tag) {
