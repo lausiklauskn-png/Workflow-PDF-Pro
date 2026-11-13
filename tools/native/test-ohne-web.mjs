@@ -54,6 +54,7 @@ test('Pro-App: keine Web-Reste, Tresor & Ablage, Updates mit Version',async t=>{
     if(method==='tresorSperren'){fx.tresor={...fx.tresor,offen:false,eingezogen:false};return {...fx.tresor};}
     if(method==='check'){fx.fragen=(fx.fragen||0)+1;if(fx.ohneNetz)throw Error('UPDATE_UNAVAILABLE');return {...fx.updates};}
     if(method==='openDownload'){fx.laden++;return {};}
+    if(method==='install'){fx.installiert=(fx.installiert||0)+1;return fx.installAntwort||{gestartet:true};}
     throw Error('Unknown bridge method '+method);
   }
   const vaultM=['state','migration','choose','unlock','lock','prepareMigration','completeMigration','cancelMigration','beginBatch','abortBatch','commitBatch','begin','append','finish','abort','info','read','list','remove','recoveryInfo','createRecovery','ordnerOeffnen','tresorZustand','tresorEinziehen','tresorVerzeichnis','tresorSperren'];
@@ -66,7 +67,7 @@ test('Pro-App: keine Web-Reste, Tresor & Ablage, Updates mit Version',async t=>{
       const wrap=list=>Object.fromEntries(list.map(m=>[m,async a=>{try{return await __vaultCall(m,a);}catch(e){throw{code:String(e?.message||e).match(/[A-Z][A-Z_]{3,}/)?.[0]||'UNKNOWN'};}}]));
       const files={};for(const m of ['begin','append','finish','abort','save','share','print','openLink'])files[m]=async()=>({});
       files.appInfo=async()=>({version:'1.0.6'});
-      window.Capacitor={isNativePlatform:()=>true,Plugins:{WorkflowFiles:files,WorkflowVault:wrap(names),WorkflowUpdates:wrap(['check','openDownload'])}};
+      window.Capacitor={isNativePlatform:()=>true,Plugins:{WorkflowFiles:files,WorkflowVault:wrap(names),WorkflowUpdates:wrap(['check','openDownload','install'])}};
     },[app,vaultM,lang]);
     await page.goto('http://127.0.0.1:'+server.address().port+'/');
     await page.waitForFunction(app=>window.__wfpdf&&window.PDFLib&&(!app||window.WFPNativeVault&&!WFPNativeVault.gate.blocked),app);
@@ -168,8 +169,8 @@ test('Pro-App: keine Web-Reste, Tresor & Ablage, Updates mit Version',async t=>{
       return {text:b.textContent,vor:b.previousElementSibling?.id||'',sichtbar:r.width>1&&r.height>1,titel:b.title,version:v?getComputedStyle(v).display:'',
         kurz:getComputedStyle(b.querySelector('.wpp-fahne-kurz')).display,lang:getComputedStyle(b.querySelector('.wpp-fahne-lang')).display};});
     const gefragt=(page,n)=>page.waitForFunction(()=>true).then(async()=>{const bis=Date.now()+15000;while((fx.fragen||0)<n){if(Date.now()>bis)throw Error('stille Prüfung blieb aus: '+(fx.fragen||0)+' von '+n);await page.waitForTimeout(100);}});
-    await t.test('Update-Fähnchen: erscheint ohne Tipp neben der Version; Tipp geht den vorhandenen Weg',async()=>{
-      fx.updates={status:'available',version:'1.0.7',installiert:'1.0.6',tag:'v1.0.7'};fx.fragen=0;fx.ohneNetz=false;fx.laden=0;
+    await t.test('Update-Fähnchen: erscheint ohne Tipp neben der Version; Tipp lädt direkt (nicht die Einstellungen)',async()=>{
+      fx.updates={status:'available',version:'1.0.7',installiert:'1.0.6',tag:'v1.0.7',apk:'Workflow-PDF-Pro-1.0.7.apk',groesse:1000};fx.fragen=0;fx.ohneNetz=false;fx.laden=0;fx.installiert=0;fx.installAntwort=null;
       const {page,errors}=await seite(true);
       await page.waitForSelector('#wppUpdateFahne',{timeout:15000});
       const f=await fahne(page);
@@ -181,8 +182,27 @@ test('Pro-App: keine Web-Reste, Tresor & Ablage, Updates mit Version',async t=>{
       await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await page.waitForTimeout(400);
       assert.equal(fx.fragen,1,'höchstens stündlich');
       await page.click('#wppUpdateFahne');
-      await page.waitForFunction(()=>/Neu: 1\.0\.7 \(du hast 1\.0\.6\)/.test(document.getElementById('stUpdatesStand')?.textContent||''));
-      await page.click('#stUpdatesLaden');assert.equal(fx.laden,1);
+      await page.waitForFunction(()=>true);const bis=Date.now()+5000;while(fx.installiert<1&&Date.now()<bis)await page.waitForTimeout(50);
+      assert.equal(fx.installiert,1,'Tipp aufs Fähnchen lädt und installiert direkt');
+      assert.equal(await page.locator('#stUpdatesKasten').count(),0,'die Einstellungen gehen nicht auf');
+      assert.equal(fx.fragen,1,'kein zweites Fragen, das Ergebnis der stillen Prüfung gilt');
+      // Tipp auf die Versionsnummer: derselbe Weg.
+      await page.click('#wppKopfVersion');const bis2=Date.now()+5000;while(fx.installiert<2&&Date.now()<bis2)await page.waitForTimeout(50);
+      assert.equal(fx.installiert,2,'Tipp auf die Version lädt ebenfalls direkt');
+      assert.equal(await page.locator('#stUpdatesKasten').count(),0,'auch die Version öffnet die Einstellungen nicht');
+      // Ohne Erlaubnis „Apps installieren“: kurze Meldung.
+      fx.installAntwort={erlaubnis:true};await page.click('#wppUpdateFahne');
+      await page.waitForFunction(()=>/Apps installieren/.test(document.getElementById('wppUpdateMeldung')?.textContent||''));
+      assert.deepEqual(errors,[]);await page.close();fx.installAntwort=null;
+    });
+    await t.test('Versionsnummer bei aktueller Fassung: kurze Meldung, keine Einstellungen, kein Laden',async()=>{
+      fx.updates={status:'current',version:'1.0.6',installiert:'1.0.6'};fx.fragen=0;fx.installiert=0;fx.laden=0;
+      const {page,errors}=await seite(true);
+      await gefragt(page,1);await page.waitForTimeout(300);
+      await page.click('#wppKopfVersion');
+      await page.waitForFunction(()=>/Aktuelle Version 1\.0\.6/.test(document.getElementById('wppUpdateMeldung')?.textContent||''));
+      assert.equal(await page.locator('#stUpdatesKasten').count(),0,'die Einstellungen gehen nicht auf');
+      assert.equal(fx.installiert+fx.laden,0,'nichts geladen');
       assert.deepEqual(errors,[]);await page.close();
     });
     await t.test('Update-Fähnchen: aktuelle Fassung und ohne Netz – kein Fähnchen, keine Meldung; nach einer Stunde neu gefragt',async()=>{

@@ -27,6 +27,8 @@ header.kopf .marke .marke-sub { flex-basis:100%; }
 .wpp-update-fahne { padding:0 6px;margin:0;border:0;border-radius:4px 4px 4px 0;background:#c62828;color:#fff;font:inherit;font-size:.72rem;font-weight:600;line-height:1.4;cursor:pointer;white-space:nowrap; }
 .wpp-update-fahne:hover, .wpp-update-fahne:focus-visible { outline:2px solid currentColor;outline-offset:1px; }
 .wpp-update-fahne .wpp-fahne-kurz { display:none; }
+.wpp-update-meldung { position:fixed;top:calc(env(safe-area-inset-top,0px) + 52px);left:50%;transform:translateX(-50%);z-index:9999;max-width:min(92vw,420px);padding:6px 12px;border-radius:6px;background:#263238;color:#fff;font-size:.85rem;line-height:1.35;box-shadow:0 2px 8px rgba(0,0,0,.25); }
+.wpp-update-meldung[hidden] { display:none; }
 /* Schmal: das Fähnchen steht AN STELLE der Versionsnummer (kurz „↑ 1.0.17“), damit der Kopf nicht umbricht. */
 @media (max-width:600px) { html[data-wpp-update] .wpp-kopf-version { display:none; } .wpp-update-fahne .wpp-fahne-lang { display:none; } .wpp-update-fahne .wpp-fahne-kurz { display:inline;margin-inline-end:3px; } }
 header.kopf .pro-schrift-knopf { height:32px; }
