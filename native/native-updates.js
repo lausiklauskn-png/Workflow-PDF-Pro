@@ -1,7 +1,10 @@
 /* „Auf Updates prüfen“ in der Android-App (Leitfaden § 6, Klaus 2026-10-28): immer mit Version —
    „Du verwendest die aktuelle Version 1.0.6.“ / „Neu: 1.0.7 (du hast 1.0.6)“. Nur auf Tipp; Java liest die öffentlichen
    GitHub-Veröffentlichungen (WorkflowUpdates). „Herunterladen“ öffnet die feste Seite der Veröffentlichung, installiert nichts.
-   Windows hat seinen eigenen Weg (windows/bridge/updates.js). */
+   Windows hat seinen eigenen Weg (windows/bridge/updates.js).
+   Update-Fähnchen (Klaus 2026-11-13): dieselbe Brücke wird zusätzlich STILL gefragt — kurz nach dem Start und beim Zurückholen der
+   App, höchstens einmal je Stunde. Steht eine neuere Fassung bereit, erscheint neben der Version im Kopf „Update X.Y.Z“; ein Tipp
+   geht den vorhandenen Weg (Einstellungen → Prüfung → „Neue Version herunterladen“). Aktuell, ohne Netz oder Fehler: nichts, keine Meldung. */
 (() => {
   'use strict';
   if(!window.Capacitor?.isNativePlatform?.())return;
@@ -12,10 +15,57 @@
     checking:['Prüfung läuft …','Checking …','Проверка …','جارٍ التحقق …'],
     download:['Neue Version herunterladen','Download new version','Загрузить новую версию','تنزيل الإصدار الجديد'],
     failed:['Updateprüfung gerade nicht möglich. Verbindung prüfen und später erneut versuchen.','Unable to check for updates right now. Check the connection and try again later.','Проверка обновлений сейчас невозможна. Проверьте соединение и повторите позже.','تعذّر التحقق من التحديثات الآن. تحقق من الاتصال وأعد المحاولة لاحقاً.'],
+    flag:['Update','Update','Обновление','تحديث'],
+    flagHint:['Update {v} steht bereit. Antippen zum Aktualisieren.','Update {v} is available. Tap to update.','Доступно обновление {v}. Нажмите, чтобы обновить.','التحديث {v} متاح. اضغط للتحديث.'],
     openFailed:['Die Seite ließ sich nicht öffnen.','The page could not be opened.','Не удалось открыть страницу.','تعذّر فتح الصفحة.']
   };
   const t=key=>words[key][Math.max(0,['de','en','ru','ar'].indexOf(document.documentElement.lang))];
-  let busy=false,result=null,fehler='';
+  let busy=false,result=null,fehler='',lauf=null;
+  // Eine Anfrage zur Zeit: Android weist eine zweite gleichzeitige ab (UPDATE_BUSY). Wer während der stillen Prüfung tippt, wartet auf sie.
+  const frage=()=>lauf||(lauf=Promise.resolve().then(()=>api.check()).finally(()=>{lauf=null;}));
+  const STILL_KEY='wpp_update_still_v1',STUNDE=60*60*1000,START_MS=2500;
+  const zahl=v=>{const m=String(v||'').match(/^v?(\d+)\.(\d+)\.(\d+)/);return m?[+m[1],+m[2],+m[3]]:null;};
+  const neuer=(a,b)=>{const x=zahl(a),y=zahl(b);if(!x||!y)return false;for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]>y[i];return false;};
+  const ich=()=>(String(document.querySelector('meta[name="wfp-version"]')?.content||'').match(/^\d+\.\d+\.\d+/)||[''])[0];
+  const gemerkt=()=>{try{const g=JSON.parse(localStorage.getItem(STILL_KEY)||'null');return g&&typeof g==='object'?g:null;}catch{return null;}};
+  const merken=g=>{try{localStorage.setItem(STILL_KEY,JSON.stringify(g));}catch{/* ohne Speicher: nur für diese Sitzung */}};
+  let fahneVersion='';
+  function fahne(){
+    // Gezeigt wird nur eine Fassung, die neuer ist als die laufende App (nach dem Update ist das Fähnchen von selbst weg).
+    const v=fahneVersion&&zahl(fahneVersion)&&(!ich()||neuer(fahneVersion,ich()))?fahneVersion:'';
+    let b=document.getElementById('wppUpdateFahne');
+    if(!v){b?.remove();delete document.documentElement.dataset.wppUpdate;return;}
+    const anker=document.getElementById('wppKopfVersion')||document.querySelector('header.kopf .marke .marke-name');
+    if(!anker)return;
+    if(!b){
+      b=document.createElement('button');b.type='button';b.id='wppUpdateFahne';b.className='wpp-update-fahne';b.dataset.keinUe='';
+      const kurz=document.createElement('span');kurz.className='wpp-fahne-kurz';kurz.setAttribute('aria-hidden','true');kurz.textContent='\u2191';
+      const lang=document.createElement('span');lang.className='wpp-fahne-lang';
+      const nr=document.createElement('span');nr.className='wpp-fahne-nr';
+      b.append(kurz,lang,nr);
+      b.addEventListener('click',()=>{
+        document.getElementById('btnEinst')?.click();
+        setTimeout(()=>{const box=document.getElementById('stUpdatesKasten');if(box)void pruefe(box);},150);
+      });
+    }
+    if(anker.nextElementSibling!==b)anker.after(b);
+    b.querySelector('.wpp-fahne-lang').textContent=t('flag')+' ';b.querySelector('.wpp-fahne-nr').textContent=v;
+    b.dataset.update=v;b.title=t('flagHint').replace('{v}',v);b.setAttribute('aria-label',b.title);
+    document.documentElement.dataset.wppUpdate=v;
+  }
+  const uebernehmen=r=>{fahneVersion=r?.status==='available'&&zahl(r.version)?zahl(r.version).join('.'):'';fahne();};
+  async function still(){
+    if(document.visibilityState==='hidden')return;
+    const g=gemerkt(),jetzt=Date.now();
+    if(g&&Number.isFinite(g.zeit)&&jetzt>=g.zeit&&jetzt-g.zeit<STUNDE){if(!lauf)uebernehmen(g.status==='available'?g:null);return;}
+    merken({zeit:jetzt,status:g?.status||'',version:g?.version||''});   // auch ein Fehlschlag zählt: höchstens eine Anfrage je Stunde
+    try{
+      const r=await frage();
+      merken({zeit:jetzt,status:r?.status==='available'?'available':'current',version:String(r?.version||'')});
+      result=r;uebernehmen(r);
+      const box=document.getElementById('stUpdatesKasten');if(box&&!busy){fehler='';zeichnen(box);}
+    }catch{/* ohne Netz oder Fehler: still, keine Meldung, ein schon gezeigtes Fähnchen bleibt */}
+  }
   function zeichnen(box){
     const P=window.ProBedienung,stand=box.querySelector('#stUpdatesStand'),knoepfe=box.querySelector('.pro-knoepfe');
     knoepfe.replaceChildren();
@@ -26,7 +76,7 @@
   }
   async function pruefe(box){
     if(busy)return;busy=true;fehler='';zeichnen(box);
-    try{result=await api.check();}catch{result=null;fehler=t('failed');}
+    try{result=await frage();uebernehmen(result);merken({zeit:Date.now(),status:result?.status==='available'?'available':'current',version:String(result?.version||'')});}catch{result=null;fehler=t('failed');}
     finally{busy=false;if(box.isConnected)zeichnen(box);}
   }
   function einsetzen(){
@@ -38,5 +88,9 @@
     box.append(knoepfe,stand);backup.parentElement.after(box);zeichnen(box);
   }
   new MutationObserver(einsetzen).observe(document.documentElement,{childList:true,subtree:true});
-  window.WFPNativeUpdates=Object.freeze({pruefe:()=>{const b=document.getElementById('stUpdatesKasten');return b?pruefe(b):null;}});
+  document.addEventListener('wfp-version',fahne);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void still();});
+  const start=()=>{fahne();setTimeout(()=>void still(),START_MS);};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+  window.WFPNativeUpdates=Object.freeze({pruefe:()=>{const b=document.getElementById('stUpdatesKasten');return b?pruefe(b):null;},still,fahne});
 })();

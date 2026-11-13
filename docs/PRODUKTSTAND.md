@@ -170,6 +170,17 @@ Nur in der App: Scanner-Direktstart per Intent (`de.familyprojekt.workflowpdf.pr
 Windows bekommt den Kern gleich; den Intent gibt es dort nicht (Windows hat keinen Weg, mit dem BookLedgerPro Windows den Scanner direkt
 öffnet — benannte Lücke). Nicht veröffentlicht, nicht am Gerät gemessen.
 
+## Update-Fähnchen neben der Version (13.11.2026, nicht veröffentlicht)
+
+Android und Windows gleich (`native/native-updates.js`, `native/native.css`): die App fragt die öffentlichen Veröffentlichungen
+über die vorhandene Brücke `WorkflowUpdates` von selbst – kurz nach dem Start und beim Zurückholen, höchstens einmal je Stunde –
+und zeigt bei einer neueren Fassung „Update X.Y.Z“ neben der Version im Kopf. Tipp = vorhandener Weg (Einstellungen, „Neue Version
+herunterladen“). Bei aktueller Fassung, ohne Netz oder bei einem Fehler erscheint nichts. Neu gegenüber vorher: es entsteht ohne
+Tipp eine Verbindung zu GitHub (nur die Liste der Veröffentlichungen, keine Dokumente). App **1.0.17 / Build 18**.
+PWA: eigenes Fähnchen im Kern (Workflow-PDF 1.1.10, eigener PR); der Kern unter `upstream/` ist hier noch 1.1.9 – nachziehen
+mit `tools/onboarding/nachziehen.py`, sobald der PWA-PR auf main ist. iOS: nicht geprüft.
+Geprüft im Browser mit gestellter Brücke (`tools/native/test-ohne-web.mjs`); nicht am Gerät, nicht mit echter GitHub-Antwort.
+
 ## Veröffentlichen
 
 **1.0.5 veröffentlicht 2026-10-26 (Klaus: „wenn das die aktuellste ist, muss die raus“):** [Android-APK](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/v1.0.5/Workflow-PDF-Pro-1.0.5.apk) (Lauf 40383096577, Tag `v1.0.5`, 83.147.148 B, SHA-256 `c9b8e67ef67bb1d38b0497d484937c271ed7f54e085b8e615d7200298512af65`, Buildnummer 6, Zertifikat `0da805c9…`, signierte Erstinstallation mit erhaltenem Ordner im Lauf) · [Windows-Setup](https://github.com/lausiklauskn-png/Workflow-PDF-Pro/releases/download/windows-v1.0.5/Workflow-PDF-Pro-Windows-1.0.5-Setup.exe) (Lauf 40384462589, Tag `windows-v1.0.5`, 15.866.577 B, SHA-256 `7e4e9195d2aa5c60ff3c7fcbf617532b6800cd4e2c60f2884c330fc06516f70c`, unsigniert, Installer aus dem Windows-Bau 40383101175 auf main, dort Installieren/Starten/Entfernen geprüft). Quelle `ba5d54e2e97e654881ebe8037995963c7d9dcef1`. Beide Downloads unabhängig geladen, Größe und SHA-256 gleich den veröffentlichten Prüfsummen. Geschenk für Jens trägt 1.0.5. Diese Veröffentlichung ist erledigt; nicht erneut auslösen. ⚠ Am Tablet und am eigenen Windows-PC nicht gemessen.

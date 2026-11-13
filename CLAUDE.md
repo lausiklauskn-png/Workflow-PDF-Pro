@@ -4,6 +4,8 @@
 
 Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 
+**Update-Fähnchen (Klaus 13.11.2026, Zweig, nicht veröffentlicht):** `native/native-updates.js` fragt die vorhandene Brücke `WorkflowUpdates` zusätzlich still (kurz nach dem Start und beim Zurückholen, höchstens einmal je Stunde, gemerkt in `wpp_update_still_v1`). Steht eine neuere Fassung bereit, erscheint neben der Version im Kopf „Update X.Y.Z“ (`#wppUpdateFahne`; bis 600 px kurz „↑ X.Y.Z“ an Stelle der Version); ein Tipp öffnet die Einstellungen und geht den vorhandenen Weg („Neue Version herunterladen“). Aktuell, ohne Netz oder Fehler: nichts, keine Meldung. Kern und gepinnte Bausteine unverändert. App **1.0.17**/Build 18 (Android, Windows gleich). Probe `test-ohne-web` (drei neue Fälle), von Hand gegengeprüft (5 Sabotagen, jede rot). Nicht am Gerät; echte GitHub-Abfrage nicht gemessen (Brücke gestellt).
+
 **Android-Testfassung 1.0.14/Build 15 veröffentlicht (04.11.2026, Klaus' Wort):** Tresor-Plan (#62) und Version (#63), Lauf 41749829952, APK SHA-256 `ba438634…df2a`, 83.350.299 B, von GitHub unabhängig geprüft; Nachweis `docs/VEROEFFENTLICHUNG-1.0.14.json`. Windows bleibt 1.0.13. Nicht erneut veröffentlichen. Am Tablet nicht geprüft.
 
 **Ordnerwahl und Tresor-Schutz (3.11.2026, Zweig, nicht veröffentlicht):** Hauptablageordner oder „Workflow PDF Pro“ öffnen dieselbe Ablage, keine Verschachtelung, Rückfrage vor neuer Ablage, „Speichern unter“ in den Tresor fragt nach, Hilfe „Wo liegt was?“ — `docs/TRESORORDNER.md` letzter Abschnitt.
