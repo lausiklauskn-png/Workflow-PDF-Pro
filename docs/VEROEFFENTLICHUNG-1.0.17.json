@@ -1,0 +1,18 @@
+{
+ "version": "1.0.17",
+ "build": 18,
+ "source": "31d3e463d3ff7b3022632c0d49d4a664e7d54857",
+ "pullRequest": [72],
+ "recordedUtc": "2026-11-13T18:20:00Z",
+ "freigabe": "Klaus 13.11.2026 (Freibrief): selbstständig veröffentlichen.",
+ "inhalt": "Update-Fähnchen neben der Version im Kopf (native/native-updates.js, still über WorkflowUpdates; Tipp öffnet den vorhandenen Weg).",
+ "mainCi": "31d3e46: Android-Baugrundlage 43467517254, Windows-Bau und Abnahme 43467517571, vollständige Android-Freigabeprüfung 43467517542 (Anlauf 2; im ersten lief android-product (31, pixel_c) nach 35 min in die Zeitgrenze, Code unverändert) – success.",
+ "releases": [
+  {"tag": "v1.0.17", "run": 43476185628, "conclusion": "success",
+   "downloadProof": [{"name": "Workflow-PDF-Pro-1.0.17.apk", "bytes": 83391432, "sha256": "f275559312d7c9019bdda17630cdeffa4ab5261847effed0082ff377ced0118b", "anonymousDownload": true, "matchesSha256File": true}]},
+  {"tag": "windows-v1.0.17", "run": 43469651042, "conclusion": "success",
+   "downloadProof": [{"name": "Workflow-PDF-Pro-Windows-1.0.17-Setup.exe", "bytes": 26479291, "sha256": "ef535738bcd75f03ef376d8bc7fd8a2be14e3b8e98f24446c3316ab0fcb48833", "anonymousDownload": true, "matchesSha256File": true}]}
+ ],
+ "notChecked": ["Tablet und Windows-PC", "Fähnchen gegen eine echte neuere Fassung auf GitHub"],
+ "naechsteFreieFassung": "1.0.18"
+}
