@@ -52,13 +52,13 @@ test('Pro-App: keine Web-Reste, Tresor & Ablage, Updates mit Version',async t=>{
     if(method==='tresorEinziehen'){fx.tresor={...fx.tresor,offen:true,eingezogen:true,eintraege:0};return {...fx.tresor,eingezogenJetzt:true};}
     if(method==='tresorVerzeichnis')return {geschrieben:true,eintraege:a.zeilen.length};
     if(method==='tresorSperren'){fx.tresor={...fx.tresor,offen:false,eingezogen:false};return {...fx.tresor};}
-    if(method==='check')return {...fx.updates};
+    if(method==='check'){fx.fragen=(fx.fragen||0)+1;if(fx.ohneNetz)throw Error('UPDATE_UNAVAILABLE');return {...fx.updates};}
     if(method==='openDownload'){fx.laden++;return {};}
     throw Error('Unknown bridge method '+method);
   }
   const vaultM=['state','migration','choose','unlock','lock','prepareMigration','completeMigration','cancelMigration','beginBatch','abortBatch','commitBatch','begin','append','finish','abort','info','read','list','remove','recoveryInfo','createRecovery','ordnerOeffnen','tresorZustand','tresorEinziehen','tresorVerzeichnis','tresorSperren'];
-  async function seite(app,lang='de'){
-    const page=await browser.newPage({viewport:{width:1100,height:900}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  async function seite(app,lang='de',breite=1100){
+    const page=await browser.newPage({viewport:{width:breite,height:900}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
     await page.exposeFunction('__vaultCall',call);
     await page.addInitScript(([app,names,lang])=>{
       if(lang!=='de')localStorage.setItem('wfpdf_sprache_v1',JSON.stringify({lang}));
@@ -162,7 +162,64 @@ test('Pro-App: keine Web-Reste, Tresor & Ablage, Updates mit Version',async t=>{
       assert.deepEqual(errors,[]);
       await page.close();
     });
+    // Update-Fähnchen (Klaus 2026-11-13): erscheint von selbst neben der Version, Tipp = vorhandener Weg; aktuell/ohne Netz: nichts.
+    const fahne=page=>page.evaluate(()=>{const b=document.getElementById('wppUpdateFahne'),v=document.getElementById('wppKopfVersion');
+      if(!b)return null;const r=b.getBoundingClientRect();
+      return {text:b.textContent,vor:b.previousElementSibling?.id||'',sichtbar:r.width>1&&r.height>1,titel:b.title,version:v?getComputedStyle(v).display:'',
+        kurz:getComputedStyle(b.querySelector('.wpp-fahne-kurz')).display,lang:getComputedStyle(b.querySelector('.wpp-fahne-lang')).display};});
+    const gefragt=(page,n)=>page.waitForFunction(()=>true).then(async()=>{const bis=Date.now()+15000;while((fx.fragen||0)<n){if(Date.now()>bis)throw Error('stille Prüfung blieb aus: '+(fx.fragen||0)+' von '+n);await page.waitForTimeout(100);}});
+    await t.test('Update-Fähnchen: erscheint ohne Tipp neben der Version; Tipp geht den vorhandenen Weg',async()=>{
+      fx.updates={status:'available',version:'1.0.7',installiert:'1.0.6',tag:'v1.0.7'};fx.fragen=0;fx.ohneNetz=false;fx.laden=0;
+      const {page,errors}=await seite(true);
+      await page.waitForSelector('#wppUpdateFahne',{timeout:15000});
+      const f=await fahne(page);
+      assert.deepEqual({text:f.text,vor:f.vor,sichtbar:f.sichtbar,version:f.version!=='none',lang:f.lang!=='none',kurz:f.kurz},{text:'↑Update 1.0.7',vor:'wppKopfVersion',sichtbar:true,version:true,lang:true,kurz:'none'});
+      assert.match(f.titel,/Update 1\.0\.7 steht bereit/);
+      assert.equal(fx.fragen,1,'genau eine stille Anfrage beim Start');
+      assert.equal(await page.locator('.dlg-grund').count(),0,'die stille Prüfung öffnet nichts');
+      // Zurückholen innerhalb der Stunde: keine zweite Anfrage.
+      await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await page.waitForTimeout(400);
+      assert.equal(fx.fragen,1,'höchstens stündlich');
+      await page.click('#wppUpdateFahne');
+      await page.waitForFunction(()=>/Neu: 1\.0\.7 \(du hast 1\.0\.6\)/.test(document.getElementById('stUpdatesStand')?.textContent||''));
+      await page.click('#stUpdatesLaden');assert.equal(fx.laden,1);
+      assert.deepEqual(errors,[]);await page.close();
+    });
+    await t.test('Update-Fähnchen: aktuelle Fassung und ohne Netz – kein Fähnchen, keine Meldung; nach einer Stunde neu gefragt',async()=>{
+      fx.updates={status:'current',version:'1.0.6',installiert:'1.0.6'};fx.fragen=0;fx.ohneNetz=false;
+      const {page,errors}=await seite(true);
+      await gefragt(page,1);await page.waitForTimeout(300);
+      assert.equal(await fahne(page),null,'aktuell: kein Fähnchen');
+      assert.equal(await page.locator('.dlg-grund, .toast.an, #stUpdatesStand, #windowsUpdates').count(),0,'aktuell: keine Meldung');
+      // Eine Stunde später (gemerkte Zeit zurückgestellt) steht ein Update bereit: Zurückholen fragt neu und zeigt es.
+      fx.updates={status:'available',version:'1.0.8',installiert:'1.0.6',tag:'v1.0.8'};
+      await page.evaluate(()=>{const g=JSON.parse(localStorage.getItem('wpp_update_still_v1'));g.zeit-=61*60*1000;localStorage.setItem('wpp_update_still_v1',JSON.stringify(g));document.dispatchEvent(new Event('visibilitychange'));});
+      await page.waitForSelector('#wppUpdateFahne[data-update="1.0.8"]',{timeout:15000});assert.equal(fx.fragen,2);
+      // Dieselbe Fassung wie die laufende App (nach dem Update): Fähnchen weg.
+      await page.evaluate(()=>{document.querySelector('meta[name="wfp-version"]').content='1.0.8';document.dispatchEvent(new Event('wfp-version'));});
+      assert.equal(await fahne(page),null,'nach dem Update ist das Fähnchen weg');
+      assert.deepEqual(errors,[]);await page.close();
+      fx.fragen=0;fx.ohneNetz=true;
+      const o=await seite(true);
+      await gefragt(o.page,1);await o.page.waitForTimeout(300);
+      assert.equal(await fahne(o.page),null,'ohne Netz: kein Fähnchen');
+      assert.equal(await o.page.locator('.dlg-grund, .toast.an, #stUpdatesStand, #windowsUpdates').count(),0,'ohne Netz: keine Meldung');
+      assert.deepEqual(o.errors,[]);await o.page.close();fx.ohneNetz=false;
+    });
+    await t.test('Update-Fähnchen: schmal (360 px) steht es kurz an Stelle der Version, der Kopf wird nicht höher',async()=>{
+      fx.updates={status:'current',version:'1.0.6',installiert:'1.0.6'};fx.fragen=0;
+      const a=await seite(true,'de',360);await gefragt(a.page,1);await a.page.waitForTimeout(300);
+      const ohne=await a.page.evaluate(()=>({h:document.querySelector('header.kopf').getBoundingClientRect().height,quer:document.documentElement.scrollWidth-innerWidth}));await a.page.close();
+      fx.updates={status:'available',version:'1.0.7',installiert:'1.0.6',tag:'v1.0.7'};
+      const b=await seite(true,'de',360);await b.page.waitForSelector('#wppUpdateFahne',{timeout:15000});
+      const mit=await b.page.evaluate(()=>({h:document.querySelector('header.kopf').getBoundingClientRect().height,quer:document.documentElement.scrollWidth-innerWidth}));
+      const f=await fahne(b.page);
+      assert.deepEqual({version:f.version,lang:f.lang,kurz:f.kurz!=='none',sichtbar:f.sichtbar},{version:'none',lang:'none',kurz:true,sichtbar:true});
+      assert.ok(mit.h<=ohne.h+0.5&&mit.quer<=Math.max(0,ohne.quer),JSON.stringify({ohne,mit}));
+      assert.deepEqual(b.errors,[]);await b.page.close();
+    });
     await t.test('Auf Updates prüfen nennt die Version (neu und aktuell); Herunterladen öffnet die Seite',async()=>{
+      fx.updates={status:'available',version:'1.0.7',installiert:'1.0.6',tag:'v1.0.7'};fx.laden=0;
       const {page,errors}=await seite(true);
       await page.evaluate(()=>__wfpdf.dlg.einstellungen());
       await page.click('#stUpdates');
