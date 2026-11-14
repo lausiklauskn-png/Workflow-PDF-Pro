@@ -1,5 +1,5 @@
 {
-  "commit": "0ed15e53d9735c32e9b3c7a3b40871c2e4f7b922",
+  "commit": "fe2e20d058172b40d53f374312bfc7d67545c28d",
   "files": [
     {
       "path": ".github/workflows/quality.yml",
@@ -18,8 +18,8 @@
     },
     {
       "path": "CLAUDE.md",
-      "bytes": 119698,
-      "sha256": "af3b6515480cc97827f9a56280fa9e3ccb821b7b71d6737649c8504a5a2b7992"
+      "bytes": 121359,
+      "sha256": "604850da7485ca795204e66a9f75a9002692c0278e057d93f80f134e18984062"
     },
     {
       "path": "LICENSE",
@@ -43,8 +43,8 @@
     },
     {
       "path": "assets/app.js",
-      "bytes": 301135,
-      "sha256": "09d2e81b80ff7c41a0cef91c353ce6fad5da40b0655fd1a7ab6fb353e66f74bc"
+      "bytes": 303266,
+      "sha256": "c510bb4ea2600e013f894b0d342a7bb166c1533bf2e943cbf00d304ae134ff48"
     },
     {
       "path": "assets/bedeutung.js",
@@ -158,8 +158,8 @@
     },
     {
       "path": "assets/sprache-texte.js",
-      "bytes": 429060,
-      "sha256": "a41b607cb6c36990cfe07653fe37ea0fdd8686febb620bbdcfe0d44a409a5485"
+      "bytes": 429715,
+      "sha256": "ebbc4d4620d2c3e5986a37de934dad24dcc1febbdf6948b4e534ea4a75d24498"
     },
     {
       "path": "assets/sprache.js",
@@ -178,8 +178,8 @@
     },
     {
       "path": "assets/style.css",
-      "bytes": 51553,
-      "sha256": "e996aaad5f950b5187bec6f19322023e8965bef8933bbd3de359acdb094a2707"
+      "bytes": 51939,
+      "sha256": "fdbd7283644ba8eacadaab63d641d2c3ea31cb4899aa080016a26d489fe818fc"
     },
     {
       "path": "assets/suche.js",
@@ -388,8 +388,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 13243,
-      "sha256": "20664d569d071e7e0273349dfcda037fcf195b2177710ccd178beeaad71c1098"
+      "bytes": 13507,
+      "sha256": "65ceb891d17db6c07d424cc43bff937652fabb2b70cb17090fe4998560a83c58"
     },
     {
       "path": "manifest.webmanifest",
@@ -398,13 +398,13 @@
     },
     {
       "path": "package-lock.json",
-      "bytes": 2973,
-      "sha256": "1f33437c0bb29b9323250b5ec736539228dd80b9ffd77f5ab8ec2a3a9e7f05e5"
+      "bytes": 2975,
+      "sha256": "0c8dcb6590cd6fcf69d83b6c2b703fa6445573b0cdd3772e1c74124f29564078"
     },
     {
       "path": "package.json",
-      "bytes": 1514,
-      "sha256": "03b604c3956ddb10b4ef9abb533911986949dbd34446b021f189be92959b19db"
+      "bytes": 1515,
+      "sha256": "81ea3805f5c77456245ea47e0eca5be0a3b222239b7ddf6240801ad3523e1258"
     },
     {
       "path": "sbkim/01_storage.js",
@@ -468,8 +468,8 @@
     },
     {
       "path": "sw.js",
-      "bytes": 5384,
-      "sha256": "c150bd459e99db2372c8846bce906524f9b0b38f46e09de4656bd87b423c9bc1"
+      "bytes": 5535,
+      "sha256": "774921f6596db5e124d1aedfcbc56f67139dd3b3d63769b92b7411ee7119edd9"
     },
     {
       "path": "tests/arbeit.mjs",
@@ -698,8 +698,8 @@
     },
     {
       "path": "tests/gegenprobe_version.mjs",
-      "bytes": 4859,
-      "sha256": "7d4b4d01ae0eaf08766a1038cf6019fd5cdec96aa061ecaad0f097cc36882917"
+      "bytes": 6640,
+      "sha256": "9bfd4515471b833d49d7c799a20ffa8848a26984bf7085b58c05ab1ab2071cdb"
     },
     {
       "path": "tests/import-abschluss.mjs",
@@ -903,8 +903,8 @@
     },
     {
       "path": "tests/version.mjs",
-      "bytes": 6910,
-      "sha256": "2bae50b4e35907d6435c58841dac1729bb8620c13f659d1de0e3ca17e4dc7bcd"
+      "bytes": 12017,
+      "sha256": "2513a1f014a6ae2dab34b87252d744273ec2b85fe030c19d4e68b0a1d0eb9915"
     },
     {
       "path": "tests/video.mjs",
@@ -1080,6 +1080,11 @@
       "path": "vendor/tesseract/worker.min.js.LICENSE.txt",
       "bytes": 466,
       "sha256": "45f54171aeaa1d10c0c1a66f374b7bba1f02472b1487fbe892eec04f840002ac"
+    },
+    {
+      "path": "version.json",
+      "bytes": 54,
+      "sha256": "893d92274018f229627da4ffe5082dd0bf09bb7efbcccadcc82b4857dfe0d6eb"
     }
   ]
 }
