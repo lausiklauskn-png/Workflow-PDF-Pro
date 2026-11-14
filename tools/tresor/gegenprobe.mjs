@@ -52,6 +52,12 @@ const faelle = [
   ['Vermerk wird nicht beachtet', 'Umzug.java', 'if (alt.gibtEs(VERMERK)) throw TresorOrdner.fehler("TRESOR_UMZUG_SCHON_UMGEZOGEN");', '', 'ortAendernKopiert'],
   ['Übergabefach liest nur einen Schreiber', 'TresorOrdner.java',
     'for (String schreiber : Fach.APPS) if (ablage.istOrdner', 'for (String schreiber : java.util.Collections.singletonList(app)) if (ablage.istOrdner', 'uebergabefach'],
+  // Fach „profile“ (2026-11-14): je App die neueste, gleicher Inhalt schreibt nichts, Prüfsumme, Grenze.
+  ['Profil: älteste statt neueste Fassung', 'Profile.java', 'if (da == null || e.datum > da.datum)', 'if (da == null || e.datum < da.datum)', 'profileGemeinsam'],
+  ['Profil: gleicher Inhalt schreibt neu', 'Profile.java', 'if (neueste != null && summe.equals(neueste.sha256) && neueste.groesse == daten.length) return neueste;', '', 'profileGemeinsam'],
+  ['Profil: Prüfsumme nicht kontrolliert', 'Profile.java', 'if (b.length != e.groesse || !sha(b).equals(e.sha256))', 'if (b.length != e.groesse)', 'profileGemeinsam',
+    ['try (InputStream in = tresor.oeffnen(fach(), e)) { b = begrenzt(in); }', 'try (InputStream in = tresor.oeffnen(fach(), e)) { b = begrenzt(in); } catch (IOException x) { b = new byte[(int) e.groesse]; }']],
+  ['Profil: keine Größengrenze', 'Profile.java', 'if (daten == null || daten.length == 0 || daten.length > MAX_BYTES)', 'if (daten == null)', 'profileGemeinsam'],
 ];
 
 let gefangen = 0, durch = 0;

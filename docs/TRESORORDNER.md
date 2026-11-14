@@ -13,7 +13,8 @@ Windows-Java-Engine von Private Brain Pro. Einzige Android-Datei ist `SafAblage.
 |---|---|
 | `VaultCrypto.java` | das Schloss PBV1 — **bis auf die `package`-Zeile byte-gleich** mit Workflow PDF Pro und Private Brain Pro (Rumpf-SHA-256 `a12fb6d5…`, von `tools/tresor/pins.mjs` geprüft) |
 | `TresorOrdner.java` | Kopf, Hauptschlüssel, Passwort- und Ersatzplätze, Fach-Schlüssel, Dateien, Inhaltsverzeichnis, Marken |
-| `Fach.java` | die neun Fächer und wer schreiben darf |
+| `Fach.java` | die zehn Fächer und wer schreiben darf (seit 2026-11-14 mit dem gemeinsamen Fach `profile`) |
+| `Profile.java` | Profile für die Maske im gemeinsamen Fach `profile`: je App eine eigene Datei, alle lesen alle, neueste gilt |
 | `Eintrag.java` | eine Zeile im Inhaltsverzeichnis (gleiches Format für alle Apps) |
 | `Ersatzschluessel.java` | Shamir 5/3, gleiche Rechnung wie `VaultRecovery`, Vorsilbe `FPT1-` |
 | `Ablage.java`, `DateiAblage.java`, `SafAblage.java` | der gewählte Ordner: Schnittstelle, java.io.File, Android-SAF |
@@ -32,6 +33,7 @@ Windows-Java-Engine von Private Brain Pro. Einzige Android-Datei ist `SafAblage.
   Private Brain/  Workflow PDF Pro/  BookLedgerPro/  Eingang-BookLedgerPro/  Eingang-WorkflowPDF/
   Private Brain V3/  Familienakte/  Eingang-Familienakte/      (seit 2026-10-31)
   Eingang-Private-Brain/                                      (seit 2026-11-01)
+  Maske-Profile/<app>/<uuid>.fpt                              (seit 2026-11-14, Fach `profile`, gemeinsam)
 ```
 
 - Jede Verpackung ist an Kennung, Art und Teil gebunden (`familyprojekt-tresorordner|<id>|kennwort|<platz>|<runden>`,
@@ -332,3 +334,21 @@ wählen …“** (`WorkflowVault.tresorEinrichten`, `ProVaultPlugin`):
 
 Paket geändert (`Hauptordner`, `SafAblage.kennung`): Pins neu (`node tools/tresor/pins.mjs --schreiben`), nach Familienakte,
 BookLedgerPro und Private Brain Pro nachziehen.
+
+## Fach `profile` – Profile für die Maske (2026-11-14)
+
+Klaus (14.11.2026, Plan Pseudonymisieren in der Familienakte `docs/PLAN_PSEUDONYMISIEREN.md`, Stufe C): die Profile für das
+Pseudonymisieren (Personen, Schreibweisen, Nummern nur als HMAC-Fingerabdruck, „immer verdecken“/„darf bleiben“) liegen im Tresor und
+gelten für alle Pro-Apps. Dafür gibt es ein **gemeinsames Fach** – ohne Besitzer und ohne Empfänger (`Fach.istGemeinsam()`):
+
+- Slug `profile`, Ordner **„Maske-Profile“** (ein Ordner „Profile“ wäre mit eigenen Ordnern leicht zu verwechseln). Entsteht beim ersten Ablegen;
+  ältere Tresore bleiben unverändert gültig.
+- `Profile.schreiben(bytes, datum)`: jede App legt ihre eigene Datei ab (`Maske-Profile/<app>/<uuid>.fpt`, Name `maske-profil.json`,
+  Auszug = Vertrag `familyprojekt-maske-profil/1`, höchstens 1 MiB). Gleicher Inhalt wie die eigene neueste → nichts Neues. Das eigene
+  Verzeichnis nennt danach nur die neue Fassung; die alte Datei **bleibt liegen** (in keinem Fach wird gelöscht).
+- `Profile.lesen()`: je App die neueste Fassung (eigene zuerst), mit Längen- und SHA-256-Prüfung; eine beschädigte Datei einer App wird mit
+  `fehler` gemeldet und hält die anderen nicht auf.
+- Der Inhalt ist für das Paket undurchsichtig. Das Format bestimmt die Maske (Familienakte `lib/maske-profil.ts`, später Sage Modul 25 Gen. 3).
+- „Überall suchen“ (`native/pro-ueberall.js`) kennt das Fach nicht und durchsucht es nie.
+- Probe `profileGemeinsamJeAppNeuesteGiltNichtsGeloescht` (zwei Apps, neueste gilt, alte Datei bleibt, kein Klartext im Ordner,
+  beschädigte Datei), Gegenprobe vier Fälle (`NUR_FALL=Profil`).

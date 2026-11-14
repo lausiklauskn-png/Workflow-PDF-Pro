@@ -9,6 +9,8 @@ import java.util.List;
  * Eigenes Fach: nur die besitzende App schreibt. Übergabefach: jede Pro-App darf ablegen,
  * gelesen wird es von der Empfänger-App. Gelesen werden dürfen alle Fächer von allen Apps.
  * Gelöscht wird in keinem Fach etwas; „übernommen“ ist eine eigene Marke-Datei.
+ * Gemeinsames Fach (ohne Besitzer und ohne Empfänger, seit 2026-11-14 nur „profile“): jede Pro-App schreibt ihre
+ * eigene Datei hinein, alle lesen alle (siehe {@link Profile}).
  */
 public final class Fach {
     public static final String PRIVATE_BRAIN_APP = "private-brain";
@@ -31,8 +33,10 @@ public final class Fach {
     public static final Fach EINGANG_FAMILIENAKTE = new Fach("eingang-familienakte", "Eingang-Familienakte", null, FAMILIENAKTE_APP);
     /** Kompatibler Rückweg zu Private Brain Pro; entsteht erst bei der ersten Ablage. */
     public static final Fach EINGANG_PRIVATE_BRAIN = new Fach("eingang-private-brain", "Eingang-Private-Brain", null, PRIVATE_BRAIN_APP);
+    /** Profile für die Maske (Pseudonymisieren, Klaus 2026-11-14): gemeinsam für alle Pro-Apps; entsteht beim ersten Ablegen. */
+    public static final Fach PROFILE = new Fach("profile", "Maske-Profile", null, null);
     public static final List<Fach> ALLE = Collections.unmodifiableList(Arrays.asList(PRIVATE_BRAIN, WORKFLOW_PDF, BOOKLEDGER, EINGANG_BOOKLEDGER, EINGANG_WORKFLOW_PDF,
-        PRIVATE_BRAIN_V3, FAMILIENAKTE, EINGANG_FAMILIENAKTE, EINGANG_PRIVATE_BRAIN));
+        PRIVATE_BRAIN_V3, FAMILIENAKTE, EINGANG_FAMILIENAKTE, EINGANG_PRIVATE_BRAIN, PROFILE));
 
     /** Kurzname im Format (Dateinamen, gebundene Daten). */
     public final String slug;
@@ -47,7 +51,11 @@ public final class Fach {
         this.slug = slug; this.ordner = ordner; this.besitzer = besitzer; this.empfaenger = empfaenger;
     }
 
+    /** Kein Besitzer: Übergabefach (mit Empfänger) oder gemeinsames Fach (ohne). Schreiben dürfen dort alle Apps. */
     public boolean istUebergabe() { return besitzer == null; }
+
+    /** Gemeinsames Fach: kein Besitzer, kein Empfänger (Profile). */
+    public boolean istGemeinsam() { return besitzer == null && empfaenger == null; }
 
     public boolean darfSchreiben(String app) {
         if (!APPS.contains(app)) return false;
