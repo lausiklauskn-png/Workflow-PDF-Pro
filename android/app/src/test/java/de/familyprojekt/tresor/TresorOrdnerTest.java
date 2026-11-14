@@ -88,7 +88,7 @@ public final class TresorOrdnerTest {
         File d = neuerOrdner(); DateiAblage a = new DateiAblage(d);
         try (TresorOrdner blp = TresorOrdner.anlegen(a, Fach.BOOKLEDGER_APP, PW)) { blp.fachAnlegen("bookledgerpro"); }
         try (TresorOrdner v3 = TresorOrdner.oeffnen(a, Fach.PRIVATE_BRAIN_V3_APP, PW)) {
-            assertEquals(9, v3.faecher().size());
+            assertEquals(10, v3.faecher().size()); // seit 2026-11-14 mit „profile“
             assertFalse(v3.fachBekannt("private-brain-v3"));
             v3.ablegen("private-brain-v3", null, "notiz.txt", "text/plain", 1L, new ByteArrayInputStream("V3".getBytes(StandardCharsets.UTF_8)), "Notiz");
             assertTrue(new File(d, "Private Brain V3").isDirectory());
@@ -196,6 +196,55 @@ public final class TresorOrdnerTest {
             assertEquals("TRESOR_UEBERGABE_PRUEFSUMME",code(() -> u.lesen(eintragId)));
             assertEquals("TRESOR_UEBERGABE_PRUEFSUMME",code(() -> u.quittieren(eintragId,"0".repeat(64))));
             assertFalse(t.marken(Fach.EINGANG_PRIVATE_BRAIN.slug).contains(eintragId));
+        }
+    }
+
+    /** Fach „profile“ (Maske, 2026-11-14): gemeinsam, jede App schreibt ihre eigene Datei, alle lesen alle,
+     * neueste gilt, alte Dateien bleiben liegen, gleicher Inhalt schreibt nichts Neues, Grenze 1 MiB. */
+    @Test public void profileGemeinsamJeAppNeuesteGiltNichtsGeloescht() throws Exception {
+        File d=neuerOrdner(); DateiAblage a=new DateiAblage(d);
+        try(TresorOrdner t=TresorOrdner.anlegen(a,Fach.FAMILIENAKTE_APP,PW)) { assertTrue(new Profile(t).lesen().isEmpty()); }
+        assertTrue(Fach.PROFILE.istGemeinsam()); assertFalse(Fach.FAMILIENAKTE.istGemeinsam()); assertFalse(Fach.EINGANG_FAMILIENAKTE.istGemeinsam());
+        for (String app : Fach.APPS) assertTrue(Fach.PROFILE.darfSchreiben(app));
+        assertFalse(Fach.PROFILE.darfSchreiben("fremde-app"));
+        byte[] eins="{\"eintraege\":[1]}".getBytes(StandardCharsets.UTF_8), zwei="{\"eintraege\":[1,2]}".getBytes(StandardCharsets.UTF_8), pb="{\"pb\":1}".getBytes(StandardCharsets.UTF_8);
+        String ersteId, pbNeu;
+        try(TresorOrdner t=TresorOrdner.oeffnen(a,Fach.FAMILIENAKTE_APP,PW)) {
+            Profile p=new Profile(t);
+            Eintrag e1=p.schreiben(eins,1000); ersteId=e1.id;
+            assertEquals(e1.id,p.schreiben(eins,2000).id);
+            Eintrag e2=p.schreiben(zwei,1500);
+            assertTrue(e2.datum>e1.datum);
+            assertEquals(1,t.eigenesVerzeichnis(Fach.PROFILE.slug).size());
+            assertEquals("TRESOR_PROFIL_GROESSE",code(() -> p.schreiben(new byte[Profile.MAX_BYTES+1],3000)));
+            assertEquals("TRESOR_PROFIL_GROESSE",code(() -> p.schreiben(new byte[0],3000)));
+        }
+        assertTrue("alte Fassung bleibt liegen", new File(d,"Maske-Profile/"+Fach.FAMILIENAKTE_APP+"/"+ersteId+".fpt").isFile());
+        Map<String,String> vorher=baum(d,"Maske-Profile/"+Fach.FAMILIENAKTE_APP);
+        try(TresorOrdner t=TresorOrdner.oeffnen(a,Fach.PRIVATE_BRAIN_APP,PW)) {
+            Profile p=new Profile(t);
+            List<Profile.Stand> l=p.lesen(); assertEquals(1,l.size());
+            assertEquals(Fach.FAMILIENAKTE_APP,l.get(0).schreiber); assertArrayEquals(zwei,l.get(0).daten());
+            p.schreiben(pb,5000);
+            l=p.lesen(); assertEquals(2,l.size());
+            assertEquals("eigene zuerst",Fach.PRIVATE_BRAIN_APP,l.get(0).schreiber); assertArrayEquals(pb,l.get(0).daten());
+            // Eine App, die ihr Verzeichnis nicht kürzt: trotzdem gilt die neueste Fassung.
+            byte[] pb2="{\"pb\":2}".getBytes(StandardCharsets.UTF_8);
+            pbNeu=t.ablegen(Fach.PROFILE.slug,Fach.PRIVATE_BRAIN_APP,Profile.NAME,Profile.ART,9000,new ByteArrayInputStream(pb2),Profile.VERTRAG).id;
+            t.ablegen(Fach.PROFILE.slug,Fach.PRIVATE_BRAIN_APP,"notiz.txt","text/plain",9999,new ByteArrayInputStream(pb),"keine Profil-Datei");
+            l=p.lesen(); assertEquals(2,l.size()); assertArrayEquals(pb2,l.get(0).daten()); assertEquals(9000,l.get(0).datum);
+        }
+        assertEquals("fremde Profil-Dateien unberührt",vorher,baum(d,"Maske-Profile/"+Fach.FAMILIENAKTE_APP));
+        // Klartext steht nirgends im Ordner (verschlüsselt wie jedes Fach).
+        for (File f : Files.walk(d.toPath()).map(java.nio.file.Path::toFile).filter(File::isFile).toArray(File[]::new))
+            assertFalse(f.getPath(), new String(Files.readAllBytes(f.toPath()),StandardCharsets.ISO_8859_1).contains("eintraege"));
+        // Beschädigte Datei einer App hält die andere nicht auf.
+        File kaputt=new File(d,"Maske-Profile/"+Fach.PRIVATE_BRAIN_APP+"/"+pbNeu+".fpt");
+        try(RandomAccessFile r=new RandomAccessFile(kaputt,"rw")) { r.seek(r.length()-3); int b=r.read(); r.seek(r.length()-3); r.write(b^1); }
+        try(TresorOrdner t=TresorOrdner.oeffnen(a,Fach.FAMILIENAKTE_APP,PW)) {
+            List<Profile.Stand> l=new Profile(t).lesen(); assertEquals(2,l.size());
+            assertEquals(Fach.FAMILIENAKTE_APP,l.get(0).schreiber); assertNull(l.get(0).fehler); assertArrayEquals(zwei,l.get(0).daten());
+            assertNotNull(l.get(1).fehler); assertNull(l.get(1).daten());
         }
     }
 
