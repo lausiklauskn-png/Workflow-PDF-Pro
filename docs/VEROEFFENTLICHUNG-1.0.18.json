@@ -1,0 +1,18 @@
+{
+ "version": "1.0.18",
+ "build": 19,
+ "source": "7b3d7431a8df5160be9b29b66c81f6886be1ecd1",
+ "pullRequest": [75],
+ "recordedUtc": "2026-11-14T08:20:00Z",
+ "freigabe": "Klaus 13.11.2026 (Freibrief): selbstständig veröffentlichen; Auftrag 14.11.: Versionsnummer lädt nur das Update, öffnet nicht zusätzlich die Einstellungen.",
+ "inhalt": "Tipp auf Version oder Update-Fähnchen lädt die APK der Veröffentlichung, prüft sie und öffnet Androids Installieren-Fenster (0b3f196, #74); Version öffnet nicht mehr die Einstellungen.",
+ "mainCi": "7b3d743: Windows-Bau und Abnahme 43568121024, Android-Baugrundlage 43568121061, vollständige Android-Freigabeprüfung 43568121110 (Versuch 2; im ersten war NativeAppSwitchTest auf android-product (31, pixel_c) rot, auf (35, pixel_2) und im vorigen Stand mit gleichem Code grün) – success.",
+ "releases": [
+  {"tag": "v1.0.18", "run": 43572306297, "conclusion": "success",
+   "downloadProof": [{"name": "Workflow-PDF-Pro-1.0.18.apk", "bytes": 83391432, "sha256": "af8abd4f6f2805096f98beb74ac599e6feb76a35ab3e861b78a3df1f5bf304f0", "anonymousDownload": true, "matchesSha256File": true}]},
+  {"tag": "windows-v1.0.18", "run": 43569524609, "conclusion": "success",
+   "downloadProof": [{"name": "Workflow-PDF-Pro-Windows-1.0.18-Setup.exe", "bytes": 26479803, "sha256": "5f43b588f65a904fc2d8637528c79acbe9382fae59e8dcde09b4b933c5921744", "anonymousDownload": true, "matchesSha256File": true}]}
+ ],
+ "notChecked": ["Tablet und Windows-PC", "direktes Laden über die Version gegen die echte Veröffentlichung"],
+ "naechsteFreieFassung": "1.0.19"
+}
