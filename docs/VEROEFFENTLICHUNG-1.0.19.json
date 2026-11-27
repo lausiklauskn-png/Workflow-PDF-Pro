@@ -1,0 +1,17 @@
+{
+ "version": "1.0.19",
+ "build": 20,
+ "source": "01e4d3b8bd49dbbca8a1ad50da94e7784977683d",
+ "pullRequest": [79, 80],
+ "recordedUtc": "2026-11-27T21:25:00Z",
+ "freigabe": "Klaus 27.11.2026: DeX-Leiste in den anderen Pro-Apps reparieren und ausgeben (alle Pro-Apps stehen mit Android und Windows im Marktplatz).",
+ "inhalt": "Kopf und Scan-Ansicht halten oben den Abstand env(safe-area-inset-top) (lagen am DeX-Monitor unter der Fensterleiste, #79); Kern unverändert.",
+ "releases": [
+  {"tag": "v1.0.19", "run": 46066740101, "conclusion": "success",
+   "downloadProof": [{"name": "Workflow-PDF-Pro-1.0.19.apk", "bytes": 83391432, "sha256": "69695b01be85d3c73d4a7526851456a9d55710cd24b517c4540ee52d9b471d83", "versionCode": 20, "certificateSha256": "0da805c9ad11ded86227fa4398e9237766f9f2d12bec66d65cb20309cbea3837", "anonymousDownload": true, "matchesSha256File": true}]},
+  {"tag": "windows-v1.0.19", "run": 46066744735, "conclusion": "success",
+   "downloadProof": [{"name": "Workflow-PDF-Pro-Windows-1.0.19-Setup.exe", "bytes": 26488589, "sha256": "832a058a1b53a876d838c3c183657f2aea822a085340df850e2ee48cc5588590", "anonymousDownload": true, "matchesSha256File": true}]}
+ ],
+ "notChecked": ["DeX-Monitor, Tablet und Windows-PC"],
+ "naechsteFreieFassung": "1.0.20"
+}

@@ -4,7 +4,7 @@
 
 Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 
-**Kopf nicht unter der Fensterleiste (Klaus 27.11.2026, Bild am DeX-Monitor; PR #79):** `native/native.css` gibt Kopf und Scan-Ansicht oben den Abstand `env(safe-area-inset-top)`, Kern unverändert. App **1.0.19**/Build 20 (Android, Windows gleich). Nicht am Gerät.
+**Kopf nicht unter der Fensterleiste (Klaus 27.11.2026, Bild am DeX-Monitor; PR #79):** `native/native.css` gibt Kopf und Scan-Ansicht oben den Abstand `env(safe-area-inset-top)`, Kern unverändert. App **1.0.19**/Build 20 (Android, Windows gleich), **veröffentlicht 27.11.** (Nachweis `docs/VEROEFFENTLICHUNG-1.0.19.json`, nicht erneut auslösen; nächste 1.0.20). Nicht am Gerät.
 
 **Versionsnummer lädt direkt (Klaus 13./14.11.2026; 1.0.18 veröffentlicht Android + Windows, Nachweis `docs/VEROEFFENTLICHUNG-1.0.18.json`; nicht erneut auslösen):** Tipp auf die Version oder das Fähnchen prüft, lädt die APK der Veröffentlichung, prüft sie (Größe, SHA-256, Paket, Zertifikat, versionCode) und öffnet Androids Installieren-Fenster; die Version öffnet nicht mehr die Einstellungen. App **1.0.18**/Build 19 (Android, Windows gleich).
 
