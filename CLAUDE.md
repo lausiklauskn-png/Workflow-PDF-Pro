@@ -4,6 +4,8 @@
 
 Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 
+**Kopf nicht unter der Fensterleiste (Klaus 27.11.2026, Bild am DeX-Monitor; PR #79):** `native/native.css` gibt Kopf und Scan-Ansicht oben den Abstand `env(safe-area-inset-top)`, Kern unverändert. App **1.0.19**/Build 20 (Android, Windows gleich). Nicht am Gerät.
+
 **Versionsnummer lädt direkt (Klaus 13./14.11.2026; 1.0.18 veröffentlicht Android + Windows, Nachweis `docs/VEROEFFENTLICHUNG-1.0.18.json`; nicht erneut auslösen):** Tipp auf die Version oder das Fähnchen prüft, lädt die APK der Veröffentlichung, prüft sie (Größe, SHA-256, Paket, Zertifikat, versionCode) und öffnet Androids Installieren-Fenster; die Version öffnet nicht mehr die Einstellungen. App **1.0.18**/Build 19 (Android, Windows gleich).
 
 **Update-Fähnchen (Klaus 13.11.2026; 1.0.17 veröffentlicht Android + Windows, Nachweis `docs/VEROEFFENTLICHUNG-1.0.17.json`; nicht erneut auslösen):** `native/native-updates.js` fragt die vorhandene Brücke `WorkflowUpdates` zusätzlich still (kurz nach dem Start und beim Zurückholen, höchstens einmal je Stunde, gemerkt in `wpp_update_still_v1`). Steht eine neuere Fassung bereit, erscheint neben der Version im Kopf „Update X.Y.Z“ (`#wppUpdateFahne`; bis 600 px kurz „↑ X.Y.Z“ an Stelle der Version); ein Tipp öffnet die Einstellungen und geht den vorhandenen Weg („Neue Version herunterladen“). Aktuell, ohne Netz oder Fehler: nichts, keine Meldung. Kern und gepinnte Bausteine unverändert. App **1.0.17**/Build 18 (Android, Windows gleich). Probe `test-ohne-web` (drei neue Fälle), von Hand gegengeprüft (5 Sabotagen, jede rot). Nicht am Gerät; echte GitHub-Abfrage nicht gemessen (Brücke gestellt).
