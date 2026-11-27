@@ -39,3 +39,7 @@ header.kopf .pro-schrift-knopf { height:32px; }
 .native-verbund-kopf{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:max(.5rem,env(safe-area-inset-top)) max(.75rem,env(safe-area-inset-right)) .5rem max(.75rem,env(safe-area-inset-left));border-bottom:1px solid #8886}
 .native-verbund-kopf h2{flex:1;margin:0;font-size:1rem}.native-verbund-kopf small{flex-basis:100%}
 .native-verbund-karte iframe{flex:1;min-height:0;width:100%;border:0;background:#fff}
+/* Klaus 27.11.2026 (Bild am DeX-Monitor, auch Handy ohne DeX): der Kopf lag unter der Fensterleiste des Systems.
+   Kopf und Scan-Ansicht halten oben den Abstand, den Android meldet (safe-area-inset-top). Im Kern (upstream) nichts geändert. */
+body .kopf{padding-top:calc(4px + env(safe-area-inset-top,0px))}
+body .scan{padding-top:env(safe-area-inset-top,0px)}
