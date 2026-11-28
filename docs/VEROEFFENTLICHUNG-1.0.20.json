@@ -1,0 +1,17 @@
+{
+ "version": "1.0.20",
+ "build": 21,
+ "source": "2da4c7bafd928c84be652299234ccc993a2cdd55",
+ "pullRequest": [82],
+ "recordedUtc": "2026-11-28T13:55:00Z",
+ "freigabe": "Klaus 28.11.2026: die Pro- und Windows-Fassungen mit den neuen Änderungen ausgeben (\"arbeitet das ab\").",
+ "inhalt": "Kern 1.1.11 aus Workflow-PDF e7f9c7d: Erklärtexte hinter ⓘ; Kurzzeile in „Überall suchen“ ausgeblendet.",
+ "releases": [
+  {"tag": "v1.0.20", "run": 46149965768, "conclusion": "success",
+   "downloadProof": [{"name": "Workflow-PDF-Pro-1.0.20.apk", "bytes": 83395528, "sha256": "cc31360fb606c87cc491804167de593958442a0e490a5777cbd2c54be0f4c12d", "versionCode": 21, "certificateSha256": "0da805c9ad11ded86227fa4398e9237766f9f2d12bec66d65cb20309cbea3837", "anonymousDownload": true, "matchesSha256File": true}]},
+  {"tag": "windows-v1.0.20", "run": 46149968454, "conclusion": "success",
+   "downloadProof": [{"name": "Workflow-PDF-Pro-Windows-1.0.20-Setup.exe", "bytes": 26492521, "sha256": "949a291cb55a67829fa6e15eaf66fed92b0d7739628d545462dd53db6d86d5f8", "anonymousDownload": true, "matchesSha256File": true}]}
+ ],
+ "notChecked": ["Tablet, DeX und Windows-PC"],
+ "naechsteFreieFassung": "1.0.21"
+}
