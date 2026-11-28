@@ -114,7 +114,10 @@ try {
     const einzeilig = Math.abs(f.getBoundingClientRect().top - document.querySelector('#bildLeiste [data-bild-an]').getBoundingClientRect().top) < 4;
     return { nachSuche: document.getElementById('bibForm').nextElementSibling === zz && z.parentElement === zz && einzeilig, text: f.querySelector('span').textContent, h: f.getBoundingClientRect().height, schatten: getComputedStyle(f).boxShadow, pressed: f.getAttribute('aria-pressed'), hilfeOffen: !t.hidden, hilfe: t.textContent, emoji: /\p{Extended_Pictographic}/u.test(z.innerText + f.title + i.title), leiste: document.getElementById('bildLeiste').innerText }; });
   ok('Punkt 14: der Schalter „Bildbeschreibung" steht flach direkt unter der Suche, in EINER Zeile mit dem Modell-Knopf, aus, ohne Emoji', zeile.nachSuche && zeile.text === 'Bildbeschreibung' && zeile.h <= 32 && zeile.schatten === 'none' && zeile.pressed === 'false' && !zeile.emoji, zeile);
-  ok('ⓘ: die Erklärung ist beim ersten Mal offen und sagt, was gesucht wird', zeile.hilfeOffen && /eigenen und die vom Modell/.test(zeile.hilfe), zeile.hilfe);
+  ok('ⓘ: die Erklärung ist beim ersten Mal ZU (Klaus 2026-11-28: hinter dem Info-Knopf) und sagt, was gesucht wird', !zeile.hilfeOffen && /eigenen und die vom Modell/.test(zeile.hilfe), zeile.hilfe);
+  ok('Neben „Fotos beschreiben lassen“ steht kein Erklärtext mehr', !/einmal laden/.test(zeile.leiste), zeile.leiste);
+  await page.click('#bildFilterZeile [data-bild-hilfe]');
+  ok('Ein Tipp auf ⓘ zeigt die Erklärung', await page.evaluate(() => !document.getElementById('bildHilfe').hidden));
   ok('Die Modell-Leiste bietet „Fotos beschreiben lassen" an und ist ohne Emoji', /Fotos beschreiben lassen/.test(zeile.leiste) && !EMOJI.test(zeile.leiste), zeile.leiste);
   ok('Vor dem Tipp geht nichts ins Netz (kein jsDelivr, kein Hugging Face)', fremd.length === 0 && await page.evaluate(() => window.__bildStub.pipelines === 0), fremd);
   await page.click('#bildFilterZeile [data-bild-hilfe]');

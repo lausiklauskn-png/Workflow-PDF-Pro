@@ -26,7 +26,7 @@
   // Gemessen 2026-10-26 (Privat-Brain-Pro, Lauf 40327837624): nicht am Tablet.
   const MESSUNG = { downloadMB: 256, spitzeMB: 1217, jeBildS: 3 };
   const BILD_QUELLEN = ['foto', 'zuschnitt'];
-  const HILFE_KEY = 'wfpdf_hilfe_v1', FILTER_KEY = 'wfpdf_bildfilter_v1';
+  const HILFE_KEY = 'wfpdf_hilfe_v2', FILTER_KEY = 'wfpdf_bildfilter_v1';
   const EIGEN_MAX = 500;
 
   const SVG = {
@@ -77,8 +77,9 @@
     if (A.S.suche && A.neu) A.neu();
   }
 
-  /* ---------- Hilfe (ⓘ): anfangs offen, die Wahl wird gemerkt ---------- */
-  const hilfeLesen = () => { try { const o = JSON.parse(localStorage.getItem(HILFE_KEY) || '{}'); return o.bild !== false; } catch (_) { return true; } };
+  /* ---------- Hilfe (ⓘ): anfangs ZU, die Wahl wird gemerkt (Klaus 2026-11-28: „hinter einem Info-Button … nehmen zu viel Platz weg“;
+     bis dahin anfangs offen — Schlüssel v2, damit niemand die alte Vorgabe behält) ---------- */
+  const hilfeLesen = () => { try { const o = JSON.parse(localStorage.getItem(HILFE_KEY) || '{}'); return o.bild === true; } catch (_) { return false; } };
   const hilfeMerken = offen => { try { const o = JSON.parse(localStorage.getItem(HILFE_KEY) || '{}'); o.bild = !!offen; localStorage.setItem(HILFE_KEY, JSON.stringify(o)); } catch (_) {} };
 
   /* ---------- Filter: nur beschriebene Fotos ---------- */
@@ -92,7 +93,7 @@
     const z = document.getElementById('bildFilterZeile'); if (!z) return;
     if (!z.querySelector('[data-bild-filter]')) {
       z.innerHTML = `<button class="bild-knopf" type="button" data-bild-filter aria-pressed="false" title="Nur Fotos mit Bildbeschreibung zeigen">${sym('bild')}<span>Bildbeschreibung</span></button>`
-        + `<button class="bild-info" type="button" data-bild-hilfe aria-expanded="true" aria-controls="bildHilfe" title="Hilfe ausblenden" aria-label="Bildbeschreibung: Hilfe">${sym('info', 18)}</button>`
+        + `<button class="bild-info" type="button" data-bild-hilfe aria-expanded="false" aria-controls="bildHilfe" title="Hilfe anzeigen" aria-label="Bildbeschreibung: Hilfe">${sym('info', 18)}</button>`
         ;
       // Die Erklärung steht unter BEIDEN Leisten (Schalter und Modell), damit die Zeile flach bleibt
       const t = document.createElement('div'); t.className = 'bild-hilfe'; t.id = 'bildHilfe'; t.dataset.bildHilfetext = ''; t.setAttribute('role', 'region');
@@ -164,7 +165,7 @@
     const z = B.zustand, st = B.stand;
     const mehr = `<button class="bild-knopf bild-knopf-rund" type="button" data-bild-mehr title="Bildbeschreibung: Einstellungen" aria-label="Bildbeschreibung: Einstellungen">${sym('mehr')}</button>`;
     let html = '';
-    if (z === 'aus') html = `<button class="bild-knopf" type="button" data-bild-an>${sym('bild')}<span>Fotos beschreiben lassen</span></button><span class="bild-t">Modell auf dem Gerät, einmal laden</span>`;
+    if (z === 'aus') html = `<button class="bild-knopf" type="button" data-bild-an>${sym('bild')}<span>Fotos beschreiben lassen</span></button>`;   /* „Modell auf dem Gerät, einmal laden“ steht seit 2026-11-28 nur noch in der Hilfe hinter ⓘ */
     else if (z === 'wartet') {
       // Pro-Umbau 5 (Klaus 2026-10-28, Leitfaden § 3): nach dem Öffnen startet nichts von selbst — erst „Beschreiben"
       const n = offen().length;

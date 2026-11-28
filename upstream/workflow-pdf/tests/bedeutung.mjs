@@ -202,6 +202,12 @@ else {
     await page.waitForFunction(() => window.__wfpdf.S.docs.every(d => window.__wfpdf.suche.TEXTE.has(d.id)), null, { timeout: 30000 });
 
     ok('Anfang: aus, mit einem Knopf zum Einschalten', await zustand(page) === 'aus' && await page.isVisible('[data-bed-an]'));
+    // Klaus 2026-11-28: der Erklärtext steht hinter ⓘ — anfangs zu, ein Tipp zeigt ihn, die Wahl bleibt nach dem Neuzeichnen
+    ok('ⓘ: „findet auch Dokumente …“ ist anfangs verborgen', await page.isVisible('[data-bed-hilfe]') && !(await page.isVisible('#bedHilfe')));
+    await page.click('[data-bed-hilfe]');
+    ok('ⓘ: ein Tipp zeigt den Erklärtext, gemerkt', await page.isVisible('#bedHilfe') && /andere Wörter/.test(await page.textContent('#bedHilfe')) && await page.evaluate(() => JSON.parse(localStorage.getItem('wfpdf_hilfe_v2') || '{}').bed === true));
+    await page.click('[data-bed-hilfe]');
+    ok('ⓘ: ein zweiter Tipp blendet ihn wieder aus', !(await page.isVisible('#bedHilfe')));
     ok('Anfang: Modul 03 wird NICHT von selbst geladen', await page.evaluate(() => !window.SbkimEmbedding && !document.querySelector('script[src*="sbkim/03"]')));
     await page.fill('#bibSuche', 'Kündigung'); await page.waitForTimeout(80);
     let k = await karten(page);
