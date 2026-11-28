@@ -496,6 +496,8 @@ body.zieht .dok-gitter,body.zieht .ordner-leiste{touch-action:none}
 /* Impressum & Datenschutz unter der Bibliothek (Klaus 2026-09-27) */
 .rechtfuss{text-align:center;font-size:.8rem;margin:22px 0 6px;opacity:.75}
 .rechtfuss a{color:inherit}
+.rechtfuss-zeile{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin:0 0 10px}.rechtfuss-zeile .rechtfuss-version{margin:0}
+.update-fahne{padding:1px 8px;border:0;border-radius:4px 4px 4px 0;background:#c62828;color:#fff;font:inherit;font-size:.75rem;font-weight:600;line-height:1.5;cursor:pointer;white-space:nowrap}.update-fahne[hidden]{display:none}
 .rechtfuss-version{text-align:center;font-size:.75rem;margin:0 0 10px;opacity:.65}.rechtfuss-version[hidden]{display:none}
 .einst-version{text-align:center;margin:10px 0 0;opacity:.7}
 /* „Alle prüfen" (Klaus 2026-10-22): gleiche gelbe Farbe wie der Prüfpunkt an der Karte */
@@ -643,3 +645,6 @@ div.dok-pruefung{cursor:default;font-weight:600;opacity:.8}
 .pruef-alle progress{accent-color:var(--rot)}
 .dok-akt button .ic-strich,.marke-klein .ic-strich{width:1em;height:1em}
 @media (min-width:521px){.kopf .knopf.klein{min-height:32px;min-width:32px}}
+/* Klaus 2026-11-28: Erklärtexte hinter ⓘ. Der ⓘ-Knopf in der Bedeutungs-Leiste so hoch wie der Knopf daneben; der Text darunter, wenn offen. */
+.bedeutung-leiste .bild-info{min-height:0;height:32px;width:32px;padding:3px}
+.bedeutung-leiste .bed-hilfe{flex:1 1 100%;font-size:.82rem}

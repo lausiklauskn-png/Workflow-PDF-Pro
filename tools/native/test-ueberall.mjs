@@ -50,6 +50,10 @@ test('Überall suchen und Kopf in Workflow PDF Pro', async t => {
       assert.ok(r.nach && r.feld && r.titel === 'Überall suchen' && r.infoZu, JSON.stringify(r));
       assert.equal(r.haken, 'app=true,tresor=true,netz=false');
     });
+    await t.test('Klaus 28.11.: die Kurzzeile steht nicht im Kasten (Erklärung nur hinter ⓘ)', async () => {
+      const k = await page.evaluate(() => { const e = document.querySelector('#wppUeberall .pro-ue-kurz'); return e ? getComputedStyle(e).display : 'fehlt'; });
+      assert.ok(k === 'none' || k === 'fehlt', k);
+    });
     await page.evaluate(async () => {
       await WFP.DB.put('docs', { id: 'd1', name: 'Mietvertrag Wohnung', folderId: null, createdAt: '2026-10-01', updatedAt: '2026-10-01', pages: [] });
       await WFP.DB.put('texte', { id: 'd1', seiten: [[['Mietvertrag', 0, 0, 1, 1], ['Lindenweg', 0, 0, 1, 1]]] });

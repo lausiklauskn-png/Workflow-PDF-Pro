@@ -43,3 +43,6 @@ header.kopf .pro-schrift-knopf { height:32px; }
    Kopf und Scan-Ansicht halten oben den Abstand, den Android meldet (safe-area-inset-top). Im Kern (upstream) nichts geändert. */
 body .kopf{padding-top:calc(4px + env(safe-area-inset-top,0px))}
 body .scan{padding-top:env(safe-area-inset-top,0px)}
+/* Klaus 28.11.2026: kleine Erklärtexte gehören hinter ⓘ. „Überall suchen“ hat sein ⓘ schon (mehr1/mehr2); die Zeile darunter fällt weg.
+   Hier, weil pro-ueberall.* aus Private Brain Pro byte-gleich kommt und dort nicht in dieser Sitzung liegt. */
+.pro-ue-kurz{display:none}
