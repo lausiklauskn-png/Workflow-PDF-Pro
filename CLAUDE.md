@@ -4,7 +4,7 @@
 
 Alle Regeln stehen in [`AGENTS.md`](AGENTS.md). Zuerst dort lesen.
 
-**Erklärtexte hinter ⓘ (Klaus 28.11.2026):** Kern **1.1.11** bytegleich aus Workflow-PDF e7f9c7d (Hilfe zur Bildbeschreibung anfangs zu, „Modell auf dem Gerät, einmal laden“ weg, „findet auch Dokumente …“ hinter ⓘ); `native/native.css` blendet die Kurzzeile in „Überall suchen“ aus (der Kasten hat sein ⓘ; die Quelle `pro-ueberall.*` liegt in Private Brain Pro). App **1.0.20**/Build 21, **nicht veröffentlicht**. Nicht am Gerät.
+**Erklärtexte hinter ⓘ (Klaus 28.11.2026):** Kern **1.1.11** bytegleich aus Workflow-PDF e7f9c7d (Hilfe zur Bildbeschreibung anfangs zu, „Modell auf dem Gerät, einmal laden“ weg, „findet auch Dokumente …“ hinter ⓘ); `native/native.css` blendet die Kurzzeile in „Überall suchen“ aus (der Kasten hat sein ⓘ; die Quelle `pro-ueberall.*` liegt in Private Brain Pro). App **1.0.20**/Build 21, **veröffentlicht 28.11.** (Nachweis `docs/VEROEFFENTLICHUNG-1.0.20.json`, nicht erneut auslösen; nächste 1.0.21). Nicht am Gerät.
 
 **Kopf nicht unter der Fensterleiste (Klaus 27.11.2026, Bild am DeX-Monitor; PR #79):** `native/native.css` gibt Kopf und Scan-Ansicht oben den Abstand `env(safe-area-inset-top)`, Kern unverändert. App **1.0.19**/Build 20 (Android, Windows gleich), **veröffentlicht 27.11.** (Nachweis `docs/VEROEFFENTLICHUNG-1.0.19.json`, nicht erneut auslösen; nächste 1.0.20). Nicht am Gerät.
 
